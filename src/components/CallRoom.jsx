@@ -14,10 +14,12 @@ const CallRoom = ({ callData, onClose }) => {
     const [actualStartTime, setActualStartTime] = useState(null);
     const [callId, setCallId] = useState(null);
     const [connectionError, setConnectionError] = useState(false);
+    const [currentBilling, setCurrentBilling] = useState(0);
 
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
     const timerRef = useRef(null);
+    const isConnectingRef = useRef(false);
     const { user, token } = useSelector(state => state.auth);
 
     const [joinCall] = useJoinCallMutation();
@@ -29,20 +31,19 @@ const CallRoom = ({ callData, onClose }) => {
         return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     };
 
-    // Socket listener for call_ended event (cross-side)
+    // Socket listener for call_ended
     useEffect(() => {
         if (!user?.id || !token || !callId) return;
 
         socketService.connect(user.id, token);
 
         const handleCallEnded = (data) => {
-
             if (timerRef.current) {
                 clearInterval(timerRef.current);
                 timerRef.current = null;
             }
             twilioVideoService.disconnect();
-            toast.success('Call ended by other participant');
+            toast.success('Call ended');
             setTimeout(() => onClose(), 500);
         };
 
@@ -53,71 +54,78 @@ const CallRoom = ({ callData, onClose }) => {
         };
     }, [user?.id, token, callId, onClose]);
 
+    // Connect to Twilio room
     useEffect(() => {
+        if (!callData?.callId || !callData?.token || isConnectingRef.current) return;
+
         const connectToCall = async () => {
-            if (!callData?.callId || !callData?.token) return;
+            if (isConnectingRef.current) return;
+            isConnectingRef.current = true;
 
             try {
                 setCallId(callData.callId);
                 setCallStatus('connecting');
                 setConnectionError(false);
 
-                const result = await joinCall(callData.callId).unwrap();
-                const tokenToUse = result?.token || result?.data?.token || callData.token;
-                const isVideoCall = callData.callType === 'VIDEO';
+                // Get fresh token via joinCall API
+                let tokenToUse = callData.token;
+                let roomName = callData.roomName;
+                let startTime = null;
 
-                const startTime = result?.call?.startTime;
+                try {
+                    const result = await joinCall(callData.callId).unwrap();
+                    tokenToUse = result?.token || result?.data?.token || callData.token;
+                    roomName = result?.call?.roomName || result?.data?.call?.roomName || callData.roomName;
+                    startTime = result?.call?.startTime || result?.data?.call?.startTime;
+                } catch (joinErr) {
+                    console.warn('joinCall failed, using original token:', joinErr);
+                }
+
                 if (startTime) {
-                    setActualStartTime(new Date(startTime).getTime());
+                    const start = new Date(startTime).getTime();
+                    setActualStartTime(start);
                 } else {
                     setActualStartTime(Date.now());
                 }
 
-                // Start timer immediately
-                if (timerRef.current) clearInterval(timerRef.current);
-                timerRef.current = setInterval(() => {
-                    if (actualStartTime) {
-                        const now = Date.now();
-                        const diffSeconds = Math.floor((now - actualStartTime) / 1000);
-                        setSeconds(diffSeconds);
-                    }
-                }, 1000);
+                setCallStatus('active');
+
+                const isVideoCall = callData.callType === 'VIDEO';
 
                 if (isVideoCall) {
                     try {
                         await twilioVideoService.connectVideo(
                             tokenToUse,
-                            callData.roomName,
+                            roomName,
                             localVideoRef.current,
                             remoteVideoRef.current
                         );
-                        setCallStatus('active');
-                        toast.success('Call connected');
+                        toast.success('Video call connected');
                     } catch (videoError) {
-                        console.warn('Video connection failed, but continuing with audio:', videoError);
+                        console.warn('Video failed, falling back to audio:', videoError);
                         setConnectionError(true);
-                        setCallStatus('active');
-                        toast.error('Camera/Microphone not found. Audio only mode.');
+                        toast.error('Camera not available. Audio only mode.');
+                        // Fallback to audio
+                        try {
+                            await twilioVideoService.connectAudio(tokenToUse, roomName);
+                        } catch (audioErr) {
+                            console.error('Audio fallback also failed:', audioErr);
+                            setConnectionError(true);
+                        }
                     }
                 } else {
                     try {
-                        await twilioVideoService.connectAudio(
-                            tokenToUse,
-                            callData.roomName,
-
-                        );
-                        setCallStatus('active');
-                        toast.success('Call connected');
+                        await twilioVideoService.connectAudio(tokenToUse, roomName);
+                        toast.success('Audio call connected');
                     } catch (audioError) {
                         console.error('Audio connection failed:', audioError);
                         setConnectionError(true);
-                        setCallStatus('active');
                         toast.error('Microphone not found');
                     }
                 }
 
             } catch (error) {
-                console.error('Failed to join call:', error);
+                console.error('Failed to connect to call:', error);
                 toast.error('Failed to connect to call');
                 setTimeout(() => onClose(), 2000);
             }
@@ -130,7 +138,7 @@ const CallRoom = ({ callData, onClose }) => {
         };
     }, [callData]);
 
-    // Timer based on actualStartTime
+    // Timer
     useEffect(() => {
         if (callStatus === 'active' && actualStartTime) {
             if (timerRef.current) clearInterval(timerRef.current);
@@ -139,6 +147,10 @@ const CallRoom = ({ callData, onClose }) => {
                 const now = Date.now();
                 const diffSeconds = Math.floor((now - actualStartTime) / 1000);
                 setSeconds(diffSeconds);
+
+                // Calculate billing
+                const pricePerSecond = 2.5 / 60;
+                setCurrentBilling(Number((diffSeconds * pricePerSecond).toFixed(2)));
             }, 1000);
         }
 
@@ -210,8 +222,8 @@ const CallRoom = ({ callData, onClose }) => {
                     </div>
 
                     <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg">
-                        <p className="text-white font-semibold">{callData?.callerName}</p>
-                        <p className="text-white/70 text-sm">{formatTime(seconds)}</p>
+                        <p className="text-white font-semibold">{callData?.callerName || 'Unknown'}</p>
+                        <p className="text-white/70 text-sm">{formatTime(seconds)} · €{currentBilling.toFixed(2)}</p>
                     </div>
 
                     <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4">
@@ -239,6 +251,7 @@ const CallRoom = ({ callData, onClose }) => {
         );
     }
 
+    // ── Audio Call UI ──
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="bg-[#2D2D2D] w-full max-w-md rounded-2xl p-8 flex flex-col items-center">
@@ -246,13 +259,18 @@ const CallRoom = ({ callData, onClose }) => {
                     {callData?.callerName?.charAt(0) || 'C'}
                 </div>
 
-                <h2 className="text-white font-bold text-2xl mb-1">{callData?.callerName}</h2>
+                <h2 className="text-white font-bold text-2xl mb-1">{callData?.callerName || 'Unknown'}</h2>
                 <p className="text-green-400 text-sm mb-6">
-                    {callStatus === 'active' ? 'Call in progress' : 'Connecting...'}
+                    {callStatus === 'active' ? '● Audio call in progress' : 'Connecting...'}
                 </p>
 
-                <div className="text-5xl font-bold text-white mb-8 font-mono">
+                <div className="text-5xl font-bold text-white mb-4 font-mono">
                     {formatTime(seconds)}
+                </div>
+
+                <div className="bg-white/10 px-6 py-3 rounded-xl mb-8 text-center">
+                    <p className="text-xs text-gray-400 mb-1 uppercase">Current Billing</p>
+                    <p className="text-white font-bold text-xl">€{currentBilling.toFixed(2)}</p>
                 </div>
 
                 <div className="flex items-center gap-6">
