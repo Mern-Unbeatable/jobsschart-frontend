@@ -91,13 +91,23 @@ export const ROUTES = {
 /* =========================
    API CONFIG (SAFE)
 ========================= */
-export const API_CONFIG = {
-  BASE_URL: getEnv('REACT_APP_API_BASE_URL', ''),
-  VITALS_ENDPOINT: getEnv('REACT_APP_VITALS_ENDPOINT', ''),
+// export const API_CONFIG = {
+//   BASE_URL: getEnv('REACT_APP_API_BASE_URL', ''),
+//   VITALS_ENDPOINT: getEnv('REACT_APP_VITALS_ENDPOINT', ''),
 
-  TIMEOUT: parseInt(getEnv('REACT_APP_API_TIMEOUT', '10000'), 10),
-  RETRY_ATTEMPTS: parseInt(getEnv('REACT_APP_API_RETRY_ATTEMPTS', '3'), 10),
-  RETRY_DELAY: parseInt(getEnv('REACT_APP_API_RETRY_DELAY', '1000'), 10),
+//   TIMEOUT: parseInt(getEnv('REACT_APP_API_TIMEOUT', '10000'), 10),
+//   RETRY_ATTEMPTS: parseInt(getEnv('REACT_APP_API_RETRY_ATTEMPTS', '3'), 10),
+//   RETRY_DELAY: parseInt(getEnv('REACT_APP_API_RETRY_DELAY', '1000'), 10),
+// };
+
+export const API_CONFIG = {
+  BASE_URL:
+    process.env.REACT_APP_API_BASE_URL ||
+    'https://jobsschart-api.maktechgroup.tech/api/v1',
+      VITALS_ENDPOINT: getEnv('REACT_APP_VITALS_ENDPOINT', ''),
+  TIMEOUT: parseInt(process.env.REACT_APP_API_TIMEOUT, 10) || 10000,
+  RETRY_ATTEMPTS: parseInt(process.env.REACT_APP_API_RETRY_ATTEMPTS, 10) || 3,
+  RETRY_DELAY: parseInt(process.env.REACT_APP_API_RETRY_DELAY, 10) || 1000,
 };
 
 /* =========================

@@ -14,9 +14,11 @@ const getAuthRuntime = async () => {
   return { store, logout, loginSuccess };
 };
 
+
+const FALLBACK_BASE_URL = 'https://jobsschart-api.maktechgroup.tech/api/v1';
 const axiosInstance = axios.create({
-  baseURL: API_CONFIG.BASE_URL,
-  timeout: API_CONFIG.TIMEOUT,
+  baseURL: API_CONFIG.BASE_URL || FALLBACK_BASE_URL,
+  timeout: API_CONFIG.TIMEOUT || 10000,
   headers: {
     'Content-Type': 'application/json',
   },

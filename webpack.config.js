@@ -8,54 +8,74 @@ const dotenv = require('dotenv');
 module.exports = (env, argv) => {
   const isProd = argv.mode === 'production';
 
-  // Use a single active env file for all modes
+  // ── Load env file ──────────────────────────────────────────
   const envPath = path.resolve(
-  __dirname,
-  argv.mode === 'production'
-    ? '.env.production'
-    : '.env.development'
-);
+    __dirname,
+    argv.mode === 'production' ? '.env.production' : '.env.development'
+  );
+
   const rawEnv = fs.existsSync(envPath)
     ? dotenv.parse(fs.readFileSync(envPath))
     : {};
 
+  // ── Fallbacks (used when .env file is missing or incomplete) ─
+  const fallbacks = {
+    REACT_APP_NAME: rawEnv.REACT_APP_NAME || 'NM',
+    REACT_APP_VERSION: rawEnv.REACT_APP_VERSION || '1.0.0',
+    REACT_APP_API_BASE_URL:
+      rawEnv.REACT_APP_API_BASE_URL ||
+      'https://jobsschart-api.maktechgroup.tech/api/v1',
+    REACT_APP_SOCKET_URL:
+      rawEnv.REACT_APP_SOCKET_URL ||
+      'https://jobsschart-api.maktechgroup.tech',
+    REACT_APP_API_TIMEOUT: rawEnv.REACT_APP_API_TIMEOUT || '10000',
+    REACT_APP_API_RETRY_ATTEMPTS:
+      rawEnv.REACT_APP_API_RETRY_ATTEMPTS || '3',
+    REACT_APP_API_RETRY_DELAY: rawEnv.REACT_APP_API_RETRY_DELAY || '1000',
+    REACT_APP_VITALS_ENDPOINT:
+      rawEnv.REACT_APP_VITALS_ENDPOINT ||
+      'https://vitals.vercel-analytics.com/v1/vitals',
+    REACT_APP_SEO_TITLE: rawEnv.REACT_APP_SEO_TITLE || 'NM',
+    REACT_APP_SEO_DESCRIPTION:
+      rawEnv.REACT_APP_SEO_DESCRIPTION || 'A professional React application',
+    REACT_APP_SEO_KEYWORDS:
+      rawEnv.REACT_APP_SEO_KEYWORDS || 'react,webpack,tailwind',
+  };
 
-  // const envKeys = {
-  //   'process.env': JSON.stringify({
-  //     NODE_ENV: argv.mode || 'development',
-  //     ...rawEnv,
-  //   }),
-  // };
-const envKeys = {
-  "process.env.REACT_APP_NAME": JSON.stringify(rawEnv.REACT_APP_NAME),
-  "process.env.REACT_APP_VERSION": JSON.stringify(rawEnv.REACT_APP_VERSION),
-  "process.env.REACT_APP_API_BASE_URL": JSON.stringify(rawEnv.REACT_APP_API_BASE_URL),
-  "process.env.REACT_APP_SOCKET_URL": JSON.stringify(rawEnv.REACT_APP_SOCKET_URL),
-  "process.env.REACT_APP_VITALS_ENDPOINT": JSON.stringify(rawEnv.REACT_APP_VITALS_ENDPOINT),
-  "process.env.REACT_APP_API_TIMEOUT": JSON.stringify(rawEnv.REACT_APP_API_TIMEOUT),
-  "process.env.REACT_APP_API_RETRY_ATTEMPTS": JSON.stringify(rawEnv.REACT_APP_API_RETRY_ATTEMPTS),
-  "process.env.REACT_APP_API_RETRY_DELAY": JSON.stringify(rawEnv.REACT_APP_API_RETRY_DELAY),
-  "process.env.REACT_APP_SEO_TITLE": JSON.stringify(rawEnv.REACT_APP_SEO_TITLE),
-  "process.env.REACT_APP_SEO_DESCRIPTION": JSON.stringify(rawEnv.REACT_APP_SEO_DESCRIPTION),
-  "process.env.REACT_APP_SEO_KEYWORDS": JSON.stringify(rawEnv.REACT_APP_SEO_KEYWORDS),
+  // ── Build DefinePlugin keys ─────────────────────────────────
+  const envKeys = {};
+  for (const [key, value] of Object.entries(fallbacks)) {
+    envKeys[`process.env.${key}`] = JSON.stringify(value);
+  }
+  envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
 
-  "process.env.NODE_ENV": JSON.stringify(argv.mode)
-};
-envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
+  // ── Debug logging (remove after confirming it works) ────────
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('BUILD MODE:', argv.mode);
+  console.log('ENV FILE PATH:', envPath);
+  console.log('FILE EXISTS:', fs.existsSync(envPath));
+  console.log('REACT_APP_API_BASE_URL =', rawEnv.REACT_APP_API_BASE_URL);
+  console.log(
+    'DEFINED AS =',
+    envKeys['process.env.REACT_APP_API_BASE_URL']
+  );
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
+  // ── Dev server config ───────────────────────────────────────
   const devPort = rawEnv.REACT_APP_DEV_PORT
     ? rawEnv.REACT_APP_DEV_PORT === 'auto'
       ? 'auto'
       : parseInt(rawEnv.REACT_APP_DEV_PORT, 10)
     : 5173;
+
   const allowedHost =
     rawEnv.REACT_APP_ALLOWED_HOST || 'jbosschart.maktechgroup.tech';
 
   return {
     entry: './src/index.jsx',
+
     output: {
       path: path.resolve(__dirname, 'dist'),
-      // Separate chunk filenames for better long-term caching
       filename: isProd ? 'js/[name].[contenthash:8].js' : 'js/[name].js',
       chunkFilename: isProd
         ? 'js/[name].[contenthash:8].chunk.js'
@@ -63,6 +83,7 @@ envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
       clean: true,
       publicPath: '/',
     },
+
     module: {
       rules: [
         {
@@ -71,7 +92,6 @@ envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
           use: {
             loader: 'babel-loader',
             options: {
-              // Cache Babel transforms between builds
               cacheDirectory: true,
               cacheCompression: false,
             },
@@ -86,7 +106,7 @@ envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
           type: 'asset',
           parser: {
             dataUrlCondition: {
-              maxSize: 8 * 1024, // Images smaller than 8KB will be inlined as base64
+              maxSize: 8 * 1024,
             },
           },
           generator: {
@@ -102,79 +122,48 @@ envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
         },
       ],
     },
+
     resolve: {
       extensions: ['.js', '.jsx'],
     },
 
     plugins: [
-  new webpack.DefinePlugin(envKeys),
+      new webpack.DefinePlugin(envKeys),
 
-  new HtmlWebpackPlugin({
-    template: './public/index.html',
-    filename: 'index.html'
-  }),
+      new HtmlWebpackPlugin({
+        template: './public/index.html',
+        filename: 'index.html',
+      }),
 
-  new CopyPlugin({
-    patterns: [
-      {
-        from: 'public',
-        to: '.',
-        globOptions: {
-          ignore: ['**/index.html'],
-        },
-      },
+      new CopyPlugin({
+        patterns: [
+          {
+            from: 'public',
+            to: '.',
+            globOptions: {
+              ignore: ['**/index.html'],
+            },
+          },
+        ],
+      }),
     ],
-  }),
-],
-    // plugins: [
-    //   new webpack.DefinePlugin(envKeys),
-    //   new HtmlWebpackPlugin({
-    //     template: './public/index.html',
-    //     filename: 'index.html',
-    //     // Minify HTML in production
-    //     minify: isProd
-    //       ? {
-    //         collapseWhitespace: true,
-    //         removeComments: true,
-    //         removeRedundantAttributes: true,
-    //         removeScriptTypeAttributes: true,
-    //         removeStyleLinkTypeAttributes: true,
-    //         useShortDoctype: true,
-    //       }
-    //       : false,
-    //   }),
-    //   new CopyPlugin({
-    //     patterns: [
-    //       {
-    //         from: 'public',
-    //         to: '.',
-    //         globOptions: {
-    //           ignore: ['**/index.html'], // Don't copy index.html, HtmlWebpackPlugin handles it
-    //         },
-    //       },
-    //     ],
-    //   }),
-    // ],
+
     optimization: {
-      // Split vendor (node_modules) into its own long-lived cached chunk
       splitChunks: {
         chunks: 'all',
         cacheGroups: {
-          // React + ReactDOM in their own chunk (changes rarely)
           react: {
             test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/,
             name: 'vendor-react',
             chunks: 'all',
             priority: 20,
           },
-          // Redux + RTK in their own chunk
           redux: {
             test: /[\\/]node_modules[\\/](@reduxjs|react-redux)[\\/]/,
             name: 'vendor-redux',
             chunks: 'all',
             priority: 10,
           },
-          // Everything else from node_modules
           vendors: {
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
@@ -193,7 +182,6 @@ envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
       historyApiFallback: true,
       host: '0.0.0.0',
       allowedHosts: 'all',
-        // allowedHosts: [allowedHost],
       port: devPort,
       hot: true,
       open: true,
@@ -202,16 +190,16 @@ envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
         'Access-Control-Allow-Origin': `https://${allowedHost}`,
         'Access-Control-Allow-Headers':
           'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+        'Access-Control-Allow-Methods':
+          'GET, POST, PUT, PATCH, DELETE, OPTIONS',
       },
-      // Fix the proxy configuration
       proxy: {
         '/api': {
-          target: 'https://jobsschart-api.maktechgroup.tech', // Your backend server
+          target: 'https://jobsschart-api.maktechgroup.tech',
           changeOrigin: true,
           secure: false,
           pathRewrite: {
-            '^/api': '/api/v1', // Optional: rewrite path if needed
+            '^/api': '/api/v1',
           },
           onError: (err, req, res) => {
             console.error('Proxy error:', err);
@@ -219,7 +207,7 @@ envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
         },
       },
     },
-    // Source maps: fast in dev, hidden in prod (no source leakage)
+
     devtool: isProd ? 'hidden-source-map' : 'eval-cheap-module-source-map',
   };
 };
