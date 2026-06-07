@@ -3,7 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@200;300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 
-/* Tailwind v4 Configuration Style */
+
 @theme {
   --font-crimson: 'Crimson Pro', serif;
   --font-poppins: 'Poppins', sans-serif;
@@ -11,10 +11,9 @@
 }
 
 * {
-  font-family: 'Crimson Pro', serif; /* Default font */
+  font-family: 'Crimson Pro', serif;
 }
 
-/* Global Styles */
 html,
 body {
   margin: 0;
