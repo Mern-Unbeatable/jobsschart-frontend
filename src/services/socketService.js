@@ -28,7 +28,7 @@ class SocketService {
             this.socket = null;
         }
 
-        const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
+        const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'https://jobsschart-api.maktechgroup.tech';
 
 
         this.socket = io(SOCKET_URL, {

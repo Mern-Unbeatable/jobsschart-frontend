@@ -165,7 +165,7 @@ module.exports = (env, argv) => {
       // Fix the proxy configuration
       proxy: {
         '/api': {
-          target: 'http://localhost:5000', // Your backend server
+          target: 'https://jobsschart-api.maktechgroup.tech', // Your backend server
           changeOrigin: true,
           secure: false,
           pathRewrite: {
