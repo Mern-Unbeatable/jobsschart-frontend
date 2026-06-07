@@ -141,10 +141,9 @@ module.exports = (env, argv) => {
           },
         },
       },
-      // Keep the webpack runtime in its own tiny chunk
       runtimeChunk: 'single',
     },
-    // In webpack.config.js, update the proxy configuration:
+
     devServer: {
       static: {
         directory: path.join(__dirname, 'public'),
