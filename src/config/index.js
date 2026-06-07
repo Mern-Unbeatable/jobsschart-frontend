@@ -1,17 +1,34 @@
-export const APP_CONFIG = {
-  NAME: process.env.REACT_APP_NAME || 'NM',
-  VERSION: process.env.REACT_APP_VERSION || '1.0.0',
+// src/config/index.js
+
+const getEnv = (key, fallback = '') => {
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key] ?? fallback;
+  }
+  return fallback;
 };
 
+/* =========================
+   APP CONFIG
+========================= */
+export const APP_CONFIG = {
+  NAME: getEnv('REACT_APP_NAME', 'NM'),
+  VERSION: getEnv('REACT_APP_VERSION', '1.0.0'),
+};
+
+/* =========================
+   ROUTES
+========================= */
 export const ROUTES = {
   HOME: '/',
   ABOUT: '/about',
   SERVICES: '/services',
   ENTREPRENEURSHIP: '/entrepreneurship',
   COMMUNITY: '/community',
+
   CONSULTANTS: '/consultants',
   CONSULTANT_DETAIL: '/consultants/:id',
   CONSULTANT_DETAIL_CHAT: '/consultants/:id/chat',
+
   CREDIT: '/credit',
   WEBSHOP: '/webshop',
   PRODUCT_DETAIL: '/webshop/:id',
@@ -20,13 +37,15 @@ export const ROUTES = {
   BLOG: '/blog',
   FAQ: '/faq',
   BLOG_DETAIL: '/blog/:blogId',
+
   LOGIN: '/login',
   REGISTER: '/register',
+
   ADMIN: '/admin',
   USER: '/user',
   CONSULTANT: '/consultant',
   REDUX_DEMO: '/redux-demo',
-  // Admin sub-routes
+
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_EMAILS: '/admin/emails',
   ADMIN_LEADS: '/admin/leads',
@@ -49,14 +68,14 @@ export const ROUTES = {
   ADMIN_SETTINGS: '/admin/settings',
   ADMIN_PROFILE: '/admin/profile',
   ADMIN_FAQ: '/admin/faq',
-  // User sub-routes
+
   USER_DASHBOARD: '/user/dashboard',
   USER_BOOKED_SCHEDULE: '/user/booked-schedule',
   USER_CHAT: '/user/chat',
   USER_PROFILE: '/user/profile',
   USER_ORDERS: '/user/orders',
   USER_SETTINGS: '/user/settings',
-  // Consultant sub-routes
+
   CONSULTANT_DASHBOARD: '/consultant/dashboard',
   CONSULTANT_SCHEDULE: '/consultant/schedule',
   CONSULTANT_SESSIONS_HISTORY: '/consultant/sessions-history',
@@ -69,24 +88,39 @@ export const ROUTES = {
   CONSULTANT_SETTINGS: '/consultant/settings',
 };
 
+/* =========================
+   API CONFIG (SAFE)
+========================= */
 export const API_CONFIG = {
-  BASE_URL: process.env.REACT_APP_API_BASE_URL || '',
-  VITALS_ENDPOINT: process.env.REACT_APP_VITALS_ENDPOINT || '',
-  TIMEOUT: parseInt(process.env.REACT_APP_API_TIMEOUT || '10000', 10),
-  RETRY_ATTEMPTS: parseInt(process.env.REACT_APP_API_RETRY_ATTEMPTS || '3', 10),
-  RETRY_DELAY: parseInt(process.env.REACT_APP_API_RETRY_DELAY || '1000', 10),
+  BASE_URL: getEnv('REACT_APP_API_BASE_URL', ''),
+  VITALS_ENDPOINT: getEnv('REACT_APP_VITALS_ENDPOINT', ''),
+
+  TIMEOUT: parseInt(getEnv('REACT_APP_API_TIMEOUT', '10000'), 10),
+  RETRY_ATTEMPTS: parseInt(getEnv('REACT_APP_API_RETRY_ATTEMPTS', '3'), 10),
+  RETRY_DELAY: parseInt(getEnv('REACT_APP_API_RETRY_DELAY', '1000'), 10),
 };
 
+/* =========================
+   SEO CONFIG
+========================= */
 export const SEO_CONFIG = {
-  DEFAULT_TITLE: process.env.REACT_APP_SEO_TITLE || 'NM',
-  DEFAULT_DESCRIPTION:
-    process.env.REACT_APP_SEO_DESCRIPTION || 'A professional React application',
-  DEFAULT_KEYWORDS: (
-    process.env.REACT_APP_SEO_KEYWORDS || 'react,webpack,tailwind'
+  DEFAULT_TITLE: getEnv('REACT_APP_SEO_TITLE', 'NM'),
+  DEFAULT_DESCRIPTION: getEnv(
+    'REACT_APP_SEO_DESCRIPTION',
+    'A professional React application'
+  ),
+  DEFAULT_KEYWORDS: getEnv(
+    'REACT_APP_SEO_KEYWORDS',
+    'react,webpack,tailwind'
   ).split(','),
-  SITE_URL: typeof window !== 'undefined' ? window.location.origin : '',
+
+  SITE_URL:
+    typeof window !== 'undefined' ? window.location.origin : '',
 };
 
+/* =========================
+   PERFORMANCE BUDGETS
+========================= */
 export const PERFORMANCE_BUDGETS = {
   LCP: 2500,
   FCP: 1800,
@@ -95,6 +129,9 @@ export const PERFORMANCE_BUDGETS = {
   TTFB: 800,
 };
 
+/* =========================
+   TOAST CONFIG
+========================= */
 export const TOAST_CONFIG = {
   POSITION: 'top-center',
   DURATION: 3000,

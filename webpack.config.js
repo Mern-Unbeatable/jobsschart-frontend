@@ -26,11 +26,21 @@ module.exports = (env, argv) => {
   //     ...rawEnv,
   //   }),
   // };
-  const envKeys = Object.keys(rawEnv).reduce((prev, next) => {
-  prev[`process.env.${next}`] = JSON.stringify(rawEnv[next]);
-  return prev;
-}, {});
+const envKeys = {
+  "process.env.REACT_APP_NAME": JSON.stringify(rawEnv.REACT_APP_NAME),
+  "process.env.REACT_APP_VERSION": JSON.stringify(rawEnv.REACT_APP_VERSION),
+  "process.env.REACT_APP_API_BASE_URL": JSON.stringify(rawEnv.REACT_APP_API_BASE_URL),
+  "process.env.REACT_APP_SOCKET_URL": JSON.stringify(rawEnv.REACT_APP_SOCKET_URL),
+  "process.env.REACT_APP_VITALS_ENDPOINT": JSON.stringify(rawEnv.REACT_APP_VITALS_ENDPOINT),
+  "process.env.REACT_APP_API_TIMEOUT": JSON.stringify(rawEnv.REACT_APP_API_TIMEOUT),
+  "process.env.REACT_APP_API_RETRY_ATTEMPTS": JSON.stringify(rawEnv.REACT_APP_API_RETRY_ATTEMPTS),
+  "process.env.REACT_APP_API_RETRY_DELAY": JSON.stringify(rawEnv.REACT_APP_API_RETRY_DELAY),
+  "process.env.REACT_APP_SEO_TITLE": JSON.stringify(rawEnv.REACT_APP_SEO_TITLE),
+  "process.env.REACT_APP_SEO_DESCRIPTION": JSON.stringify(rawEnv.REACT_APP_SEO_DESCRIPTION),
+  "process.env.REACT_APP_SEO_KEYWORDS": JSON.stringify(rawEnv.REACT_APP_SEO_KEYWORDS),
 
+  "process.env.NODE_ENV": JSON.stringify(argv.mode)
+};
 envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
 
   const devPort = rawEnv.REACT_APP_DEV_PORT
