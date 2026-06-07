@@ -9,18 +9,29 @@ module.exports = (env, argv) => {
   const isProd = argv.mode === 'production';
 
   // Use a single active env file for all modes
-  const envPath = path.resolve(__dirname, '.env.development');
+  const envPath = path.resolve(
+  __dirname,
+  argv.mode === 'production'
+    ? '.env.production'
+    : '.env.development'
+);
   const rawEnv = fs.existsSync(envPath)
     ? dotenv.parse(fs.readFileSync(envPath))
     : {};
 
-  // Stringify all environment variables for DefinePlugin 
-  const envKeys = {
-    'process.env': JSON.stringify({
-      NODE_ENV: argv.mode || 'development',
-      ...rawEnv,
-    }),
-  };
+
+  // const envKeys = {
+  //   'process.env': JSON.stringify({
+  //     NODE_ENV: argv.mode || 'development',
+  //     ...rawEnv,
+  //   }),
+  // };
+  const envKeys = Object.keys(rawEnv).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(rawEnv[next]);
+  return prev;
+}, {});
+
+envKeys['process.env.NODE_ENV'] = JSON.stringify(argv.mode);
 
   const devPort = rawEnv.REACT_APP_DEV_PORT
     ? rawEnv.REACT_APP_DEV_PORT === 'auto'
@@ -84,35 +95,56 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: ['.js', '.jsx'],
     },
+
     plugins: [
-      new webpack.DefinePlugin(envKeys),
-      new HtmlWebpackPlugin({
-        template: './public/index.html',
-        filename: 'index.html',
-        // Minify HTML in production
-        minify: isProd
-          ? {
-            collapseWhitespace: true,
-            removeComments: true,
-            removeRedundantAttributes: true,
-            removeScriptTypeAttributes: true,
-            removeStyleLinkTypeAttributes: true,
-            useShortDoctype: true,
-          }
-          : false,
-      }),
-      new CopyPlugin({
-        patterns: [
-          {
-            from: 'public',
-            to: '.',
-            globOptions: {
-              ignore: ['**/index.html'], // Don't copy index.html, HtmlWebpackPlugin handles it
-            },
-          },
-        ],
-      }),
+  new webpack.DefinePlugin(envKeys),
+
+  new HtmlWebpackPlugin({
+    template: './public/index.html',
+    filename: 'index.html'
+  }),
+
+  new CopyPlugin({
+    patterns: [
+      {
+        from: 'public',
+        to: '.',
+        globOptions: {
+          ignore: ['**/index.html'],
+        },
+      },
     ],
+  }),
+],
+    // plugins: [
+    //   new webpack.DefinePlugin(envKeys),
+    //   new HtmlWebpackPlugin({
+    //     template: './public/index.html',
+    //     filename: 'index.html',
+    //     // Minify HTML in production
+    //     minify: isProd
+    //       ? {
+    //         collapseWhitespace: true,
+    //         removeComments: true,
+    //         removeRedundantAttributes: true,
+    //         removeScriptTypeAttributes: true,
+    //         removeStyleLinkTypeAttributes: true,
+    //         useShortDoctype: true,
+    //       }
+    //       : false,
+    //   }),
+    //   new CopyPlugin({
+    //     patterns: [
+    //       {
+    //         from: 'public',
+    //         to: '.',
+    //         globOptions: {
+    //           ignore: ['**/index.html'], // Don't copy index.html, HtmlWebpackPlugin handles it
+    //         },
+    //       },
+    //     ],
+    //   }),
+    // ],
     optimization: {
       // Split vendor (node_modules) into its own long-lived cached chunk
       splitChunks: {
