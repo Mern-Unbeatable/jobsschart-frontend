@@ -7,7 +7,7 @@ import {
   useInitiateCallMutation,
   useEndCallMutation,
   useGetCallByIdQuery,
-  useCancelCallMutation
+  useCancelCallMutation,
 } from '../../../features/api/callApi';
 import toast from 'react-hot-toast';
 import { twilioVideoService } from '../../../services/twilioVideoService';
@@ -15,13 +15,13 @@ import { twilioVideoService } from '../../../services/twilioVideoService';
 const LISTENER_KEY = 'audio-call-modal';
 
 const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
-
   const [seconds, setSeconds] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [currentBilling, setCurrentBilling] = useState(0);
   const [callState, setCallState] = useState(null);
   const [actualStartTime, setActualStartTime] = useState(null);
+
   const { user, token } = useSelector(state => state.auth);
   const [initiateCall, { isLoading: isInitiating }] = useInitiateCallMutation();
   const [endCall, { isLoading: isEnding }] = useEndCallMutation();
@@ -29,6 +29,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
 
   const timerRef = useRef(null);
   const callStateRef = useRef(null);
+  const isClosingRef = useRef(false);
   callStateRef.current = callState;
 
   const { data: callData } = useGetCallByIdQuery(callState?.callId, {
@@ -50,16 +51,18 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
 
   // Timer based on actual start time
   useEffect(() => {
-    if (isOpen && !showFeedback && callState?.status === 'active' && actualStartTime) {
+    if (isOpen && !showFeedback && callState?.status === 'active' && actualStartTime && !isClosingRef.current) {
       if (timerRef.current) clearInterval(timerRef.current);
 
       timerRef.current = setInterval(() => {
-        const now = Date.now();
-        const diffSeconds = Math.floor((now - actualStartTime) / 1000);
-        setSeconds(diffSeconds);
+        if (!isClosingRef.current && callStateRef.current?.status === 'active') {
+          const now = Date.now();
+          const diffSeconds = Math.floor((now - actualStartTime) / 1000);
+          setSeconds(diffSeconds);
 
-        const pricePerSecond = (consultant?.pricePerMinute || 2.5) / 60;
-        setCurrentBilling(Number((diffSeconds * pricePerSecond).toFixed(2)));
+          const pricePerSecond = (consultant?.pricePerMinute || 2.5) / 60;
+          setCurrentBilling(Number((diffSeconds * pricePerSecond).toFixed(2)));
+        }
       }, 1000);
     }
 
@@ -77,8 +80,8 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
 
     socketService.connect(user.id, token);
 
-    socketService.on('call_accepted', LISTENER_KEY, (data) => {
-
+    socketService.on('call_accepted', LISTENER_KEY, async (data) => {
+      if (isClosingRef.current) return;
 
       const startTime = data.actualStartTime ? new Date(data.actualStartTime).getTime() : Date.now();
       setActualStartTime(startTime);
@@ -89,15 +92,36 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
         ...prev,
         status: 'active',
         roomName: data.roomName || prev.roomName,
+        userToken: data.token || prev.userToken,
       } : null);
+
+      toast.success('Call accepted! Connecting audio...');
+
+      // ✅ FIX: Actually connect to the Twilio audio room
+      const roomName = data.roomName || callStateRef.current?.roomName;
+      const tokenToUse = data.token || callStateRef.current?.userToken;
+
+      if (tokenToUse && roomName) {
+        try {
+          await twilioVideoService.connectAudio(tokenToUse, roomName);
+          console.log('✅ Audio connected successfully');
+        } catch (err) {
+          console.error('❌ Audio connect error:', err);
+          toast.error('Audio connection failed');
+        }
+      } else {
+        console.error('Missing token or roomName for audio connection');
+      }
     });
 
     socketService.on('call_rejected', LISTENER_KEY, (data) => {
+      if (isClosingRef.current) return;
 
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
+      twilioVideoService.disconnect();
       setCallState(null);
       setActualStartTime(null);
       toast.error('Call was rejected by consultant');
@@ -105,6 +129,8 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
     });
 
     socketService.on('call_ended', LISTENER_KEY, (data) => {
+      if (isClosingRef.current) return;
+
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -131,7 +157,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
 
   // Initiate call
   useEffect(() => {
-    if (!isOpen || callState || !consultant || isInitiating) return;
+    if (!isOpen || callState || !consultant || isInitiating || isClosingRef.current) return;
 
     const startCall = async () => {
       try {
@@ -145,7 +171,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
 
         const response = await initiateCall({
           consultantId: consultantUserId,
-          callType: 'PHONE'
+          callType: 'PHONE',
         }).unwrap();
 
         const callObj = response?.data?.call || response?.call;
@@ -155,7 +181,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
           callId: callObj.id,
           roomName: callObj.roomName,
           userToken: tokensObj.user.token,
-          status: 'pending'
+          status: 'pending',
         });
 
         toast('Calling consultant...', { icon: '📞' });
@@ -170,6 +196,8 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
   }, [isOpen, consultant]);
 
   const handleEndCall = async () => {
+    if (isClosingRef.current) return;
+    isClosingRef.current = true;
 
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -186,12 +214,12 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
         } else {
           const result = await endCall(callStateRef.current.callId).unwrap();
 
-          // Use duration from server response
           const finalDuration = result?.data?.durationSeconds || result?.durationSeconds || seconds;
           setSeconds(finalDuration);
 
           if (finalDuration > 0) {
             setShowFeedback(true);
+            isClosingRef.current = false;
           } else {
             closeAll();
           }
@@ -201,6 +229,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
       console.error('End call error:', err);
       if (seconds > 0) {
         setShowFeedback(true);
+        isClosingRef.current = false;
       } else {
         closeAll();
       }
@@ -218,6 +247,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
     setCallState(null);
     setActualStartTime(null);
     twilioVideoService.disconnect();
+    isClosingRef.current = false;
     onClose();
   };
 

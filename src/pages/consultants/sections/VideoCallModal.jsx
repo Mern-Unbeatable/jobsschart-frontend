@@ -92,7 +92,6 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   // Handle incoming call data (for consultant side)
   useEffect(() => {
     if (incomingCallData && !callState && isOpen && !isClosingRef.current) {
-
       setCallState({
         callId: incomingCallData.callId,
         roomName: incomingCallData.roomName,
@@ -103,17 +102,15 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     }
   }, [incomingCallData, isOpen]);
 
-  // Function to connect video after call is accepted
+  // Connect video after call is accepted
   const connectVideoAfterAccept = async (callId, roomName, tokenToUse) => {
-
     if (!tokenToUse || !roomName) {
       console.error('Missing token or roomName for video connection');
       return false;
     }
 
     try {
-      // Small delay to ensure DOM elements are ready
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       await twilioVideoService.connectVideo(
         tokenToUse,
@@ -137,7 +134,6 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     socketService.connect(user.id, token);
 
     const handleCallAccepted = async (data) => {
-
       if (isClosingRef.current || isAcceptedRef.current) return;
       isAcceptedRef.current = true;
 
@@ -146,32 +142,27 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       setSeconds(0);
       setCurrentBilling(0);
 
-      // Update call state to active
-      setCallState(prev => {
-        const newState = {
-          ...prev,
-          status: 'active',
-          roomName: data.roomName || prev?.roomName,
-          callId: data.callId || prev?.callId,
-        };
-        return newState;
-      });
+      setCallState(prev => ({
+        ...prev,
+        status: 'active',
+        roomName: data.roomName || prev?.roomName,
+        callId: data.callId || prev?.callId,
+        userToken: data.token || prev?.userToken,
+      }));
 
       toast.success('Call accepted! Connecting video...');
 
-      // Get the current state after update
       const currentState = callStateRef.current;
       const roomName = data.roomName || currentState?.roomName;
-      let tokenToUse = currentState?.userToken;
+      let tokenToUse = data.token || currentState?.userToken;
 
-      // If no token and we have callId, accept via API
+      // If no token, accept via API
       if (!tokenToUse && (data.callId || currentState?.callId)) {
         const acceptCallId = data.callId || currentState?.callId;
         try {
           const acceptResult = await acceptCall(acceptCallId).unwrap();
           tokenToUse = acceptResult?.data?.token || acceptResult?.token;
 
-          // Update callState with new token
           setCallState(prev => prev ? { ...prev, userToken: tokenToUse } : null);
         } catch (err) {
           console.error('Failed to accept call:', err);
@@ -181,11 +172,9 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         }
       }
 
-      // Connect to video room
+      // ✅ Connect to Twilio room (handles both audio AND video)
       if (tokenToUse && roomName) {
         await connectVideoAfterAccept(data.callId || currentState?.callId, roomName, tokenToUse);
-      } else {
-        console.warn('Missing token or roomName for video connection');
       }
     };
 
@@ -198,9 +187,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       }
       toast.error('Call was rejected by consultant');
       setTimeout(() => {
-        if (!isClosingRef.current) {
-          closeAll();
-        }
+        if (!isClosingRef.current) closeAll();
       }, 500);
     };
 
@@ -221,9 +208,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         setShowFeedback(true);
       } else {
         setTimeout(() => {
-          if (!isClosingRef.current) {
-            closeAll();
-          }
+          if (!isClosingRef.current) closeAll();
         }, 500);
       }
     };
@@ -254,13 +239,10 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
           return;
         }
 
-
-
         const response = await initiateCall({
           consultantId: consultantUserId,
           callType: 'VIDEO',
         }).unwrap();
-
 
         const callObj = response?.data?.call || response?.call;
         const tokensObj = response?.data?.tokens || response?.tokens;
@@ -330,9 +312,8 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   const handleAcceptCall = async () => {
     if (!callState?.callId || isClosingRef.current) return;
 
-
     try {
-      const result = await acceptCall(callState.callId).unwrap()
+      const result = await acceptCall(callState.callId).unwrap();
 
       const tokenToUse = result?.data?.token || result?.token;
       const roomName = result?.data?.call?.roomName || callState.roomName;
@@ -347,7 +328,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         setActualStartTime(Date.now());
         toast.success('Call accepted, connecting...');
 
-        // Connect to video
+        // ✅ Connect to Twilio room (handles both audio AND video)
         await connectVideoAfterAccept(callState.callId, roomName, tokenToUse);
       }
     } catch (err) {
@@ -381,7 +362,6 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
   if (!isOpen) return null;
 
-  // Loading state while initiating
   if (isInitiating) {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
@@ -393,7 +373,6 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     );
   }
 
-  // Feedback modal
   if (showFeedback) {
     return (
       <CallFeedbackModal
@@ -408,9 +387,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   return (
     <div
       className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[9999] p-4"
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
+      onClick={(e) => e.stopPropagation()}
     >
       <div
         className="relative w-full max-w-sm aspect-[3/4] max-h-[80vh] rounded-2xl overflow-hidden bg-gray-900 shadow-2xl border border-white/10"
@@ -421,7 +398,6 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
           ref={remoteVideoRef}
           className="absolute inset-0 w-full h-full bg-gray-800"
         >
-          {/* Placeholder when no remote video yet */}
           {callState?.status !== 'active' && (
             <div className="w-full h-full flex flex-col items-center justify-center">
               <div className="w-24 h-24 rounded-full bg-[#D1C4E9] flex items-center justify-center text-[#5E35B1] text-3xl font-bold mb-4">
@@ -450,7 +426,6 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
             </div>
           )}
 
-          {/* Show active call UI */}
           {callState?.status === 'active' && !isVideoConnected && (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-center">
@@ -464,7 +439,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none" />
 
-        {/* Local Video (picture-in-picture) - Only show when call is active */}
+        {/* Local Video (PiP) */}
         {callState?.status === 'active' && (
           <div className="absolute top-4 right-4 w-20 h-28 rounded-xl overflow-hidden border-2 border-white/20 shadow-lg bg-gray-700 z-10">
             <div ref={localVideoRef} className="w-full h-full" />
@@ -491,7 +466,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
           </div>
         </div>
 
-        {/* Bottom Controls - Only show when call is active */}
+        {/* Bottom Controls */}
         {callState?.status === 'active' && (
           <div className="absolute bottom-8 left-0 right-0 z-10">
             <div className="flex items-center justify-center gap-3 px-4">
@@ -501,8 +476,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
                   setIsMuted(newMuted);
                   newMuted ? twilioVideoService.mute() : twilioVideoService.unmute();
                 }}
-                className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-xl transition-all ${isMuted ? 'bg-red-500/90 text-white' : 'bg-white/15 text-white hover:bg-white/30'
-                  }`}
+                className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-xl transition-all ${isMuted ? 'bg-red-500/90 text-white' : 'bg-white/15 text-white hover:bg-white/30'}`}
               >
                 {isMuted ? <MicOff size={18} /> : <Mic size={18} />}
               </button>
@@ -513,8 +487,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
                   setIsVideoOff(newVideoOff);
                   newVideoOff ? twilioVideoService.disableVideo() : twilioVideoService.enableVideo();
                 }}
-                className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-xl transition-all ${isVideoOff ? 'bg-red-500/90 text-white' : 'bg-white/15 text-white hover:bg-white/30'
-                  }`}
+                className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-xl transition-all ${isVideoOff ? 'bg-red-500/90 text-white' : 'bg-white/15 text-white hover:bg-white/30'}`}
               >
                 {isVideoOff ? <VideoOff size={18} /> : <Video size={18} />}
               </button>
@@ -534,7 +507,6 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
           </div>
         )}
 
-        {/* Bottom indicator */}
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-white/20 rounded-full" />
       </div>
     </div>
