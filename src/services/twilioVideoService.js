@@ -10,23 +10,31 @@ class TwilioVideoService {
         this._audioContainer = null;
     }
 
-    // ── FIX: Use visually-hidden container, NOT display:none ──
-    // Browsers won't play audio from display:none elements!
-    _getAudioContainer() {
-        if (!this._audioContainer) {
-            let container = document.getElementById('twilio-audio-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'twilio-audio-container';
-                // ✅ Visually hidden but NOT display:none
-                // This ensures the browser treats elements as "rendered" and allows audio playback
-                container.style.cssText = 'position:fixed;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;padding:0;margin:-1px;top:-9999px;left:-9999px;';
-                document.body.appendChild(container);
-            }
-            this._audioContainer = container;
+  _getAudioContainer() {
+    if (!this._audioContainer) {
+        let container = document.getElementById('twilio-audio-container');
+
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'twilio-audio-container';
+
+        
+            container.style.cssText = `
+                position: fixed;
+                width: 0;
+                height: 0;
+                opacity: 0;
+                pointer-events: none;
+                overflow: hidden;
+            `;
+
+            document.body.appendChild(container);
         }
-        return this._audioContainer;
+
+        this._audioContainer = container;
     }
+    return this._audioContainer;
+}
 
     // ── Clean up existing connection BEFORE creating a new one ──
     _cleanupBeforeConnect() {
@@ -97,33 +105,38 @@ class TwilioVideoService {
     _attachTrack(track, remoteVideoRef, audioContainer) {
         const el = track.attach();
 
-        if (track.kind === 'audio') {
-            // ✅ FIX: Set all required attributes for autoplay
-            el.setAttribute('autoplay', '');
-            el.setAttribute('playsinline', '');
-            el.volume = 1; // ✅ Explicitly set volume to max
+       if (track.kind === 'audio') {
+    const el = track.attach();
 
-            audioContainer.appendChild(el);
+    el.autoplay = true;
+    el.playsInline = true;
+    el.muted = false;
+    el.volume = 1;
 
-            // ✅ FIX: Explicitly call play() — some browsers block autoplay
-            // even with the attribute, but allow it after user interaction
-            const playPromise = el.play();
-            if (playPromise) {
-                playPromise.catch(err => {
-                    console.warn('🔇 Autoplay blocked, retrying:', err.name);
-                    // ✅ If autoplay is blocked, try again on next user interaction
-                    const resumeAudio = () => {
-                        el.play().catch(() => {});
-                        document.removeEventListener('click', resumeAudio);
-                        document.removeEventListener('keydown', resumeAudio);
-                        document.removeEventListener('touchstart', resumeAudio);
-                    };
-                    document.addEventListener('click', resumeAudio, { once: true });
-                    document.addEventListener('keydown', resumeAudio, { once: true });
-                    document.addEventListener('touchstart', resumeAudio, { once: true });
-                });
-            }
-        } else if (track.kind === 'video') {
+    audioContainer.appendChild(el);
+
+    // ✅ HARD FORCE PLAY (fixes user-side silent audio)
+    const tryPlay = () => {
+        const p = el.play();
+        if (p) {
+            p.catch(() => {
+                setTimeout(() => el.play().catch(() => {}), 500);
+            });
+        }
+    };
+
+    tryPlay();
+
+    // fallback unlock on ANY interaction
+    const unlock = () => {
+        tryPlay();
+        document.removeEventListener('click', unlock);
+        document.removeEventListener('touchstart', unlock);
+    };
+
+    document.addEventListener('click', unlock);
+    document.addEventListener('touchstart', unlock);
+} else if (track.kind === 'video') {
             if (remoteVideoRef) {
                 remoteVideoRef.appendChild(el);
             }
@@ -180,45 +193,47 @@ class TwilioVideoService {
     }
 
     // ── Connect to AUDIO-ONLY room ──
-    async connectAudio(token, roomName, onConnect, onDisconnect) {
-        this._cleanupBeforeConnect();
+async connectAudio(token, roomName, onConnect, onDisconnect) {
+    this._cleanupBeforeConnect();
 
-        const localTracks = await this._getLocalTracks('PHONE');
-        this.localTracks = localTracks;
+    const localTracks = await this._getLocalTracks('PHONE');
+    this.localTracks = localTracks;
 
-        this.room = await connectTwilioVideo(token, {
-            name: roomName,
-            tracks: localTracks,
+    this.room = await connectTwilioVideo(token, {
+        name: roomName,
+        tracks: localTracks,
+    });
+
+    const audioContainer = this._getAudioContainer();
+
+    // ✅ attach existing participants FIRST
+    this.room.participants.forEach(participant => {
+        this._attachParticipant(participant, null);
+    });
+
+    // ✅ attach new participants
+    this.room.on('participantConnected', participant => {
+        this._attachParticipant(participant, null);
+    });
+
+    this.room.on('participantDisconnected', participant => {
+        participant.tracks.forEach(pub => {
+            pub.track?.detach()?.forEach(el => el.remove());
         });
+    });
 
-        // ✅ Attach ALREADY-CONNECTED remote participants (for their audio)
-        this.room.participants.forEach(participant => {
-            this._attachParticipant(participant, null);
-            onConnect?.();
-        });
+    this.room.on('disconnected', () => {
+        this.cleanup();
+        onDisconnect?.();
+    });
 
-        // ✅ Attach NEW participants as they connect
-        this.room.on('participantConnected', participant => {
-            this._attachParticipant(participant, null);
-            onConnect?.();
-        });
+    // ✅ IMPORTANT: trigger connect callback ONCE after room ready
+    setTimeout(() => {
+        onConnect?.();
+    }, 500);
 
-        this.room.on('participantDisconnected', participant => {
-            participant.tracks.forEach(publication => {
-                if (publication.track) {
-                    publication.track.detach().forEach(el => el.remove());
-                }
-            });
-            onDisconnect?.();
-        });
-
-        this.room.on('disconnected', () => {
-            this.cleanup();
-            onDisconnect?.();
-        });
-
-        return this.room;
-    }
+    return this.room;
+}
 
     // ── Mute / Unmute ──
     mute() {

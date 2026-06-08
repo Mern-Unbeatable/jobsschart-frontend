@@ -101,7 +101,15 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
 
       toast.success('Call accepted! Connecting audio...');
 
-      // ✅ Connect to Twilio audio room
+      // 🔥 ADD THIS
+      const unlockAudio = () => {
+        const audio = new Audio();
+        audio.muted = true;
+        audio.play().catch(() => { });
+      };
+      unlockAudio();
+
+      //  Connect to Twilio audio room
       const roomName = data.roomName || callStateRef.current?.roomName;
       const tokenToUse = data.token || callStateRef.current?.userToken;
 
@@ -109,9 +117,9 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
         try {
           isConnectedRef.current = true;
           await twilioVideoService.connectAudio(tokenToUse, roomName);
-          console.log('✅ User audio connected successfully');
+          console.log(' User audio connected successfully');
         } catch (err) {
-          console.error('❌ Audio connect error:', err);
+          console.error(' Audio connect error:', err);
           toast.error('Audio connection failed');
           isConnectedRef.current = false;
         }
