@@ -8,6 +8,7 @@ class SocketService {
         this._isConnected = false;
         this._isRegistered = false;
         this._listeners = {};
+        this._heartbeatInterval = null;
     }
 
     connect(userId, token) {
@@ -21,15 +22,15 @@ class SocketService {
             return this.socket;
         }
 
-        // Clean up existing socket
+        // Clean up existing socket before creating new one
         if (this.socket) {
             this.socket.removeAllListeners();
             this.socket.disconnect();
             this.socket = null;
         }
 
-        const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'https://jobsschart-api.maktechgroup.tech';
-
+        const SOCKET_URL =
+            process.env.REACT_APP_SOCKET_URL || 'https://jobsschart-api.maktechgroup.tech';
 
         this.socket = io(SOCKET_URL, {
             auth: { token },
@@ -42,10 +43,13 @@ class SocketService {
             timeout: 10000,
         });
 
+        // ── Connection events ───────────────────────────────────────
+
         this.socket.on('connect', () => {
             this._isConnected = true;
             this._isRegistered = false;
             this.socket.emit('register', userId);
+            this._startHeartbeat();
         });
 
         this.socket.on('registered', (data) => {
@@ -56,6 +60,7 @@ class SocketService {
         this.socket.on('disconnect', (reason) => {
             this._isConnected = false;
             this._isRegistered = false;
+            this._stopHeartbeat();
         });
 
         this.socket.on('connect_error', (err) => {
@@ -64,15 +69,14 @@ class SocketService {
             this._isRegistered = false;
         });
 
-        this.socket.on('reconnect', (attemptNumber) => {
+        this.socket.on('reconnect', () => {
             this._isConnected = true;
             this._isRegistered = false;
             this.socket.emit('register', userId);
+            this._startHeartbeat();
         });
 
-        this.socket.on('reconnect_attempt', (attempt) => {
-        });
-
+        // Forward all server events to registered listeners
         this.socket.onAny((event, ...args) => {
             this._emit(event, ...args);
         });
@@ -80,10 +84,30 @@ class SocketService {
         return this.socket;
     }
 
+    // ── Heartbeat ─────────────────────────────────────────────────
+
+    _startHeartbeat() {
+        this._stopHeartbeat(); // clear any existing interval first
+        this._heartbeatInterval = setInterval(() => {
+            if (this.socket?.connected) {
+                this.socket.emit('heartbeat');
+            }
+        }, 30_000); // every 30 seconds
+    }
+
+    _stopHeartbeat() {
+        if (this._heartbeatInterval) {
+            clearInterval(this._heartbeatInterval);
+            this._heartbeatInterval = null;
+        }
+    }
+
+    // ── Internal event bus ────────────────────────────────────────
+
     _emit(event, ...args) {
         const cbs = this._listeners[event];
         if (!cbs) return;
-        Object.values(cbs).forEach(cb => {
+        Object.values(cbs).forEach((cb) => {
             if (typeof cb === 'function') {
                 try {
                     cb(...args);
@@ -94,6 +118,12 @@ class SocketService {
         });
     }
 
+    /**
+     * Subscribe to a socket event.
+     * @param {string} event   - Socket event name
+     * @param {string|Function} keyOrCallback - Unique key (for removal) or callback
+     * @param {Function} [callback] - Callback if key was provided
+     */
     on(event, keyOrCallback, callback) {
         if (!this._listeners[event]) this._listeners[event] = {};
         if (typeof keyOrCallback === 'function') {
@@ -103,6 +133,11 @@ class SocketService {
         }
     }
 
+    /**
+     * Unsubscribe from a socket event.
+     * @param {string} event - Socket event name
+     * @param {string} [key] - Specific key to remove, or all if omitted
+     */
     off(event, key) {
         if (!this._listeners[event]) return;
         if (key) {
@@ -112,6 +147,9 @@ class SocketService {
         }
     }
 
+    /**
+     * Emit a socket event to the server.
+     */
     emit(event, data, callback) {
         if (!this.socket?.connected) {
             console.warn('Cannot emit, socket not connected:', event);
@@ -125,6 +163,9 @@ class SocketService {
         return true;
     }
 
+    /**
+     * Emit a socket event and wait for the server callback (Promise).
+     */
     emitWithAck(event, data) {
         return new Promise((resolve, reject) => {
             if (!this.socket?.connected) {
@@ -135,7 +176,16 @@ class SocketService {
         });
     }
 
+    /**
+     * Manually set your status (ONLINE | BUSY | OFFLINE).
+     * Useful for consultant to go "BUSY" during a call.
+     */
+    setStatus(status) {
+        this.emit('set_status', { status });
+    }
+
     disconnect() {
+        this._stopHeartbeat();
         if (this.socket) {
             this.socket.removeAllListeners();
             this.socket.disconnect();
@@ -146,8 +196,13 @@ class SocketService {
         this._listeners = {};
     }
 
-    isConnected() { return this._isConnected; }
-    isRegistered() { return this._isRegistered; }
+    isConnected() {
+        return this._isConnected;
+    }
+
+    isRegistered() {
+        return this._isRegistered;
+    }
 }
 
 export const socketService = new SocketService();

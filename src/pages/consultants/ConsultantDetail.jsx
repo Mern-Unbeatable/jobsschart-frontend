@@ -1,4 +1,3 @@
-
 import React, { memo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -10,6 +9,31 @@ import VideoCallModal from './sections/VideoCallModal';
 import BookScheduleModal from './sections/BookScheduleModal';
 import { useGetConsultantByIdQuery } from '../../features/api/consultantApi';
 import RealTimeChat from './RealTimeChat';
+import { useConsultantStatus } from '../../hooks/usePresence'; // adjust path if needed
+
+// ─────────────────────────────────────────────────────────────
+// STATUS HELPERS (shared)
+// ─────────────────────────────────────────────────────────────
+
+const toDisplayStatus = (raw = '') => {
+  switch (raw?.toUpperCase()) {
+    case 'ONLINE': return 'Available Now';
+    case 'BUSY': return 'Busy';
+    default: return 'Offline';
+  }
+};
+
+const getStatusBadgeStyle = (display) => {
+  switch (display) {
+    case 'Available Now': return 'bg-green-500/90';
+    case 'Busy': return 'bg-yellow-500/90';
+    default: return 'bg-gray-400/80';
+  }
+};
+
+// ─────────────────────────────────────────────────────────────
+// CONSULTANT DETAIL
+// ─────────────────────────────────────────────────────────────
 
 const ConsultantDetail = memo(() => {
   const { id } = useParams();
@@ -24,6 +48,12 @@ const ConsultantDetail = memo(() => {
     consultantData?.consultant ||
     consultantData?.data ||
     null;
+
+  // ✅ Live status for this single consultant
+  // consultant.userId is the User.id; consultant.onlineStatus is the DB fallback
+  const consultantUserId = consultant?.userId || consultant?.user?.id;
+  const liveStatus = useConsultantStatus(consultantUserId, consultant?.onlineStatus);
+  const displayStatus = toDisplayStatus(liveStatus);
 
   if (isLoading) {
     return (
@@ -53,41 +83,47 @@ const ConsultantDetail = memo(() => {
   const areas = consultant.specialization || consultant.areas || [];
   const reviews = consultant.reviews || [];
 
-  // ── FIX: consultant এর userId সহ UserChatPage এ navigate ──────
   const handleChatNow = () => {
     const userId = consultantForModal.userId;
     if (!userId) {
       console.error('Consultant userId not found');
       return;
     }
-
     navigate(`/consultants/${userId}/chat`);
-
-
   };
 
   return (
     <div className='min-h-screen bg-[#FBFDFF]'>
       <div className='container mx-auto pt-14 pb-8 md:pb-20 px-4 lg:px-6'>
 
-        {/* ── Hero Grid ────────────────────────────────────────── */}
+        {/* ── Hero Grid ─────────────────────────────────── */}
         <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-start'>
 
           {/* Left: Image */}
           <div className='lg:col-span-5'>
             <div className='relative rounded-2xl overflow-hidden aspect-square shadow-sm border border-gray-100'>
               <img
-                src={consultantForModal.image || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop'}
+                src={
+                  consultantForModal.image ||
+                  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop'
+                }
                 alt={consultantForModal.name}
                 className='w-full h-full object-cover'
                 onError={(e) => {
-                  e.target.src = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop';
+                  e.target.src =
+                    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop';
                 }}
               />
+
+              {/* ✅ Live status badge on hero image */}
               <div className='absolute bottom-6 left-6 text-white z-10'>
-                <div className='flex items-center gap-1.5 bg-green-500/90 text-[11px] font-bold px-3 py-1 rounded-full w-fit mb-2'>
-                  <div className='w-2 h-2 bg-white rounded-full animate-pulse' />
-                  {consultant.onlineStatus === 'ONLINE' ? 'Available Now' : consultant.onlineStatus || 'Offline'}
+                <div
+                  className={`flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded-full w-fit mb-2 ${getStatusBadgeStyle(displayStatus)}`}
+                >
+                  {displayStatus === 'Available Now' && (
+                    <div className='w-2 h-2 bg-white rounded-full animate-pulse' />
+                  )}
+                  {displayStatus}
                 </div>
                 <h1 className='text-3xl font-bold'>{consultantForModal.name}</h1>
               </div>
@@ -102,11 +138,15 @@ const ConsultantDetail = memo(() => {
               {consultant.bio || 'Professional consultant ready to help you.'}
             </p>
 
-            <h3 className='text-2xl md:text-3xl font-bold text-gray-800 mb-4'>Areas of Expertise</h3>
+            <h3 className='text-2xl md:text-3xl font-bold text-gray-800 mb-4'>
+              Areas of Expertise
+            </h3>
             <div className='flex flex-wrap gap-3 mb-10'>
               {areas.map((area, idx) => (
-                <span key={idx}
-                  className='px-6 py-2.5 border border-[#00000033] rounded-xl text-base font-medium text-gray-700 bg-white transition-colors'>
+                <span
+                  key={idx}
+                  className='px-6 py-2.5 border border-[#00000033] rounded-xl text-base font-medium text-gray-700 bg-white transition-colors'
+                >
                   {area}
                 </span>
               ))}
@@ -115,10 +155,12 @@ const ConsultantDetail = memo(() => {
             {/* Pricing note */}
             <div className='flex items-center gap-2 mb-6 p-3 bg-[#F5F1FD] rounded-xl border border-[#6E35AE]/20'>
               <span className='text-[#6E35AE] font-bold text-lg'>€2.50</span>
-              <span className='text-gray-500 text-sm'>per minute for Chat, Audio & Video sessions</span>
+              <span className='text-gray-500 text-sm'>
+                per minute for Chat, Audio & Video sessions
+              </span>
             </div>
 
-            {/* Action Buttons */}
+            {/* Action buttons */}
             <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3'>
               <button
                 onClick={() => setShowAudioCall(true)}
@@ -132,7 +174,6 @@ const ConsultantDetail = memo(() => {
               >
                 <Video size={20} /> Video Call
               </button>
-
               <button
                 type='button'
                 onClick={handleChatNow}
@@ -150,14 +191,17 @@ const ConsultantDetail = memo(() => {
           </div>
         </div>
 
-        {/* ── Info Grid ─────────────────────────────────────────── */}
+        {/* ── Info Grid ──────────────────────────────────── */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-16'>
           {[
             { label: 'Experience', value: `${consultant.experience || '5'}+ Years`, icon: Award },
             { label: 'Languages', value: consultant.language || consultant.languages || 'English', icon: Globe },
             { label: 'Location', value: consultant.location || 'Online Consultant', icon: MapPin },
           ].map((item, i) => (
-            <div key={i} className='border border-[#00000033] rounded-xl p-8 flex items-center gap-4 bg-white'>
+            <div
+              key={i}
+              className='border border-[#00000033] rounded-xl p-8 flex items-center gap-4 bg-white'
+            >
               <div className='text-gray-400'><item.icon size={24} strokeWidth={1.5} /></div>
               <div>
                 <p className='text-base text-gray-400 font-medium'>{item.label}</p>
@@ -167,7 +211,7 @@ const ConsultantDetail = memo(() => {
           ))}
         </div>
 
-        {/* ── Reviews ───────────────────────────────────────────── */}
+        {/* ── Reviews ────────────────────────────────────── */}
         <div className='mb-16'>
           <h2 className='text-2xl md:text-3xl font-bold text-gray-800 mb-8'>Reviews</h2>
           {reviews.length === 0 ? (
@@ -175,18 +219,32 @@ const ConsultantDetail = memo(() => {
           ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               {reviews.map((rev, i) => (
-                <div key={i} className='border border-[#00000033] rounded-2xl p-7 bg-white shadow-sm'>
+                <div
+                  key={i}
+                  className='border border-[#00000033] rounded-2xl p-7 bg-white shadow-sm'
+                >
                   <div className='flex justify-between items-center mb-3'>
-                    <p className='font-bold text-gray-900 text-lg'>{rev.user?.name || rev.user || 'User'}</p>
+                    <p className='font-bold text-gray-900 text-lg'>
+                      {rev.user?.name || rev.user || 'User'}
+                    </p>
                     <div className='flex gap-1'>
                       {[...Array(5)].map((_, starIdx) => (
-                        <Star key={starIdx} size={18}
+                        <Star
+                          key={starIdx}
+                          size={18}
                           fill={starIdx < rev.rating ? '#EAB308' : 'none'}
-                          className={starIdx < rev.rating ? 'text-[#EAB308]' : 'text-gray-200'} />
+                          className={
+                            starIdx < rev.rating
+                              ? 'text-[#EAB308]'
+                              : 'text-gray-200'
+                          }
+                        />
                       ))}
                     </div>
                   </div>
-                  <p className='text-sm text-gray-500 italic'>"{rev.comment || rev.text}"</p>
+                  <p className='text-sm text-gray-500 italic'>
+                    "{rev.comment || rev.text}"
+                  </p>
                 </div>
               ))}
             </div>
@@ -201,9 +259,21 @@ const ConsultantDetail = memo(() => {
           titleClassName='text-black font-bold text-xl sm:text-2xl tracking-widest uppercase'
         />
 
-        <AudioCallModal isOpen={showAudioCall} onClose={() => setShowAudioCall(false)} consultant={consultantForModal} />
-        <VideoCallModal isOpen={showVideoCall} onClose={() => setShowVideoCall(false)} consultant={consultantForModal} />
-        <BookScheduleModal isOpen={showBookSchedule} onClose={() => setShowBookSchedule(false)} consultant={consultantForModal} />
+        <AudioCallModal
+          isOpen={showAudioCall}
+          onClose={() => setShowAudioCall(false)}
+          consultant={consultantForModal}
+        />
+        <VideoCallModal
+          isOpen={showVideoCall}
+          onClose={() => setShowVideoCall(false)}
+          consultant={consultantForModal}
+        />
+        <BookScheduleModal
+          isOpen={showBookSchedule}
+          onClose={() => setShowBookSchedule(false)}
+          consultant={consultantForModal}
+        />
       </div>
     </div>
   );
@@ -212,7 +282,9 @@ const ConsultantDetail = memo(() => {
 ConsultantDetail.displayName = 'ConsultantDetail';
 export default ConsultantDetail;
 
-
+// ─────────────────────────────────────────────────────────────
+// CONSULTANT DETAIL CHAT
+// ─────────────────────────────────────────────────────────────
 
 export const ConsultantDetailChat = memo(() => {
   const { id } = useParams();
@@ -261,4 +333,5 @@ export const ConsultantDetailChat = memo(() => {
     </div>
   );
 });
+
 ConsultantDetailChat.displayName = 'ConsultantDetailChat';
