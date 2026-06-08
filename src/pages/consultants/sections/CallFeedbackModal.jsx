@@ -30,10 +30,7 @@ const CallFeedbackModal = memo(({ consultant, seconds, callId, onClose }) => {
   });
 
   const handleSubmit = async () => {
-    if (rating === 0) {
-      toast.error('Please select a rating');
-      return;
-    }
+
 
     try {
       await createReview({

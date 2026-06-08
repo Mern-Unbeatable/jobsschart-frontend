@@ -10,14 +10,17 @@ class TwilioVideoService {
         this._audioContainer = null;
     }
 
-    // ── Hidden container for <audio> elements (MUST be in DOM for sound) ──
+    // ── FIX: Use visually-hidden container, NOT display:none ──
+    // Browsers won't play audio from display:none elements!
     _getAudioContainer() {
         if (!this._audioContainer) {
             let container = document.getElementById('twilio-audio-container');
             if (!container) {
                 container = document.createElement('div');
                 container.id = 'twilio-audio-container';
-                container.style.display = 'none';
+                // ✅ Visually hidden but NOT display:none
+                // This ensures the browser treats elements as "rendered" and allows audio playback
+                container.style.cssText = 'position:fixed;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;padding:0;margin:-1px;top:-9999px;left:-9999px;';
                 document.body.appendChild(container);
             }
             this._audioContainer = container;
@@ -27,7 +30,6 @@ class TwilioVideoService {
 
     // ── Clean up existing connection BEFORE creating a new one ──
     _cleanupBeforeConnect() {
-        // Stop and detach local tracks
         this.localTracks.forEach(track => {
             try {
                 track.stop();
@@ -36,7 +38,6 @@ class TwilioVideoService {
         });
         this.localTracks = [];
 
-        // Disconnect existing room
         if (this.room) {
             try {
                 this.room.removeAllListeners();
@@ -45,7 +46,6 @@ class TwilioVideoService {
             this.room = null;
         }
 
-        // Clear audio container
         if (this._audioContainer) {
             this._audioContainer.innerHTML = '';
         }
@@ -57,7 +57,6 @@ class TwilioVideoService {
         try {
             const audioTrack = await createLocalAudioTrack();
             tracks.push(audioTrack);
-            console.log('✅ Local audio track created:', audioTrack.id);
         } catch (e) {
             console.warn('⚠️ No microphone:', e.message);
         }
@@ -65,7 +64,6 @@ class TwilioVideoService {
             try {
                 const videoTrack = await createLocalVideoTrack({ width: 640, height: 480 });
                 tracks.push(videoTrack);
-                console.log('✅ Local video track created:', videoTrack.id);
             } catch (e) {
                 console.warn('⚠️ No camera:', e.message);
             }
@@ -76,40 +74,55 @@ class TwilioVideoService {
     // ── Attach a participant's tracks (BOTH audio + video) ──
     _attachParticipant(participant, remoteVideoRef) {
         const audioContainer = this._getAudioContainer();
-        console.log(`📎 Attaching participant: ${participant.identity}, tracks: ${participant.tracks.size}`);
 
         // Attach all already-subscribed tracks
         participant.tracks.forEach(publication => {
             if (publication.isSubscribed && publication.track) {
-                console.log(`  → Already subscribed: ${publication.track.kind} (${publication.track.id})`);
                 this._attachTrack(publication.track, remoteVideoRef, audioContainer);
-            } else {
-                console.log(`  → Not yet subscribed: ${publication.kind}`);
             }
         });
 
         // Listen for future tracks being subscribed
         participant.on('trackSubscribed', track => {
-            console.log(`  → Track subscribed: ${track.kind} (${track.id})`);
             this._attachTrack(track, remoteVideoRef, audioContainer);
         });
 
         // Clean up when tracks are unsubscribed
         participant.on('trackUnsubscribed', track => {
-            console.log(`  → Track unsubscribed: ${track.kind} (${track.id})`);
             track.detach().forEach(el => el.remove());
         });
     }
 
-    // ── Attach a single track to the correct DOM element ──
+    // ── FIX: Attach track with explicit play() call ──
     _attachTrack(track, remoteVideoRef, audioContainer) {
         const el = track.attach();
 
         if (track.kind === 'audio') {
+            // ✅ FIX: Set all required attributes for autoplay
             el.setAttribute('autoplay', '');
             el.setAttribute('playsinline', '');
+            el.volume = 1; // ✅ Explicitly set volume to max
+
             audioContainer.appendChild(el);
-            console.log(`🔊 Audio element appended to container, total audio elements: ${audioContainer.children.length}`);
+
+            // ✅ FIX: Explicitly call play() — some browsers block autoplay
+            // even with the attribute, but allow it after user interaction
+            const playPromise = el.play();
+            if (playPromise) {
+                playPromise.catch(err => {
+                    console.warn('🔇 Autoplay blocked, retrying:', err.name);
+                    // ✅ If autoplay is blocked, try again on next user interaction
+                    const resumeAudio = () => {
+                        el.play().catch(() => {});
+                        document.removeEventListener('click', resumeAudio);
+                        document.removeEventListener('keydown', resumeAudio);
+                        document.removeEventListener('touchstart', resumeAudio);
+                    };
+                    document.addEventListener('click', resumeAudio, { once: true });
+                    document.addEventListener('keydown', resumeAudio, { once: true });
+                    document.addEventListener('touchstart', resumeAudio, { once: true });
+                });
+            }
         } else if (track.kind === 'video') {
             if (remoteVideoRef) {
                 remoteVideoRef.appendChild(el);
@@ -127,13 +140,6 @@ class TwilioVideoService {
         this.room = await connectTwilioVideo(token, {
             name: roomName,
             tracks: localTracks,
-        });
-
-        console.log('✅ Connected to VIDEO room:', this.room.name, 'Local identity:', this.room.localParticipant.identity);
-
-        // Log local tracks published
-        this.room.localParticipant.tracks.forEach(publication => {
-            console.log(`📤 Published local track: ${publication.kind} (${publication.track?.id})`);
         });
 
         // Attach local video to PiP
@@ -155,12 +161,10 @@ class TwilioVideoService {
 
         // ✅ Attach NEW participants as they connect
         this.room.on('participantConnected', participant => {
-            console.log(`👤 Participant connected: ${participant.identity}`);
             this._attachParticipant(participant, remoteVideoRef);
         });
 
         this.room.on('participantDisconnected', participant => {
-            console.log(`👤 Participant disconnected: ${participant.identity}`);
             participant.tracks.forEach(publication => {
                 if (publication.track) {
                     publication.track.detach().forEach(el => el.remove());
@@ -169,7 +173,6 @@ class TwilioVideoService {
         });
 
         this.room.on('disconnected', () => {
-            console.log('🔌 Disconnected from room');
             this.cleanup();
         });
 
@@ -188,13 +191,6 @@ class TwilioVideoService {
             tracks: localTracks,
         });
 
-        console.log('✅ Connected to AUDIO room:', this.room.name, 'Local identity:', this.room.localParticipant.identity);
-
-        // Log local tracks published
-        this.room.localParticipant.tracks.forEach(publication => {
-            console.log(`📤 Published local track: ${publication.kind} (${publication.track?.id})`);
-        });
-
         // ✅ Attach ALREADY-CONNECTED remote participants (for their audio)
         this.room.participants.forEach(participant => {
             this._attachParticipant(participant, null);
@@ -203,13 +199,11 @@ class TwilioVideoService {
 
         // ✅ Attach NEW participants as they connect
         this.room.on('participantConnected', participant => {
-            console.log(`👤 Participant connected: ${participant.identity}`);
             this._attachParticipant(participant, null);
             onConnect?.();
         });
 
         this.room.on('participantDisconnected', participant => {
-            console.log(`👤 Participant disconnected: ${participant.identity}`);
             participant.tracks.forEach(publication => {
                 if (publication.track) {
                     publication.track.detach().forEach(el => el.remove());
@@ -219,7 +213,6 @@ class TwilioVideoService {
         });
 
         this.room.on('disconnected', () => {
-            console.log('🔌 Disconnected from audio room');
             this.cleanup();
             onDisconnect?.();
         });

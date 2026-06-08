@@ -38,6 +38,8 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
     pollingInterval: 2000,
   });
 
+  const hasInitiatedRef = useRef(false);
+
   // Sync call duration from server
   useEffect(() => {
     if (callData?.data?.durationSeconds && showFeedback === false) {
@@ -162,44 +164,44 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
   }, [isOpen, user?.id, token]);
 
   // Initiate call
-  useEffect(() => {
-    if (!isOpen || callState || !consultant || isInitiating || isClosingRef.current) return;
+  // useEffect(() => {
+  //   if (!isOpen || callState || !consultant || isInitiating || isClosingRef.current) return;
 
-    const startCall = async () => {
-      try {
-        const consultantUserId = consultant.user?.id || consultant.id;
+  //   const startCall = async () => {
+  //     try {
+  //       const consultantUserId = consultant.user?.id || consultant.id;
 
-        if (!consultantUserId) {
-          toast.error('Consultant ID not found');
-          onClose();
-          return;
-        }
+  //       if (!consultantUserId) {
+  //         toast.error('Consultant ID not found');
+  //         onClose();
+  //         return;
+  //       }
 
-        const response = await initiateCall({
-          consultantId: consultantUserId,
-          callType: 'PHONE',
-        }).unwrap();
+  //       const response = await initiateCall({
+  //         consultantId: consultantUserId,
+  //         callType: 'PHONE',
+  //       }).unwrap();
 
-        const callObj = response?.data?.call || response?.call;
-        const tokensObj = response?.data?.tokens || response?.tokens;
+  //       const callObj = response?.data?.call || response?.call;
+  //       const tokensObj = response?.data?.tokens || response?.tokens;
 
-        setCallState({
-          callId: callObj.id,
-          roomName: callObj.roomName,
-          userToken: tokensObj.user.token,
-          status: 'pending',
-        });
+  //       setCallState({
+  //         callId: callObj.id,
+  //         roomName: callObj.roomName,
+  //         userToken: tokensObj.user.token,
+  //         status: 'pending',
+  //       });
 
-        toast('Calling consultant...', { icon: '📞' });
-      } catch (err) {
-        console.error('❌ initiateCall error:', err);
-        toast.error(err?.data?.message || err?.message || 'Failed to start call');
-        onClose();
-      }
-    };
+  //       toast('Calling consultant...', { icon: '📞' });
+  //     } catch (err) {
+  //       console.error('❌ initiateCall error:', err);
+  //       toast.error(err?.data?.message || err?.message || 'Failed to start call');
+  //       onClose();
+  //     }
+  //   };
 
-    startCall();
-  }, [isOpen, consultant]);
+  //   startCall();
+  // }, [isOpen, consultant]);
 
   const handleEndCall = async () => {
     if (isClosingRef.current) return;
@@ -242,19 +244,72 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
     }
   };
 
+  useEffect(() => {
+    if (!isOpen || !consultant || isClosingRef.current) return;
+
+    // ✅ HARD STOP DUPLICATE CALLS
+    if (hasInitiatedRef.current) return;
+    hasInitiatedRef.current = true;
+
+    const startCall = async () => {
+      try {
+        const consultantUserId = consultant.user?.id || consultant.id;
+
+        if (!consultantUserId) {
+          toast.error('Consultant ID not found');
+          onClose();
+          return;
+        }
+
+        const response = await initiateCall({
+          consultantId: consultantUserId,
+          callType: 'PHONE',
+        }).unwrap();
+
+        const callObj = response?.data?.call || response?.call;
+        const tokensObj = response?.data?.tokens || response?.tokens;
+
+        setCallState({
+          callId: callObj.id,
+          roomName: callObj.roomName,
+          userToken: tokensObj.user.token,
+          status: 'pending',
+        });
+
+        toast('Calling consultant...', { icon: '📞' });
+
+      } catch (err) {
+        console.error('❌ initiateCall error:', err);
+
+        // ✅ allow retry if failed
+        hasInitiatedRef.current = false;
+
+        toast.error(err?.data?.message || err?.message || 'Failed to start call');
+        onClose();
+      }
+    };
+
+    startCall();
+  }, [isOpen, consultant]);
   const closeAll = () => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+
     setSeconds(0);
     setCurrentBilling(0);
     setShowFeedback(false);
     setCallState(null);
     setActualStartTime(null);
+
     twilioVideoService.disconnect();
     isConnectedRef.current = false;
     isClosingRef.current = false;
+
+    // ✅ ADD THIS (CRITICAL FIX)
+    hasInitiatedRef.current = false;
+
     onClose();
   };
 

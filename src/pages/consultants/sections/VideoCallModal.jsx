@@ -20,6 +20,7 @@ import {
 import { twilioVideoService } from '../../../services/twilioVideoService';
 import toast from 'react-hot-toast';
 
+
 const LISTENER_KEY = 'video-call-modal';
 
 const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCallData }) => {
@@ -45,7 +46,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   const isClosingRef = useRef(false);
   const isAcceptedRef = useRef(false);
   callStateRef.current = callState;
-
+  const hasInitiatedRef = useRef(false);
   // Poll for call status
   const { data: callData } = useGetCallByIdQuery(callState?.callId, {
     skip: !callState?.callId || showFeedback,
@@ -226,8 +227,52 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   }, [isOpen, user?.id, token, acceptCall]);
 
   // Initiate call (caller side)
+  // useEffect(() => {
+  //   if (!isOpen || callState || !consultant || isInitiating || incomingCallData || isClosingRef.current) return;
+
+  //   const startCall = async () => {
+  //     try {
+  //       const consultantUserId = consultant.user?.id || consultant.id;
+
+  //       if (!consultantUserId) {
+  //         toast.error('Consultant ID not found');
+  //         closeAll();
+  //         return;
+  //       }
+
+  //       const response = await initiateCall({
+  //         consultantId: consultantUserId,
+  //         callType: 'VIDEO',
+  //       }).unwrap();
+
+  //       const callObj = response?.data?.call || response?.call;
+  //       const tokensObj = response?.data?.tokens || response?.tokens;
+
+  //       setCallState({
+  //         callId: callObj.id,
+  //         roomName: callObj.roomName,
+  //         userToken: tokensObj.user.token,
+  //         status: 'pending',
+  //         isIncoming: false,
+  //       });
+
+  //       toast('Calling consultant...', { icon: '📹' });
+  //     } catch (err) {
+  //       console.error('❌ initiateCall error:', err);
+  //       toast.error(err?.data?.message || 'Failed to start video call');
+  //       closeAll();
+  //     }
+  //   };
+
+  //   startCall();
+  // }, [isOpen, consultant, incomingCallData]);
+
   useEffect(() => {
-    if (!isOpen || callState || !consultant || isInitiating || incomingCallData || isClosingRef.current) return;
+    if (!isOpen || !consultant || incomingCallData || isClosingRef.current) return;
+
+    // ✅ HARD STOP DUPLICATE CALLS
+    if (hasInitiatedRef.current) return;
+    hasInitiatedRef.current = true;
 
     const startCall = async () => {
       try {
@@ -256,8 +301,13 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         });
 
         toast('Calling consultant...', { icon: '📹' });
+
       } catch (err) {
         console.error('❌ initiateCall error:', err);
+
+        // ✅ allow retry
+        hasInitiatedRef.current = false;
+
         toast.error(err?.data?.message || 'Failed to start video call');
         closeAll();
       }
@@ -351,6 +401,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     twilioVideoService.disconnect();
     isClosingRef.current = false;
     isAcceptedRef.current = false;
+    hasInitiatedRef.current = false;
     onClose();
   };
 

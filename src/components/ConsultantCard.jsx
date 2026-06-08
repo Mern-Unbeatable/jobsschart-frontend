@@ -7,6 +7,7 @@ import VideoCallModal from '../pages/consultants/sections/VideoCallModal';
 const ConsultantCard = memo(({ consultantsData }) => {
   const navigate = useNavigate();
 
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'Online':
