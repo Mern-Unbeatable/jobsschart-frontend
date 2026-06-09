@@ -10,7 +10,6 @@ class TwilioVideoService {
         this._participantListeners = new Map();
     }
 
-    // ── Dedicated hidden audio container in <body> ──────────────────
     _getAudioContainer() {
         if (!this._audioContainer) {
             let container = document.getElementById('twilio-audio-container');
@@ -26,7 +25,6 @@ class TwilioVideoService {
         return this._audioContainer;
     }
 
-    // ── Stop / detach everything before a new connection ───────────
     _cleanupBeforeConnect() {
         this._participantListeners.forEach((listeners, participant) => {
             listeners.forEach(({ event, fn }) => {
@@ -50,7 +48,6 @@ class TwilioVideoService {
         }
     }
 
-    // ── Acquire local tracks without throwing ──────────────────────
     async _getLocalTracks(callType) {
         const tracks = [];
         try {
@@ -70,9 +67,6 @@ class TwilioVideoService {
         return tracks;
     }
 
-    // ── Attach a single track to the right container ───────────────
-    // Audio → hidden _audioContainer  (autoplay + unlock on first gesture)
-    // Video → remoteVideoRef DOM node
     _attachTrack(track, remoteVideoRef) {
         if (track.kind === 'audio') {
             const audioContainer = this._getAudioContainer();
@@ -89,7 +83,6 @@ class TwilioVideoService {
             };
             tryPlay();
 
-            // Unlock audio after any user gesture (mobile safari)
             const unlock = () => {
                 tryPlay();
                 document.removeEventListener('click', unlock);
@@ -106,25 +99,50 @@ class TwilioVideoService {
         }
     }
 
-    // ── Wire up all tracks for one remote participant ──────────────
+    // ─────────────────────────────────────────────────────────────────
+    // KEY FIX: For 'group' rooms, tracks are NOT auto-subscribed.
+    // We must listen to 'trackPublished' and call publication.subscribe()
+    // manually. For already-published tracks we also call subscribe().
+    // 'trackSubscribed' fires after subscribe() succeeds — that's where
+    // we attach the media element.
+    // ─────────────────────────────────────────────────────────────────
     _attachParticipant(participant, remoteVideoRef) {
         const listeners = [];
 
-        // Tracks already subscribed when we attach
-        participant.tracks.forEach(publication => {
-            if (publication.isSubscribed && publication.track) {
-                this._attachTrack(publication.track, remoteVideoRef);
+        // Helper: subscribe to a publication if not already subscribed
+        const subscribeToPublication = (publication) => {
+            if (publication.isSubscribed) {
+                // Already subscribed — attach immediately
+                if (publication.track) {
+                    this._attachTrack(publication.track, remoteVideoRef);
+                }
+            } else {
+                // For group rooms: manually subscribe
+                publication.subscribe().catch(err => {
+                    console.warn('subscribe() failed:', err.message);
+                });
             }
+        };
+
+        // Handle tracks already published when we join
+        participant.tracks.forEach(publication => {
+            subscribeToPublication(publication);
         });
 
-        // Tracks that arrive later
+        // Handle tracks published after we join (group rooms)
+        const onTrackPublished = (publication) => {
+            subscribeToPublication(publication);
+        };
+        participant.on('trackPublished', onTrackPublished);
+        listeners.push({ event: 'trackPublished', fn: onTrackPublished });
+
+        // trackSubscribed fires when subscribe() resolves — attach here
         const onSubscribed = (track) => {
             this._attachTrack(track, remoteVideoRef);
         };
         participant.on('trackSubscribed', onSubscribed);
         listeners.push({ event: 'trackSubscribed', fn: onSubscribed });
 
-        // Clean up detached tracks
         const onUnsubscribed = (track) => {
             track.detach().forEach(el => el.remove());
         };
@@ -134,7 +152,6 @@ class TwilioVideoService {
         this._participantListeners.set(participant, listeners);
     }
 
-    // ── VIDEO CALL ─────────────────────────────────────────────────
     async connectVideo(token, roomName, localVideoRef, remoteVideoRef) {
         this._cleanupBeforeConnect();
 
@@ -148,7 +165,7 @@ class TwilioVideoService {
 
         console.log('✅ Connected to video room:', this.room.name);
 
-        // Show our own camera in the PiP box
+        // Attach local video to PiP
         localTracks.forEach(track => {
             if (track.kind === 'video' && localVideoRef) {
                 const el = track.attach();
@@ -158,12 +175,12 @@ class TwilioVideoService {
             }
         });
 
-        // Remote participants already in the room
+        // Wire up remote participants already in the room
         this.room.participants.forEach(participant => {
             this._attachParticipant(participant, remoteVideoRef);
         });
 
-        // Remote participants who join after us
+        // Wire up participants who join after us
         this.room.on('participantConnected', participant => {
             this._attachParticipant(participant, remoteVideoRef);
         });
@@ -180,7 +197,6 @@ class TwilioVideoService {
         return this.room;
     }
 
-    // ── AUDIO CALL ─────────────────────────────────────────────────
     async connectAudio(token, roomName, onConnect, onDisconnect) {
         this._cleanupBeforeConnect();
 
@@ -194,12 +210,10 @@ class TwilioVideoService {
 
         console.log('✅ Connected to audio room:', this.room.name);
 
-        // Wire up any participants already present
         this.room.participants.forEach(participant => {
-            this._attachParticipant(participant, null); // null → audio only
+            this._attachParticipant(participant, null);
         });
 
-        // Wire up participants who join later
         this.room.on('participantConnected', participant => {
             this._attachParticipant(participant, null);
             onConnect?.();
@@ -217,7 +231,6 @@ class TwilioVideoService {
             onDisconnect?.();
         });
 
-        // If a participant is already there, fire onConnect right away
         if (this.room.participants.size > 0) {
             setTimeout(() => onConnect?.(), 200);
         }
@@ -225,7 +238,6 @@ class TwilioVideoService {
         return this.room;
     }
 
-    // ── Controls ───────────────────────────────────────────────────
     mute() {
         this.localTracks.forEach(t => { if (t.kind === 'audio') t.disable(); });
         this.isMuted = true;
@@ -254,7 +266,6 @@ class TwilioVideoService {
         this.isVideoOff = false;
     }
 
-    // ── Full teardown ──────────────────────────────────────────────
     cleanup() {
         this._participantListeners.forEach((listeners, participant) => {
             listeners.forEach(({ event, fn }) => {
