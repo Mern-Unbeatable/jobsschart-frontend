@@ -9,31 +9,11 @@ import VideoCallModal from './sections/VideoCallModal';
 import BookScheduleModal from './sections/BookScheduleModal';
 import { useGetConsultantByIdQuery } from '../../features/api/consultantApi';
 import RealTimeChat from './RealTimeChat';
-import { useConsultantStatus } from '../../hooks/usePresence'; // adjust path if needed
+import { useConsultantStatus } from '../../hooks/usePresence';
+import { getStatusBadgeStyle, toDisplayStatus } from '../../utils/status';
 
-// ─────────────────────────────────────────────────────────────
-// STATUS HELPERS (shared)
-// ─────────────────────────────────────────────────────────────
 
-const toDisplayStatus = (raw = '') => {
-  switch (raw?.toUpperCase()) {
-    case 'ONLINE': return 'Available Now';
-    case 'BUSY': return 'Busy';
-    default: return 'Offline';
-  }
-};
 
-const getStatusBadgeStyle = (display) => {
-  switch (display) {
-    case 'Available Now': return 'bg-green-500/90';
-    case 'Busy': return 'bg-yellow-500/90';
-    default: return 'bg-gray-400/80';
-  }
-};
-
-// ─────────────────────────────────────────────────────────────
-// CONSULTANT DETAIL
-// ─────────────────────────────────────────────────────────────
 
 const ConsultantDetail = memo(() => {
   const { id } = useParams();
@@ -49,8 +29,6 @@ const ConsultantDetail = memo(() => {
     consultantData?.data ||
     null;
 
-  // ✅ Live status for this single consultant
-  // consultant.userId is the User.id; consultant.onlineStatus is the DB fallback
   const consultantUserId = consultant?.userId || consultant?.user?.id;
   const liveStatus = useConsultantStatus(consultantUserId, consultant?.onlineStatus);
   const displayStatus = toDisplayStatus(liveStatus);
@@ -115,7 +93,7 @@ const ConsultantDetail = memo(() => {
                 }}
               />
 
-              {/* ✅ Live status badge on hero image */}
+
               <div className='absolute bottom-6 left-6 text-white z-10'>
                 <div
                   className={`flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded-full w-fit mb-2 ${getStatusBadgeStyle(displayStatus)}`}
@@ -281,10 +259,6 @@ const ConsultantDetail = memo(() => {
 
 ConsultantDetail.displayName = 'ConsultantDetail';
 export default ConsultantDetail;
-
-// ─────────────────────────────────────────────────────────────
-// CONSULTANT DETAIL CHAT
-// ─────────────────────────────────────────────────────────────
 
 export const ConsultantDetailChat = memo(() => {
   const { id } = useParams();

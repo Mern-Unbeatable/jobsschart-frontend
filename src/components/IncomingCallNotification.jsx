@@ -39,7 +39,6 @@ export const IncomingCallNotification = () => {
             socketService.on('registered', LISTENER_KEY, (data) => {
                 setRegistered(true);
                 setSocketStatus('connected');
-                // Clear reconnect timer on success
                 if (reconnectTimerRef.current) {
                     clearTimeout(reconnectTimerRef.current);
                     reconnectTimerRef.current = null;
@@ -160,21 +159,7 @@ export const IncomingCallNotification = () => {
 
     return (
         <>
-            {/* Debug Panel */}
-            <div className="fixed bottom-2 left-2 z-[9998] bg-black/80 text-white text-xs px-3 py-2 rounded-lg font-mono max-w-xs">
-                <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${socketStatus === 'connected' ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`} />
-                    Socket: {socketStatus}
-                </div>
-                <div className="flex items-center gap-2 mt-1">
-                    <div className={`w-2 h-2 rounded-full ${registered ? 'bg-green-400' : 'bg-yellow-400'}`} />
-                    Registered: {registered ? 'Yes' : 'No'}
-                </div>
-                <div className="mt-1">User: {user?.id?.slice(0, 12)}...</div>
-                {incomingCall && (
-                    <div className="text-green-400 font-bold mt-1">🔔 CALL INCOMING!</div>
-                )}
-            </div>
+
 
             {incomingCall && (
                 <div className="fixed top-4 right-4 z-[9999]">

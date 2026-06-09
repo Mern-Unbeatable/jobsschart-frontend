@@ -3,36 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Phone, Video, MessageSquare, Star } from 'lucide-react';
 import AudioCallModal from '../pages/consultants/sections/AudioCallModal';
 import VideoCallModal from '../pages/consultants/sections/VideoCallModal';
-import { usePresence } from '../hooks/usePresence'; // adjust path if needed
+import { usePresence } from '../hooks/usePresence';
+import { getStatusStyle, toDisplayStatus } from '../utils/status';
 
-// ─────────────────────────────────────────────────────────────
-// STATUS HELPERS
-// ─────────────────────────────────────────────────────────────
 
-/** Normalise raw DB value to display string */
-const toDisplayStatus = (raw = '') => {
-  switch (raw?.toUpperCase()) {
-    case 'ONLINE': return 'Online';
-    case 'BUSY': return 'Busy';
-    default: return 'Offline';
-  }
-};
-
-const getStatusStyle = (display) => {
-  switch (display) {
-    case 'Online': return 'bg-[#05BC27] text-white';
-    case 'Busy': return 'bg-[#E2AB0B] text-white';
-    default: return 'bg-gray-100 text-gray-500';
-  }
-};
-
-// ─────────────────────────────────────────────────────────────
-// COMPONENT
-// ─────────────────────────────────────────────────────────────
 
 const ConsultantCard = memo(({ consultantsData }) => {
   const navigate = useNavigate();
-  const { getStatus } = usePresence(); // ✅ live status hook
+  const { getStatus } = usePresence();
 
   const [showAudio, setShowAudio] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
@@ -78,10 +56,7 @@ const ConsultantCard = memo(({ consultantsData }) => {
     <>
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
         {consultants.map((consultant) => {
-          // ✅ userId is the User.id on the Consultant — needed for presence lookup
           const consultantUserId = consultant.userId || consultant.user?.id;
-
-          // Live status (falls back to DB value while socket not yet updated)
           const rawStatus = getStatus(consultantUserId, consultant.onlineStatus);
           const displayStatus = toDisplayStatus(rawStatus);
 
@@ -91,7 +66,7 @@ const ConsultantCard = memo(({ consultantsData }) => {
               onClick={() => handleCardClick(consultant.id)}
               className='bg-[#F5F1FD] rounded-2xl overflow-hidden shadow-sm p-4 cursor-pointer transition-transform hover:scale-105 duration-300'
             >
-              {/* Image + status badge */}
+
               <div className='relative rounded-xl overflow-hidden'>
                 <img
                   src={
@@ -105,11 +80,11 @@ const ConsultantCard = memo(({ consultantsData }) => {
                       'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop';
                   }}
                 />
-                {/* ✅ Live status badge */}
+
                 <div
                   className={`absolute top-3 right-3 px-3 py-1 rounded-full text-[12px] font-medium flex items-center gap-1.5 ${getStatusStyle(displayStatus)}`}
                 >
-                  {/* Pulsing dot for online */}
+
                   {displayStatus === 'Online' && (
                     <span className='relative flex h-2 w-2'>
                       <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75' />
@@ -179,7 +154,6 @@ const ConsultantCard = memo(({ consultantsData }) => {
         })}
       </div>
 
-      {/* Modals — rendered once outside the map */}
       {selectedConsultant && (
         <>
           <AudioCallModal

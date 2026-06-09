@@ -75,7 +75,7 @@ const RealTimeChat = memo(({
     const [startSessionMutation] = useStartSessionMutation();
     const [endSessionMutation] = useEndSessionMutation();
 
-    // ✅ 'ACTIVE' only — 'ENDING' and 'ENDED' are NOT active
+
     const isSessionActive = sessionStatus === 'ACTIVE';
     const canSend = !!inputValue.trim() && !isUploading && !isStartingSession && !isEndingSession;
 

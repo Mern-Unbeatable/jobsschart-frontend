@@ -1,4 +1,4 @@
-// src/pages/dashboard/consultant/Dashboard.jsx
+
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../store/slices/authSlice';
@@ -67,23 +67,6 @@ const ConsultantDashboard = () => {
     return RECENT_CLIENTS.slice(startIndex, endIndex);
   }, [currentPage]);
 
-  // Initialize socket connection when user is authenticated
-  useEffect(() => {
-    if (user?.id && token) {
-      socketService.connect(user.id, token);
-
-      const checkConnection = setInterval(() => {
-        // ✅ Use getConnectionStatus() or isConnected()
-        const isConnected = socketService.isConnected();
-        setSocketConnected(isConnected);
-      }, 3000);
-
-      return () => {
-        clearInterval(checkConnection);
-      };
-    }
-  }, [user?.id, token]);
-
   const handlePageChange = useCallback(
     (nextPage) => {
       const safePage = Math.max(1, Math.min(nextPage, totalPages));
@@ -92,32 +75,10 @@ const ConsultantDashboard = () => {
     [totalPages],
   );
 
-  const toggleOnlineStatus = async () => {
-    try {
-      const newStatus = !isOnline;
-      await updateOnlineStatus({ onlineStatus: newStatus ? 'ONLINE' : 'OFFLINE' }).unwrap();
-      setIsOnline(newStatus);
-      toast.success(`You are now ${newStatus ? 'Online' : 'Offline'}`);
 
-      // Also emit socket event to notify status change
-      if (socketService.isConnected()) {
-        socketService.emit('consultant_status', { status: newStatus ? 'ONLINE' : 'OFFLINE' });
-      }
-    } catch (error) {
-      console.error('Failed to update status:', error);
-      toast.error('Failed to update status');
-    }
-  };
 
-  // Debug function to test socket
-  const testSocketConnection = () => {
-    const status = socketService.isConnected();
-    toast.success(`Socket ${status ? 'Connected' : 'Disconnected'}`);
 
-    if (status) {
-      socketService.emit('get_rooms', {});
-    }
-  };
+
 
   return (
     <section className='space-y-6 sm:space-y-8'>
@@ -127,36 +88,11 @@ const ConsultantDashboard = () => {
           <h1 className='dashboard-page-title'>
             Welcome back, {user?.name || 'Sarah'}
           </h1>
-          <p className='dashboard-page-subtitle mt-2'>
-            You have 3 sessions scheduled for today.
-          </p>
-          {/* Socket Status Indicator */}
-          <div className="mt-2 flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${socketConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-            <span className="text-xs text-gray-500">
-              Socket: {socketConnected ? 'Connected ✅' : 'Disconnected ❌'}
-            </span>
-            <button
-              onClick={testSocketConnection}
-              className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-0.5 rounded ml-2"
-            >
-              Test
-            </button>
-          </div>
+
+
         </div>
 
-        {/* Online Status Toggle Button */}
-        <button
-          onClick={toggleOnlineStatus}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all ${isOnline
-            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-        >
-          {isOnline ? <Wifi size={18} /> : <WifiOff size={18} />}
-          <span>{isOnline ? 'Online' : 'Offline'}</span>
-          <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
-        </button>
+
       </div>
 
       {/* Earnings metric cards */}

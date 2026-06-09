@@ -1,4 +1,4 @@
-// CommonSidebar.jsx
+
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -16,11 +16,11 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-// Define NAV_BASE - was missing
+
 const NAV_BASE =
   'group flex items-center gap-3 rounded-lg border text-base font-medium transition-all duration-200 pl-3.25 pr-3 py-2.5 hover:-translate-y-0.5';
 
-// Define getNavClass function
+
 const getNavClass = (isActive, activeColor, inactiveColor) =>
   `${NAV_BASE} ${isActive
     ? `${activeColor}`
@@ -119,7 +119,6 @@ const CommonSidebar = ({
       console.error('Logout error:', error);
       toast.error('Failed to logout. Please try again.');
 
-      // Force clear local state even if API fails
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
@@ -301,10 +300,10 @@ const CommonSidebar = ({
                         size={18}
                         aria-hidden='true'
                         className={`shrink-0 transition-colors ${isActive
-                            ? actualRole === 'consultant'
-                              ? 'text-yellow-600'
-                              : 'text-orange-500'
-                            : 'text-gray-400 group-hover:text-gray-500'
+                          ? actualRole === 'consultant'
+                            ? 'text-yellow-600'
+                            : 'text-orange-500'
+                          : 'text-gray-400 group-hover:text-gray-500'
                           }`}
                       />
                       <span className='flex-1 truncate'>{name}</span>
@@ -313,8 +312,8 @@ const CommonSidebar = ({
                           size={16}
                           aria-hidden='true'
                           className={`shrink-0 animate-nav-arrow ${actualRole === 'consultant'
-                              ? 'text-yellow-500'
-                              : 'text-orange-400'
+                            ? 'text-yellow-500'
+                            : 'text-orange-400'
                             }`}
                         />
                       )}

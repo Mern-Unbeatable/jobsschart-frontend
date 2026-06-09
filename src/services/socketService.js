@@ -43,7 +43,7 @@ class SocketService {
             timeout: 10000,
         });
 
-        // ── Connection events ───────────────────────────────────────
+        // ── Connection events 
 
         this.socket.on('connect', () => {
             this._isConnected = true;
@@ -76,7 +76,6 @@ class SocketService {
             this._startHeartbeat();
         });
 
-        // Forward all server events to registered listeners
         this.socket.onAny((event, ...args) => {
             this._emit(event, ...args);
         });
@@ -84,15 +83,15 @@ class SocketService {
         return this.socket;
     }
 
-    // ── Heartbeat ─────────────────────────────────────────────────
+    // ── Heartbeat
 
     _startHeartbeat() {
-        this._stopHeartbeat(); // clear any existing interval first
+        this._stopHeartbeat();
         this._heartbeatInterval = setInterval(() => {
             if (this.socket?.connected) {
                 this.socket.emit('heartbeat');
             }
-        }, 30_000); // every 30 seconds
+        }, 30_000);
     }
 
     _stopHeartbeat() {
@@ -102,7 +101,7 @@ class SocketService {
         }
     }
 
-    // ── Internal event bus ────────────────────────────────────────
+    // ── Internal event bus
 
     _emit(event, ...args) {
         const cbs = this._listeners[event];
@@ -118,12 +117,6 @@ class SocketService {
         });
     }
 
-    /**
-     * Subscribe to a socket event.
-     * @param {string} event   - Socket event name
-     * @param {string|Function} keyOrCallback - Unique key (for removal) or callback
-     * @param {Function} [callback] - Callback if key was provided
-     */
     on(event, keyOrCallback, callback) {
         if (!this._listeners[event]) this._listeners[event] = {};
         if (typeof keyOrCallback === 'function') {
@@ -133,11 +126,6 @@ class SocketService {
         }
     }
 
-    /**
-     * Unsubscribe from a socket event.
-     * @param {string} event - Socket event name
-     * @param {string} [key] - Specific key to remove, or all if omitted
-     */
     off(event, key) {
         if (!this._listeners[event]) return;
         if (key) {
@@ -177,8 +165,7 @@ class SocketService {
     }
 
     /**
-     * Manually set your status (ONLINE | BUSY | OFFLINE).
-     * Useful for consultant to go "BUSY" during a call.
+     * Manually set your status
      */
     setStatus(status) {
         this.emit('set_status', { status });
