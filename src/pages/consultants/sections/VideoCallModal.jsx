@@ -40,15 +40,15 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   const isClosingRef = useRef(false);
   const isAcceptedRef = useRef(false);
   const hasInitiatedRef = useRef(false);
+  // Store pending connection params so we can retry once refs are ready
+  const pendingVideoConnectRef = useRef(null);
   callStateRef.current = callState;
 
-  // Poll for call status
   const { data: callData } = useGetCallByIdQuery(callState?.callId, {
     skip: !callState?.callId || showFeedback,
     pollingInterval: 2000,
   });
 
-  // Sync call duration from server when call ends
   useEffect(() => {
     if (callData?.data?.durationSeconds && !showFeedback && !isClosingRef.current) {
       const serverDuration = callData.data.durationSeconds;
@@ -84,45 +84,71 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       setCallState({
         callId: incomingCallData.callId,
         roomName: incomingCallData.roomName,
-        userToken: incomingCallData.token, // ✅ This IS the consultant's token
+        userToken: incomingCallData.token,
         status: 'pending',
         isIncoming: true,
       });
     }
   }, [incomingCallData, isOpen]);
 
-  // ✅ Connect video — wait for refs to be ready
-  const connectVideoAfterAccept = useCallback(async (callId, roomName, tokenToUse) => {
-    if (!tokenToUse || !roomName) {
-      console.error('Missing token or roomName for video connection');
-      return false;
-    }
-
-    // ✅ Wait for refs to be available (max 3 seconds)
-    const waitForRef = (ref, name, maxWait = 3000) => new Promise((resolve, reject) => {
-      if (ref.current) { resolve(ref.current); return; }
+  // ─────────────────────────────────────────────────────────────────
+  // KEY FIX: connectVideo using the LIVE ref values at call time.
+  // We do NOT use useCallback with captured refs — instead we read
+  // remoteVideoRef.current and localVideoRef.current at the moment
+  // we actually call twilioVideoService.connectVideo, after waiting
+  // for them to be present in the DOM via a polling loop (no guessed
+  // timeout).
+  // ─────────────────────────────────────────────────────────────────
+  const waitForRefs = useCallback((maxMs = 5000) => {
+    return new Promise((resolve, reject) => {
       const start = Date.now();
       const check = () => {
-        if (ref.current) { resolve(ref.current); return; }
-        if (Date.now() - start > maxWait) { reject(new Error(`${name} ref not available`)); return; }
+        if (localVideoRef.current && remoteVideoRef.current) {
+          resolve({ local: localVideoRef.current, remote: remoteVideoRef.current });
+          return;
+        }
+        if (Date.now() - start > maxMs) {
+          reject(new Error('Video ref elements not available after ' + maxMs + 'ms'));
+          return;
+        }
         requestAnimationFrame(check);
       };
       check();
     });
+  }, []);
 
+  const connectVideo = useCallback(async (roomName, tokenToUse) => {
+    if (!tokenToUse || !roomName) {
+      console.error('connectVideo: missing token or roomName');
+      return false;
+    }
     try {
-      const localEl = await waitForRef(localVideoRef, 'localVideo');
-      const remoteEl = await waitForRef(remoteVideoRef, 'remoteVideo');
-
-      await twilioVideoService.connectVideo(tokenToUse, roomName, localEl, remoteEl);
+      const { local, remote } = await waitForRefs(5000);
+      await twilioVideoService.connectVideo(tokenToUse, roomName, local, remote);
       setIsVideoConnected(true);
+      console.log('✅ Video connected successfully');
       return true;
     } catch (err) {
       console.error('❌ Video connect error:', err);
-      toast.error('Failed to connect video, but audio may work');
+      toast.error('Failed to connect video');
       return false;
     }
-  }, []);
+  }, [waitForRefs]);
+
+  // If a connection was requested before refs were ready, retry once
+  // the component re-renders with active state (refs now in DOM).
+  useEffect(() => {
+    if (
+      callState?.status === 'active' &&
+      !isVideoConnected &&
+      !isClosingRef.current &&
+      pendingVideoConnectRef.current
+    ) {
+      const { roomName, tokenToUse } = pendingVideoConnectRef.current;
+      pendingVideoConnectRef.current = null;
+      connectVideo(roomName, tokenToUse);
+    }
+  }, [callState?.status, isVideoConnected, connectVideo]);
 
   // Socket listeners
   useEffect(() => {
@@ -138,6 +164,10 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       setSeconds(0);
       setCurrentBilling(0);
 
+      const roomName = data.roomName || callStateRef.current?.roomName;
+      const tokenToUse = data.token || callStateRef.current?.userToken;
+
+      // Update state first so the active UI (with video divs) renders
       setCallState(prev => ({
         ...prev,
         status: 'active',
@@ -148,16 +178,9 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
       toast.success('Call accepted! Connecting video...');
 
-      // ✅ Small delay to let React render the video containers
-      await new Promise(resolve => setTimeout(resolve, 200));
-
-      const currentState = callStateRef.current;
-      const roomName = data.roomName || currentState?.roomName;
-      let tokenToUse = data.token || currentState?.userToken;
-
-      if (tokenToUse && roomName) {
-        await connectVideoAfterAccept(data.callId || currentState?.callId, roomName, tokenToUse);
-      }
+      // Store params; the useEffect above will call connectVideo once
+      // refs are in the DOM after the state update re-render.
+      pendingVideoConnectRef.current = { roomName, tokenToUse };
     };
 
     const handleCallRejected = () => {
@@ -190,7 +213,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       socketService.off('call_ended', LISTENER_KEY);
       isAcceptedRef.current = false;
     };
-  }, [isOpen, user?.id, token, connectVideoAfterAccept]);
+  }, [isOpen, user?.id, token]);
 
   // Initiate call (caller side)
   useEffect(() => {
@@ -264,32 +287,28 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     }
   };
 
-  // ✅ FIX: Consultant uses THEIR OWN token
+  // Consultant accepts incoming call
   const handleAcceptCall = async () => {
     if (!callState?.callId || isClosingRef.current) return;
 
     try {
       const result = await acceptCall(callState.callId).unwrap();
 
-      // ✅ CRITICAL FIX: Use consultant's token, NOT user's token
       const tokenToUse = result?.data?.consultantToken || result?.consultantToken || callState.userToken;
       const roomName = result?.data?.call?.roomName || callState.roomName;
 
-      if (tokenToUse && roomName) {
-        setCallState(prev => ({
-          ...prev,
-          userToken: tokenToUse,
-          status: 'active',
-        }));
+      // Set active state first so video divs render, then connectVideo
+      // will find the refs via waitForRefs polling.
+      setCallState(prev => ({
+        ...prev,
+        userToken: tokenToUse,
+        status: 'active',
+      }));
+      setActualStartTime(Date.now());
+      toast.success('Call accepted, connecting...');
 
-        setActualStartTime(Date.now());
-        toast.success('Call accepted, connecting...');
-
-        // ✅ Small delay to let React render the active-state UI (video containers)
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-        await connectVideoAfterAccept(callState.callId, roomName, tokenToUse);
-      }
+      // Store params for the pending-connect useEffect
+      pendingVideoConnectRef.current = { roomName, tokenToUse };
     } catch (err) {
       console.error('Failed to accept call:', err);
       toast.error('Failed to accept call');
@@ -298,9 +317,9 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
   const closeAll = () => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-    // ✅ Clear video container DOM elements
     if (remoteVideoRef.current) remoteVideoRef.current.innerHTML = '';
     if (localVideoRef.current) localVideoRef.current.innerHTML = '';
+    pendingVideoConnectRef.current = null;
     setSeconds(0);
     setCurrentBilling(0);
     setShowFeedback(false);
@@ -353,13 +372,13 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         className="relative w-full max-w-sm aspect-[3/4] max-h-[80vh] rounded-2xl overflow-hidden bg-gray-900 shadow-2xl border border-white/10"
         onClick={e => e.stopPropagation()}
       >
-        {/* ✅ Remote Video Container — NO React children, Twilio manages this */}
+        {/* Remote Video Container — Twilio appends <video> elements here */}
         <div
           ref={remoteVideoRef}
           className="absolute inset-0 w-full h-full bg-gray-800"
         />
 
-        {/* ✅ Overlays — siblings ON TOP of video container, NOT children */}
+        {/* Pending state overlay */}
         {callState?.status !== 'active' && (
           <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center z-[5]">
             <div className="w-24 h-24 rounded-full bg-[#D1C4E9] flex items-center justify-center text-[#5E35B1] text-3xl font-bold mb-4">
@@ -388,6 +407,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
           </div>
         )}
 
+        {/* Connecting video spinner */}
         {callState?.status === 'active' && !isVideoConnected && (
           <div className="absolute inset-0 w-full h-full flex items-center justify-center z-[5]">
             <div className="text-center">
@@ -400,10 +420,9 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none z-[6]" />
 
-        {/* Local Video (PiP) */}
+        {/* Local Video PiP — only rendered when active so ref is available */}
         {callState?.status === 'active' && (
           <div className="absolute top-4 right-4 w-20 h-28 rounded-xl overflow-hidden border-2 border-white/20 shadow-lg bg-gray-700 z-20">
-            {/* ✅ Empty container — Twilio manages content */}
             <div ref={localVideoRef} className="w-full h-full" />
             {isVideoOff && (
               <div className="absolute inset-0 bg-gray-800 flex items-center justify-center z-[2]">
