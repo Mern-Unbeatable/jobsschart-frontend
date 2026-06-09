@@ -12,9 +12,6 @@ import RealTimeChat from './RealTimeChat';
 import { useConsultantStatus } from '../../hooks/usePresence';
 import { getStatusBadgeStyle, toDisplayStatus } from '../../utils/status';
 
-
-
-
 const ConsultantDetail = memo(() => {
   const { id } = useParams();
   const navigate = useNavigate();
