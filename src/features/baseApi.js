@@ -6,7 +6,6 @@ const BASE_URL =
   process.env.REACT_APP_API_BASE_URL ||
   'https://jobsschart-api.maktechgroup.tech/api/v1';
 
-console.log('🔍 RTK Query baseUrl =', BASE_URL); // Remove after debugging
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
@@ -27,7 +26,7 @@ const baseQuery = fetchBaseQuery({
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
   if (result.error) {
-    console.error('❌ API Error Details:', {
+    console.error(' API Error Details:', {
       status: result.error.status,
       data: result.error.data,
       url: args.url,
