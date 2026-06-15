@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
-import { ROUTES } from '../../../config';
+import { ROUTES } from '../../../../config';
 
 // ─── Image asset constants (Figma; expire after 7 days) ───────────────────────
 
