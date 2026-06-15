@@ -2,7 +2,12 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, ImagePlus, X } from 'lucide-react';
 import { gsap } from 'gsap';
+import toast from 'react-hot-toast';
 import { ROUTES } from '../../../../config';
+import {
+  useCreateProductMutation,
+  useUpdateProductMutation,
+} from '../../../../features/api/productApi';
 
 const CATEGORY_OPTIONS = [
   'Spiritual Items',
@@ -12,12 +17,29 @@ const CATEGORY_OPTIONS = [
   'Books',
 ];
 
+const CATEGORY_MAP = {
+  'Spiritual Items': 'SpiritualItems',
+  'Healing Tools': 'HealingTools',
+  'Articles': 'Articles',
+  'Digital Products': 'DigitalProducts',
+  'Books': 'Books',
+};
+
+const REVERSE_CATEGORY_MAP = {
+  'SpiritualItems': 'Spiritual Items',
+  'HealingTools': 'Healing Tools',
+  'Articles': 'Articles',
+  'DigitalProducts': 'Digital Products',
+  'Books': 'Books',
+};
+
 const FILE_HINTS = ['JPEG, PNG', 'Max 7 photos', '1920x1080px recommended'];
 
 const INITIAL_FORM = {
   title: '',
   category: '',
-  price: '€18.00',
+  price: '',
+  stock: '',
   description: '',
   features: '',
   inside: '',
@@ -31,11 +53,12 @@ const toMultiline = (value) => {
 
 const mapProductToForm = (product) => ({
   title: product?.name || '',
-  category: product?.category || '',
-  price: `€${Number(product?.price || 0).toFixed(2)}`,
-  description: product?.longDescription || product?.description || '',
+  category: REVERSE_CATEGORY_MAP[product?.productCategoryId] || product?.category || '',
+  price: product?.price ? String(product.price) : '',
+  stock: product?.stock ? String(product.stock) : '',
+  description: product?.description || '',
   features: toMultiline(product?.features),
-  inside: toMultiline(product?.inside),
+  inside: toMultiline(product?.whatsInside || product?.inside),
   benefits: toMultiline(product?.benefits),
 });
 
@@ -48,24 +71,37 @@ const AdminAddNewProduct = () => {
   const mode = location.state?.mode === 'edit' ? 'edit' : 'add';
   const sourceProduct = location.state?.product;
 
+  const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
+  const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
+
   const [form, setForm] = useState(() => {
     if (mode !== 'edit' || !sourceProduct) return INITIAL_FORM;
     return mapProductToForm(sourceProduct);
   });
 
-  const [previewUrls, setPreviewUrls] = useState(() =>
-    mode === 'edit' && sourceProduct?.image ? [sourceProduct.image] : [],
-  );
+  const [previewUrls, setPreviewUrls] = useState(() => {
+    if (mode === 'edit') {
+      if (sourceProduct?.gallery && sourceProduct.gallery.length > 0) {
+        return sourceProduct.gallery;
+      }
+      return sourceProduct?.image ? [sourceProduct.image] : [];
+    }
+    return [];
+  });
+  
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (mode === 'edit' && sourceProduct) {
       setForm(mapProductToForm(sourceProduct));
-      setPreviewUrls(sourceProduct.image ? [sourceProduct.image] : []);
+      setPreviewUrls(sourceProduct.gallery && sourceProduct.gallery.length > 0 ? sourceProduct.gallery : (sourceProduct.image ? [sourceProduct.image] : []));
+      setSelectedFiles([]);
       return;
     }
     setForm(INITIAL_FORM);
     setPreviewUrls([]);
+    setSelectedFiles([]);
   }, [mode, sourceProduct]);
 
   useEffect(() => {
@@ -94,6 +130,8 @@ const AdminAddNewProduct = () => {
   const handleImageChange = useCallback((e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
+    
+    setSelectedFiles((prev) => [...prev, ...files].slice(0, 7));
     const newUrls = files.map((f) => URL.createObjectURL(f));
     setPreviewUrls((prev) => [...prev, ...newUrls].slice(0, 7));
     e.target.value = '';
@@ -105,11 +143,61 @@ const AdminAddNewProduct = () => {
       if (removed?.startsWith('blob:')) URL.revokeObjectURL(removed);
       return prev.filter((_, i) => i !== idx);
     });
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== idx));
   }, []);
 
-  const handleSubmit = useCallback((event) => {
+  const toCommaSeparated = (text) => {
+    if (!text) return '';
+    return text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line !== '')
+      .join(',');
+  };
+
+  const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
-  }, []);
+
+    if (!form.title || !form.price || !form.category) {
+      toast.error('Product title, category, and price are required.');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('name', form.title);
+      // Strip currency symbols/spaces if present
+      const cleanedPrice = form.price.replace(/[€$£\s]/g, '');
+      formData.append('price', cleanedPrice);
+      formData.append('stock', form.stock || '0');
+      formData.append('description', form.description || '');
+      formData.append('features', toCommaSeparated(form.features));
+      formData.append('whatsInside', toCommaSeparated(form.inside));
+      formData.append('benefits', toCommaSeparated(form.benefits));
+      
+      const mappedCategoryId = CATEGORY_MAP[form.category] || form.category;
+      formData.append('productCategoryId', mappedCategoryId);
+
+      selectedFiles.forEach((file) => {
+        formData.append('gallery', file);
+      });
+
+      if (mode === 'edit') {
+        await updateProduct({ id: sourceProduct.id, body: formData }).unwrap();
+        toast.success('Product updated successfully!');
+      } else {
+        await createProduct(formData).unwrap();
+        toast.success('Product created successfully!');
+      }
+
+      navigate(ROUTES.ADMIN_WEBSHOP);
+    } catch (err) {
+      console.error('Submit error:', err);
+      toast.error(err?.data?.message || err?.message || 'Failed to save product.');
+    }
+  }, [form, selectedFiles, mode, sourceProduct, createProduct, updateProduct, navigate]);
+
+  const isSaving = isCreating || isUpdating;
 
   return (
     <div ref={pageRef} className='flex flex-col gap-6'>
@@ -121,7 +209,7 @@ const AdminAddNewProduct = () => {
         <button
           type='button'
           onClick={() => navigate(ROUTES.ADMIN_WEBSHOP)}
-          className='inline-flex items-center gap-2 text-sm font-medium text-[#E2AB0B] w-fit hover:opacity-80 transition-opacity'
+          className='inline-flex items-center gap-2 text-sm font-medium text-[#E2AB0B] w-fit hover:opacity-80 transition-opacity cursor-pointer'
         >
           <ArrowLeft size={16} />
           Back
@@ -173,7 +261,18 @@ const AdminAddNewProduct = () => {
               type='text'
               value={form.price}
               onChange={(e) => handleChange('price', e.target.value)}
-              placeholder='€18.00'
+              placeholder='18.00'
+              className='h-12 rounded-lg border border-black/40 px-4 text-sm text-[#333] placeholder:text-[#989DA1] focus:outline-none focus:ring-2 focus:ring-[#E2AB0B]/30'
+            />
+          </label>
+
+          <label className='flex flex-col gap-2.5'>
+            <span className='text-base lg:text-lg text-[#464646]'>Stock</span>
+            <input
+              type='number'
+              value={form.stock}
+              onChange={(e) => handleChange('stock', e.target.value)}
+              placeholder='25'
               className='h-12 rounded-lg border border-black/40 px-4 text-sm text-[#333] placeholder:text-[#989DA1] focus:outline-none focus:ring-2 focus:ring-[#E2AB0B]/30'
             />
           </label>
@@ -191,7 +290,7 @@ const AdminAddNewProduct = () => {
         </label>
 
         <label data-reveal className='flex flex-col gap-2.5'>
-          <span className='text-base lg:text-lg text-[#464646]'>Features</span>
+          <span className='text-base lg:text-lg text-[#464646]'>Features (One item per line)</span>
           <textarea
             rows={6}
             value={form.features}
@@ -202,7 +301,7 @@ const AdminAddNewProduct = () => {
         </label>
 
         <label data-reveal className='flex flex-col gap-2.5'>
-          <span className='text-base lg:text-lg text-[#464646]'>What's Inside</span>
+          <span className='text-base lg:text-lg text-[#464646]'>What's Inside (One item per line)</span>
           <textarea
             rows={6}
             value={form.inside}
@@ -213,7 +312,7 @@ const AdminAddNewProduct = () => {
         </label>
 
         <label data-reveal className='flex flex-col gap-2.5'>
-          <span className='text-base lg:text-lg text-[#464646]'>Benefits</span>
+          <span className='text-base lg:text-lg text-[#464646]'>Benefits (One item per line)</span>
           <textarea
             rows={6}
             value={form.benefits}
@@ -326,15 +425,16 @@ const AdminAddNewProduct = () => {
           <button
             ref={saveBtnRef}
             type='submit'
+            disabled={isSaving}
             onMouseEnter={() =>
               gsap.to(saveBtnRef.current, { scale: 1.03, duration: 0.12 })
             }
             onMouseLeave={() =>
               gsap.to(saveBtnRef.current, { scale: 1, duration: 0.12 })
             }
-            className='bg-[#E2AB0B] text-white px-6 py-2.5 rounded text-base font-normal hover:bg-[#c99809] transition-colors'
+            className='bg-[#E2AB0B] text-white px-6 py-2.5 rounded text-base font-normal hover:bg-[#c99809] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            {mode === 'edit' ? 'Update' : 'Save'}
+            {isSaving ? 'Saving...' : mode === 'edit' ? 'Update' : 'Save'}
           </button>
         </div>
       </form>
