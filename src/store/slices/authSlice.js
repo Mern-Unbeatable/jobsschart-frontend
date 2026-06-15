@@ -1,9 +1,9 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import Cookies from 'js-cookie';
-import { signIn, signOut } from '../../services/authApi';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
+import { signIn, signOut } from "../../services/authApi";
 
 const normalizeRole = (role) =>
-  typeof role === 'string' ? role.toLowerCase() : null;
+  typeof role === "string" ? role.toLowerCase() : null;
 
 const normalizeUser = (user) => {
   if (!user) return null;
@@ -15,20 +15,20 @@ const normalizeUser = (user) => {
 
 const getErrorMessage = (error, fallback) => {
   if (!error) return fallback;
-  if (typeof error === 'string') return error;
-  if (typeof error.message === 'string' && error.message.trim()) {
+  if (typeof error === "string") return error;
+  if (typeof error.message === "string" && error.message.trim()) {
     return error.message;
   }
   return fallback;
 };
 
 export const loginUser = createAsyncThunk(
-  'auth/loginUser',
+  "auth/loginUser",
   async (credentials, { rejectWithValue }) => {
     const { data, error } = await signIn(credentials);
 
     if (error) {
-      return rejectWithValue(getErrorMessage(error, 'Login failed'));
+      return rejectWithValue(getErrorMessage(error, "Login failed"));
     }
 
     const payload = data?.data;
@@ -37,25 +37,25 @@ export const loginUser = createAsyncThunk(
     const refreshToken = payload?.refreshToken || payload?.user?.refreshTokens;
 
     if (!user || !token) {
-      return rejectWithValue('Invalid login response from server');
+      return rejectWithValue("Invalid login response from server");
     }
 
     return {
       user,
       token,
       refreshToken: refreshToken || null,
-      message: data?.message || 'Login successful',
+      message: data?.message || "Login successful",
     };
   },
 );
 
 export const logoutUser = createAsyncThunk(
-  'auth/logoutUser',
+  "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     const { error } = await signOut();
 
     if (error) {
-      return rejectWithValue(getErrorMessage(error, 'Logout failed'));
+      return rejectWithValue(getErrorMessage(error, "Logout failed"));
     }
 
     return true;
@@ -64,9 +64,9 @@ export const logoutUser = createAsyncThunk(
 
 const loadAuthState = () => {
   try {
-    const token = Cookies.get('token') || null;
-    const refreshToken = Cookies.get('refreshToken') || null;
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const token = Cookies.get("token") || null;
+    const refreshToken = Cookies.get("refreshToken") || null;
+    const user = JSON.parse(localStorage.getItem("user") || "null");
     return {
       user: normalizeUser(user),
       isAuthenticated: !!token,
@@ -88,7 +88,7 @@ const loadAuthState = () => {
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState: loadAuthState(),
   reducers: {
     loginSuccess: (state, action) => {
@@ -138,9 +138,9 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error =
-          typeof action.payload === 'string'
+          typeof action.payload === "string"
             ? action.payload
-            : action.error?.message || 'Login failed';
+            : action.error?.message || "Login failed";
       })
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
@@ -161,7 +161,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.loading = false;
         state.error =
-          typeof action.payload === 'string'
+          typeof action.payload === "string"
             ? action.payload
             : action.error?.message || null;
       });

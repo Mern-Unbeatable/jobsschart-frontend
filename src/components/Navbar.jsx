@@ -1,20 +1,16 @@
 import React, { memo } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import { Menu, X } from "lucide-react";
-import { ROUTES } from "../config";
+import { useSelector, useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { Menu, X, LogOut } from "lucide-react";
+import { ROUTES, getDashboardRoute } from "../config";
 import LanguageSelector from "./LanguageSelector";
 import {
   selectIsAuthenticated,
   selectUserRole,
-} from "../store/slices/authSlice";
-
-const DASHBOARD_MAP = {
-  admin: ROUTES.ADMIN_DASHBOARD,
-  user: ROUTES.USER_DASHBOARD,
-  consultant: ROUTES.CONSULTANT_DASHBOARD,
-};
+  logoutUser,
+} from "../features/slices/authSlice";
 
 const NAV_LINKS = [
   { to: ROUTES.HOME, labelKey: "common.home", end: true },
@@ -50,12 +46,33 @@ const mobileNavLinkClass = ({ isActive }) =>
 
 const Navbar = memo(({ menuOpen, setMenuOpen }) => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const userRole = useSelector(selectUserRole);
   const logoTo = isAuthenticated
-    ? DASHBOARD_MAP[userRole] || ROUTES.HOME
+    ? getDashboardRoute(userRole)
     : ROUTES.HOME;
   const closeMenu = () => setMenuOpen(false);
+
+  const handleLogout = async () => {
+    try {
+      const loadingToast = toast.loading("Logging out...");
+      await dispatch(logoutUser()).unwrap();
+      toast.dismiss(loadingToast);
+      toast.success("Signed out successfully");
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to logout. Please try again.");
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      localStorage.removeItem("auth");
+      navigate("/login", { replace: true });
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-100 border-b border-gray-100 bg-white shadow-sm">
       <div className="relative z-10 w-full container mx-auto px-4 lg:px-6 ">
@@ -86,12 +103,22 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
           <div className="hidden xl:flex items-center gap-3">
             <LanguageSelector />
             {isAuthenticated ? (
-              <Link
-                to={DASHBOARD_MAP[userRole] || ROUTES.HOME}
-                className="rounded-md bg-green-500/60 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all uppercase tracking-wide"
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  to={getDashboardRoute(userRole)}
+                  className="rounded-md bg-green-500/60 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all uppercase tracking-wide"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 rounded-md bg-red-500/80 hover:bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all uppercase tracking-wide cursor-pointer"
+                >
+                  <LogOut size={16} />
+                  <span>{t("common.signOut")}</span>
+                </button>
+              </>
             ) : (
               <>
                 <Link
@@ -156,13 +183,26 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
 
             <div className="flex flex-col gap-3 border-t border-gray-100 p-6">
               {isAuthenticated ? (
-                <Link
-                  to={DASHBOARD_MAP[userRole] || ROUTES.HOME}
-                  onClick={closeMenu}
-                  className="w-full rounded-md bg-green-500/60 py-4 text-center text-lg font-bold text-white shadow-md uppercase tracking-wide"
-                >
-                  Dashboard
-                </Link>
+                <>
+                  <Link
+                    to={getDashboardRoute(userRole)}
+                    onClick={closeMenu}
+                    className="w-full rounded-md bg-green-500/60 py-4 text-center text-lg font-bold text-white shadow-md uppercase tracking-wide"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeMenu();
+                      handleLogout();
+                    }}
+                    className="flex items-center justify-center gap-2 w-full rounded-md bg-red-500/80 hover:bg-red-600 py-4 text-center text-lg font-bold text-white shadow-md uppercase tracking-wide cursor-pointer"
+                  >
+                    <LogOut size={20} />
+                    <span>{t("common.signOut")}</span>
+                  </button>
+                </>
               ) : (
                 <>
                   <Link

@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useSignInMutation } from "../features/api/authApi";
-import { setCredentials, selectAuthLoading } from "../features/slices/authSlice"; // Fixed path
-import { ROUTES } from "../config";
+import {
+  setCredentials,
+  selectAuthLoading,
+} from "../features/slices/authSlice"; // Fixed path
+import { ROUTES, getDashboardRoute } from "../config";
 import { Eye, EyeOff, ArrowLeft, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -53,45 +56,29 @@ const Login = () => {
         password,
       }).unwrap();
 
-
       // Extract data from response
-      const { accessToken, user, refreshToken } = response;
+      const payload = response?.data ?? response;
+      const { accessToken, user, refreshToken } = payload;
 
       // Dispatch to Redux store
-      dispatch(setCredentials({
-        user: user,
-        token: accessToken
-      }));
+      dispatch(
+        setCredentials({
+          user,
+          token: accessToken,
+        }),
+      );
 
-      // Store tokens in localStorage
-      if (accessToken) {
-        localStorage.setItem('token', accessToken);
-      }
       if (refreshToken) {
-        localStorage.setItem('refreshToken', refreshToken);
-      }
-      if (user) {
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem("refreshToken", refreshToken);
       }
 
-      // Show success message
-      toast.success(response.message || "Login successful! Redirecting...");
+      toast.success(response.message || payload.message || "Login successful! Redirecting...");
 
-      // ✅ FIXED: Handle uppercase roles from backend
-      const role = user?.role?.toUpperCase(); // Normalize to uppercase
-
-      const dashboardMap = {
-        ADMIN: ROUTES.ADMIN_DASHBOARD || "/admin/dashboard",
-        USER: ROUTES.USER_DASHBOARD || "/user/dashboard",
-        CONSULTANT: ROUTES.CONSULTANT_DASHBOARD || "/consultant/dashboard",
-      };
-
-      const redirectPath = dashboardMap[role] || ROUTES.HOME;
+      const redirectPath = getDashboardRoute(user?.role);
 
       setTimeout(() => {
         navigate(redirectPath, { replace: true });
       }, 100);
-
     } catch (error) {
       console.error("Login error:", error);
 
@@ -161,8 +148,9 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSigningIn || authLoading}
-                className={`w-full px-4 py-3 bg-[#FEF5E7] border-none rounded text-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-[#E2AB0B] outline-none transition-all disabled:opacity-60 ${errors.email ? "ring-2 ring-red-400" : ""
-                  }`}
+                className={`w-full px-4 py-3 bg-[#FEF5E7] border-none rounded text-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-[#E2AB0B] outline-none transition-all disabled:opacity-60 ${
+                  errors.email ? "ring-2 ring-red-400" : ""
+                }`}
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-500">{errors.email}</p>
@@ -181,8 +169,9 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isSigningIn || authLoading}
-                  className={`w-full px-4 py-3 bg-[#FEF5E7] border-none rounded text-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-[#E2AB0B] outline-none transition-all disabled:opacity-60 ${errors.password ? "ring-2 ring-red-400" : ""
-                    }`}
+                  className={`w-full px-4 py-3 bg-[#FEF5E7] border-none rounded text-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-[#E2AB0B] outline-none transition-all disabled:opacity-60 ${
+                    errors.password ? "ring-2 ring-red-400" : ""
+                  }`}
                 />
                 <button
                   type="button"
@@ -212,7 +201,7 @@ const Login = () => {
               disabled={isSigningIn || authLoading}
               className="w-full bg-[#E2AB0B] disabled:opacity-60 text-white py-3 rounded font-bold text-sm transition-all shadow-md active:scale-[0.98] inline-flex items-center justify-center gap-2"
             >
-              {(isSigningIn || authLoading) ? (
+              {isSigningIn || authLoading ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
                   Processing...

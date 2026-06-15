@@ -11,21 +11,17 @@ import Layout from '../components/Layout';
 import AdminLayout from '../components/layout/admin/Layout';
 import UserLayout from '../components/layout/user/Layout';
 import ConsultantLayout from '../components/layout/consultant/Layout';
-import { ROUTES } from '../config';
+import { ROUTES, getDashboardRoute } from '../config';
 import {
   selectIsAuthenticated,
   selectUserRole,
-} from '../store/slices/authSlice';
+} from '../features/slices/authSlice';
 
-// Role to dashboard path mapping - UPPERCASE keys
-const dashboardMap = {
-  ADMIN: ROUTES.ADMIN_DASHBOARD,
-  USER: ROUTES.USER_DASHBOARD,
-  CONSULTANT: ROUTES.CONSULTANT_DASHBOARD,
+// Derive a relative segment from an absolute route path
+const seg = (route, basePath) => {
+  const prefix = `${basePath}/`;
+  return route.startsWith(prefix) ? route.slice(prefix.length) : route;
 };
-
-// Derive a relative segment from an absolute admin route path
-const seg = (route) => route.replace(`${ROUTES.ADMIN}/`, '');
 
 // Lazy imports (your existing imports remain the same)
 const Home = lazy(() => import('../pages/home/Home'));
@@ -113,7 +109,7 @@ const GuestOnlyRoute = ({ children }) => {
   const userRole = useSelector(selectUserRole);
 
   if (isAuthenticated) {
-    const redirectPath = dashboardMap[userRole] || ROUTES.HOME;
+    const redirectPath = getDashboardRoute(userRole);
     return <Navigate to={redirectPath} replace />;
   }
   return children;
@@ -139,7 +135,7 @@ const RoleBasedRoute = ({ children, allowedRoles }) => {
   }
 
   if (!allowedRoles.includes(userRole)) {
-    const redirectPath = dashboardMap[userRole] || ROUTES.HOME;
+    const redirectPath = getDashboardRoute(userRole);
     return <Navigate to={redirectPath} replace />;
   }
 
@@ -209,28 +205,28 @@ const router = createBrowserRouter(
         }
       >
         <Route index element={<Navigate to={ROUTES.ADMIN_DASHBOARD} replace />} />
-        <Route path={seg(ROUTES.ADMIN_DASHBOARD)} element={<Dashboard />} />
-        <Route path={seg(ROUTES.ADMIN_EMAILS)} element={<Emails />} />
-        <Route path={seg(ROUTES.ADMIN_LEADS)} element={<Leads />} />
-        <Route path={seg(ROUTES.ADMIN_ORDERS)} element={<Orders />} />
-        <Route path={seg(ROUTES.ADMIN_MARKETPLACE_ORDERS)} element={<MarketplaceOrders />} />
-        <Route path={seg(ROUTES.ADMIN_CASE_STUDIES)} element={<CaseStudies />} />
-        <Route path={seg(ROUTES.ADMIN_BLOG)} element={<Blog />} />
-        <Route path={seg(ROUTES.ADMIN_JOBS)} element={<Jobs />} />
-        <Route path={seg(ROUTES.ADMIN_PRICING)} element={<Pricing />} />
-        <Route path={seg(ROUTES.ADMIN_CONSULTANTS)} element={<AdminConsultants />} />
-        <Route path={seg(ROUTES.ADMIN_USERS)} element={<AdminUsers />} />
-        <Route path={seg(ROUTES.ADMIN_WEBSHOP)} element={<AdminWebshop />} />
-        <Route path={seg(ROUTES.ADMIN_WEBSHOP_ADD_PRODUCT)} element={<AdminAddNewProduct />} />
-        <Route path={seg(ROUTES.ADMIN_WEBSHOP_PRODUCT_VIEW)} element={<AdminProductView />} />
-        <Route path={seg(ROUTES.ADMIN_DONATION)} element={<AdminDonation />} />
-        <Route path={seg(ROUTES.ADMIN_ADS)} element={<AdminAds />} />
-        <Route path={seg(ROUTES.ADMIN_ADS_PUBLISHED)} element={<AdminAdsPublished />} />
-        <Route path={seg(ROUTES.ADMIN_SESSION)} element={<AdminSession />} />
-        <Route path={seg(ROUTES.ADMIN_PAYOUT)} element={<AdminPayout />} />
-        <Route path={seg(ROUTES.ADMIN_SETTINGS)} element={<AdminSettings />} />
-        <Route path={seg(ROUTES.ADMIN_PROFILE)} element={<AdminProfile />} />
-        <Route path={seg(ROUTES.ADMIN_FAQ)} element={<AdminFaq />} />
+        <Route path={seg(ROUTES.ADMIN_DASHBOARD, ROUTES.ADMIN)} element={<Dashboard />} />
+        <Route path={seg(ROUTES.ADMIN_EMAILS, ROUTES.ADMIN)} element={<Emails />} />
+        <Route path={seg(ROUTES.ADMIN_LEADS, ROUTES.ADMIN)} element={<Leads />} />
+        <Route path={seg(ROUTES.ADMIN_ORDERS, ROUTES.ADMIN)} element={<Orders />} />
+        <Route path={seg(ROUTES.ADMIN_MARKETPLACE_ORDERS, ROUTES.ADMIN)} element={<MarketplaceOrders />} />
+        <Route path={seg(ROUTES.ADMIN_CASE_STUDIES, ROUTES.ADMIN)} element={<CaseStudies />} />
+        <Route path={seg(ROUTES.ADMIN_BLOG, ROUTES.ADMIN)} element={<Blog />} />
+        <Route path={seg(ROUTES.ADMIN_JOBS, ROUTES.ADMIN)} element={<Jobs />} />
+        <Route path={seg(ROUTES.ADMIN_PRICING, ROUTES.ADMIN)} element={<Pricing />} />
+        <Route path={seg(ROUTES.ADMIN_CONSULTANTS, ROUTES.ADMIN)} element={<AdminConsultants />} />
+        <Route path={seg(ROUTES.ADMIN_USERS, ROUTES.ADMIN)} element={<AdminUsers />} />
+        <Route path={seg(ROUTES.ADMIN_WEBSHOP, ROUTES.ADMIN)} element={<AdminWebshop />} />
+        <Route path={seg(ROUTES.ADMIN_WEBSHOP_ADD_PRODUCT, ROUTES.ADMIN)} element={<AdminAddNewProduct />} />
+        <Route path={seg(ROUTES.ADMIN_WEBSHOP_PRODUCT_VIEW, ROUTES.ADMIN)} element={<AdminProductView />} />
+        <Route path={seg(ROUTES.ADMIN_DONATION, ROUTES.ADMIN)} element={<AdminDonation />} />
+        <Route path={seg(ROUTES.ADMIN_ADS, ROUTES.ADMIN)} element={<AdminAds />} />
+        <Route path={seg(ROUTES.ADMIN_ADS_PUBLISHED, ROUTES.ADMIN)} element={<AdminAdsPublished />} />
+        <Route path={seg(ROUTES.ADMIN_SESSION, ROUTES.ADMIN)} element={<AdminSession />} />
+        <Route path={seg(ROUTES.ADMIN_PAYOUT, ROUTES.ADMIN)} element={<AdminPayout />} />
+        <Route path={seg(ROUTES.ADMIN_SETTINGS, ROUTES.ADMIN)} element={<AdminSettings />} />
+        <Route path={seg(ROUTES.ADMIN_PROFILE, ROUTES.ADMIN)} element={<AdminProfile />} />
+        <Route path={seg(ROUTES.ADMIN_FAQ, ROUTES.ADMIN)} element={<AdminFaq />} />
       </Route>
 
       {/* User routes - UPPERCASE */}
@@ -245,12 +241,13 @@ const router = createBrowserRouter(
         }
       >
 
-        <Route path={seg(ROUTES.USER_DASHBOARD)} element={<UserDashboard />} />
-        <Route path={seg(ROUTES.USER_BOOKED_SCHEDULE)} element={<UserBookedSchedule />} />
-        <Route path={seg(ROUTES.USER_CHAT)} element={<UserChat />} />
-        <Route path={seg(ROUTES.USER_PROFILE)} element={<UserProfile />} />
-        <Route path={seg(ROUTES.USER_ORDERS)} element={<UserOrders />} />
-        <Route path={seg(ROUTES.USER_SETTINGS)} element={<UserSettings />} />
+        <Route index element={<Navigate to={ROUTES.USER_DASHBOARD} replace />} />
+        <Route path={seg(ROUTES.USER_DASHBOARD, ROUTES.USER)} element={<UserDashboard />} />
+        <Route path={seg(ROUTES.USER_BOOKED_SCHEDULE, ROUTES.USER)} element={<UserBookedSchedule />} />
+        <Route path={seg(ROUTES.USER_CHAT, ROUTES.USER)} element={<UserChat />} />
+        <Route path={seg(ROUTES.USER_PROFILE, ROUTES.USER)} element={<UserProfile />} />
+        <Route path={seg(ROUTES.USER_ORDERS, ROUTES.USER)} element={<UserOrders />} />
+        <Route path={seg(ROUTES.USER_SETTINGS, ROUTES.USER)} element={<UserSettings />} />
       </Route>
 
       {/* Consultant routes - UPPERCASE */}
@@ -264,16 +261,17 @@ const router = createBrowserRouter(
           </Suspense>
         }
       >
-        <Route path={seg(ROUTES.CONSULTANT_DASHBOARD)} element={<ConsultantDashboard />} />
-        <Route path={seg(ROUTES.CONSULTANT_SCHEDULE)} element={<ConsultantSchedule />} />
-        <Route path={seg(ROUTES.CONSULTANT_SESSIONS_HISTORY)} element={<ConsultantSessionsHistory />} />
-        <Route path={seg(ROUTES.CONSULTANT_CHAT)} element={<UserChatPage />} />
-        <Route path={seg(ROUTES.CONSULTANT_SUPPORT_TICKETS)} element={<ConsultantSupportTickets />} />
-        <Route path={seg(ROUTES.CONSULTANT_PROFILE)} element={<ConsultantProfile />} />
-        <Route path={seg(ROUTES.CONSULTANT_BOOKINGS)} element={<ConsultantBookings />} />
-        <Route path={seg(ROUTES.CONSULTANT_EARNINGS)} element={<ConsultantEarnings />} />
-        <Route path={seg(ROUTES.CONSULTANT_PAYOUT)} element={<ConsultantPayout />} />
-        <Route path={seg(ROUTES.CONSULTANT_SETTINGS)} element={<ConsultantSettings />} />
+        <Route index element={<Navigate to={ROUTES.CONSULTANT_DASHBOARD} replace />} />
+        <Route path={seg(ROUTES.CONSULTANT_DASHBOARD, ROUTES.CONSULTANT)} element={<ConsultantDashboard />} />
+        <Route path={seg(ROUTES.CONSULTANT_SCHEDULE, ROUTES.CONSULTANT)} element={<ConsultantSchedule />} />
+        <Route path={seg(ROUTES.CONSULTANT_SESSIONS_HISTORY, ROUTES.CONSULTANT)} element={<ConsultantSessionsHistory />} />
+        <Route path={seg(ROUTES.CONSULTANT_CHAT, ROUTES.CONSULTANT)} element={<UserChatPage />} />
+        <Route path={seg(ROUTES.CONSULTANT_SUPPORT_TICKETS, ROUTES.CONSULTANT)} element={<ConsultantSupportTickets />} />
+        <Route path={seg(ROUTES.CONSULTANT_PROFILE, ROUTES.CONSULTANT)} element={<ConsultantProfile />} />
+        <Route path={seg(ROUTES.CONSULTANT_BOOKINGS, ROUTES.CONSULTANT)} element={<ConsultantBookings />} />
+        <Route path={seg(ROUTES.CONSULTANT_EARNINGS, ROUTES.CONSULTANT)} element={<ConsultantEarnings />} />
+        <Route path={seg(ROUTES.CONSULTANT_PAYOUT, ROUTES.CONSULTANT)} element={<ConsultantPayout />} />
+        <Route path={seg(ROUTES.CONSULTANT_SETTINGS, ROUTES.CONSULTANT)} element={<ConsultantSettings />} />
       </Route>
 
       {/* 404 route */}

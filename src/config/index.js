@@ -88,6 +88,21 @@ export const ROUTES = {
   CONSULTANT_SETTINGS: '/consultant/settings',
 };
 
+export const DASHBOARD_BY_ROLE = {
+  ADMIN: ROUTES.ADMIN_DASHBOARD,
+  USER: ROUTES.USER_DASHBOARD,
+  CONSULTANT: ROUTES.CONSULTANT_DASHBOARD,
+};
+
+export const normalizeUserRole = (role) =>
+  typeof role === 'string' ? role.toUpperCase() : null;
+
+export const getDashboardRoute = (role) => {
+  const normalizedRole = normalizeUserRole(role);
+  if (!normalizedRole) return ROUTES.HOME;
+  return DASHBOARD_BY_ROLE[normalizedRole] || ROUTES.HOME;
+};
+
 /* =========================
    API CONFIG (SAFE)
 ========================= */
