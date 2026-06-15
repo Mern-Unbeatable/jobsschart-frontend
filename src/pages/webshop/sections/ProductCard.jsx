@@ -3,12 +3,19 @@ import { useNavigate } from 'react-router-dom';
 
 const ProductCard = memo(({ product }) => {
   const navigate = useNavigate();
+
+  const handleBuyNow = (e) => {
+    e.stopPropagation();
+    navigate('/checkout', { state: { product, quantity: 1 } });
+  };
+
   const handleDetailsClick = (e) => {
     e.stopPropagation();
     navigate(`/webshop/${product.id}`);
   };
+
   return (
-    <div className="bg-white rounded-xl overflow-hidden border border-[#E2AB0B] shadow-sm p-3 flex flex-col h-full">
+    <div className="bg-white rounded-xl overflow-hidden border border-green-400 shadow-sm p-3 flex flex-col h-full">
       {/* Image Container with Inset padding and border */}
       <div className="relative aspect-square mb-4 rounded-lg overflow-hidden border border-gray-100">
         <img
@@ -34,7 +41,7 @@ const ProductCard = memo(({ product }) => {
 
         {/* Action Buttons */}
         <div className="flex gap-2 mt-auto pb-1">
-          <button className="flex-1 bg-[#E2AB0B]  text-white text-base  py-2.5 rounded-lg">
+          <button onClick={handleBuyNow} className="flex-1 bg-green-500/60  text-white text-base  py-2.5 rounded-lg">
             Buy Now
           </button>
 
