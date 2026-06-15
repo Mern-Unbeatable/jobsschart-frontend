@@ -6,5 +6,6 @@ export const tagList = [
   'Earnings',
   'Consultant',
   "Review",
-  "ChatConversation"
+  "ChatConversation",
+  "Product"
 ];

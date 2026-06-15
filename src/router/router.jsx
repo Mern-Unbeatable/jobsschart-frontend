@@ -56,7 +56,7 @@ const Pricing = lazy(() => import('../pages/dashboard/admin/Pricing'));
 const AdminConsultants = lazy(() => import('../pages/dashboard/admin/Consultants'));
 const AdminUsers = lazy(() => import('../pages/dashboard/admin/Users'));
 const AdminWebshop = lazy(() => import('../pages/dashboard/admin/webshop/Webshop'));
-const AdminAddNewProduct = lazy(() => import('../pages/dashboard/admin/AddNewProduct'));
+const AdminAddNewProduct = lazy(() => import('../pages/dashboard/admin/webshop/AddNewProduct'));
 const AdminProductView = lazy(() => import('../pages/dashboard/admin/ProductView'));
 const AdminDonation = lazy(() => import('../pages/dashboard/admin/Donation'));
 const AdminAds = lazy(() => import('../pages/dashboard/admin/AdsManagement'));

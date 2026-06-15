@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, ImagePlus, X } from 'lucide-react';
 import { gsap } from 'gsap';
-import { ROUTES } from '../../../config';
+import { ROUTES } from '../../../../config';
 
 const CATEGORY_OPTIONS = [
   'Spiritual Items',
