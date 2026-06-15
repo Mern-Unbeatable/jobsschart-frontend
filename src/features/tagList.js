@@ -7,5 +7,8 @@ export const tagList = [
   'Consultant',
   "Review",
   "ChatConversation",
-  "Product"
+  "Product",
+  "Payment",
+  "PaymentHistory",
+  "AllPayments",
 ];

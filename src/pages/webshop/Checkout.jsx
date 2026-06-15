@@ -1,6 +1,8 @@
 import React, { memo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSEO } from '../../hooks/useSEO';
+import { useCreateCheckoutMutation } from '../../features/api/paymentApi';
+import toast from 'react-hot-toast';
 
 const Checkout = memo(() => {
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ const Checkout = memo(() => {
     address: '',
     city: '',
     postalCode: '',
+    country: 'Switzerland',
   });
 
   useSEO({
@@ -22,26 +25,60 @@ const Checkout = memo(() => {
     keywords: ['checkout', 'purchase', 'order'],
   });
 
+  const [createCheckout, { isLoading: isCheckingOut }] = useCreateCheckoutMutation();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const subtotal = product ? product.price * quantity : 0;
+  const subtotal = product ? parseFloat(product.price || 0) * quantity : 0;
   const deliveryFee = 15.0;
-  const discount = -0.0;
-  const total = subtotal + deliveryFee + discount;
+  const total = subtotal + deliveryFee;
 
-  const handleConfirmPurchase = () => {
-    if (!formData.fullName || !formData.email || !formData.phone || !formData.address || !formData.city || !formData.postalCode) {
-      alert('Please fill in all fields');
+  const handleConfirmPurchase = async () => {
+    if (
+      !formData.fullName ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.address ||
+      !formData.city ||
+      !formData.postalCode
+    ) {
+      toast.error('Please fill in all required fields.');
       return;
     }
-    alert(`Order confirmed! Total: €${total.toFixed(2)}`);
-    navigate('/webshop');
+
+    try {
+      const payload = {
+        type: 'WEBSHOP',
+        cartItems: [
+          {
+            productId: product.id,
+            quantity: quantity,
+          },
+        ],
+        shippingAddress: {
+          street: formData.address,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          country: formData.country,
+        },
+      };
+
+      const result = await createCheckout(payload).unwrap();
+
+      // Backend returns { url, sessionId } — redirect to Stripe checkout
+      if (result?.url) {
+        window.location.href = result.url;
+      } else {
+        toast.error('Could not initiate payment. Please try again.');
+      }
+    } catch (err) {
+      toast.error(
+        err?.data?.message || err?.message || 'Payment failed. Please try again.'
+      );
+    }
   };
 
   if (!product) {
@@ -60,19 +97,25 @@ const Checkout = memo(() => {
     );
   }
 
+  const productImage = product.gallery?.[0] || product.image || '';
+
   return (
     <div className='min-h-screen bg-[#FBFDFF] pt-8 md:pt-12 pb-14'>
       <div className='container mx-auto px-4 lg:px-6'>
 
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-12'>
-          {/* Left: Customer Information - 2 columns */}
+          {/* Left: Customer Information */}
           <div className='lg:col-span-2'>
-            <h2 className='text-2xl md:text-3xl font-bold text-gray-800 mb-4'>Customer Information</h2>
+            <h2 className='text-2xl md:text-3xl font-bold text-gray-800 mb-4'>
+              Customer Information
+            </h2>
 
             <div className='space-y-6'>
               {/* Full Name */}
               <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>Full Name</label>
+                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                  Full Name <span className='text-red-500'>*</span>
+                </label>
                 <input
                   type='text'
                   name='fullName'
@@ -85,7 +128,9 @@ const Checkout = memo(() => {
 
               {/* Email Address */}
               <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>Email Address</label>
+                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                  Email Address <span className='text-red-500'>*</span>
+                </label>
                 <input
                   type='email'
                   name='email'
@@ -98,7 +143,9 @@ const Checkout = memo(() => {
 
               {/* Phone Number */}
               <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>Phone Number</label>
+                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                  Phone Number <span className='text-red-500'>*</span>
+                </label>
                 <input
                   type='tel'
                   name='phone'
@@ -111,39 +158,62 @@ const Checkout = memo(() => {
 
               {/* Detailed Address */}
               <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>Detailed Address</label>
+                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                  Street Address <span className='text-red-500'>*</span>
+                </label>
                 <textarea
                   name='address'
                   value={formData.address}
                   onChange={handleChange}
                   placeholder='Street name, House no. Apartment...'
-                  rows='4'
+                  rows='3'
                   className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
                 />
               </div>
 
-              {/* City */}
-              <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>City</label>
-                <input
-                  type='text'
-                  name='city'
-                  value={formData.city}
-                  onChange={handleChange}
-                  placeholder='Hopwell Junction'
-                  className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
-                />
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                {/* City */}
+                <div>
+                  <label className='block text-base font-semibold text-gray-700 mb-2'>
+                    City <span className='text-red-500'>*</span>
+                  </label>
+                  <input
+                    type='text'
+                    name='city'
+                    value={formData.city}
+                    onChange={handleChange}
+                    placeholder='Zurich'
+                    className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
+                  />
+                </div>
+
+                {/* Postal Code */}
+                <div>
+                  <label className='block text-base font-semibold text-gray-700 mb-2'>
+                    Postal Code <span className='text-red-500'>*</span>
+                  </label>
+                  <input
+                    type='text'
+                    name='postalCode'
+                    value={formData.postalCode}
+                    onChange={handleChange}
+                    placeholder='8001'
+                    className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
+                  />
+                </div>
               </div>
 
-              {/* Postal Code */}
+              {/* Country */}
               <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>Postal Code</label>
+                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                  Country
+                </label>
                 <input
                   type='text'
-                  name='postalCode'
-                  value={formData.postalCode}
+                  name='country'
+                  value={formData.country}
                   onChange={handleChange}
-                  placeholder='Zip 12345'
+                  placeholder='Switzerland'
                   className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
                 />
               </div>
@@ -154,6 +224,24 @@ const Checkout = memo(() => {
           <div className='lg:col-span-1'>
             <div className='bg-[#FCF7E7] rounded-lg p-4 md:p-6 sticky top-34'>
               <h2 className='text-2xl font-bold text-gray-800 mb-4'>Order Summary</h2>
+
+              {/* Product preview */}
+              <div className='flex items-center gap-3 mb-4 pb-4 border-b border-[#E2AB0B]'>
+                {productImage && (
+                  <img
+                    src={productImage}
+                    alt={product.name}
+                    className='w-16 h-16 rounded-lg object-cover border border-gray-200 shrink-0'
+                  />
+                )}
+                <div className='flex-1 min-w-0'>
+                  <p className='text-sm font-semibold text-gray-800 truncate'>{product.name}</p>
+                  <p className='text-xs text-gray-500'>Qty: {quantity}</p>
+                </div>
+                <span className='text-sm font-bold text-gray-900'>
+                  €{(parseFloat(product.price || 0) * quantity).toFixed(2)}
+                </span>
+              </div>
 
               <div className='space-y-4 mb-6 border-b border-[#E2AB0B] pb-4'>
                 {/* Subtotal */}
@@ -167,27 +255,36 @@ const Checkout = memo(() => {
                   <span className='text-gray-600'>Delivery Fee</span>
                   <span className='font-semibold text-gray-900'>€{deliveryFee.toFixed(2)}</span>
                 </div>
-
-                {/* Discount */}
-                <div className='flex justify-between items-center'>
-                  <span className='text-gray-600'>Discount</span>
-                  <span className='font-semibold text-gray-900'>${discount.toFixed(2)}</span>
-                </div>
               </div>
 
               {/* Total */}
-              <div className='flex justify-between items-center mb-4'>
+              <div className='flex justify-between items-center mb-6'>
                 <span className='text-lg font-bold text-gray-800'>Total</span>
                 <span className='text-2xl font-bold text-gray-900'>€{total.toFixed(2)}</span>
               </div>
 
-              {/* Confirm Purchase Button */}
+              {/* Confirm Purchase → Stripe Redirect */}
               <button
                 onClick={handleConfirmPurchase}
-                className='w-full bg-[#E2AB0B]  text-white font-bold py-3 rounded-lg transition-colors text-lg'
+                disabled={isCheckingOut}
+                className='w-full bg-[#E2AB0B] text-white font-bold py-3 rounded-lg transition-colors text-lg hover:bg-[#c99809] disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                Confirm Purchase
+                {isCheckingOut ? (
+                  <span className='flex items-center justify-center gap-2'>
+                    <svg className='animate-spin h-5 w-5' viewBox='0 0 24 24' fill='none'>
+                      <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                      <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v8z' />
+                    </svg>
+                    Redirecting to Payment...
+                  </span>
+                ) : (
+                  'Confirm & Pay'
+                )}
               </button>
+
+              <p className='text-xs text-gray-400 text-center mt-3'>
+                You will be redirected to Stripe for secure payment.
+              </p>
             </div>
           </div>
         </div>

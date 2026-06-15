@@ -111,7 +111,7 @@ const ProductDetail = memo(() => {
               <p className="text-lg text-gray-500 mb-4">{product.subTitle}</p>
             )}
 
-            <div className="text-3xl font-bold text-[#E2AB0B] mb-2">
+            <div className="text-3xl font-bold text-green-500/60  mb-2">
               €{price.toFixed(2)}
             </div>
 
@@ -163,7 +163,7 @@ const ProductDetail = memo(() => {
               </div>
               <button
                 onClick={() => navigate("/checkout", { state: { product, quantity } })}
-                className="flex-1 bg-[#E2AB0B] text-white font-bold h-12 rounded-md shadow-sm transition-all text-base hover:bg-[#d99a00]"
+                className="flex-1 bg-green-500/60 text-white font-bold h-12 rounded-md shadow-sm transition-all text-base hover:bg-[#d99a00]"
               >
                 Buy Now
               </button>
