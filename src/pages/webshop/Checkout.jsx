@@ -222,11 +222,11 @@ const Checkout = memo(() => {
 
           {/* Right: Order Summary */}
           <div className='lg:col-span-1'>
-            <div className='bg-[#FCF7E7] rounded-lg p-4 md:p-6 sticky top-34'>
+            <div className='bg-green-50 rounded-lg p-4 md:p-6 sticky top-34'>
               <h2 className='text-2xl font-bold text-gray-800 mb-4'>Order Summary</h2>
 
               {/* Product preview */}
-              <div className='flex items-center gap-3 mb-4 pb-4 border-b border-[#E2AB0B]'>
+              <div className='flex items-center gap-3 mb-4 pb-4 border-b border-green-400'>
                 {productImage && (
                   <img
                     src={productImage}
@@ -243,7 +243,7 @@ const Checkout = memo(() => {
                 </span>
               </div>
 
-              <div className='space-y-4 mb-6 border-b border-[#E2AB0B] pb-4'>
+              <div className='space-y-4 mb-6 border-b border-green-400 pb-4'>
                 {/* Subtotal */}
                 <div className='flex justify-between items-center'>
                   <span className='text-gray-600'>Subtotal ({quantity} items)</span>
@@ -267,7 +267,7 @@ const Checkout = memo(() => {
               <button
                 onClick={handleConfirmPurchase}
                 disabled={isCheckingOut}
-                className='w-full bg-[#E2AB0B] text-white font-bold py-3 rounded-lg transition-colors text-lg hover:bg-[#c99809] disabled:opacity-50 disabled:cursor-not-allowed'
+                className='w-full bg-green-500/60 text-white font-bold py-3 rounded-lg transition-colors text-lg hover:bg-[#c99809] disabled:opacity-50 disabled:cursor-not-allowed'
               >
                 {isCheckingOut ? (
                   <span className='flex items-center justify-center gap-2'>
@@ -282,7 +282,7 @@ const Checkout = memo(() => {
                 )}
               </button>
 
-              <p className='text-xs text-gray-400 text-center mt-3'>
+              <p className='text-sm text-gray-400 text-center mt-3'>
                 You will be redirected to Stripe for secure payment.
               </p>
             </div>
