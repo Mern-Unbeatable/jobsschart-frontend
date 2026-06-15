@@ -29,7 +29,7 @@ const ProductCard = memo(({ product }) => {
         </p>
 
         <div className="text-2xl font-semibold text-gray-900 mb-4 ">
-          €{product.price.toFixed(2)}
+          €{parseFloat(product.price || 0).toFixed(2)}
         </div>
 
         {/* Action Buttons */}
