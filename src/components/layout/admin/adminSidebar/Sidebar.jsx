@@ -43,7 +43,7 @@ const Sidebar = ({
     <CommonSidebar
       role='admin'
       navItems={NAV_ITEMS}
-      logoSrc='/logo1.webp'
+      logoSrc='/logo.png'
       onClose={onClose}
       onDesktopClose={onDesktopClose}
       isCollapsed={isCollapsed}

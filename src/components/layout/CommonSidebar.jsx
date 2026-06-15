@@ -30,7 +30,7 @@ const getNavClass = (isActive, activeColor, inactiveColor) =>
 const CommonSidebar = ({
   role = 'user',
   navItems = [],
-  logoSrc = '/logo.webp',
+  logoSrc = '/logo.png',
   onClose,
   onDesktopClose,
   isCollapsed,
