@@ -6,12 +6,12 @@ import { API_ENDPOINTS } from './httpEndpoint';
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const getAuthRuntime = async () => {
-  const [{ default: store }, { logout, loginSuccess }] = await Promise.all([
-    import('../store/store'),
-    import('../store/slices/authSlice'),
+  const [{ default: store }, { clearCredentials, setCredentials }] = await Promise.all([
+    import('../features/store'),
+    import('../features/slices/authSlice'),
   ]);
 
-  return { store, logout, loginSuccess };
+  return { store, clearCredentials, setCredentials };
 };
 
 
@@ -94,18 +94,18 @@ axiosInstance.interceptors.response.use(
         }
 
         const refreshed = await refreshPromise;
-        const { store, loginSuccess } = await getAuthRuntime();
+        const { store, setCredentials } = await getAuthRuntime();
         const newToken = refreshed.token ?? refreshed.accessToken;
         const user = refreshed.user ?? store.getState().auth.user;
 
-        store.dispatch(loginSuccess({ token: newToken, user }));
+        store.dispatch(setCredentials({ token: newToken, user }));
 
         // Retry the original request with the new token
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return axiosInstance(originalRequest);
       } catch {
-        const { store, logout } = await getAuthRuntime();
-        store.dispatch(logout());
+        const { store, clearCredentials } = await getAuthRuntime();
+        store.dispatch(clearCredentials());
         window.location.replace(ROUTES.LOGIN);
         return Promise.reject(error);
       }

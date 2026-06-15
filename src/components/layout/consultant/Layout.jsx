@@ -8,7 +8,7 @@ import ScrollToTop from "../../ScrollToTop";
 import { IncomingCallNotification } from "../../IncomingCallNotification";
 import CallRoom from "../../CallRoom";
 import { ROUTES } from "../../../config";
-import { selectUser } from "../../../store/slices/authSlice";
+import { selectUser } from "../../../features/slices/authSlice";
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

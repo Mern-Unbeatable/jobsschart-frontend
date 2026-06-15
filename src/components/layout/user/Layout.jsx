@@ -6,7 +6,7 @@ import Sidebar from './userSidebar/Sidebar';
 import LanguageSelector from '../../LanguageSelector';
 import ScrollToTop from '../../ScrollToTop';
 import { ROUTES } from '../../../config';
-import { selectUser } from '../../../store/slices/authSlice';
+import { selectUser } from '../../../features/slices/authSlice';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -7,7 +7,7 @@ import {
   selectUser,
   logoutUser,
   selectUserRole,
-} from '../../store/slices/authSlice';
+} from '../../features/slices/authSlice';
 import {
   LogOut,
   X,

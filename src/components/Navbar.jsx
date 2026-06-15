@@ -50,6 +50,9 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
   const navigate = useNavigate();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const userRole = useSelector(selectUserRole);
+
+
+
   const logoTo = isAuthenticated
     ? getDashboardRoute(userRole)
     : ROUTES.HOME;

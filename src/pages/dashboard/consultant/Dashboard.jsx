@@ -1,7 +1,7 @@
 
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { selectUser } from '../../../store/slices/authSlice';
+import { selectUser } from '../../../features/slices/authSlice';
 import { Euro, TrendingUp, CalendarDays, Star, User, Wifi, WifiOff } from 'lucide-react';
 import { useUpdateOnlineStatusMutation } from '../../../features/api/consultantApi';
 import { socketService } from '../../../services/socketService';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { selectUser } from '../../../store/slices/authSlice';
+import { selectUser } from '../../../features/slices/authSlice';
 import { Wallet } from 'lucide-react';
 import ScheduleCard from './components/ScheduleCard';
 
