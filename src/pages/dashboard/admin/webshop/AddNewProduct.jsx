@@ -135,7 +135,7 @@ const AdminAddNewProduct = () => {
       <form onSubmit={handleSubmit} className='flex flex-col gap-5'>
         <div data-reveal className='grid grid-cols-1 lg:grid-cols-3 gap-5'>
           <label className='flex flex-col gap-2.5'>
-            <span className='text-sm text-[#464646]'>Product Title</span>
+            <span className='text-base lg:text-lg text-[#464646]'>Product Title</span>
             <input
               type='text'
               value={form.title}
@@ -146,7 +146,7 @@ const AdminAddNewProduct = () => {
           </label>
 
           <label className='flex flex-col gap-2.5'>
-            <span className='text-sm text-[#464646]'>Category</span>
+            <span className='text-base lg:text-lg text-[#464646]'>Category</span>
             <div className='relative'>
               <select
                 value={form.category}
@@ -168,7 +168,7 @@ const AdminAddNewProduct = () => {
           </label>
 
           <label className='flex flex-col gap-2.5'>
-            <span className='text-sm text-[#464646]'>Price</span>
+            <span className='text-base lg:text-lg text-[#464646]'>Price</span>
             <input
               type='text'
               value={form.price}
@@ -180,7 +180,7 @@ const AdminAddNewProduct = () => {
         </div>
 
         <label data-reveal className='flex flex-col gap-2.5'>
-          <span className='text-sm text-[#464646]'>Description</span>
+          <span className='text-base lg:text-lg text-[#464646]'>Description</span>
           <textarea
             rows={6}
             value={form.description}
@@ -191,7 +191,7 @@ const AdminAddNewProduct = () => {
         </label>
 
         <label data-reveal className='flex flex-col gap-2.5'>
-          <span className='text-sm text-[#464646]'>Features</span>
+          <span className='text-base lg:text-lg text-[#464646]'>Features</span>
           <textarea
             rows={6}
             value={form.features}
@@ -202,7 +202,7 @@ const AdminAddNewProduct = () => {
         </label>
 
         <label data-reveal className='flex flex-col gap-2.5'>
-          <span className='text-sm text-[#464646]'>What's Inside</span>
+          <span className='text-base lg:text-lg text-[#464646]'>What's Inside</span>
           <textarea
             rows={6}
             value={form.inside}
@@ -213,7 +213,7 @@ const AdminAddNewProduct = () => {
         </label>
 
         <label data-reveal className='flex flex-col gap-2.5'>
-          <span className='text-sm text-[#464646]'>Benefits</span>
+          <span className='text-base lg:text-lg text-[#464646]'>Benefits</span>
           <textarea
             rows={6}
             value={form.benefits}
@@ -224,7 +224,7 @@ const AdminAddNewProduct = () => {
         </label>
 
         <div data-reveal className='flex flex-col gap-2.5'>
-          <span className='text-sm text-[#464646]'>
+          <span className='text-base lg:text-lg text-[#464646]'>
             Uploaded Gallery
             {previewUrls.length > 0 && ` (${previewUrls.length})`}
           </span>
