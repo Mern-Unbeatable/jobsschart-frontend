@@ -83,7 +83,8 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
           <div className="shrink-0">
             <Link to={ROUTES.HOME} className="flex items-center gap-2">
               <img
-                src="/logo2.webp"
+                src="/logo.png"
+                // src="/logo2.webp"
                 alt="Netwerkmediums Logo"
                 className="h-18 w-auto object-contain "
               />

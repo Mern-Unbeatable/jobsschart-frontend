@@ -13,7 +13,7 @@ const Footer = () => {
         <div className="flex flex-col items-start gap-2">
          
           <img 
-            src="/logo1.webp" 
+           src="/logo.png"
             alt={t('footer.logoAlt')} 
             className="h-20 w-auto object-contain " 
           />
@@ -109,7 +109,7 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar: Gold/Yellow Color */}
-      <div className="bg-green-500/60 text-white py-4">
+      <div className="bg-green-500/80 text-white py-4">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-base font-medium">
           <span>{t('footer.bottomBar.copyright')}</span>
           <div className="flex gap-6 items-center">
