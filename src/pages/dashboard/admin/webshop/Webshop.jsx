@@ -25,6 +25,15 @@ const CATEGORIES = [
   'Books',
 ];
 
+// Map display label → API enum value
+const CATEGORY_API_MAP = {
+  'Spiritual Items': 'SpiritualItems',
+  'Healing Tools': 'HealingTools',
+  'Articles': 'Articles',
+  'Digital Products': 'DigitalProducts',
+  'Books': 'Books',
+};
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const AdminWebshop = () => {
@@ -37,12 +46,9 @@ const AdminWebshop = () => {
   const filterBtnRefs = useRef([]);
 
   // Fetch real data using RTK Query
-  const queryParams = {
-    page,
-    limit: PAGE_SIZE,
-  };
+  const queryParams = { page, limit: PAGE_SIZE };
   if (activeCategory !== 'All') {
-    queryParams.category = activeCategory;
+    queryParams.productCategory = CATEGORY_API_MAP[activeCategory] || activeCategory;
   }
   
   const { data, isLoading, error } = useGetProductsQuery(queryParams);
