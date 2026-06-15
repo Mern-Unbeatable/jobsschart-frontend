@@ -11,19 +11,15 @@ console.log('🔍 RTK Query baseUrl =', BASE_URL); // Remove after debugging
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
   credentials: 'include',
-  prepareHeaders: (headers, { getState }) => {
+  prepareHeaders: (headers, { getState, extra }) => {
     const token = getState()?.auth?.token;
     if (token) {
       headers.set('authorization', `Bearer ${token}`);
     }
-    
-    // If we explicitly set Content-Type to 'multipart/form-data', we delete it
-    // so the browser can automatically set it along with the correct boundary
-    if (headers.get('Content-Type') === 'multipart/form-data') {
-      headers.delete('Content-Type');
-    } else if (!headers.has('Content-Type')) {
-      headers.set('Content-Type', 'application/json');
-    }
+    // Do NOT set Content-Type here — for FormData the browser must set it
+    // automatically so it includes the correct multipart boundary.
+    // For non-multipart requests, RTK Query's fetchBaseQuery defaults to
+    // application/json when body is a plain object.
     return headers;
   },
 });

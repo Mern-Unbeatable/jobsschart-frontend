@@ -26,9 +26,6 @@ export const productApi = baseApi.injectEndpoints({
         url: '/products',
         method: 'POST',
         body: data,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
       }),
       invalidatesTags: ['Product'],
       transformResponse: (response) => response.data,
@@ -39,9 +36,6 @@ export const productApi = baseApi.injectEndpoints({
         url: `/products/${id}`,
         method: 'PATCH',
         body,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: 'Product', id },

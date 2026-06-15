@@ -79,6 +79,7 @@ const AdminAddNewProduct = () => {
     return mapProductToForm(sourceProduct);
   });
 
+  // Tracks: existing server URLs (strings) + new blob preview URLs (strings)
   const [previewUrls, setPreviewUrls] = useState(() => {
     if (mode === 'edit') {
       if (sourceProduct?.gallery && sourceProduct.gallery.length > 0) {
@@ -88,20 +89,39 @@ const AdminAddNewProduct = () => {
     }
     return [];
   });
-  
-  const [selectedFiles, setSelectedFiles] = useState([]);
+
+  // Parallel array to previewUrls — null for existing server images, File for new uploads
+  const [fileSlots, setFileSlots] = useState(() => {
+    if (mode === 'edit') {
+      const existing =
+        sourceProduct?.gallery?.length > 0
+          ? sourceProduct.gallery
+          : sourceProduct?.image
+          ? [sourceProduct.image]
+          : [];
+      return existing.map(() => null); // null = existing server image
+    }
+    return [];
+  });
+
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (mode === 'edit' && sourceProduct) {
       setForm(mapProductToForm(sourceProduct));
-      setPreviewUrls(sourceProduct.gallery && sourceProduct.gallery.length > 0 ? sourceProduct.gallery : (sourceProduct.image ? [sourceProduct.image] : []));
-      setSelectedFiles([]);
+      const existing =
+        sourceProduct.gallery?.length > 0
+          ? sourceProduct.gallery
+          : sourceProduct.image
+          ? [sourceProduct.image]
+          : [];
+      setPreviewUrls(existing);
+      setFileSlots(existing.map(() => null));
       return;
     }
     setForm(INITIAL_FORM);
     setPreviewUrls([]);
-    setSelectedFiles([]);
+    setFileSlots([]);
   }, [mode, sourceProduct]);
 
   useEffect(() => {
@@ -130,10 +150,20 @@ const AdminAddNewProduct = () => {
   const handleImageChange = useCallback((e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
-    
-    setSelectedFiles((prev) => [...prev, ...files].slice(0, 7));
-    const newUrls = files.map((f) => URL.createObjectURL(f));
-    setPreviewUrls((prev) => [...prev, ...newUrls].slice(0, 7));
+
+    setPreviewUrls((prev) => {
+      const remaining = 7 - prev.length;
+      const toAdd = files.slice(0, remaining);
+      const newUrls = toAdd.map((f) => URL.createObjectURL(f));
+      return [...prev, ...newUrls];
+    });
+
+    setFileSlots((prev) => {
+      const remaining = 7 - prev.length;
+      const toAdd = files.slice(0, remaining);
+      return [...prev, ...toAdd];
+    });
+
     e.target.value = '';
   }, []);
 
@@ -143,7 +173,7 @@ const AdminAddNewProduct = () => {
       if (removed?.startsWith('blob:')) URL.revokeObjectURL(removed);
       return prev.filter((_, i) => i !== idx);
     });
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== idx));
+    setFileSlots((prev) => prev.filter((_, i) => i !== idx));
   }, []);
 
   const toCommaSeparated = (text) => {
@@ -175,11 +205,14 @@ const AdminAddNewProduct = () => {
       formData.append('whatsInside', toCommaSeparated(form.inside));
       formData.append('benefits', toCommaSeparated(form.benefits));
       
-      const mappedCategoryId = CATEGORY_MAP[form.category] || form.category;
-      formData.append('productCategoryId', mappedCategoryId);
+      const mappedCategory = CATEGORY_MAP[form.category] || form.category;
+      formData.append('productCategory', mappedCategory);
 
-      selectedFiles.forEach((file) => {
-        formData.append('gallery', file);
+      // Only append actual File objects (skip null = existing server images)
+      fileSlots.forEach((slot) => {
+        if (slot instanceof File) {
+          formData.append('gallery', slot);
+        }
       });
 
       if (mode === 'edit') {
@@ -195,7 +228,7 @@ const AdminAddNewProduct = () => {
       console.error('Submit error:', err);
       toast.error(err?.data?.message || err?.message || 'Failed to save product.');
     }
-  }, [form, selectedFiles, mode, sourceProduct, createProduct, updateProduct, navigate]);
+  }, [form, fileSlots, mode, sourceProduct, createProduct, updateProduct, navigate]);
 
   const isSaving = isCreating || isUpdating;
 
