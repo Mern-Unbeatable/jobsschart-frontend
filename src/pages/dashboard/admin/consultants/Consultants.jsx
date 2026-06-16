@@ -1,170 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import FilterTabs from "./components/FilterTabs";
 import ConsultantsTable from "./components/ConsultantsTable";
 import Pagination from "./components/Pagination";
 import DeleteModal from "./components/DeleteModal";
 import ConsultantDetail from "./components/ConsultantDetail";
-
-const INITIAL_CONSULTANTS = [
-  {
-    id: 1,
-    name: "Eleanor Pena",
-    title: "Professional Consultant",
-    email: "eleanor@pixelexpertise.com",
-    phone: "+1 0335-000-7132",
-    address: "1901 Thornridge Cir. Shiloh, Hawaii 81063",
-    category: "Psychic & Medium",
-    status: "Approved",
-    avatar:
-      "https://ui-avatars.com/api/?name=Eleanor+Pena&background=E2AB0B&color=fff&size=80",
-    about:
-      "Hello! I am Eleanor, a professional consultant with extensive experience in helping individuals navigate their personal and professional journeys. My approach combines empathy, expertise, and practical strategies to support my clients in achieving their goals.",
-    experience: { years: "3 Years", role: "Professional consulting" },
-    languages: ["Bangla", "English", "Dutch"],
-    location: { place: "Hawaii, USA", note: "Available for remote sessions" },
-    expertise: [
-      "Consultant",
-      "Relation Articles",
-      "Career Guide",
-      "Personal Growth",
-      "Emotional Support",
-    ],
-    availability: [
-      { days: "Monday - Friday", hours: "8:00 AM - 3:00 PM" },
-      { days: "Saturday", hours: "10:00 AM - 2:00 PM" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Esther Howard",
-    title: "Tarot Specialist",
-    email: "esther@gmail.com",
-    phone: "+880 1934-567890",
-    address: "450 Maple Ave, Portland, Oregon 97201",
-    category: "Tarot Reader",
-    status: "Pending",
-    avatar:
-      "https://ui-avatars.com/api/?name=Esther+Howard&background=6366f1&color=fff&size=80",
-    about:
-      "Experienced Tarot reader with over 5 years of practice, specializing in life guidance and spiritual clarity.",
-    experience: { years: "5 Years", role: "Tarot & spiritual guidance" },
-    languages: ["English", "Spanish"],
-    location: { place: "Portland, USA", note: "In-person and remote" },
-    expertise: ["Tarot", "Spiritual Guidance", "Life Coaching"],
-    availability: [
-      { days: "Tuesday - Thursday", hours: "9:00 AM - 5:00 PM" },
-      { days: "Sunday", hours: "12:00 PM - 4:00 PM" },
-    ],
-  },
-  {
-    id: 3,
-    name: "Annette Black",
-    title: "Tarot Reader & Healer",
-    email: "annette@gmail.com",
-    phone: "+880 1934-567890",
-    address: "23 Oak Street, Austin, Texas 78701",
-    category: "Tarot Reader",
-    status: "Suspended",
-    avatar:
-      "https://ui-avatars.com/api/?name=Annette+Black&background=ef4444&color=fff&size=80",
-    about:
-      "Certified tarot reader and energy healer dedicated to bringing clarity and healing to clients.",
-    experience: { years: "2 Years", role: "Energy healing & tarot" },
-    languages: ["English", "French"],
-    location: { place: "Austin, USA", note: "Remote only" },
-    expertise: ["Tarot", "Energy Healing"],
-    availability: [{ days: "Monday - Wednesday", hours: "10:00 AM - 4:00 PM" }],
-  },
-  {
-    id: 4,
-    name: "Jenny Wilson",
-    title: "Psychic Advisor",
-    email: "jenny@gmail.com",
-    phone: "+880 1934-567890",
-    address: "88 Pine Road, Seattle, Washington 98101",
-    category: "Tarot Reader",
-    status: "Approved",
-    avatar:
-      "https://ui-avatars.com/api/?name=Jenny+Wilson&background=10b981&color=fff&size=80",
-    about:
-      "Intuitive psychic advisor helping clients gain clarity in relationships, career, and life purpose.",
-    experience: { years: "7 Years", role: "Psychic readings & guidance" },
-    languages: ["English", "Dutch"],
-    location: { place: "Seattle, USA", note: "Available for remote sessions" },
-    expertise: ["Psychic Readings", "Relationship Guidance", "Career Coaching"],
-    availability: [
-      { days: "Monday - Friday", hours: "8:00 AM - 6:00 PM" },
-      { days: "Saturday", hours: "10:00 AM - 3:00 PM" },
-    ],
-  },
-  {
-    id: 5,
-    name: "Darlene Robertson",
-    title: "Holistic Consultant",
-    email: "darlene@gmail.com",
-    phone: "+880 1934-567890",
-    address: "312 Elm Street, Chicago, Illinois 60601",
-    category: "Tarot Reader",
-    status: "Suspended",
-    avatar:
-      "https://ui-avatars.com/api/?name=Darlene+Robertson&background=f59e0b&color=fff&size=80",
-    about:
-      "Holistic consultant bridging spiritual insights with practical life solutions.",
-    experience: { years: "4 Years", role: "Holistic life consulting" },
-    languages: ["English"],
-    location: { place: "Chicago, USA", note: "In-person preferred" },
-    expertise: ["Holistic Healing", "Tarot", "Meditation"],
-    availability: [{ days: "Wednesday - Friday", hours: "11:00 AM - 5:00 PM" }],
-  },
-  {
-    id: 6,
-    name: "Guy Hawkins",
-    title: "Spiritual Life Coach",
-    email: "guy@gmail.com",
-    phone: "+880 1934-567890",
-    address: "99 Birch Lane, Denver, Colorado 80201",
-    category: "Tarot Reader",
-    status: "Pending",
-    avatar:
-      "https://ui-avatars.com/api/?name=Guy+Hawkins&background=8b5cf6&color=fff&size=80",
-    about:
-      "Certified life coach and tarot reader offering practical spiritual support for modern challenges.",
-    experience: { years: "6 Years", role: "Spiritual life coaching" },
-    languages: ["English", "Bangla"],
-    location: { place: "Denver, USA", note: "Remote sessions available" },
-    expertise: ["Life Coaching", "Tarot", "Stress Management"],
-    availability: [
-      { days: "Monday, Wednesday, Friday", hours: "9:00 AM - 4:00 PM" },
-    ],
-  },
-  {
-    id: 7,
-    name: "Robert Fox",
-    title: "Astrology Expert",
-    email: "robert@gmail.com",
-    phone: "+880 1934-567890",
-    address: "14 Sunset Blvd, Los Angeles, CA 90001",
-    category: "Astrologer",
-    status: "Approved",
-    avatar:
-      "https://ui-avatars.com/api/?name=Robert+Fox&background=0ea5e9&color=fff&size=80",
-    about:
-      "Professional astrologer offering in-depth natal chart readings and predictive astrology consultations.",
-    experience: { years: "10 Years", role: "Astrology & chart reading" },
-    languages: ["English", "Spanish", "Dutch"],
-    location: { place: "Los Angeles, USA", note: "Remote and in-person" },
-    expertise: [
-      "Astrology",
-      "Natal Charts",
-      "Predictive Astrology",
-      "Transit Readings",
-    ],
-    availability: [
-      { days: "Monday - Thursday", hours: "10:00 AM - 7:00 PM" },
-      { days: "Saturday", hours: "9:00 AM - 1:00 PM" },
-    ],
-  },
-];
+import { useGetAllConsultantsQuery, useApproveConsultantMutation } from "../../../../features/api/consultantApi";
+import { useUpdateUserStatusMutation, useDeleteUserMutation } from "../../../../features/api/userApi";
 
 const PAGE_SIZE = 7;
 
@@ -180,14 +21,59 @@ function scrollConsultantPageToTop() {
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
+const mapBackendConsultant = (c) => {
+  const specialization = Array.isArray(c.specialization) ? c.specialization : [];
+  
+  // Status mapping
+  let status = "Pending";
+  if (c.user?.status === "SUSPENDED" || c.user?.status === "Suspended") {
+    status = "Suspended";
+  } else if (c.isApproved) {
+    status = "Approved";
+  }
+
+  const place = c.user?.location || "N/A";
+  
+  return {
+    id: c.id,
+    userId: c.userId || c.user?.id,
+    name: c.user?.name || "Consultant",
+    title: c.user?.bio || c.bio || "Professional Consultant",
+    email: c.user?.email || "N/A",
+    phone: c.user?.phone || "N/A",
+    address: c.user?.location || "N/A",
+    category: c.category || specialization[0] || "Consultant",
+    status,
+    avatar: c.user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.user?.name || "C")}&background=E2AB0B&color=fff`,
+    about: c.bio || "No description available.",
+    experience: { years: "N/A", role: "Consulting" },
+    languages: ["English"],
+    location: { place, note: "Remote and in-person" },
+    expertise: specialization,
+    availability: [
+      { days: "Monday - Friday", hours: "9:00 AM - 5:00 PM" }
+    ],
+    raw: c
+  };
+};
+
 const AdminConsultants = () => {
-  const [consultants, setConsultants] = useState(INITIAL_CONSULTANTS);
   const [filter, setFilter] = useState("All");
   const [openMenuId, setOpenMenuId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [detailConsultant, setDetailConsultant] = useState(null);
+  const [detailConsultantId, setDetailConsultantId] = useState(null);
   const [page, setPage] = useState(1);
   const btnRefs = useRef({});
+
+  const { data: apiResponse, isLoading, error } = useGetAllConsultantsQuery();
+  const [approveConsultant] = useApproveConsultantMutation();
+  const [updateUserStatus] = useUpdateUserStatusMutation();
+  const [deleteUser] = useDeleteUserMutation();
+
+  const consultants = useMemo(() => {
+    if (!apiResponse?.consultants) return [];
+    return apiResponse.consultants.map(mapBackendConsultant);
+  }, [apiResponse]);
 
   useEffect(() => {
     const h = () => setOpenMenuId(null);
@@ -195,12 +81,16 @@ const AdminConsultants = () => {
     return () => document.removeEventListener("click", h);
   }, []);
 
-  const filtered =
-    filter === "All"
+  const filtered = useMemo(() => {
+    return filter === "All"
       ? consultants
       : consultants.filter((c) => c.status === filter);
+  }, [consultants, filter]);
+
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const paginated = useMemo(() => {
+    return filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  }, [filtered, page]);
 
   const handleFilterChange = (f) => {
     setFilter(f);
@@ -209,25 +99,72 @@ const AdminConsultants = () => {
     scrollConsultantPageToTop();
   };
 
-  const handleStatusChange = useCallback((id, status) => {
-    setConsultants((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status } : c)),
-    );
-    setOpenMenuId(null);
-  }, []);
+  const handleStatusChange = useCallback(async (id, newStatus) => {
+    const consultant = consultants.find((c) => c.id === id);
+    if (!consultant) return;
 
-  const handleDelete = useCallback(() => {
+    try {
+      if (newStatus === "Approved") {
+        await approveConsultant({ id, isApproved: true }).unwrap();
+        if (consultant.status === "Suspended") {
+          await updateUserStatus({ id: consultant.userId, status: "ACTIVE" }).unwrap();
+        }
+      } else if (newStatus === "Pending") {
+        await approveConsultant({ id, isApproved: false }).unwrap();
+        if (consultant.status === "Suspended") {
+          await updateUserStatus({ id: consultant.userId, status: "ACTIVE" }).unwrap();
+        }
+      } else if (newStatus === "Suspended") {
+        await updateUserStatus({ id: consultant.userId, status: "SUSPENDED" }).unwrap();
+      }
+      setOpenMenuId(null);
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    }
+  }, [consultants, approveConsultant, updateUserStatus]);
+
+  const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
-    setConsultants((prev) => prev.filter((c) => c.id !== deleteTarget.id));
-    setDeleteTarget(null);
-    setOpenMenuId(null);
-  }, [deleteTarget]);
+    try {
+      await deleteUser(deleteTarget.userId).unwrap();
+      setDeleteTarget(null);
+      setOpenMenuId(null);
+    } catch (err) {
+      console.error("Failed to delete consultant user:", err);
+    }
+  }, [deleteTarget, deleteUser]);
+
+  const detailConsultant = useMemo(() => {
+    return detailConsultantId ? consultants.find((c) => c.id === detailConsultantId) : null;
+  }, [consultants, detailConsultantId]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500/60"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-red-500 font-semibold text-lg">Failed to fetch consultants.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-5 py-2 bg-green-500/60 text-white rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   if (detailConsultant) {
     return (
       <ConsultantDetail
         consultant={detailConsultant}
-        onBack={() => setDetailConsultant(null)}
+        onBack={() => setDetailConsultantId(null)}
       />
     );
   }
@@ -253,7 +190,7 @@ const AdminConsultants = () => {
         btnRefs={btnRefs}
         openMenuId={openMenuId}
         setOpenMenuId={setOpenMenuId}
-        setDetailConsultant={setDetailConsultant}
+        setDetailConsultant={(c) => setDetailConsultantId(c.id)}
         handleStatusChange={handleStatusChange}
         setDeleteTarget={setDeleteTarget}
       >
