@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { gsap } from 'gsap';
 import TabBar from './components/TabBar';
 import OrdersTable from './components/OrdersTable';
 import Pagination from './components/Pagination';
 import OrderDetailModal from './components/OrderDetailModal';
+import { useGetAdminOrdersQuery, useUpdateOrderStatusMutation } from '../../../../features/api/orderApi';
 
 const TABS = [
   'All',
@@ -22,149 +23,96 @@ const STATUS_STYLES = {
   Cancelled: 'bg-[#FFF0F0] text-[#EF4444]',
 };
 
-const MOCK_ITEMS = [
-  { name: 'Healing Crystal Set', qty: 1, price: '$200.00' },
-  { name: 'Healing Crystal Set', qty: 1, price: '$200.00' },
-  { name: 'Healing Crystal Set', qty: 1, price: '$200.00' },
-];
-
-const INITIAL_ORDERS = [
-  {
-    id: '#ORD-001',
-    customer: 'Darlene Robertson',
-    phone: '(239) 555-0108',
-    email: 'michelle.rivera@example.com',
-    address: '3891 Ranchview Dr. Richardson, California 62639',
-    product: 'Healing Crystal Set',
-    price: '$150,000',
-    date: '2024-03-24',
-    status: 'Pending',
-    items: MOCK_ITEMS,
-    subtotal: '$1000.00',
-    delivery: '$150.00',
-    total: '$1500.00',
-  },
-  {
-    id: '#ORD-002',
-    customer: 'Cameron Williamson',
-    phone: '(312) 555-0199',
-    email: 'cameron.williamson@example.com',
-    address: '2464 Royal Ln. Mesa, New Jersey 45463',
-    product: 'Sacred Incense Pack',
-    price: '$190,000',
-    date: '2024-03-24',
-    status: 'Delivered',
-    items: MOCK_ITEMS,
-    subtotal: '$1000.00',
-    delivery: '$150.00',
-    total: '$1500.00',
-  },
-  {
-    id: '#ORD-004',
-    customer: 'Robert Fox',
-    phone: '(480) 555-0103',
-    email: 'robert.fox@example.com',
-    address: '1901 Thornridge Cir. Shiloh, Hawaii 81063',
-    product: 'Tarot Guidance Pack',
-    price: '$170,000',
-    date: '2024-03-24',
-    status: 'Shipped',
-    items: MOCK_ITEMS,
-    subtotal: '$1000.00',
-    delivery: '$150.00',
-    total: '$1500.00',
-  },
-  {
-    id: '#ORD-003',
-    customer: 'Darlene Robertson',
-    phone: '(239) 555-0108',
-    email: 'michelle.rivera@example.com',
-    address: '3891 Ranchview Dr. Richardson, California 62639',
-    product: 'Healing Crystal Set',
-    price: '$150,000',
-    date: '2024-03-24',
-    status: 'Pending',
-    items: MOCK_ITEMS,
-    subtotal: '$1000.00',
-    delivery: '$150.00',
-    total: '$1500.00',
-  },
-  {
-    id: '#ORD-005',
-    customer: 'Cameron Williamson',
-    phone: '(312) 555-0199',
-    email: 'cameron.williamson@example.com',
-    address: '2464 Royal Ln. Mesa, New Jersey 45463',
-    product: 'Healing Crystal Set',
-    price: '$190,000',
-    date: '2024-03-24',
-    status: 'Delivered',
-    items: MOCK_ITEMS,
-    subtotal: '$1000.00',
-    delivery: '$150.00',
-    total: '$1500.00',
-  },
-  {
-    id: '#ORD-006',
-    customer: 'Robert Fox',
-    phone: '(480) 555-0103',
-    email: 'robert.fox@example.com',
-    address: '1901 Thornridge Cir. Shiloh, Hawaii 81063',
-    product: 'Healing Crystal Set',
-    price: '$170,000',
-    date: '2024-03-24',
-    status: 'Processing',
-    items: MOCK_ITEMS,
-    subtotal: '$1000.00',
-    delivery: '$150.00',
-    total: '$1500.00',
-  },
-  {
-    id: '#ORD-007',
-    customer: 'Jane Cooper',
-    phone: '(605) 555-0144',
-    email: 'jane.cooper@example.com',
-    address: '4140 Parker Rd. Allentown, New Mexico 31134',
-    product: 'Meditation Bundle',
-    price: '$120,000',
-    date: '2024-03-25',
-    status: 'Cancelled',
-    cancelReason:
-      'The order has been cancelled due to a change in customer requirements. If you have any questions or need further assistance, please feel free to contact us.',
-    items: MOCK_ITEMS,
-    subtotal: '$1000.00',
-    delivery: '$150.00',
-    total: '$1500.00',
-  },
-];
-
 const PAGE_SIZE = 6;
+
+const formatStatus = (status) => {
+  if (!status) return 'Pending';
+  return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+};
+
+const mapBackendOrder = (order) => {
+  const customerName = order.user?.name || order.shippingAddress?.name || 'Guest';
+  const customerPhone = order.phone || order.shippingAddress?.phone || 'N/A';
+  const customerEmail = order.user?.email || order.shippingAddress?.email || 'N/A';
+  
+  // Format Address
+  let address = 'N/A';
+  if (order.shippingAddress) {
+    const { street, city, country, postalCode } = order.shippingAddress;
+    address = [street, city, country, postalCode].filter(Boolean).join(', ');
+  }
+
+  // Format Date
+  const dateStr = order.createdAt ? order.createdAt.split('T')[0] : '';
+
+  // Format Items
+  const items = (order.items || []).map((item) => ({
+    name: item.product?.name || 'Unknown Product',
+    qty: item.quantity || 1,
+    price: item.price ? (item.price.toString().startsWith('$') || item.price.toString().startsWith('€') ? item.price : `$${item.price}`) : '$0.00',
+    image: item.product?.image || (item.product?.gallery && item.product.gallery[0]) || null
+  }));
+
+  // Format main product name to show in the table
+  const mainProduct = items.length > 0 ? items[0].name + (items.length > 1 ? ` + ${items.length - 1} more` : '') : 'No products';
+
+  // Format prices
+  const totalStr = order.totalAmount ? (order.totalAmount.toString().startsWith('$') || order.totalAmount.toString().startsWith('€') ? order.totalAmount : `$${order.totalAmount}`) : '$0.00';
+
+  return {
+    id: order.id,
+    customer: customerName,
+    phone: customerPhone,
+    email: customerEmail,
+    address,
+    product: mainProduct,
+    price: totalStr,
+    date: dateStr,
+    status: formatStatus(order.status),
+    items,
+    subtotal: totalStr,
+    delivery: '$0.00',
+    total: totalStr,
+    cancelReason: order.cancelReason || null,
+    raw: order
+  };
+};
 
 const AdminOrders = () => {
   const pageRef = useRef(null);
   const anchorRefs = useRef({});
 
   const [activeTab, setActiveTab] = useState('All');
-  const [orders, setOrders] = useState(INITIAL_ORDERS);
   const [page, setPage] = useState(1);
   const [openId, setOpenId] = useState(null);
-  const [detailOrder, setDetailOrder] = useState(null);
+  const [detailOrderId, setDetailOrderId] = useState(null);
+
+  const { data: apiResponse, isLoading, error } = useGetAdminOrdersQuery();
+  const [updateOrderStatus] = useUpdateOrderStatusMutation();
+
+  const orders = useMemo(() => {
+    if (!apiResponse?.orders) return [];
+    return apiResponse.orders.map(mapBackendOrder);
+  }, [apiResponse]);
 
   useEffect(() => {
-    if (!pageRef.current) return;
+    if (isLoading || error || !pageRef.current) return;
     const blocks = pageRef.current.querySelectorAll('[data-reveal]');
     gsap.fromTo(
       blocks,
       { opacity: 0, y: 14 },
       { opacity: 1, y: 0, duration: 0.32, stagger: 0.05, ease: 'power2.out' },
     );
-  }, []);
+  }, [isLoading, error]);
 
-  const filtered =
-    activeTab === 'All' ? orders : orders.filter((o) => o.status === activeTab);
+  const filtered = useMemo(() => {
+    return activeTab === 'All' ? orders : orders.filter((o) => o.status === activeTab);
+  }, [orders, activeTab]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const paginated = useMemo(() => {
+    return filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  }, [filtered, page]);
 
   const handleTabChange = useCallback((tab) => {
     setActiveTab(tab);
@@ -179,21 +127,46 @@ const AdminOrders = () => {
   const handleClose = useCallback(() => setOpenId(null), []);
 
   const handleSeeDetails = useCallback((order) => {
-    setDetailOrder(order);
+    setDetailOrderId(order.id);
     setOpenId(null);
   }, []);
 
-  const handleCloseDetail = useCallback(() => setDetailOrder(null), []);
+  const handleCloseDetail = useCallback(() => setDetailOrderId(null), []);
 
-  const handleStatusChange = useCallback((orderId, newStatus) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)),
+  const handleStatusChange = useCallback(async (orderId, newStatus) => {
+    try {
+      await updateOrderStatus({ id: orderId, status: newStatus.toUpperCase() }).unwrap();
+      setOpenId(null);
+    } catch (err) {
+      console.error('Failed to update status:', err);
+    }
+  }, [updateOrderStatus]);
+
+  const detailOrder = useMemo(() => {
+    return detailOrderId ? orders.find((o) => o.id === detailOrderId) : null;
+  }, [orders, detailOrderId]);
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center min-h-[400px]'>
+        <div className='animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#E2AB0B]'></div>
+      </div>
     );
-    setDetailOrder((prev) =>
-      prev && prev.id === orderId ? { ...prev, status: newStatus } : prev,
+  }
+
+  if (error) {
+    return (
+      <div className='flex flex-col items-center justify-center min-h-[400px] gap-4'>
+        <p className='text-red-500 font-semibold text-lg'>Failed to fetch orders.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className='px-5 py-2 bg-[#E2AB0B] text-white rounded-lg hover:bg-[#c99508] transition-colors'
+        >
+          Try Again
+        </button>
+      </div>
     );
-    setOpenId(null);
-  }, []);
+  }
 
   return (
     <div ref={pageRef} className='flex flex-col gap-6'>

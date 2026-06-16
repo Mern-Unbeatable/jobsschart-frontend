@@ -13,4 +13,5 @@ export const tagList = [
   "AllPayments",
   "Package",
   "Donation",
+  "Order",
 ];

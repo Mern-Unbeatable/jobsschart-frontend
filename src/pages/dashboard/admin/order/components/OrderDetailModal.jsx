@@ -95,7 +95,11 @@ function OrderDetailModal({ order, onClose, onStatusChange }) {
                   className='flex items-center justify-between gap-3 bg-[#F9FAFB] rounded-lg px-3 py-2'
                 >
                   <div className='w-10 h-10 rounded-md bg-[#E5E7EB] shrink-0 overflow-hidden'>
-                    <div className='w-full h-full bg-linear-to-br from-gray-200 to-gray-300' />
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className='w-full h-full object-cover' />
+                    ) : (
+                      <div className='w-full h-full bg-linear-to-br from-gray-200 to-gray-300' />
+                    )}
                   </div>
                   <div className='flex-1 min-w-0'>
                     <p className='text-base font-medium text-[#050609] truncate'>
