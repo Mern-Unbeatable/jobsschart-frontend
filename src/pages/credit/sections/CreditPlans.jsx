@@ -1,13 +1,39 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Check } from "lucide-react";
 import { useGetAllPackagesQuery } from "../../../features/api/packageApi";
+import { useCreateCheckoutMutation } from "../../../features/api/paymentApi";
+import toast from "react-hot-toast";
+import CreditPlanCard from "./CreditPlanCard";
 
 const CreditPlans = memo(() => {
   const { t } = useTranslation();
   const { data: packagesData, isLoading } = useGetAllPackagesQuery();
+  const [createCheckout, { isLoading: isCheckingOut }] = useCreateCheckoutMutation();
+  const [activePackageId, setActivePackageId] = useState(null);
 
   const creditPlans = packagesData?.packages || [];
+
+  const handleBuyCredits = async (packageId) => {
+    setActivePackageId(packageId);
+    try {
+      const payload = {
+        type: 'PACKAGE',
+        packageId: packageId,
+      };
+      const result = await createCheckout(payload).unwrap();
+      if (result?.url) {
+        window.location.href = result.url;
+      } else {
+        toast.error('Could not initiate payment. Please try again.');
+      }
+    } catch (err) {
+      toast.error(
+        err?.data?.message || err?.message || 'Payment failed. Please try again.'
+      );
+    } finally {
+      setActivePackageId(null);
+    }
+  };
 
   return (
     <div className="mb-12 ">
@@ -45,61 +71,12 @@ const CreditPlans = memo(() => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {creditPlans.map((plan) => (
-              <div
+              <CreditPlanCard
                 key={plan.id}
-                className=" rounded-xl p-6 border border-[#00000033] flex flex-col"
-              >
-                {/* Plan Name & Credits Badge */}
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-2xl font-bold text-gray-800">
-                    {plan.name}
-                  </h3>
-                  {plan.credits !== undefined && (
-                    <span className="px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full border border-green-200">
-                      {plan.credits} Credits
-                    </span>
-                  )}
-                </div>
-
-                {/* Pricing Section */}
-                <div className="flex items-baseline mb-2">
-                  <span className="text-4xl font-bold text-gray-900">
-                    €{plan.price}
-                  </span>
-                  {plan.minutes !== undefined && plan.minutes > 0 && (
-                    <span className="text-gray-500 text-base ml-1">
-                      /{plan.minutes} minutes
-                    </span>
-                  )}
-                </div>
-
-                {/* Secondary Pricing Text / Description */}
-                <p className="text-base text-gray-600 mb-4 h-12 line-clamp-2">
-                  {plan.description || (plan.minutes > 0 ? `${plan.minutes} minutes session` : '')}
-                </p>
-
-                {/* Button */}
-                <button className="w-full bg-green-500/60 hover:bg-green-500/60 text-white py-3 rounded-md font-semibold mb-4 transition duration-200 shadow-sm mt-auto">
-                  Buy Credits
-                </button>
-
-                {/* Features List */}
-                <ul className="space-y-4  border-gray-100 ">
-                  {(plan.features || []).map((feature, idx) => (
-                    <li
-                      key={idx}
-                      className="flex items-center gap-3 text-gray-600 text-base"
-                    >
-                      <Check
-                        size={18}
-                        className="text-[#10B981] shrink-0"
-                        strokeWidth={3}
-                      />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                plan={plan}
+                onBuyCredits={handleBuyCredits}
+                isCheckingOut={isCheckingOut && activePackageId === plan.id}
+              />
             ))}
           </div>
         )}

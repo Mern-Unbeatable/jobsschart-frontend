@@ -267,7 +267,7 @@ const Checkout = memo(() => {
               <button
                 onClick={handleConfirmPurchase}
                 disabled={isCheckingOut}
-                className='w-full bg-green-500/60 text-white font-bold py-3 rounded-lg transition-colors text-lg hover:bg-[#c99809] disabled:opacity-50 disabled:cursor-not-allowed'
+                className='w-full bg-green-500/60 text-white font-bold py-3 rounded-lg transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed'
               >
                 {isCheckingOut ? (
                   <span className='flex items-center justify-center gap-2'>

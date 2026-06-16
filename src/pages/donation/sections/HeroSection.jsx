@@ -27,7 +27,7 @@ const HeroSection = memo(() => {
 
      
           <button 
-            className='bg-[#EAB308] cursor-pointer text-white px-6 py-3 rounded-sm font-medium text-sm sm:text-base transition-all duration-300 shadow-md active:scale-95'
+            className='bg-green-400/90 hover:bg-green-600 cursor-pointer text-white px-6 py-3 rounded-sm font-medium text-sm sm:text-base transition-all duration-300 shadow-md active:scale-95'
           >
             {t('donationHero.button')}
           </button>
