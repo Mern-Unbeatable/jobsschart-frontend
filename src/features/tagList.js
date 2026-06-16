@@ -12,4 +12,5 @@ export const tagList = [
   "PaymentHistory",
   "AllPayments",
   "Package",
+  "Donation",
 ];
