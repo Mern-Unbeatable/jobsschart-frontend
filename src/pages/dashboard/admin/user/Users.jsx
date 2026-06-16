@@ -1,92 +1,40 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import FilterTabs from "./components/FilterTabs";
 import UsersTable from "./components/UsersTable";
 import Pagination from "./components/Pagination";
 import DeleteModal from "./components/DeleteModal";
+import { useGetAllUsersQuery, useUpdateUserStatusMutation, useDeleteUserMutation } from "../../../../features/api/userApi";
 
 const PAGE_SIZE = 6;
 
-const INITIAL_USERS = [
-  {
-    id: 1,
-    name: "Eleanor Pena",
-    email: "aliza@gmail.com",
-    phone: "+880 1712-345678",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Esther Howard",
-    email: "liyana@gmail.com",
-    phone: "+880 1934-567890",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Annette Black",
-    email: "liyana@gmail.com",
-    phone: "+880 1934-567890",
-    status: "Active",
-  },
-  {
-    id: 4,
-    name: "Jenny Wilson",
-    email: "liyana@gmail.com",
-    phone: "+880 1934-567890",
-    status: "Active",
-  },
-  {
-    id: 5,
-    name: "Darlene Robertson",
-    email: "liyana@gmail.com",
-    phone: "+880 1934-567890",
-    status: "Active",
-  },
-  {
-    id: 6,
-    name: "Guy Hawkins",
-    email: "liyana@gmail.com",
-    phone: "+880 1934-567890",
-    status: "Active",
-  },
-  {
-    id: 7,
-    name: "Robert Fox",
-    email: "robert@gmail.com",
-    phone: "+880 1934-567890",
-    status: "Suspended",
-  },
-  {
-    id: 8,
-    name: "Cameron Williamson",
-    email: "cameron@gmail.com",
-    phone: "+880 1934-567890",
-    status: "Active",
-  },
-  {
-    id: 9,
-    name: "Brooklyn Simmons",
-    email: "brook@gmail.com",
-    phone: "+880 1934-567890",
-    status: "Suspended",
-  },
-  {
-    id: 10,
-    name: "Kristin Watson",
-    email: "kristin@gmail.com",
-    phone: "+880 1934-567890",
-    status: "Active",
-  },
-];
+const mapBackendUser = (u) => {
+  const status = u.status === "ACTIVE" ? "Active" : "Suspended";
+  return {
+    id: u.id,
+    name: u.name || "User",
+    email: u.email || "N/A",
+    phone: u.phone || "N/A",
+    status,
+    raw: u
+  };
+};
 
 const AdminUsers = () => {
-  const [users, setUsers] = useState(INITIAL_USERS);
   const [filter, setFilter] = useState("Active");
   const [openMenuId, setOpenMenuId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [page, setPage] = useState(1);
 
   const btnRefs = useRef({});
+
+  const { data: apiResponse, isLoading, error } = useGetAllUsersQuery();
+  const [updateUserStatus] = useUpdateUserStatusMutation();
+  const [deleteUser] = useDeleteUserMutation();
+
+  const users = useMemo(() => {
+    if (!apiResponse?.users) return [];
+    return apiResponse.users.map(mapBackendUser);
+  }, [apiResponse]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -95,26 +43,62 @@ const AdminUsers = () => {
     return () => document.removeEventListener("click", handleOutsideClick);
   }, []);
 
-  const filtered = users.filter((u) => u.status === filter);
+  const filtered = useMemo(() => {
+    return users.filter((u) => u.status === filter);
+  }, [users, filter]);
+
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const paginated = useMemo(() => {
+    return filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  }, [filtered, page]);
 
   const handleFilterChange = (f) => {
     setFilter(f);
     setPage(1);
   };
 
-  const handleStatusChange = useCallback((id, status) => {
-    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, status } : u)));
-    setOpenMenuId(null);
-  }, []);
+  const handleStatusChange = useCallback(async (id, newStatus) => {
+    try {
+      const apiStatus = newStatus === "Active" ? "ACTIVE" : "SUSPENDED";
+      await updateUserStatus({ id, status: apiStatus }).unwrap();
+      setOpenMenuId(null);
+    } catch (err) {
+      console.error("Failed to update user status:", err);
+    }
+  }, [updateUserStatus]);
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
-    setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id));
-    setDeleteTarget(null);
-    setOpenMenuId(null);
-  }, [deleteTarget]);
+    try {
+      await deleteUser(deleteTarget.id).unwrap();
+      setDeleteTarget(null);
+      setOpenMenuId(null);
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+    }
+  }, [deleteTarget, deleteUser]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500/60"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-red-500 font-semibold text-lg">Failed to fetch users.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-5 py-2 bg-green-500/60 text-white rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
