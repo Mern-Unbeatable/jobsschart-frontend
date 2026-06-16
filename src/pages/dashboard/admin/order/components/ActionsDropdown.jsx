@@ -1,24 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { gsap } from 'gsap';
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { gsap } from "gsap";
 
-const ALLOWED_TRANSITIONS = {
-  Pending: ['Processing', 'Cancelled'],
-  Processing: ['Shipped', 'Cancelled'],
-  Shipped: ['Delivered'],
-  Delivered: [],
-  Cancelled: [],
-};
+const ALL_STATUSES = [
+  "Pending",
+  "Processing",
+  "Delivered",
+  "Shipped",
+  "Cancelled",
+];
 
 const ACTION_MENU_WIDTH = 176;
-const ACTION_MENU_HEIGHT = 220; // Reduced height since menu will have fewer items now
+const ACTION_MENU_HEIGHT = 320;
 const VIEWPORT_GAP = 12;
 
-function ActionsDropdown({ anchorEl, onClose, onSeeDetails, onStatusChange, currentStatus }) {
+function ActionsDropdown({ anchorEl, onClose, onSeeDetails, onStatusChange }) {
   const menuRef = useRef(null);
   const [pos, setPos] = useState({ top: 0, left: 0 });
-
-  const allowedStatuses = ALLOWED_TRANSITIONS[currentStatus] || [];
 
   useEffect(() => {
     if (!anchorEl) return;
@@ -42,7 +40,7 @@ function ActionsDropdown({ anchorEl, onClose, onSeeDetails, onStatusChange, curr
     gsap.fromTo(
       menuRef.current,
       { opacity: 0, y: shouldOpenAbove ? 8 : -8, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.18, ease: 'power2.out' },
+      { opacity: 1, y: 0, scale: 1, duration: 0.18, ease: "power2.out" },
     );
     const handleOutside = (e) => {
       if (
@@ -53,45 +51,41 @@ function ActionsDropdown({ anchorEl, onClose, onSeeDetails, onStatusChange, curr
         onClose();
       }
     };
-    document.addEventListener('mousedown', handleOutside);
-    return () => document.removeEventListener('mousedown', handleOutside);
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
   }, [anchorEl, onClose]);
 
   return createPortal(
     <div
       ref={menuRef}
       style={{
-        position: 'fixed',
+        position: "fixed",
         top: pos.top,
         left: pos.left,
         zIndex: 9999,
       }}
-      className='w-44 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden'
+      className="w-44 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden"
     >
       <button
-        type='button'
+        type="button"
         onClick={onSeeDetails}
-        className='w-full text-left px-4 py-2.5 text-sm font-semibold text-white bg-green-500/60 transition-colors'
+        className="w-full text-left px-4 py-2.5 text-sm font-semibold text-white bg-green-500/60 transition-colors"
       >
         See Details
       </button>
-      {allowedStatuses.length > 0 && (
-        <>
-          <div className='px-4 pt-2 pb-1 text-xs font-bold text-gray-400 uppercase tracking-widest'>
-            Status
-          </div>
-          {allowedStatuses.map((s) => (
-            <button
-              key={s}
-              type='button'
-              onClick={() => onStatusChange(s)}
-              className='w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors'
-            >
-              {s}
-            </button>
-          ))}
-        </>
-      )}
+      <div className="px-4 pt-2 pb-1 text-xs font-bold text-gray-400 uppercase tracking-widest">
+        Status
+      </div>
+      {ALL_STATUSES.map((s) => (
+        <button
+          key={s}
+          type="button"
+          onClick={() => onStatusChange(s)}
+          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          {s}
+        </button>
+      ))}
     </div>,
     document.body,
   );

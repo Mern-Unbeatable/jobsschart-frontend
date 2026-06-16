@@ -193,7 +193,7 @@ const AdminAddNewProduct = () => {
     async (event) => {
       event.preventDefault();
 
-      if (!form.title || !form.price || !form.category) {
+      if (mode !== "edit" && (!form.title || !form.price || !form.category)) {
         toast.error("Product title, category, and price are required.");
         return;
       }

@@ -2,7 +2,8 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, CircleCheck } from "lucide-react";
 import { gsap } from "gsap";
-import { ROUTES } from "../../../config";
+import { ROUTES } from "../../../../config";
+import { useGetProductByIdQuery } from "../../../../features/api/productApi";
 
 const IMG_MAIN =
   "https://www.figma.com/api/mcp/asset/a210cb64-a86e-4731-a765-c53d8334de62";
@@ -57,30 +58,90 @@ const ProductView = () => {
 
   const stateProduct = location.state?.product;
 
+  const { data: fetchedProduct, isLoading, error } = useGetProductByIdQuery(productId, {
+    skip: !!stateProduct,
+  });
+
   const product = useMemo(() => {
     if (stateProduct) return stateProduct;
-    return {
-      id: Number(productId) || 1,
-      name: "Healing Crystal Set",
-      description: "Premium crystal set for energy balance & stress relief",
-      price: 29.99,
-      image: IMG_MAIN,
-      category: "Spiritual Items",
-    };
-  }, [productId, stateProduct]);
+    if (fetchedProduct) {
+      return fetchedProduct.product || fetchedProduct;
+    }
+    return null;
+  }, [stateProduct, fetchedProduct]);
 
-  const [activeImage, setActiveImage] = useState(product.image || IMG_MAIN);
+  const allImages = useMemo(() => {
+    const list = [];
+    if (product?.image) {
+      list.push(product.image);
+    }
+    if (product?.gallery && Array.isArray(product.gallery)) {
+      product.gallery.forEach((img) => {
+        if (img && !list.includes(img)) {
+          list.push(img);
+        }
+      });
+    }
+    return list;
+  }, [product]);
+
+  const [activeImage, setActiveImage] = useState(null);
   const wrapRef = useRef(null);
 
+  // Sync activeImage when product details load
   useEffect(() => {
-    if (!wrapRef.current) return;
+    if (allImages.length > 0) {
+      setActiveImage(allImages[0]);
+    } else {
+      setActiveImage(null);
+    }
+  }, [allImages]);
+
+  useEffect(() => {
+    if (!product || !wrapRef.current) return;
     const cards = wrapRef.current.querySelectorAll(".anim-card");
     gsap.fromTo(
       cards,
       { opacity: 0, y: 18 },
       { opacity: 1, y: 0, stagger: 0.07, duration: 0.35, ease: "power2.out" },
     );
-  }, [product.id]);
+  }, [product?.id]);
+
+  const features = useMemo(() => {
+    return product?.features || BASE_FEATURES;
+  }, [product]);
+
+  const inside = useMemo(() => {
+    return product?.inside || product?.whatsInside || WHATS_INSIDE;
+  }, [product]);
+
+  const benefits = useMemo(() => {
+    return product?.benefits || BENEFITS;
+  }, [product]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500/60"></div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-red-500 font-semibold text-lg">
+          {error?.data?.message || "Failed to load product details."}
+        </p>
+        <button
+          onClick={() => navigate(ROUTES.ADMIN_WEBSHOP)}
+          className="px-5 py-2 bg-green-500/60 text-white rounded-lg hover:opacity-95 transition-opacity"
+        >
+          Back to Webshop
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div ref={wrapRef} className="flex flex-col gap-6">
@@ -95,17 +156,21 @@ const ProductView = () => {
 
       <div className="anim-card grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-10">
         <div className="flex flex-col gap-3">
-          <div className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
-            <img
-              src={activeImage}
-              alt={product.name}
-              className="w-full h-full object-contain"
-            />
+          <div className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center">
+            {activeImage ? (
+              <img
+                src={activeImage}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-gray-400 text-base">No Image Available</span>
+            )}
           </div>
 
-          <div className="grid grid-cols-6 gap-2">
-            {[product.image || IMG_MAIN, ...GALLERY.slice(0, 5)].map(
-              (img, i) => (
+          {allImages.length > 0 && (
+            <div className="grid grid-cols-6 gap-2">
+              {allImages.slice(0, 6).map((img, i) => (
                 <button
                   key={`${img}-${i}`}
                   type="button"
@@ -123,9 +188,9 @@ const ProductView = () => {
                     className="w-full h-full object-cover"
                   />
                 </button>
-              ),
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-6 justify-center">
@@ -157,10 +222,7 @@ const ProductView = () => {
             </h2>
             <div className="h-px bg-[#d4d4d4]" />
             <p className="text-base md:text-lg text-[#545454] leading-relaxed">
-              Healing Crystal Set is carefully designed to help you attract
-              positive energy, reduce stress, and restore emotional and
-              spiritual balance. Each crystal is selected for its unique healing
-              properties and hand-polished to perfection.
+              {product.longDescription || product.description || "No description available."}
             </p>
           </div>
 
@@ -172,7 +234,7 @@ const ProductView = () => {
               Features
             </h2>
             <div className="flex flex-col gap-2">
-              {BASE_FEATURES.map((item) => (
+              {features.map((item) => (
                 <div key={item} className="flex items-center gap-2.5">
                   <CircleCheck size={20} className="text-[#22C55E]" />
                   <p className="text-base md:text-lg text-[#545454]">{item}</p>
@@ -190,15 +252,16 @@ const ProductView = () => {
                   product: {
                     ...product,
                     longDescription:
+                      product.longDescription ||
                       "Healing Crystal Set is carefully designed to help you attract positive energy, reduce stress, and restore emotional and spiritual balance. Each crystal is selected for its unique healing properties and hand-polished to perfection.",
-                    features: BASE_FEATURES,
-                    inside: WHATS_INSIDE,
-                    benefits: BENEFITS,
+                    features: features,
+                    inside: inside,
+                    benefits: benefits,
                   },
                 },
               })
             }
-            className="w-fit bg-green-500/60 text-white px-6 py-2.5 rounded text-base font-medium hover:bg-[#c99809] transition-colors"
+            className="w-fit bg-green-500/60 text-white px-6 py-2.5 rounded text-base font-medium hover:opacity-90 transition-opacity"
           >
             Edit Product
           </button>
@@ -214,7 +277,7 @@ const ProductView = () => {
             What's Inside
           </h3>
           <div className="flex flex-wrap gap-3">
-            {WHATS_INSIDE.map((item) => (
+            {inside.map((item) => (
               <span
                 key={item}
                 className="px-5 py-2.5 rounded-lg bg-[#f2f2f2] text-[#545454] text-base"
@@ -233,7 +296,7 @@ const ProductView = () => {
             Benefits
           </h3>
           <div className="flex flex-wrap gap-3">
-            {BENEFITS.map((item) => (
+            {benefits.map((item) => (
               <span
                 key={item}
                 className="px-5 py-2.5 rounded-lg bg-[#f2f2f2] text-[#545454] text-base"

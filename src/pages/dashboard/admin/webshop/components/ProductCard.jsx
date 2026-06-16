@@ -34,7 +34,7 @@ function ProductCard({ product, onView, onEdit, onDelete }) {
           onView();
         }
       }}
-      className="border border-green-500/60/30 rounded-2xl p-4 flex flex-col gap-6 bg-white cursor-pointer h-full"
+      className="border border-green-500/60 rounded-2xl p-4 flex flex-col gap-6 bg-white cursor-pointer h-full"
     >
       {/* Product image */}
       <div className="w-full h-48 sm:h-56 lg:h-64 rounded-lg overflow-hidden shrink-0">
@@ -79,7 +79,7 @@ function ProductCard({ product, onView, onEdit, onDelete }) {
             }}
             onMouseEnter={handleEditEnter}
             onMouseLeave={handleEditLeave}
-            className="flex-1 flex items-center justify-center gap-2.5 bg-green-500/60 text-white px-6 py-3 rounded text-base font-normal transition-colors hover:bg-[#c99809] cursor-pointer"
+            className="flex-1 flex items-center justify-center gap-2.5 bg-green-500/60 text-white px-6 py-3 rounded text-base font-normal transition-colors cursor-pointer"
           >
             <Pencil size={18} />
             Edit
