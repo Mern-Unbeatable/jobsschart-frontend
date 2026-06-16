@@ -53,7 +53,7 @@ const CaseStudies = lazy(() => import('../pages/dashboard/admin/CaseStudies'));
 const Blog = lazy(() => import('../pages/dashboard/admin/Blog'));
 const Jobs = lazy(() => import('../pages/dashboard/admin/Jobs'));
 const Pricing = lazy(() => import('../pages/dashboard/admin/Pricing'));
-const AdminConsultants = lazy(() => import('../pages/dashboard/admin/Consultants'));
+const AdminConsultants = lazy(() => import('../pages/dashboard/admin/consultants/Consultants'));
 const AdminUsers = lazy(() => import('../pages/dashboard/admin/user/Users'));
 const AdminWebshop = lazy(() => import('../pages/dashboard/admin/webshop/Webshop'));
 const AdminAddNewProduct = lazy(() => import('../pages/dashboard/admin/webshop/AddNewProduct'));
