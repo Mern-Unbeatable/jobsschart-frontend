@@ -65,7 +65,7 @@ const BlogContent = memo(() => {
         {/* Blog Grid */}
         <BlogGrid blogs={blogs} />
 
-        {/* Ads Section */}
+        
         <CommonAdsSection 
           wrapperClassName='mt-16'
       containerClassName='container mx-auto'
