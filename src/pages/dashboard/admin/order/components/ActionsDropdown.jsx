@@ -2,21 +2,23 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 
-const ALL_STATUSES = [
-  'Pending',
-  'Processing',
-  'Delivered',
-  'Shipped',
-  'Cancelled',
-];
+const ALLOWED_TRANSITIONS = {
+  Pending: ['Processing', 'Cancelled'],
+  Processing: ['Shipped', 'Cancelled'],
+  Shipped: ['Delivered'],
+  Delivered: [],
+  Cancelled: [],
+};
 
 const ACTION_MENU_WIDTH = 176;
-const ACTION_MENU_HEIGHT = 320;
+const ACTION_MENU_HEIGHT = 220; // Reduced height since menu will have fewer items now
 const VIEWPORT_GAP = 12;
 
-function ActionsDropdown({ anchorEl, onClose, onSeeDetails, onStatusChange }) {
+function ActionsDropdown({ anchorEl, onClose, onSeeDetails, onStatusChange, currentStatus }) {
   const menuRef = useRef(null);
   const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  const allowedStatuses = ALLOWED_TRANSITIONS[currentStatus] || [];
 
   useEffect(() => {
     if (!anchorEl) return;
@@ -73,19 +75,23 @@ function ActionsDropdown({ anchorEl, onClose, onSeeDetails, onStatusChange }) {
       >
         See Details
       </button>
-      <div className='px-4 pt-2 pb-1 text-xs font-bold text-gray-400 uppercase tracking-widest'>
-        Status
-      </div>
-      {ALL_STATUSES.map((s) => (
-        <button
-          key={s}
-          type='button'
-          onClick={() => onStatusChange(s)}
-          className='w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors'
-        >
-          {s}
-        </button>
-      ))}
+      {allowedStatuses.length > 0 && (
+        <>
+          <div className='px-4 pt-2 pb-1 text-xs font-bold text-gray-400 uppercase tracking-widest'>
+            Status
+          </div>
+          {allowedStatuses.map((s) => (
+            <button
+              key={s}
+              type='button'
+              onClick={() => onStatusChange(s)}
+              className='w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors'
+            >
+              {s}
+            </button>
+          ))}
+        </>
+      )}
     </div>,
     document.body,
   );
