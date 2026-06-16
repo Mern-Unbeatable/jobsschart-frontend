@@ -3,12 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, CircleCheck, Minus, Plus } from "lucide-react";
 import CommonAdsSection from "../../components/CommonAdsSection";
 import { useGetProductByIdQuery } from "../../features/api/productApi";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "../../features/slices/authSlice";
+import Swal from "sweetalert2";
 
 const ProductDetail = memo(() => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const { data, isLoading, isError } = useGetProductByIdQuery(id, { skip: !id });
 
@@ -162,7 +166,25 @@ const ProductDetail = memo(() => {
                 </button>
               </div>
               <button
-                onClick={() => navigate("/checkout", { state: { product, quantity } })}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    Swal.fire({
+                      title: "Login Required",
+                      text: "You must log in to purchase this product.",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonColor: "#3085d6",
+                      cancelButtonColor: "#d33",
+                      confirmButtonText: "Login",
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        navigate("/login");
+                      }
+                    });
+                    return;
+                  }
+                  navigate("/checkout", { state: { product, quantity } });
+                }}
                 className="flex-1 bg-green-500/60 text-white font-bold h-12 rounded-md shadow-sm transition-all text-base "
               >
                 Buy Now

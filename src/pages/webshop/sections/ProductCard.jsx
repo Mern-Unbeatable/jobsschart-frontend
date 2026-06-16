@@ -1,11 +1,31 @@
 import React, { memo } from "react";
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "../../../features/slices/authSlice";
+import Swal from "sweetalert2";
 
 const ProductCard = memo(({ product }) => {
   const navigate = useNavigate();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const handleBuyNow = (e) => {
     e.stopPropagation();
+    if (!isAuthenticated) {
+      Swal.fire({
+        title: "Login Required",
+        text: "You must log in to purchase this product.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/login");
+        }
+      });
+      return;
+    }
     navigate('/checkout', { state: { product, quantity: 1 } });
   };
 
