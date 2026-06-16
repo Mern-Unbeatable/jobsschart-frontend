@@ -105,7 +105,7 @@ const AdminWebshop = () => {
         </div>
         <button
           onClick={() => navigate(ROUTES.ADMIN_WEBSHOP_ADD_PRODUCT)}
-          className="shrink-0 flex items-center gap-2 bg-green-500/60 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[#c99809] transition-colors cursor-pointer"
+          className="shrink-0 flex items-center gap-2 bg-green-500/60 text-white px-4 py-2.5 rounded-lg text-sm font-medium  transition-colors cursor-pointer"
         >
           <Plus size={16} />
           Add New Products
