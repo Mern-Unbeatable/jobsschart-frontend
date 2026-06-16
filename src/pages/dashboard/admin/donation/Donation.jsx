@@ -10,7 +10,7 @@ import Pagination from './components/Pagination';
 import DonationTable from './components/DonationTable';
 import StatCards from './components/StatCards';
 import { gsap } from 'gsap';
-import { useGetDonationsQuery, useDeleteDonationMutation } from '../../../../features/api/donationApi';
+import { useGetDonationsQuery, useGetDonationStatsQuery, useDeleteDonationMutation } from '../../../../features/api/donationApi';
 import toast from 'react-hot-toast';
 
 const PAGE_SIZE = 6;
@@ -37,9 +37,11 @@ const AdminDonation = () => {
   const pageRef = useRef(null);
   const anchorRefs = useRef({});
 
-  const { data: donationsData, isLoading } = useGetDonationsQuery({ page, limit: PAGE_SIZE });
-  const { data: allDonationsData } = useGetDonationsQuery({ limit: 10000 });
+  const { data: donationsData, isLoading: isDonationsLoading } = useGetDonationsQuery({ page, limit: PAGE_SIZE });
+  const { data: statsData, isLoading: isStatsLoading } = useGetDonationStatsQuery();
   const [deleteDonation] = useDeleteDonationMutation();
+
+  const isLoading = isDonationsLoading || isStatsLoading;
 
   useEffect(() => {
     if (!pageRef.current || isLoading) return;
@@ -50,11 +52,11 @@ const AdminDonation = () => {
     );
   }, [isLoading]);
 
-  // Dynamic stats calculation
-  const allDonations = allDonationsData?.donations || [];
-  const totalDonationsSum = allDonations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
-  const totalDonorsCount = allDonationsData?.meta?.total || allDonations.length;
-  const businessDonorsCount = allDonations.filter(d => d.donorType === 'BUSINESS').length;
+  // Dynamic stats calculation from API summary
+  const summary = statsData?.stats?.summary || {};
+  const totalDonationsSum = Number(summary.totalAmount || 0);
+  const totalDonorsCount = Number(summary.totalDonors || 0);
+  const businessDonorsCount = Number(summary.businessDonors || 0);
 
   const STAT_CARDS = [
     {
