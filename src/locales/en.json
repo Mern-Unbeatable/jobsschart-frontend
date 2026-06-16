@@ -242,20 +242,20 @@
           }
         }
       }
+    }
+  },
+  "creditBenefits": {
+    "instantUsage": {
+      "title": "Instant Usage",
+      "description": "€2.50 per minute usage. Credits will be deducted automatically as you consult."
     },
-    "creditBenefits": {
-      "instantUsage": {
-        "title": "Instant Usage",
-        "description": "€2.50 per minute usage. Credits will be deducted automatically as you consult."
-      },
-      "noHiddenFees": {
-        "title": "No Hidden Fees",
-        "description": "Pay only for what you use. No subscription required, no hidden charges."
-      },
-      "universalValidity": {
-        "title": "Universal Validity",
-        "description": "Valid for all consultants across chat, call, and video consultations."
-      }
+    "noHiddenFees": {
+      "title": "No Hidden Fees",
+      "description": "Pay only for what you use. No subscription required, no hidden charges."
+    },
+    "universalValidity": {
+      "title": "Universal Validity",
+      "description": "Valid for all consultants across chat, call, and video consultations."
     }
   },
   "donationHero": {

@@ -12,7 +12,7 @@ const CreditPlans = memo(() => {
   return (
     <div className="mb-12 ">
       {/* Header Section */}
-      <div className="container mx-auto px-4 text-center mb-12 md:mb-16">
+      <div className="container mx-auto px-4 text-center mb-8">
         <span className="inline-block px-4 py-1 rounded-full bg-white border border-[#00000033] text-sm text-gray-500 font-medium mb-4">
           {t("creditPlans.badge")}
         </span>
@@ -79,7 +79,7 @@ const CreditPlans = memo(() => {
                 </p>
 
                 {/* Button */}
-                <button className="w-full bg-[#D4A017] hover:bg-[#B88A14] text-white py-3 rounded-md font-semibold mb-4 transition duration-200 shadow-sm mt-auto">
+                <button className="w-full bg-green-500/60 hover:bg-green-500/60 text-white py-3 rounded-md font-semibold mb-4 transition duration-200 shadow-sm mt-auto">
                   Buy Credits
                 </button>
 
