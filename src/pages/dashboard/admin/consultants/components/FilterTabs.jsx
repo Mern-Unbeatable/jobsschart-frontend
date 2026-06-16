@@ -21,9 +21,9 @@ function FilterTabs({ active, onChange }) {
           }
           className={`flex-1 sm:flex-none text-center px-3 py-1 rounded-md text-base font-normal transition-colors ${
             active === f
-              ? "bg-[#FCF7E7] text-green-500/60"
+              ? "bg-green-50 text-green-600"
               : "text-[#333] hover:text-green-500/60"
-          }`}
+          }`} 
         >
           {f}
         </button>
