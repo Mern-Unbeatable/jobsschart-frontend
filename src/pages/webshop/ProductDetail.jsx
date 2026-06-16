@@ -163,7 +163,7 @@ const ProductDetail = memo(() => {
               </div>
               <button
                 onClick={() => navigate("/checkout", { state: { product, quantity } })}
-                className="flex-1 bg-green-500/60 text-white font-bold h-12 rounded-md shadow-sm transition-all text-base hover:bg-[#d99a00]"
+                className="flex-1 bg-green-500/60 text-white font-bold h-12 rounded-md shadow-sm transition-all text-base "
               >
                 Buy Now
               </button>
