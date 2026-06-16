@@ -72,7 +72,7 @@ const UserDashboard = lazy(() => import('../pages/dashboard/user/Dashboard'));
 const UserBookedSchedule = lazy(() => import('../pages/dashboard/user/BookedSchedule'));
 const UserChat = lazy(() => import('../pages/dashboard/user/Chat'));
 const UserProfile = lazy(() => import('../pages/dashboard/user/Profile'));
-const UserOrders = lazy(() => import('../pages/dashboard/user/Orders'));
+const UserOrders = lazy(() => import('../pages/dashboard/user/orders/Orders'));
 const UserSettings = lazy(() => import('../pages/dashboard/user/Settings'));
 
 // Consultant pages
