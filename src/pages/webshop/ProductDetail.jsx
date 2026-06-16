@@ -14,7 +14,9 @@ const ProductDetail = memo(() => {
   const [selectedImage, setSelectedImage] = useState(0);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
-  const { data, isLoading, isError } = useGetProductByIdQuery(id, { skip: !id });
+  const { data, isLoading, isError } = useGetProductByIdQuery(id, {
+    skip: !id,
+  });
 
   // API response: { product: { ... } }
   const product = data?.product || data || null;
@@ -29,7 +31,10 @@ const ProductDetail = memo(() => {
               <div className="rounded-2xl bg-gray-200 h-96 mb-4" />
               <div className="grid grid-cols-6 gap-2">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="aspect-square rounded-lg bg-gray-200" />
+                  <div
+                    key={i}
+                    className="aspect-square rounded-lg bg-gray-200"
+                  />
                 ))}
               </div>
             </div>
@@ -55,7 +60,7 @@ const ProductDetail = memo(() => {
           <p className="text-xl text-gray-500 mb-4">Product not found.</p>
           <button
             onClick={() => navigate("/webshop")}
-            className="text-[#E2AB0B] font-medium hover:underline flex items-center gap-1 mx-auto"
+            className="text-green-500/60 font-medium hover:underline flex items-center gap-1 mx-auto"
           >
             <ArrowLeft size={16} /> Back to Webshop
           </button>
@@ -89,11 +94,17 @@ const ProductDetail = memo(() => {
                       <div
                         key={idx}
                         className={`aspect-square rounded-lg overflow-hidden border-2 cursor-pointer hover:border-[#D9A108] transition-all ${
-                          selectedImage === idx ? "border-[#D9A108]" : "border-gray-200"
+                          selectedImage === idx
+                            ? "border-[#D9A108]"
+                            : "border-gray-200"
                         }`}
                         onClick={() => setSelectedImage(idx)}
                       >
-                        <img src={img} alt="gallery" className="w-full h-full object-cover" />
+                        <img
+                          src={img}
+                          alt="gallery"
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                     ))}
                   </div>
@@ -137,7 +148,10 @@ const ProductDetail = memo(() => {
                 </h3>
                 <ul className="space-y-3 mb-10">
                   {product.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-3 text-lg text-gray-600">
+                    <li
+                      key={idx}
+                      className="flex items-center gap-3 text-lg text-gray-600"
+                    >
                       <div className="text-green-500">
                         <CircleCheck size={18} strokeWidth={2} />
                       </div>
@@ -159,7 +173,9 @@ const ProductDetail = memo(() => {
                 </button>
                 <span className="px-4 font-bold text-gray-700">{quantity}</span>
                 <button
-                  onClick={() => setQuantity((q) => Math.min(product.stock || 99, q + 1))}
+                  onClick={() =>
+                    setQuantity((q) => Math.min(product.stock || 99, q + 1))
+                  }
                   className="px-3 text-gray-500 hover:text-black"
                 >
                   <Plus size={16} />

@@ -2,15 +2,16 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 
-const ALL_STATUSES = [
-  'Pending',
-  'Processing',
-  'Delivered',
-  'Shipped',
-  'Cancelled',
-];
+const ALLOWED_TRANSITIONS = {
+  Pending: ['Processing', 'Cancelled'],
+  Processing: ['Shipped', 'Cancelled'],
+  Shipped: ['Delivered'],
+  Delivered: [],
+  Cancelled: [],
+};
 
 function OrderDetailModal({ order, onClose, onStatusChange }) {
+  const allowedStatuses = ALLOWED_TRANSITIONS[order.status] || [];
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -149,27 +150,25 @@ function OrderDetailModal({ order, onClose, onStatusChange }) {
         )}
 
         {/* Update Order Status */}
-        <div className='px-6 pb-6'>
-          <p className='text-base font-semibold text-[#050609] mb-3'>
-            Update Order Status
-          </p>
-          <div className='flex flex-wrap gap-2'>
-            {ALL_STATUSES.map((s) => (
-              <button
-                key={s}
-                type='button'
-                onClick={() => onStatusChange(s)}
-                className={`px-4 py-1.5 rounded border text-base font-medium transition-colors ${
-                  order.status === s
-                    ? 'bg-[#3DB4CC] border-[#3DB4CC] text-white'
-                    : 'border-[#D0D0D0] text-[#333] hover:border-[#3DB4CC] hover:text-[#3DB4CC]'
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+        {allowedStatuses.length > 0 && (
+          <div className='px-6 pb-6'>
+            <p className='text-base font-semibold text-[#050609] mb-3'>
+              Update Order Status
+            </p>
+            <div className='flex flex-wrap gap-2'>
+              {allowedStatuses.map((s) => (
+                <button
+                  key={s}
+                  type='button'
+                  onClick={() => onStatusChange(s)}
+                  className='px-4 py-1.5 rounded border border-[#D0D0D0] text-[#333] hover:border-[#3DB4CC] hover:text-[#3DB4CC] text-base font-medium transition-colors'
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>,
     document.body,

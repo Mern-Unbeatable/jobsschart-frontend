@@ -72,7 +72,11 @@ const Login = () => {
         localStorage.setItem("refreshToken", refreshToken);
       }
 
-      toast.success(response.message || payload.message || "Login successful! Redirecting...");
+      toast.success(
+        response.message ||
+          payload.message ||
+          "Login successful! Redirecting...",
+      );
 
       const redirectPath = getDashboardRoute(user?.role);
 
@@ -115,7 +119,7 @@ const Login = () => {
           {/* Back Button */}
           <Link
             to={ROUTES.HOME}
-            className="inline-flex items-center gap-2 text-base text-gray-600 hover:text-[#E2AB0B] font-medium transition-colors mb-2 group"
+            className="inline-flex items-center gap-2 text-base text-gray-600 hover:text-green-500/60 font-medium transition-colors mb-2 group"
           >
             <ArrowLeft
               size={16}
@@ -148,7 +152,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSigningIn || authLoading}
-                className={`w-full px-4 py-3 bg-[#FEF5E7] border-none rounded text-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-[#E2AB0B] outline-none transition-all disabled:opacity-60 ${
+                className={`w-full px-4 py-3 bg-[#FEF5E7] border-none rounded text-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-green-500/60 outline-none transition-all disabled:opacity-60 ${
                   errors.email ? "ring-2 ring-red-400" : ""
                 }`}
               />
@@ -169,7 +173,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isSigningIn || authLoading}
-                  className={`w-full px-4 py-3 bg-[#FEF5E7] border-none rounded text-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-[#E2AB0B] outline-none transition-all disabled:opacity-60 ${
+                  className={`w-full px-4 py-3 bg-[#FEF5E7] border-none rounded text-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-green-500/60 outline-none transition-all disabled:opacity-60 ${
                     errors.password ? "ring-2 ring-red-400" : ""
                   }`}
                 />
@@ -188,7 +192,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/forgot-password")}
-                  className="text-sm font-medium text-[#E2AB0B] hover:text-[#DF900A] transition-colors"
+                  className="text-sm font-medium text-green-500/60 hover:text-[#DF900A] transition-colors"
                 >
                   Forgot Password?
                 </button>
@@ -199,7 +203,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isSigningIn || authLoading}
-              className="w-full bg-[#E2AB0B] disabled:opacity-60 text-white py-3 rounded font-bold text-sm transition-all shadow-md active:scale-[0.98] inline-flex items-center justify-center gap-2"
+              className="w-full bg-green-500/60 disabled:opacity-60 text-white py-3 rounded font-bold text-sm transition-all shadow-md active:scale-[0.98] inline-flex items-center justify-center gap-2"
             >
               {isSigningIn || authLoading ? (
                 <>
@@ -217,7 +221,7 @@ const Login = () => {
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="text-[#E2AB0B] font-medium hover:text-[#DF900A] transition-colors"
+              className="text-green-500/60 font-medium hover:text-[#DF900A] transition-colors"
             >
               Register
             </Link>

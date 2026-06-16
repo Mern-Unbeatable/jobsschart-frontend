@@ -92,6 +92,7 @@ const OrdersTable = memo(({
                         onStatusChange={(s) =>
                           handleStatusChange(order.id, s)
                         }
+                        currentStatus={order.status}
                       />
                     )}
                   </td>
@@ -154,6 +155,7 @@ const OrdersTable = memo(({
                       onClose={handleClose}
                       onSeeDetails={() => handleSeeDetails(order)}
                       onStatusChange={(s) => handleStatusChange(order.id, s)}
+                      currentStatus={order.status}
                     />
                   )}
               </div>

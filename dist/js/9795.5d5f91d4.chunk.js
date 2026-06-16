@@ -1,2 +1,2986 @@
 /*! For license information please see 9795.5d5f91d4.chunk.js.LICENSE.txt */
-"use strict";(self.webpackChunkreact_webpack_tailwind_app=self.webpackChunkreact_webpack_tailwind_app||[]).push([[9795],{34119(e,t,n){n.d(t,{n:()=>f,x:()=>d});var r=n(96540),o=n(44127);function l(e){return l="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},l(e)}function i(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),n.push.apply(n,r)}return n}function a(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?i(Object(n),!0).forEach(function(t){c(e,t,n[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):i(Object(n)).forEach(function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))})}return e}function c(e,t,n){return(t=function(e){var t=function(e){if("object"!=l(e)||!e)return e;var t=e[Symbol.toPrimitive];if(void 0!==t){var n=t.call(e,"string");if("object"!=l(n))return n;throw new TypeError("@@toPrimitive must return a primitive value.")}return String(e)}(e);return"symbol"==l(t)?t:t+""}(t))in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}function u(e,t){return function(e){if(Array.isArray(e))return e}(e)||function(e,t){var n=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=n){var r,o,l,i,a=[],c=!0,u=!1;try{if(l=(n=n.call(e)).next,0===t){if(Object(n)!==n)return;c=!1}else for(;!(c=(r=l.call(n)).done)&&(a.push(r.value),a.length!==t);c=!0);}catch(e){u=!0,o=e}finally{try{if(!c&&null!=n.return&&(i=n.return(),Object(i)!==i))return}finally{if(u)throw o}}return a}}(e,t)||function(e,t){if(e){if("string"==typeof e)return s(e,t);var n={}.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?s(e,t):void 0}}(e,t)||function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function s(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=Array(t);n<t;n++)r[n]=e[n];return r}function d(){var e=u((0,r.useState)({}),2),t=e[0],n=e[1];(0,r.useEffect)(function(){return o.A.on("consultant_status_changed","usePresence",function(e){var t=e.userId,r=e.status;n(function(e){return a(a({},e),{},c({},t,r))})}),function(){o.A.off("consultant_status_changed","usePresence")}},[]);var l=(0,r.useCallback)(function(e){var n,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:"OFFLINE";return e&&null!==(n=t[e])&&void 0!==n?n:r},[t]);return{liveStatuses:t,getStatus:l}}function f(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:"OFFLINE",n=u((0,r.useState)(t),2),l=n[0],i=n[1];return(0,r.useEffect)(function(){i(t)},[t]),(0,r.useEffect)(function(){if(e){var t="status_".concat(e);return o.A.on("consultant_status_changed",t,function(t){t.userId===e&&i(t.status)}),function(){o.A.off("consultant_status_changed",t)}}},[e]),l}},4138(e,t,n){n.d(t,{A:()=>A});var r=n(96540),o=n(84910),l=n(68614),i=n(97869),a=n(55584),c=n(65173),u=n(44127),s=n(71468),d=n(85843),f=n(90888),v=n(58841),m=n(74848);function b(e){return b="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},b(e)}function p(){var e,t,n="function"==typeof Symbol?Symbol:{},r=n.iterator||"@@iterator",o=n.toStringTag||"@@toStringTag";function l(n,r,o,l){var c=r&&r.prototype instanceof a?r:a,u=Object.create(c.prototype);return h(u,"_invoke",function(n,r,o){var l,a,c,u=0,s=o||[],d=!1,f={p:0,n:0,v:e,a:v,f:v.bind(e,4),d:function(t,n){return l=t,a=0,c=e,f.n=n,i}};function v(n,r){for(a=n,c=r,t=0;!d&&u&&!o&&t<s.length;t++){var o,l=s[t],v=f.p,m=l[2];n>3?(o=m===r)&&(c=l[(a=l[4])?5:(a=3,3)],l[4]=l[5]=e):l[0]<=v&&((o=n<2&&v<l[1])?(a=0,f.v=r,f.n=l[1]):v<m&&(o=n<3||l[0]>r||r>m)&&(l[4]=n,l[5]=r,f.n=m,a=0))}if(o||n>1)return i;throw d=!0,r}return function(o,s,m){if(u>1)throw TypeError("Generator is already running");for(d&&1===s&&v(s,m),a=s,c=m;(t=a<2?e:c)||!d;){l||(a?a<3?(a>1&&(f.n=-1),v(a,c)):f.n=c:f.v=c);try{if(u=2,l){if(a||(o="next"),t=l[o]){if(!(t=t.call(l,c)))throw TypeError("iterator result is not an object");if(!t.done)return t;c=t.value,a<2&&(a=0)}else 1===a&&(t=l.return)&&t.call(l),a<2&&(c=TypeError("The iterator does not provide a '"+o+"' method"),a=1);l=e}else if((t=(d=f.n<0)?c:n.call(r,f))!==i)break}catch(t){l=e,a=1,c=t}finally{u=1}}return{value:t,done:d}}}(n,o,l),!0),u}var i={};function a(){}function c(){}function u(){}t=Object.getPrototypeOf;var s=[][r]?t(t([][r]())):(h(t={},r,function(){return this}),t),d=u.prototype=a.prototype=Object.create(s);function f(e){return Object.setPrototypeOf?Object.setPrototypeOf(e,u):(e.__proto__=u,h(e,o,"GeneratorFunction")),e.prototype=Object.create(d),e}return c.prototype=u,h(d,"constructor",u),h(u,"constructor",c),c.displayName="GeneratorFunction",h(u,o,"GeneratorFunction"),h(d),h(d,o,"Generator"),h(d,r,function(){return this}),h(d,"toString",function(){return"[object Generator]"}),(p=function(){return{w:l,m:f}})()}function h(e,t,n,r){var o=Object.defineProperty;try{o({},"",{})}catch(e){o=0}h=function(e,t,n,r){function l(t,n){h(e,t,function(e){return this._invoke(t,n,e)})}t?o?o(e,t,{value:n,enumerable:!r,configurable:!r,writable:!r}):e[t]=n:(l("next",0),l("throw",1),l("return",2))},h(e,t,n,r)}function y(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),n.push.apply(n,r)}return n}function x(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?y(Object(n),!0).forEach(function(t){g(e,t,n[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):y(Object(n)).forEach(function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))})}return e}function g(e,t,n){return(t=function(e){var t=function(e){if("object"!=b(e)||!e)return e;var t=e[Symbol.toPrimitive];if(void 0!==t){var n=t.call(e,"string");if("object"!=b(n))return n;throw new TypeError("@@toPrimitive must return a primitive value.")}return String(e)}(e);return"symbol"==b(t)?t:t+""}(t))in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}function w(e,t,n,r,o,l,i){try{var a=e[l](i),c=a.value}catch(e){return void n(e)}a.done?t(c):Promise.resolve(c).then(r,o)}function j(e){return function(){var t=this,n=arguments;return new Promise(function(r,o){var l=e.apply(t,n);function i(e){w(l,r,o,i,a,"next",e)}function a(e){w(l,r,o,i,a,"throw",e)}i(void 0)})}}function N(e,t){return function(e){if(Array.isArray(e))return e}(e)||function(e,t){var n=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=n){var r,o,l,i,a=[],c=!0,u=!1;try{if(l=(n=n.call(e)).next,0===t){if(Object(n)!==n)return;c=!1}else for(;!(c=(r=l.call(n)).done)&&(a.push(r.value),a.length!==t);c=!0);}catch(e){u=!0,o=e}finally{try{if(!c&&null!=n.return&&(i=n.return(),Object(i)!==i))return}finally{if(u)throw o}}return a}}(e,t)||function(e,t){if(e){if("string"==typeof e)return S(e,t);var n={}.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?S(e,t):void 0}}(e,t)||function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function S(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=Array(t);n<t;n++)r[n]=e[n];return r}var k="audio-call-modal",O=(0,r.memo)(function(e){var t,n,b=e.isOpen,h=e.onClose,y=e.consultant,g=N((0,r.useState)(0),2),w=g[0],S=g[1],O=N((0,r.useState)(!1),2),A=O[0],I=O[1],T=N((0,r.useState)(!1),2),P=T[0],C=T[1],E=N((0,r.useState)(0),2),_=E[0],z=E[1],D=N((0,r.useState)(null),2),F=D[0],M=D[1],R=N((0,r.useState)(null),2),G=R[0],L=R[1],U=(0,s.d4)(function(e){return e.auth}),B=U.user,V=U.token,H=N((0,d.sl)(),2),W=H[0],$=H[1].isLoading,q=N((0,d.Mm)(),2),J=q[0],Y=q[1].isLoading,K=N((0,d.H3)(),1)[0],Q=(0,r.useRef)(null),X=(0,r.useRef)(null),Z=(0,r.useRef)(!1),ee=(0,r.useRef)(!1);X.current=F;var te=(0,d.is)(null==F?void 0:F.callId,{skip:!(null!=F&&F.callId)||P,pollingInterval:2e3}).data,ne=(0,r.useRef)(!1);(0,r.useEffect)(function(){var e;if(null!=te&&null!==(e=te.data)&&void 0!==e&&e.durationSeconds&&!1===P){var t=te.data.durationSeconds;if(t>0&&0===w){S(t);var n=((null==y?void 0:y.pricePerMinute)||2.5)/60;z(Number((t*n).toFixed(2)))}}},[te,P,null==y?void 0:y.pricePerMinute]),(0,r.useEffect)(function(){return b&&!P&&"active"===(null==F?void 0:F.status)&&G&&!Z.current&&(Q.current&&clearInterval(Q.current),Q.current=setInterval(function(){var e;if(!Z.current&&"active"===(null===(e=X.current)||void 0===e?void 0:e.status)){var t=Date.now(),n=Math.floor((t-G)/1e3);S(n);var r=((null==y?void 0:y.pricePerMinute)||2.5)/60;z(Number((n*r).toFixed(2)))}},1e3)),function(){Q.current&&(clearInterval(Q.current),Q.current=null)}},[b,P,null==F?void 0:F.status,G,null==y?void 0:y.pricePerMinute]),(0,r.useEffect)(function(){if(b&&null!=B&&B.id&&V)return u.z.connect(B.id,V),u.z.on("call_accepted",k,function(){var e=j(p().m(function e(t){var n,r,o,l,i,a;return p().w(function(e){for(;;)switch(e.p=e.n){case 0:if(!Z.current&&!ee.current){e.n=1;break}return e.a(2);case 1:if(o=t.actualStartTime?new Date(t.actualStartTime).getTime():Date.now(),L(o),S(0),z(0),M(function(e){return e?x(x({},e),{},{status:"active",roomName:t.roomName||e.roomName,userToken:t.token||e.userToken}):null}),f.Ay.success("Call accepted! Connecting audio..."),function(){var e=new Audio;e.muted=!0,e.play().catch(function(){})}(),l=t.roomName||(null===(n=X.current)||void 0===n?void 0:n.roomName),!(i=t.token||(null===(r=X.current)||void 0===r?void 0:r.userToken))||!l){e.n=6;break}return e.p=2,ee.current=!0,e.n=3,v.T.connectAudio(i,l);case 3:console.log(" User audio connected successfully"),e.n=5;break;case 4:e.p=4,a=e.v,console.error(" Audio connect error:",a),f.Ay.error("Audio connection failed"),ee.current=!1;case 5:e.n=7;break;case 6:console.error("Missing token or roomName for audio connection");case 7:return e.a(2)}},e,null,[[2,4]])}));return function(t){return e.apply(this,arguments)}}()),u.z.on("call_rejected",k,function(){Z.current||(Q.current&&(clearInterval(Q.current),Q.current=null),v.T.disconnect(),ee.current=!1,M(null),L(null),f.Ay.error("Call was rejected by consultant"),h())}),u.z.on("call_ended",k,function(e){if(!Z.current){Q.current&&(clearInterval(Q.current),Q.current=null),v.T.disconnect(),ee.current=!1;var t=(null==e?void 0:e.durationSeconds)||w;S(t),t>0?C(!0):ae()}}),function(){u.z.off("call_accepted",k),u.z.off("call_rejected",k),u.z.off("call_ended",k)}},[b,null==B?void 0:B.id,V]);var re=function(){var e=j(p().m(function e(){var t,n,r,o,l;return p().w(function(e){for(;;)switch(e.p=e.n){case 0:if(!Z.current){e.n=1;break}return e.a(2);case 1:if(Z.current=!0,Q.current&&(clearInterval(Q.current),Q.current=null),v.T.disconnect(),ee.current=!1,e.p=2,null===(t=X.current)||void 0===t||!t.callId){e.n=6;break}if("pending"!==X.current.status){e.n=4;break}return e.n=3,K(X.current.callId).unwrap();case 3:ae(),e.n=6;break;case 4:return e.n=5,J(X.current.callId).unwrap();case 5:r=e.v,o=(null==r||null===(n=r.data)||void 0===n?void 0:n.durationSeconds)||(null==r?void 0:r.durationSeconds)||w,S(o),o>0?(C(!0),Z.current=!1):ae();case 6:e.n=8;break;case 7:e.p=7,l=e.v,console.error("End call error:",l),w>0?(C(!0),Z.current=!1):ae();case 8:return e.a(2)}},e,null,[[2,7]])}));return function(){return e.apply(this,arguments)}}();(0,r.useEffect)(function(){if(b&&y&&!Z.current&&!ne.current){ne.current=!0;var e=function(){var e=j(p().m(function e(){var t,n,r,o,l,i,a,c,u;return p().w(function(e){for(;;)switch(e.p=e.n){case 0:if(e.p=0,o=(null===(t=y.user)||void 0===t?void 0:t.id)||y.id){e.n=1;break}return f.Ay.error("Consultant ID not found"),h(),e.a(2);case 1:return e.n=2,W({consultantId:o,callType:"PHONE"}).unwrap();case 2:l=e.v,i=(null==l||null===(n=l.data)||void 0===n?void 0:n.call)||(null==l?void 0:l.call),a=(null==l||null===(r=l.data)||void 0===r?void 0:r.tokens)||(null==l?void 0:l.tokens),M({callId:i.id,roomName:i.roomName,userToken:a.user.token,status:"pending"}),(0,f.Ay)("Calling consultant...",{icon:"📞"}),e.n=4;break;case 3:e.p=3,u=e.v,console.error("❌ initiateCall error:",u),ne.current=!1,f.Ay.error((null==u||null===(c=u.data)||void 0===c?void 0:c.message)||(null==u?void 0:u.message)||"Failed to start call"),h();case 4:return e.a(2)}},e,null,[[0,3]])}));return function(){return e.apply(this,arguments)}}();e()}},[b,y]);var oe,le,ie,ae=function(){Q.current&&(clearInterval(Q.current),Q.current=null),S(0),z(0),C(!1),M(null),L(null),v.T.disconnect(),ee.current=!1,Z.current=!1,ne.current=!1,h()};return b?$?(0,m.jsx)("div",{className:"fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]",children:(0,m.jsxs)("div",{className:"bg-[#2D2D2D] w-full max-w-md rounded-2xl p-8 flex flex-col items-center",children:[(0,m.jsx)("div",{className:"animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-400 mb-4"}),(0,m.jsxs)("p",{className:"text-white text-lg",children:["Connecting to ",null==y?void 0:y.name,"..."]})]})}):(0,m.jsx)("div",{className:"fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4",children:P?(0,m.jsx)(c.A,{consultant:y,seconds:w,callId:null===(n=X.current)||void 0===n?void 0:n.callId,onClose:ae}):(0,m.jsxs)("div",{className:"bg-[#2D2D2D] w-full max-w-md rounded-2xl p-6 flex flex-col items-center",children:[(0,m.jsx)("div",{className:"w-20 h-20 rounded-full bg-[#D1C4E9] flex items-center justify-center mb-4 text-[#5E35B1] text-3xl font-bold",children:(null==y||null===(t=y.name)||void 0===t?void 0:t.charAt(0))||"C"}),(0,m.jsx)("h2",{className:"text-white font-bold text-xl mb-1",children:null==y?void 0:y.name}),(0,m.jsx)("p",{className:"text-sm font-semibold mb-6 uppercase tracking-wider ".concat("active"===(null==F?void 0:F.status)?"text-green-400":"text-yellow-400"),children:"active"===(null==F?void 0:F.status)?"● In Progress":"● Waiting for answer..."}),(0,m.jsx)("div",{className:"text-5xl font-bold text-white mb-8 font-mono",children:(oe=w,le=Math.floor(oe/60),ie=oe%60,"".concat(String(le).padStart(2,"0"),":").concat(String(ie).padStart(2,"0")))}),(0,m.jsxs)("div",{className:"bg-white/10 px-6 py-3 rounded-xl mb-8 text-center",children:[(0,m.jsx)("p",{className:"text-xs text-gray-400 mb-1 uppercase",children:"Current Billing"}),(0,m.jsxs)("p",{className:"text-white font-bold text-xl",children:["€",_.toFixed(2)]})]}),(0,m.jsxs)("div",{className:"flex items-center gap-4",children:[(0,m.jsx)("button",{onClick:function(){var e=!A;I(e),e?v.T.mute():v.T.unmute()},className:"w-12 h-12 rounded-full flex items-center justify-center ".concat(A?"bg-red-500":"bg-white/10"," text-white"),children:A?(0,m.jsx)(o.A,{size:20}):(0,m.jsx)(l.A,{size:20})}),(0,m.jsx)("button",{onClick:re,disabled:Y,className:"w-14 h-14 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-full flex items-center justify-center",children:(0,m.jsx)(i.A,{size:22})}),(0,m.jsx)("button",{className:"w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center",children:(0,m.jsx)(a.A,{size:20})})]})]})}):null});O.displayName="AudioCallModal";const A=O},65173(e,t,n){n.d(t,{A:()=>x});var r=n(96540),o=n(48697),l=n(45773),i=n(19869),a=n(41181),c=n(69215).q.injectEndpoints({endpoints:function(e){return{createReview:e.mutation({query:function(e){return{url:"/reviews",method:"POST",body:e}},invalidatesTags:["Review"]})}}}).useCreateReviewMutation,u=n(71468),s=n(90888),d=n(74848);function f(){var e,t,n="function"==typeof Symbol?Symbol:{},r=n.iterator||"@@iterator",o=n.toStringTag||"@@toStringTag";function l(n,r,o,l){var c=r&&r.prototype instanceof a?r:a,u=Object.create(c.prototype);return v(u,"_invoke",function(n,r,o){var l,a,c,u=0,s=o||[],d=!1,f={p:0,n:0,v:e,a:v,f:v.bind(e,4),d:function(t,n){return l=t,a=0,c=e,f.n=n,i}};function v(n,r){for(a=n,c=r,t=0;!d&&u&&!o&&t<s.length;t++){var o,l=s[t],v=f.p,m=l[2];n>3?(o=m===r)&&(c=l[(a=l[4])?5:(a=3,3)],l[4]=l[5]=e):l[0]<=v&&((o=n<2&&v<l[1])?(a=0,f.v=r,f.n=l[1]):v<m&&(o=n<3||l[0]>r||r>m)&&(l[4]=n,l[5]=r,f.n=m,a=0))}if(o||n>1)return i;throw d=!0,r}return function(o,s,m){if(u>1)throw TypeError("Generator is already running");for(d&&1===s&&v(s,m),a=s,c=m;(t=a<2?e:c)||!d;){l||(a?a<3?(a>1&&(f.n=-1),v(a,c)):f.n=c:f.v=c);try{if(u=2,l){if(a||(o="next"),t=l[o]){if(!(t=t.call(l,c)))throw TypeError("iterator result is not an object");if(!t.done)return t;c=t.value,a<2&&(a=0)}else 1===a&&(t=l.return)&&t.call(l),a<2&&(c=TypeError("The iterator does not provide a '"+o+"' method"),a=1);l=e}else if((t=(d=f.n<0)?c:n.call(r,f))!==i)break}catch(t){l=e,a=1,c=t}finally{u=1}}return{value:t,done:d}}}(n,o,l),!0),u}var i={};function a(){}function c(){}function u(){}t=Object.getPrototypeOf;var s=[][r]?t(t([][r]())):(v(t={},r,function(){return this}),t),d=u.prototype=a.prototype=Object.create(s);function m(e){return Object.setPrototypeOf?Object.setPrototypeOf(e,u):(e.__proto__=u,v(e,o,"GeneratorFunction")),e.prototype=Object.create(d),e}return c.prototype=u,v(d,"constructor",u),v(u,"constructor",c),c.displayName="GeneratorFunction",v(u,o,"GeneratorFunction"),v(d),v(d,o,"Generator"),v(d,r,function(){return this}),v(d,"toString",function(){return"[object Generator]"}),(f=function(){return{w:l,m}})()}function v(e,t,n,r){var o=Object.defineProperty;try{o({},"",{})}catch(e){o=0}v=function(e,t,n,r){function l(t,n){v(e,t,function(e){return this._invoke(t,n,e)})}t?o?o(e,t,{value:n,enumerable:!r,configurable:!r,writable:!r}):e[t]=n:(l("next",0),l("throw",1),l("return",2))},v(e,t,n,r)}function m(e,t,n,r,o,l,i){try{var a=e[l](i),c=a.value}catch(e){return void n(e)}a.done?t(c):Promise.resolve(c).then(r,o)}function b(e,t){return function(e){if(Array.isArray(e))return e}(e)||function(e,t){var n=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=n){var r,o,l,i,a=[],c=!0,u=!1;try{if(l=(n=n.call(e)).next,0===t){if(Object(n)!==n)return;c=!1}else for(;!(c=(r=l.call(n)).done)&&(a.push(r.value),a.length!==t);c=!0);}catch(e){u=!0,o=e}finally{try{if(!c&&null!=n.return&&(i=n.return(),Object(i)!==i))return}finally{if(u)throw o}}return a}}(e,t)||p(e,t)||function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function p(e,t){if(e){if("string"==typeof e)return h(e,t);var n={}.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?h(e,t):void 0}}function h(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=Array(t);n<t;n++)r[n]=e[n];return r}var y=(0,r.memo)(function(e){var t,n,v,y=e.consultant,x=e.seconds,g=e.callId,w=e.onClose,j=b((0,r.useState)(0),2),N=j[0],S=j[1],k=b((0,r.useState)(""),2),O=k[0],A=k[1],I=b((0,r.useState)(!1),2),T=(I[0],I[1]),P=((0,u.d4)(function(e){return e.auth}).user,b(c(),2)),C=P[0],E=P[1].isLoading,_=(x||0)/60,z=(null==y?void 0:y.pricePerMinute)||2.5,D=(_*z).toFixed(2),F=Math.floor((x||0)/60),M=(x||0)%60,R=M>0?"".concat(F," min ").concat(M," sec"):"".concat(F," min"),G=(new Date).toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit",hour12:!0}),L=function(){var e,t=(e=f().m(function e(){var t;return f().w(function(e){for(;;)switch(e.p=e.n){case 0:return e.p=0,e.n=1,C({consultantId:(null==y?void 0:y.id)||(null==y?void 0:y.userId),callId:g,rating:N,comment:O}).unwrap();case 1:s.Ay.success("Review submitted!"),T(!0),setTimeout(function(){w()},1500),e.n=3;break;case 2:e.p=2,t=e.v,console.error("Review error:",t),(0,s.Ay)("Review could not be saved",{icon:"⚠️"}),w();case 3:return e.a(2)}},e,null,[[0,2]])}),function(){var t=this,n=arguments;return new Promise(function(r,o){var l=e.apply(t,n);function i(e){m(l,r,o,i,a,"next",e)}function a(e){m(l,r,o,i,a,"throw",e)}i(void 0)})});return function(){return t.apply(this,arguments)}}();return(0,d.jsx)("div",{className:"fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4",children:(0,d.jsxs)("div",{className:"relative bg-[#333333] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border-t-4 border-green-500",children:[(0,d.jsx)("button",{onClick:function(){w()},className:"absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10",children:(0,d.jsx)(o.A,{size:20})}),(0,d.jsxs)("div",{className:"p-8 flex flex-col items-center",children:[(0,d.jsx)("div",{className:"w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-4",children:(0,d.jsx)("div",{className:"w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white",children:(0,d.jsx)(l.A,{size:20,strokeWidth:4})})}),(0,d.jsx)("h2",{className:"text-white font-bold text-2xl mb-8",children:"Consultation Completed"}),(0,d.jsxs)("div",{className:"w-full bg-white/10 rounded-xl p-4 flex items-center gap-4 mb-6 border border-white/5",children:[(0,d.jsx)("img",{src:(null==y?void 0:y.image)||(null==y?void 0:y.avatar)||(null==y||null===(t=y.user)||void 0===t?void 0:t.avatar)||"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",alt:"",className:"w-12 h-12 rounded-full object-cover border border-white/20",onError:function(e){e.target.src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop"}}),(0,d.jsxs)("div",{className:"flex flex-col",children:[(0,d.jsx)("p",{className:"text-white text-lg font-bold",children:(null==y?void 0:y.name)||(null==y||null===(n=y.user)||void 0===n?void 0:n.name)||"Consultant"}),(0,d.jsxs)("div",{className:"flex items-center gap-1 text-gray-300 text-base",children:[(0,d.jsx)(i.A,{size:14}),(0,d.jsx)("span",{children:"Call Completed"})]})]})]}),(0,d.jsxs)("div",{className:"grid grid-cols-3 gap-3 w-full mb-6",children:[(0,d.jsxs)("div",{className:"bg-white/10 rounded-xl py-3 px-1 text-center border border-white/5",children:[(0,d.jsx)("p",{className:"text-base text-gray-400 mb-1 uppercase font-medium",children:"Duration"}),(0,d.jsx)("p",{className:"text-white font-bold text-lg",children:R})]}),(0,d.jsxs)("div",{className:"bg-white/10 rounded-xl py-3 px-1 text-center border border-white/5",children:[(0,d.jsx)("p",{className:"text-base text-gray-400 mb-1 uppercase font-medium",children:"Cost"}),(0,d.jsxs)("p",{className:"text-white font-bold text-lg",children:["€",D]})]}),(0,d.jsxs)("div",{className:"bg-white/10 rounded-xl py-3 px-1 text-center border border-white/5",children:[(0,d.jsx)("p",{className:"text-base text-gray-400 mb-1 uppercase font-medium",children:"Rate/min"}),(0,d.jsxs)("p",{className:"text-white font-bold text-lg",children:["€",z.toFixed(2)]})]})]}),(0,d.jsx)("p",{className:"text-base text-gray-400 mb-6 font-medium",children:G}),(0,d.jsx)("p",{className:"text-white text-lg font-bold mb-4",children:"Rate your experience"}),(0,d.jsx)("div",{className:"flex justify-center gap-2 mb-4",children:(v=Array(5),function(e){if(Array.isArray(e))return h(e)}(v)||function(e){if("undefined"!=typeof Symbol&&null!=e[Symbol.iterator]||null!=e["@@iterator"])return Array.from(e)}(v)||p(v)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()).map(function(e,t){return(0,d.jsx)("button",{onClick:function(){return S(t+1)},className:"transition-transform active:scale-90",children:(0,d.jsx)(a.A,{size:28,fill:t<N?"#FFFFFF":"none",className:t<N?"text-white":"text-white/30 hover:text-white"})},t)})}),(0,d.jsx)("div",{className:"w-full text-left mb-2",children:(0,d.jsx)("label",{className:"text-white text-lg font-bold block",children:"Review"})}),(0,d.jsx)("textarea",{value:O,onChange:function(e){return A(e.target.value)},placeholder:"Write here...",className:"w-full bg-[#444444] border border-white/10 rounded-xl p-4 text-base text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/30 h-32 mb-4 resize-none transition-all"}),(0,d.jsx)("button",{onClick:L,disabled:E,className:"w-full bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white py-3.5 rounded-xl font-bold text-base transition-all",children:E?"Submitting...":"Submit Review"})]})]})})});y.displayName="CallFeedbackModal";const x=y},78283(e,t,n){n.d(t,{A:()=>T});var r=n(96540),o=n(84910),l=n(68614),i=n(97869),a=n(43850),c=n(50802),u=n(55584),s=n(65173),d=n(44127),f=n(71468),v=n(85843),m=n(58841),b=n(90888),p=n(74848);function h(e){return h="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},h(e)}function y(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),n.push.apply(n,r)}return n}function x(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?y(Object(n),!0).forEach(function(t){g(e,t,n[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):y(Object(n)).forEach(function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))})}return e}function g(e,t,n){return(t=function(e){var t=function(e){if("object"!=h(e)||!e)return e;var t=e[Symbol.toPrimitive];if(void 0!==t){var n=t.call(e,"string");if("object"!=h(n))return n;throw new TypeError("@@toPrimitive must return a primitive value.")}return String(e)}(e);return"symbol"==h(t)?t:t+""}(t))in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}function w(){var e,t,n="function"==typeof Symbol?Symbol:{},r=n.iterator||"@@iterator",o=n.toStringTag||"@@toStringTag";function l(n,r,o,l){var c=r&&r.prototype instanceof a?r:a,u=Object.create(c.prototype);return j(u,"_invoke",function(n,r,o){var l,a,c,u=0,s=o||[],d=!1,f={p:0,n:0,v:e,a:v,f:v.bind(e,4),d:function(t,n){return l=t,a=0,c=e,f.n=n,i}};function v(n,r){for(a=n,c=r,t=0;!d&&u&&!o&&t<s.length;t++){var o,l=s[t],v=f.p,m=l[2];n>3?(o=m===r)&&(c=l[(a=l[4])?5:(a=3,3)],l[4]=l[5]=e):l[0]<=v&&((o=n<2&&v<l[1])?(a=0,f.v=r,f.n=l[1]):v<m&&(o=n<3||l[0]>r||r>m)&&(l[4]=n,l[5]=r,f.n=m,a=0))}if(o||n>1)return i;throw d=!0,r}return function(o,s,m){if(u>1)throw TypeError("Generator is already running");for(d&&1===s&&v(s,m),a=s,c=m;(t=a<2?e:c)||!d;){l||(a?a<3?(a>1&&(f.n=-1),v(a,c)):f.n=c:f.v=c);try{if(u=2,l){if(a||(o="next"),t=l[o]){if(!(t=t.call(l,c)))throw TypeError("iterator result is not an object");if(!t.done)return t;c=t.value,a<2&&(a=0)}else 1===a&&(t=l.return)&&t.call(l),a<2&&(c=TypeError("The iterator does not provide a '"+o+"' method"),a=1);l=e}else if((t=(d=f.n<0)?c:n.call(r,f))!==i)break}catch(t){l=e,a=1,c=t}finally{u=1}}return{value:t,done:d}}}(n,o,l),!0),u}var i={};function a(){}function c(){}function u(){}t=Object.getPrototypeOf;var s=[][r]?t(t([][r]())):(j(t={},r,function(){return this}),t),d=u.prototype=a.prototype=Object.create(s);function f(e){return Object.setPrototypeOf?Object.setPrototypeOf(e,u):(e.__proto__=u,j(e,o,"GeneratorFunction")),e.prototype=Object.create(d),e}return c.prototype=u,j(d,"constructor",u),j(u,"constructor",c),c.displayName="GeneratorFunction",j(u,o,"GeneratorFunction"),j(d),j(d,o,"Generator"),j(d,r,function(){return this}),j(d,"toString",function(){return"[object Generator]"}),(w=function(){return{w:l,m:f}})()}function j(e,t,n,r){var o=Object.defineProperty;try{o({},"",{})}catch(e){o=0}j=function(e,t,n,r){function l(t,n){j(e,t,function(e){return this._invoke(t,n,e)})}t?o?o(e,t,{value:n,enumerable:!r,configurable:!r,writable:!r}):e[t]=n:(l("next",0),l("throw",1),l("return",2))},j(e,t,n,r)}function N(e,t,n,r,o,l,i){try{var a=e[l](i),c=a.value}catch(e){return void n(e)}a.done?t(c):Promise.resolve(c).then(r,o)}function S(e){return function(){var t=this,n=arguments;return new Promise(function(r,o){var l=e.apply(t,n);function i(e){N(l,r,o,i,a,"next",e)}function a(e){N(l,r,o,i,a,"throw",e)}i(void 0)})}}function k(e,t){return function(e){if(Array.isArray(e))return e}(e)||function(e,t){var n=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=n){var r,o,l,i,a=[],c=!0,u=!1;try{if(l=(n=n.call(e)).next,0===t){if(Object(n)!==n)return;c=!1}else for(;!(c=(r=l.call(n)).done)&&(a.push(r.value),a.length!==t);c=!0);}catch(e){u=!0,o=e}finally{try{if(!c&&null!=n.return&&(i=n.return(),Object(i)!==i))return}finally{if(u)throw o}}return a}}(e,t)||function(e,t){if(e){if("string"==typeof e)return O(e,t);var n={}.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?O(e,t):void 0}}(e,t)||function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function O(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=Array(t);n<t;n++)r[n]=e[n];return r}var A="video-call-modal",I=(0,r.memo)(function(e){var t,n=e.isOpen,h=e.onClose,y=e.consultant,g=e.callData,j=k((0,r.useState)(0),2),N=j[0],O=j[1],I=k((0,r.useState)(!1),2),T=I[0],P=I[1],C=k((0,r.useState)(!1),2),E=C[0],_=C[1],z=k((0,r.useState)(!1),2),D=z[0],F=z[1],M=k((0,r.useState)(0),2),R=M[0],G=M[1],L=k((0,r.useState)(null),2),U=L[0],B=L[1],V=k((0,r.useState)(null),2),H=V[0],W=V[1],$=k((0,r.useState)(!1),2),q=$[0],J=$[1],Y=(0,f.d4)(function(e){return e.auth}),K=Y.user,Q=Y.token,X=k((0,v.sl)(),2),Z=X[0],ee=X[1].isLoading,te=k((0,v.Mm)(),2),ne=te[0],re=te[1].isLoading,oe=k((0,v.H3)(),1)[0],le=k((0,v.JP)(),1)[0],ie=(0,r.useRef)(null),ae=(0,r.useRef)(null),ce=(0,r.useRef)(null),ue=(0,r.useRef)(null),se=(0,r.useRef)(!1),de=(0,r.useRef)(!1),fe=(0,r.useRef)(!1),ve=(0,r.useRef)(null);ue.current=U;var me=(0,v.is)(null==U?void 0:U.callId,{skip:!(null!=U&&U.callId)||D,pollingInterval:2e3}).data;(0,r.useEffect)(function(){var e;if(null!=me&&null!==(e=me.data)&&void 0!==e&&e.durationSeconds&&!D&&!se.current){var t=me.data.durationSeconds;if(t>0&&0===N){O(t);var n=((null==y?void 0:y.pricePerMinute)||2.5)/60;G(Number((t*n).toFixed(2)))}}},[me,D,null==y?void 0:y.pricePerMinute,N]),(0,r.useEffect)(function(){return n&&!D&&"active"===(null==U?void 0:U.status)&&H&&!se.current&&(ce.current&&clearInterval(ce.current),ce.current=setInterval(function(){var e;if(!se.current&&"active"===(null===(e=ue.current)||void 0===e?void 0:e.status)){var t=Math.floor((Date.now()-H)/1e3);O(t);var n=((null==y?void 0:y.pricePerMinute)||2.5)/60;G(Number((t*n).toFixed(2)))}},1e3)),function(){ce.current&&(clearInterval(ce.current),ce.current=null)}},[n,D,null==U?void 0:U.status,H,null==y?void 0:y.pricePerMinute]),(0,r.useEffect)(function(){g&&!U&&n&&!se.current&&B({callId:g.callId,roomName:g.roomName,userToken:g.token,status:"pending",isIncoming:!0})},[g,n]);var be=(0,r.useCallback)(function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:5e3;return new Promise(function(t,n){var r=Date.now(),o=function(){ie.current&&ae.current?t({local:ie.current,remote:ae.current}):Date.now()-r>e?n(new Error("Video ref elements not available after "+e+"ms")):requestAnimationFrame(o)};o()})},[]),pe=(0,r.useCallback)(function(){var e=S(w().m(function e(t,n){var r,o,l,i;return w().w(function(e){for(;;)switch(e.p=e.n){case 0:if(n&&t){e.n=1;break}return console.error("connectVideo: missing token or roomName"),e.a(2,!1);case 1:return e.p=1,e.n=2,be(5e3);case 2:return r=e.v,o=r.local,l=r.remote,e.n=3,m.T.connectVideo(n,t,o,l);case 3:return J(!0),console.log("✅ Video connected successfully"),e.a(2,!0);case 4:return e.p=4,i=e.v,console.error("❌ Video connect error:",i),b.Ay.error("Failed to connect video"),e.a(2,!1)}},e,null,[[1,4]])}));return function(t,n){return e.apply(this,arguments)}}(),[be]);(0,r.useEffect)(function(){if("active"===(null==U?void 0:U.status)&&!q&&!se.current&&ve.current){var e=ve.current,t=e.roomName,n=e.tokenToUse;ve.current=null,pe(t,n)}},[null==U?void 0:U.status,q,pe]),(0,r.useEffect)(function(){if(n&&null!=K&&K.id&&Q){d.z.connect(K.id,Q);var e=function(){var e=S(w().m(function e(t){var n,r,o,l,i;return w().w(function(e){for(;;)switch(e.n){case 0:if(!se.current&&!de.current){e.n=1;break}return e.a(2);case 1:de.current=!0,o=t.actualStartTime?new Date(t.actualStartTime).getTime():Date.now(),W(o),O(0),G(0),l=t.roomName||(null===(n=ue.current)||void 0===n?void 0:n.roomName),i=t.token||(null===(r=ue.current)||void 0===r?void 0:r.userToken),B(function(e){return x(x({},e),{},{status:"active",roomName:t.roomName||(null==e?void 0:e.roomName),callId:t.callId||(null==e?void 0:e.callId),userToken:t.token||(null==e?void 0:e.userToken)})}),b.Ay.success("Call accepted! Connecting video..."),ve.current={roomName:l,tokenToUse:i};case 2:return e.a(2)}},e)}));return function(t){return e.apply(this,arguments)}}();return d.z.on("call_accepted",A,e),d.z.on("call_rejected",A,function(){se.current||(ce.current&&(clearInterval(ce.current),ce.current=null),b.Ay.error("Call was rejected by consultant"),setTimeout(function(){se.current||Ne()},500))}),d.z.on("call_ended",A,function(e){if(!se.current){ce.current&&(clearInterval(ce.current),ce.current=null),m.T.disconnect();var t=(null==e?void 0:e.durationSeconds)||N;O(t),t>0?F(!0):setTimeout(function(){se.current||Ne()},500)}}),function(){d.z.off("call_accepted",A),d.z.off("call_rejected",A),d.z.off("call_ended",A),de.current=!1}}},[n,null==K?void 0:K.id,Q]),(0,r.useEffect)(function(){if(n&&y&&!g&&!se.current&&!fe.current){fe.current=!0;var e=function(){var e=S(w().m(function e(){var t,n,r,o,l,i,a,c,u;return w().w(function(e){for(;;)switch(e.p=e.n){case 0:if(e.p=0,o=(null===(t=y.user)||void 0===t?void 0:t.id)||y.id){e.n=1;break}return b.Ay.error("Consultant ID not found"),Ne(),e.a(2);case 1:return e.n=2,Z({consultantId:o,callType:"VIDEO"}).unwrap();case 2:l=e.v,i=(null==l||null===(n=l.data)||void 0===n?void 0:n.call)||(null==l?void 0:l.call),a=(null==l||null===(r=l.data)||void 0===r?void 0:r.tokens)||(null==l?void 0:l.tokens),B({callId:i.id,roomName:i.roomName,userToken:a.user.token,status:"pending",isIncoming:!1}),(0,b.Ay)("Calling consultant...",{icon:"📹"}),e.n=4;break;case 3:e.p=3,u=e.v,console.error("❌ initiateCall error:",u),fe.current=!1,b.Ay.error((null==u||null===(c=u.data)||void 0===c?void 0:c.message)||"Failed to start video call"),Ne();case 4:return e.a(2)}},e,null,[[0,3]])}));return function(){return e.apply(this,arguments)}}();e()}},[n,y,g]);var he,ye,xe,ge,we=function(){var e=S(w().m(function e(){var t,n,r,o,l;return w().w(function(e){for(;;)switch(e.p=e.n){case 0:if(!se.current){e.n=1;break}return e.a(2);case 1:if(se.current=!0,ce.current&&(clearInterval(ce.current),ce.current=null),m.T.disconnect(),e.p=2,null===(t=ue.current)||void 0===t||!t.callId){e.n=7;break}if("pending"!==ue.current.status){e.n=4;break}return e.n=3,oe(ue.current.callId).unwrap();case 3:Ne(),e.n=6;break;case 4:return e.n=5,ne(ue.current.callId).unwrap();case 5:r=e.v,o=(null==r||null===(n=r.data)||void 0===n?void 0:n.durationSeconds)||(null==r?void 0:r.durationSeconds)||N,O(o),o>0?(F(!0),se.current=!1):Ne();case 6:e.n=8;break;case 7:Ne();case 8:e.n=10;break;case 9:e.p=9,l=e.v,console.error("End call error:",l),N>0?(F(!0),se.current=!1):Ne();case 10:return e.a(2)}},e,null,[[2,9]])}));return function(){return e.apply(this,arguments)}}(),je=function(){var e=S(w().m(function e(){var t,n,r,o,l,i;return w().w(function(e){for(;;)switch(e.p=e.n){case 0:if(null!=U&&U.callId&&!se.current){e.n=1;break}return e.a(2);case 1:return e.p=1,e.n=2,le(U.callId).unwrap();case 2:r=e.v,o=(null==r||null===(t=r.data)||void 0===t?void 0:t.consultantToken)||(null==r?void 0:r.consultantToken)||U.userToken,l=(null==r||null===(n=r.data)||void 0===n||null===(n=n.call)||void 0===n?void 0:n.roomName)||U.roomName,B(function(e){return x(x({},e),{},{userToken:o,status:"active"})}),W(Date.now()),b.Ay.success("Call accepted, connecting..."),ve.current={roomName:l,tokenToUse:o},e.n=4;break;case 3:e.p=3,i=e.v,console.error("Failed to accept call:",i),b.Ay.error("Failed to accept call");case 4:return e.a(2)}},e,null,[[1,3]])}));return function(){return e.apply(this,arguments)}}(),Ne=function(){ce.current&&(clearInterval(ce.current),ce.current=null),ae.current&&(ae.current.innerHTML=""),ie.current&&(ie.current.innerHTML=""),ve.current=null,O(0),G(0),F(!1),B(null),W(null),J(!1),m.T.disconnect(),se.current=!1,de.current=!1,fe.current=!1,h()};return n?ee?(0,p.jsx)("div",{className:"fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]",children:(0,p.jsxs)("div",{className:"bg-gray-900 w-full max-w-md rounded-2xl p-8 flex flex-col items-center",children:[(0,p.jsx)("div",{className:"animate-spin rounded-full h-10 w-10 border-b-2 border-green-400 mb-4"}),(0,p.jsxs)("p",{className:"text-white text-lg",children:["Connecting video call to ",null==y?void 0:y.name,"..."]})]})}):D?(0,p.jsx)(s.A,{consultant:y,seconds:N,callId:null===(he=ue.current)||void 0===he?void 0:he.callId,onClose:Ne}):(0,p.jsx)("div",{className:"fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[9999] p-4",onClick:function(e){return e.stopPropagation()},children:(0,p.jsxs)("div",{className:"relative w-full max-w-sm aspect-[3/4] max-h-[80vh] rounded-2xl overflow-hidden bg-gray-900 shadow-2xl border border-white/10",onClick:function(e){return e.stopPropagation()},children:[(0,p.jsx)("div",{ref:ae,className:"absolute inset-0 w-full h-full bg-gray-800"}),"active"!==(null==U?void 0:U.status)&&(0,p.jsxs)("div",{className:"absolute inset-0 w-full h-full flex flex-col items-center justify-center z-[5]",children:[(0,p.jsx)("div",{className:"w-24 h-24 rounded-full bg-[#D1C4E9] flex items-center justify-center text-[#5E35B1] text-3xl font-bold mb-4",children:(null==y||null===(t=y.name)||void 0===t?void 0:t.charAt(0))||"C"}),(0,p.jsx)("p",{className:"text-white font-semibold text-lg",children:null==y?void 0:y.name}),(0,p.jsx)("p",{className:"text-yellow-400 text-sm mt-2 animate-pulse",children:null!=U&&U.isIncoming?"● Incoming call...":"● Waiting for answer..."}),(null==U?void 0:U.isIncoming)&&(0,p.jsxs)("div",{className:"flex gap-4 mt-6",children:[(0,p.jsx)("button",{onClick:je,className:"px-6 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white font-semibold",children:"Accept"}),(0,p.jsx)("button",{onClick:we,className:"px-6 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold",children:"Decline"})]})]}),"active"===(null==U?void 0:U.status)&&!q&&(0,p.jsx)("div",{className:"absolute inset-0 w-full h-full flex items-center justify-center z-[5]",children:(0,p.jsxs)("div",{className:"text-center",children:[(0,p.jsx)("div",{className:"animate-spin rounded-full h-10 w-10 border-b-2 border-green-400 mx-auto mb-4"}),(0,p.jsx)("p",{className:"text-white",children:"Connecting video..."})]})}),(0,p.jsx)("div",{className:"absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none z-[6]"}),"active"===(null==U?void 0:U.status)&&(0,p.jsxs)("div",{className:"absolute top-4 right-4 w-20 h-28 rounded-xl overflow-hidden border-2 border-white/20 shadow-lg bg-gray-700 z-20",children:[(0,p.jsx)("div",{ref:ie,className:"w-full h-full"}),E&&(0,p.jsx)("div",{className:"absolute inset-0 bg-gray-800 flex items-center justify-center z-[2]",children:(0,p.jsx)(a.A,{size:20,className:"text-white/60"})})]}),(0,p.jsx)("div",{className:"absolute top-4 left-4 z-20",children:(0,p.jsxs)("div",{className:"bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 border border-white/10",children:[(0,p.jsx)("div",{className:"w-2 h-2 rounded-full ".concat("active"===(null==U?void 0:U.status)?"bg-green-400 animate-pulse":"bg-yellow-400 animate-pulse")}),(0,p.jsx)("p",{className:"text-xs font-bold text-white tracking-wide",children:"active"===(null==U?void 0:U.status)?"".concat((ye=N,xe=Math.floor(ye/60),ge=ye%60,"".concat(String(xe).padStart(2,"0"),":").concat(String(ge).padStart(2,"0")))," | €").concat(R.toFixed(2)):null!=U&&U.isIncoming?"Incoming call from ".concat(null==y?void 0:y.name,"..."):"Calling ".concat(null==y?void 0:y.name,"...")})]})}),"active"===(null==U?void 0:U.status)&&(0,p.jsx)("div",{className:"absolute bottom-8 left-0 right-0 z-20",children:(0,p.jsxs)("div",{className:"flex items-center justify-center gap-3 px-4",children:[(0,p.jsx)("button",{onClick:function(){var e=!T;P(e),e?m.T.mute():m.T.unmute()},className:"w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-xl transition-all ".concat(T?"bg-red-500/90 text-white":"bg-white/15 text-white hover:bg-white/30"),children:T?(0,p.jsx)(o.A,{size:18}):(0,p.jsx)(l.A,{size:18})}),(0,p.jsx)("button",{onClick:function(){var e=!E;_(e),e?m.T.disableVideo():m.T.enableVideo()},className:"w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-xl transition-all ".concat(E?"bg-red-500/90 text-white":"bg-white/15 text-white hover:bg-white/30"),children:E?(0,p.jsx)(a.A,{size:18}):(0,p.jsx)(c.A,{size:18})}),(0,p.jsx)("button",{className:"w-11 h-11 rounded-full bg-white/15 text-white hover:bg-white/30 flex items-center justify-center backdrop-blur-xl transition-all",children:(0,p.jsx)(u.A,{size:18})}),(0,p.jsx)("button",{onClick:we,disabled:re,className:"w-13 h-13 bg-red-500 hover:bg-red-600 disabled:opacity-50 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:scale-105",children:(0,p.jsx)(i.A,{size:22,fill:"currentColor"})})]})}),(0,p.jsx)("div",{className:"absolute bottom-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-white/20 rounded-full"})]})}):null});I.displayName="VideoCallModal";const T=I},77632(e,t,n){n.d(t,{Cx:()=>l,D1:()=>o,e8:()=>r});var r=function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"";switch(null==e?void 0:e.toUpperCase()){case"ONLINE":return"Available Now";case"BUSY":return"Busy";default:return"Offline"}},o=function(e){switch(e){case"Available Now":return"bg-green-500/90";case"Busy":return"bg-yellow-500/90";default:return"bg-gray-400/80"}},l=function(e){switch(e){case"Online":return"bg-[#05BC27] text-white";case"Busy":return"bg-[#E2AB0B] text-white";default:return"bg-gray-100 text-gray-500"}}}}]);
+"use strict";
+(self.webpackChunkreact_webpack_tailwind_app =
+  self.webpackChunkreact_webpack_tailwind_app || []).push([
+  [9795],
+  {
+    34119(e, t, n) {
+      n.d(t, { n: () => f, x: () => d });
+      var r = n(96540),
+        o = n(44127);
+      function l(e) {
+        return (
+          (l =
+            "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
+              ? function (e) {
+                  return typeof e;
+                }
+              : function (e) {
+                  return e &&
+                    "function" == typeof Symbol &&
+                    e.constructor === Symbol &&
+                    e !== Symbol.prototype
+                    ? "symbol"
+                    : typeof e;
+                }),
+          l(e)
+        );
+      }
+      function i(e, t) {
+        var n = Object.keys(e);
+        if (Object.getOwnPropertySymbols) {
+          var r = Object.getOwnPropertySymbols(e);
+          (t &&
+            (r = r.filter(function (t) {
+              return Object.getOwnPropertyDescriptor(e, t).enumerable;
+            })),
+            n.push.apply(n, r));
+        }
+        return n;
+      }
+      function a(e) {
+        for (var t = 1; t < arguments.length; t++) {
+          var n = null != arguments[t] ? arguments[t] : {};
+          t % 2
+            ? i(Object(n), !0).forEach(function (t) {
+                c(e, t, n[t]);
+              })
+            : Object.getOwnPropertyDescriptors
+              ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n))
+              : i(Object(n)).forEach(function (t) {
+                  Object.defineProperty(
+                    e,
+                    t,
+                    Object.getOwnPropertyDescriptor(n, t),
+                  );
+                });
+        }
+        return e;
+      }
+      function c(e, t, n) {
+        return (
+          (t = (function (e) {
+            var t = (function (e) {
+              if ("object" != l(e) || !e) return e;
+              var t = e[Symbol.toPrimitive];
+              if (void 0 !== t) {
+                var n = t.call(e, "string");
+                if ("object" != l(n)) return n;
+                throw new TypeError(
+                  "@@toPrimitive must return a primitive value.",
+                );
+              }
+              return String(e);
+            })(e);
+            return "symbol" == l(t) ? t : t + "";
+          })(t)) in e
+            ? Object.defineProperty(e, t, {
+                value: n,
+                enumerable: !0,
+                configurable: !0,
+                writable: !0,
+              })
+            : (e[t] = n),
+          e
+        );
+      }
+      function u(e, t) {
+        return (
+          (function (e) {
+            if (Array.isArray(e)) return e;
+          })(e) ||
+          (function (e, t) {
+            var n =
+              null == e
+                ? null
+                : ("undefined" != typeof Symbol && e[Symbol.iterator]) ||
+                  e["@@iterator"];
+            if (null != n) {
+              var r,
+                o,
+                l,
+                i,
+                a = [],
+                c = !0,
+                u = !1;
+              try {
+                if (((l = (n = n.call(e)).next), 0 === t)) {
+                  if (Object(n) !== n) return;
+                  c = !1;
+                } else
+                  for (
+                    ;
+                    !(c = (r = l.call(n)).done) &&
+                    (a.push(r.value), a.length !== t);
+                    c = !0
+                  );
+              } catch (e) {
+                ((u = !0), (o = e));
+              } finally {
+                try {
+                  if (
+                    !c &&
+                    null != n.return &&
+                    ((i = n.return()), Object(i) !== i)
+                  )
+                    return;
+                } finally {
+                  if (u) throw o;
+                }
+              }
+              return a;
+            }
+          })(e, t) ||
+          (function (e, t) {
+            if (e) {
+              if ("string" == typeof e) return s(e, t);
+              var n = {}.toString.call(e).slice(8, -1);
+              return (
+                "Object" === n && e.constructor && (n = e.constructor.name),
+                "Map" === n || "Set" === n
+                  ? Array.from(e)
+                  : "Arguments" === n ||
+                      /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
+                    ? s(e, t)
+                    : void 0
+              );
+            }
+          })(e, t) ||
+          (function () {
+            throw new TypeError(
+              "Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
+            );
+          })()
+        );
+      }
+      function s(e, t) {
+        (null == t || t > e.length) && (t = e.length);
+        for (var n = 0, r = Array(t); n < t; n++) r[n] = e[n];
+        return r;
+      }
+      function d() {
+        var e = u((0, r.useState)({}), 2),
+          t = e[0],
+          n = e[1];
+        (0, r.useEffect)(function () {
+          return (
+            o.A.on("consultant_status_changed", "usePresence", function (e) {
+              var t = e.userId,
+                r = e.status;
+              n(function (e) {
+                return a(a({}, e), {}, c({}, t, r));
+              });
+            }),
+            function () {
+              o.A.off("consultant_status_changed", "usePresence");
+            }
+          );
+        }, []);
+        var l = (0, r.useCallback)(
+          function (e) {
+            var n,
+              r =
+                arguments.length > 1 && void 0 !== arguments[1]
+                  ? arguments[1]
+                  : "OFFLINE";
+            return e && null !== (n = t[e]) && void 0 !== n ? n : r;
+          },
+          [t],
+        );
+        return { liveStatuses: t, getStatus: l };
+      }
+      function f(e) {
+        var t =
+            arguments.length > 1 && void 0 !== arguments[1]
+              ? arguments[1]
+              : "OFFLINE",
+          n = u((0, r.useState)(t), 2),
+          l = n[0],
+          i = n[1];
+        return (
+          (0, r.useEffect)(
+            function () {
+              i(t);
+            },
+            [t],
+          ),
+          (0, r.useEffect)(
+            function () {
+              if (e) {
+                var t = "status_".concat(e);
+                return (
+                  o.A.on("consultant_status_changed", t, function (t) {
+                    t.userId === e && i(t.status);
+                  }),
+                  function () {
+                    o.A.off("consultant_status_changed", t);
+                  }
+                );
+              }
+            },
+            [e],
+          ),
+          l
+        );
+      }
+    },
+    4138(e, t, n) {
+      n.d(t, { A: () => A });
+      var r = n(96540),
+        o = n(84910),
+        l = n(68614),
+        i = n(97869),
+        a = n(55584),
+        c = n(65173),
+        u = n(44127),
+        s = n(71468),
+        d = n(85843),
+        f = n(90888),
+        v = n(58841),
+        m = n(74848);
+      function b(e) {
+        return (
+          (b =
+            "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
+              ? function (e) {
+                  return typeof e;
+                }
+              : function (e) {
+                  return e &&
+                    "function" == typeof Symbol &&
+                    e.constructor === Symbol &&
+                    e !== Symbol.prototype
+                    ? "symbol"
+                    : typeof e;
+                }),
+          b(e)
+        );
+      }
+      function p() {
+        var e,
+          t,
+          n = "function" == typeof Symbol ? Symbol : {},
+          r = n.iterator || "@@iterator",
+          o = n.toStringTag || "@@toStringTag";
+        function l(n, r, o, l) {
+          var c = r && r.prototype instanceof a ? r : a,
+            u = Object.create(c.prototype);
+          return (
+            h(
+              u,
+              "_invoke",
+              (function (n, r, o) {
+                var l,
+                  a,
+                  c,
+                  u = 0,
+                  s = o || [],
+                  d = !1,
+                  f = {
+                    p: 0,
+                    n: 0,
+                    v: e,
+                    a: v,
+                    f: v.bind(e, 4),
+                    d: function (t, n) {
+                      return ((l = t), (a = 0), (c = e), (f.n = n), i);
+                    },
+                  };
+                function v(n, r) {
+                  for (
+                    a = n, c = r, t = 0;
+                    !d && u && !o && t < s.length;
+                    t++
+                  ) {
+                    var o,
+                      l = s[t],
+                      v = f.p,
+                      m = l[2];
+                    n > 3
+                      ? (o = m === r) &&
+                        ((c = l[(a = l[4]) ? 5 : ((a = 3), 3)]),
+                        (l[4] = l[5] = e))
+                      : l[0] <= v &&
+                        ((o = n < 2 && v < l[1])
+                          ? ((a = 0), (f.v = r), (f.n = l[1]))
+                          : v < m &&
+                            (o = n < 3 || l[0] > r || r > m) &&
+                            ((l[4] = n), (l[5] = r), (f.n = m), (a = 0)));
+                  }
+                  if (o || n > 1) return i;
+                  throw ((d = !0), r);
+                }
+                return function (o, s, m) {
+                  if (u > 1) throw TypeError("Generator is already running");
+                  for (
+                    d && 1 === s && v(s, m), a = s, c = m;
+                    (t = a < 2 ? e : c) || !d;
+                  ) {
+                    l ||
+                      (a
+                        ? a < 3
+                          ? (a > 1 && (f.n = -1), v(a, c))
+                          : (f.n = c)
+                        : (f.v = c));
+                    try {
+                      if (((u = 2), l)) {
+                        if ((a || (o = "next"), (t = l[o]))) {
+                          if (!(t = t.call(l, c)))
+                            throw TypeError("iterator result is not an object");
+                          if (!t.done) return t;
+                          ((c = t.value), a < 2 && (a = 0));
+                        } else
+                          (1 === a && (t = l.return) && t.call(l),
+                            a < 2 &&
+                              ((c = TypeError(
+                                "The iterator does not provide a '" +
+                                  o +
+                                  "' method",
+                              )),
+                              (a = 1)));
+                        l = e;
+                      } else if ((t = (d = f.n < 0) ? c : n.call(r, f)) !== i)
+                        break;
+                    } catch (t) {
+                      ((l = e), (a = 1), (c = t));
+                    } finally {
+                      u = 1;
+                    }
+                  }
+                  return { value: t, done: d };
+                };
+              })(n, o, l),
+              !0,
+            ),
+            u
+          );
+        }
+        var i = {};
+        function a() {}
+        function c() {}
+        function u() {}
+        t = Object.getPrototypeOf;
+        var s = [][r]
+            ? t(t([][r]()))
+            : (h((t = {}), r, function () {
+                return this;
+              }),
+              t),
+          d = (u.prototype = a.prototype = Object.create(s));
+        function f(e) {
+          return (
+            Object.setPrototypeOf
+              ? Object.setPrototypeOf(e, u)
+              : ((e.__proto__ = u), h(e, o, "GeneratorFunction")),
+            (e.prototype = Object.create(d)),
+            e
+          );
+        }
+        return (
+          (c.prototype = u),
+          h(d, "constructor", u),
+          h(u, "constructor", c),
+          (c.displayName = "GeneratorFunction"),
+          h(u, o, "GeneratorFunction"),
+          h(d),
+          h(d, o, "Generator"),
+          h(d, r, function () {
+            return this;
+          }),
+          h(d, "toString", function () {
+            return "[object Generator]";
+          }),
+          (p = function () {
+            return { w: l, m: f };
+          })()
+        );
+      }
+      function h(e, t, n, r) {
+        var o = Object.defineProperty;
+        try {
+          o({}, "", {});
+        } catch (e) {
+          o = 0;
+        }
+        ((h = function (e, t, n, r) {
+          function l(t, n) {
+            h(e, t, function (e) {
+              return this._invoke(t, n, e);
+            });
+          }
+          t
+            ? o
+              ? o(e, t, {
+                  value: n,
+                  enumerable: !r,
+                  configurable: !r,
+                  writable: !r,
+                })
+              : (e[t] = n)
+            : (l("next", 0), l("throw", 1), l("return", 2));
+        }),
+          h(e, t, n, r));
+      }
+      function y(e, t) {
+        var n = Object.keys(e);
+        if (Object.getOwnPropertySymbols) {
+          var r = Object.getOwnPropertySymbols(e);
+          (t &&
+            (r = r.filter(function (t) {
+              return Object.getOwnPropertyDescriptor(e, t).enumerable;
+            })),
+            n.push.apply(n, r));
+        }
+        return n;
+      }
+      function x(e) {
+        for (var t = 1; t < arguments.length; t++) {
+          var n = null != arguments[t] ? arguments[t] : {};
+          t % 2
+            ? y(Object(n), !0).forEach(function (t) {
+                g(e, t, n[t]);
+              })
+            : Object.getOwnPropertyDescriptors
+              ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n))
+              : y(Object(n)).forEach(function (t) {
+                  Object.defineProperty(
+                    e,
+                    t,
+                    Object.getOwnPropertyDescriptor(n, t),
+                  );
+                });
+        }
+        return e;
+      }
+      function g(e, t, n) {
+        return (
+          (t = (function (e) {
+            var t = (function (e) {
+              if ("object" != b(e) || !e) return e;
+              var t = e[Symbol.toPrimitive];
+              if (void 0 !== t) {
+                var n = t.call(e, "string");
+                if ("object" != b(n)) return n;
+                throw new TypeError(
+                  "@@toPrimitive must return a primitive value.",
+                );
+              }
+              return String(e);
+            })(e);
+            return "symbol" == b(t) ? t : t + "";
+          })(t)) in e
+            ? Object.defineProperty(e, t, {
+                value: n,
+                enumerable: !0,
+                configurable: !0,
+                writable: !0,
+              })
+            : (e[t] = n),
+          e
+        );
+      }
+      function w(e, t, n, r, o, l, i) {
+        try {
+          var a = e[l](i),
+            c = a.value;
+        } catch (e) {
+          return void n(e);
+        }
+        a.done ? t(c) : Promise.resolve(c).then(r, o);
+      }
+      function j(e) {
+        return function () {
+          var t = this,
+            n = arguments;
+          return new Promise(function (r, o) {
+            var l = e.apply(t, n);
+            function i(e) {
+              w(l, r, o, i, a, "next", e);
+            }
+            function a(e) {
+              w(l, r, o, i, a, "throw", e);
+            }
+            i(void 0);
+          });
+        };
+      }
+      function N(e, t) {
+        return (
+          (function (e) {
+            if (Array.isArray(e)) return e;
+          })(e) ||
+          (function (e, t) {
+            var n =
+              null == e
+                ? null
+                : ("undefined" != typeof Symbol && e[Symbol.iterator]) ||
+                  e["@@iterator"];
+            if (null != n) {
+              var r,
+                o,
+                l,
+                i,
+                a = [],
+                c = !0,
+                u = !1;
+              try {
+                if (((l = (n = n.call(e)).next), 0 === t)) {
+                  if (Object(n) !== n) return;
+                  c = !1;
+                } else
+                  for (
+                    ;
+                    !(c = (r = l.call(n)).done) &&
+                    (a.push(r.value), a.length !== t);
+                    c = !0
+                  );
+              } catch (e) {
+                ((u = !0), (o = e));
+              } finally {
+                try {
+                  if (
+                    !c &&
+                    null != n.return &&
+                    ((i = n.return()), Object(i) !== i)
+                  )
+                    return;
+                } finally {
+                  if (u) throw o;
+                }
+              }
+              return a;
+            }
+          })(e, t) ||
+          (function (e, t) {
+            if (e) {
+              if ("string" == typeof e) return S(e, t);
+              var n = {}.toString.call(e).slice(8, -1);
+              return (
+                "Object" === n && e.constructor && (n = e.constructor.name),
+                "Map" === n || "Set" === n
+                  ? Array.from(e)
+                  : "Arguments" === n ||
+                      /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
+                    ? S(e, t)
+                    : void 0
+              );
+            }
+          })(e, t) ||
+          (function () {
+            throw new TypeError(
+              "Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
+            );
+          })()
+        );
+      }
+      function S(e, t) {
+        (null == t || t > e.length) && (t = e.length);
+        for (var n = 0, r = Array(t); n < t; n++) r[n] = e[n];
+        return r;
+      }
+      var k = "audio-call-modal",
+        O = (0, r.memo)(function (e) {
+          var t,
+            n,
+            b = e.isOpen,
+            h = e.onClose,
+            y = e.consultant,
+            g = N((0, r.useState)(0), 2),
+            w = g[0],
+            S = g[1],
+            O = N((0, r.useState)(!1), 2),
+            A = O[0],
+            I = O[1],
+            T = N((0, r.useState)(!1), 2),
+            P = T[0],
+            C = T[1],
+            E = N((0, r.useState)(0), 2),
+            _ = E[0],
+            z = E[1],
+            D = N((0, r.useState)(null), 2),
+            F = D[0],
+            M = D[1],
+            R = N((0, r.useState)(null), 2),
+            G = R[0],
+            L = R[1],
+            U = (0, s.d4)(function (e) {
+              return e.auth;
+            }),
+            B = U.user,
+            V = U.token,
+            H = N((0, d.sl)(), 2),
+            W = H[0],
+            $ = H[1].isLoading,
+            q = N((0, d.Mm)(), 2),
+            J = q[0],
+            Y = q[1].isLoading,
+            K = N((0, d.H3)(), 1)[0],
+            Q = (0, r.useRef)(null),
+            X = (0, r.useRef)(null),
+            Z = (0, r.useRef)(!1),
+            ee = (0, r.useRef)(!1);
+          X.current = F;
+          var te = (0, d.is)(null == F ? void 0 : F.callId, {
+              skip: !(null != F && F.callId) || P,
+              pollingInterval: 2e3,
+            }).data,
+            ne = (0, r.useRef)(!1);
+          ((0, r.useEffect)(
+            function () {
+              var e;
+              if (
+                null != te &&
+                null !== (e = te.data) &&
+                void 0 !== e &&
+                e.durationSeconds &&
+                !1 === P
+              ) {
+                var t = te.data.durationSeconds;
+                if (t > 0 && 0 === w) {
+                  S(t);
+                  var n = ((null == y ? void 0 : y.pricePerMinute) || 2.5) / 60;
+                  z(Number((t * n).toFixed(2)));
+                }
+              }
+            },
+            [te, P, null == y ? void 0 : y.pricePerMinute],
+          ),
+            (0, r.useEffect)(
+              function () {
+                return (
+                  b &&
+                    !P &&
+                    "active" === (null == F ? void 0 : F.status) &&
+                    G &&
+                    !Z.current &&
+                    (Q.current && clearInterval(Q.current),
+                    (Q.current = setInterval(function () {
+                      var e;
+                      if (
+                        !Z.current &&
+                        "active" ===
+                          (null === (e = X.current) || void 0 === e
+                            ? void 0
+                            : e.status)
+                      ) {
+                        var t = Date.now(),
+                          n = Math.floor((t - G) / 1e3);
+                        S(n);
+                        var r =
+                          ((null == y ? void 0 : y.pricePerMinute) || 2.5) / 60;
+                        z(Number((n * r).toFixed(2)));
+                      }
+                    }, 1e3))),
+                  function () {
+                    Q.current && (clearInterval(Q.current), (Q.current = null));
+                  }
+                );
+              },
+              [
+                b,
+                P,
+                null == F ? void 0 : F.status,
+                G,
+                null == y ? void 0 : y.pricePerMinute,
+              ],
+            ),
+            (0, r.useEffect)(
+              function () {
+                if (b && null != B && B.id && V)
+                  return (
+                    u.z.connect(B.id, V),
+                    u.z.on(
+                      "call_accepted",
+                      k,
+                      (function () {
+                        var e = j(
+                          p().m(function e(t) {
+                            var n, r, o, l, i, a;
+                            return p().w(
+                              function (e) {
+                                for (;;)
+                                  switch ((e.p = e.n)) {
+                                    case 0:
+                                      if (!Z.current && !ee.current) {
+                                        e.n = 1;
+                                        break;
+                                      }
+                                      return e.a(2);
+                                    case 1:
+                                      if (
+                                        ((o = t.actualStartTime
+                                          ? new Date(
+                                              t.actualStartTime,
+                                            ).getTime()
+                                          : Date.now()),
+                                        L(o),
+                                        S(0),
+                                        z(0),
+                                        M(function (e) {
+                                          return e
+                                            ? x(
+                                                x({}, e),
+                                                {},
+                                                {
+                                                  status: "active",
+                                                  roomName:
+                                                    t.roomName || e.roomName,
+                                                  userToken:
+                                                    t.token || e.userToken,
+                                                },
+                                              )
+                                            : null;
+                                        }),
+                                        f.Ay.success(
+                                          "Call accepted! Connecting audio...",
+                                        ),
+                                        (function () {
+                                          var e = new Audio();
+                                          ((e.muted = !0),
+                                            e.play().catch(function () {}));
+                                        })(),
+                                        (l =
+                                          t.roomName ||
+                                          (null === (n = X.current) ||
+                                          void 0 === n
+                                            ? void 0
+                                            : n.roomName)),
+                                        !(i =
+                                          t.token ||
+                                          (null === (r = X.current) ||
+                                          void 0 === r
+                                            ? void 0
+                                            : r.userToken)) || !l)
+                                      ) {
+                                        e.n = 6;
+                                        break;
+                                      }
+                                      return (
+                                        (e.p = 2),
+                                        (ee.current = !0),
+                                        (e.n = 3),
+                                        v.T.connectAudio(i, l)
+                                      );
+                                    case 3:
+                                      (console.log(
+                                        " User audio connected successfully",
+                                      ),
+                                        (e.n = 5));
+                                      break;
+                                    case 4:
+                                      ((e.p = 4),
+                                        (a = e.v),
+                                        console.error(
+                                          " Audio connect error:",
+                                          a,
+                                        ),
+                                        f.Ay.error("Audio connection failed"),
+                                        (ee.current = !1));
+                                    case 5:
+                                      e.n = 7;
+                                      break;
+                                    case 6:
+                                      console.error(
+                                        "Missing token or roomName for audio connection",
+                                      );
+                                    case 7:
+                                      return e.a(2);
+                                  }
+                              },
+                              e,
+                              null,
+                              [[2, 4]],
+                            );
+                          }),
+                        );
+                        return function (t) {
+                          return e.apply(this, arguments);
+                        };
+                      })(),
+                    ),
+                    u.z.on("call_rejected", k, function () {
+                      Z.current ||
+                        (Q.current &&
+                          (clearInterval(Q.current), (Q.current = null)),
+                        v.T.disconnect(),
+                        (ee.current = !1),
+                        M(null),
+                        L(null),
+                        f.Ay.error("Call was rejected by consultant"),
+                        h());
+                    }),
+                    u.z.on("call_ended", k, function (e) {
+                      if (!Z.current) {
+                        (Q.current &&
+                          (clearInterval(Q.current), (Q.current = null)),
+                          v.T.disconnect(),
+                          (ee.current = !1));
+                        var t = (null == e ? void 0 : e.durationSeconds) || w;
+                        (S(t), t > 0 ? C(!0) : ae());
+                      }
+                    }),
+                    function () {
+                      (u.z.off("call_accepted", k),
+                        u.z.off("call_rejected", k),
+                        u.z.off("call_ended", k));
+                    }
+                  );
+              },
+              [b, null == B ? void 0 : B.id, V],
+            ));
+          var re = (function () {
+            var e = j(
+              p().m(function e() {
+                var t, n, r, o, l;
+                return p().w(
+                  function (e) {
+                    for (;;)
+                      switch ((e.p = e.n)) {
+                        case 0:
+                          if (!Z.current) {
+                            e.n = 1;
+                            break;
+                          }
+                          return e.a(2);
+                        case 1:
+                          if (
+                            ((Z.current = !0),
+                            Q.current &&
+                              (clearInterval(Q.current), (Q.current = null)),
+                            v.T.disconnect(),
+                            (ee.current = !1),
+                            (e.p = 2),
+                            null === (t = X.current) ||
+                              void 0 === t ||
+                              !t.callId)
+                          ) {
+                            e.n = 6;
+                            break;
+                          }
+                          if ("pending" !== X.current.status) {
+                            e.n = 4;
+                            break;
+                          }
+                          return ((e.n = 3), K(X.current.callId).unwrap());
+                        case 3:
+                          (ae(), (e.n = 6));
+                          break;
+                        case 4:
+                          return ((e.n = 5), J(X.current.callId).unwrap());
+                        case 5:
+                          ((r = e.v),
+                            (o =
+                              (null == r ||
+                              null === (n = r.data) ||
+                              void 0 === n
+                                ? void 0
+                                : n.durationSeconds) ||
+                              (null == r ? void 0 : r.durationSeconds) ||
+                              w),
+                            S(o),
+                            o > 0 ? (C(!0), (Z.current = !1)) : ae());
+                        case 6:
+                          e.n = 8;
+                          break;
+                        case 7:
+                          ((e.p = 7),
+                            (l = e.v),
+                            console.error("End call error:", l),
+                            w > 0 ? (C(!0), (Z.current = !1)) : ae());
+                        case 8:
+                          return e.a(2);
+                      }
+                  },
+                  e,
+                  null,
+                  [[2, 7]],
+                );
+              }),
+            );
+            return function () {
+              return e.apply(this, arguments);
+            };
+          })();
+          (0, r.useEffect)(
+            function () {
+              if (b && y && !Z.current && !ne.current) {
+                ne.current = !0;
+                var e = (function () {
+                  var e = j(
+                    p().m(function e() {
+                      var t, n, r, o, l, i, a, c, u;
+                      return p().w(
+                        function (e) {
+                          for (;;)
+                            switch ((e.p = e.n)) {
+                              case 0:
+                                if (
+                                  ((e.p = 0),
+                                  (o =
+                                    (null === (t = y.user) || void 0 === t
+                                      ? void 0
+                                      : t.id) || y.id))
+                                ) {
+                                  e.n = 1;
+                                  break;
+                                }
+                                return (
+                                  f.Ay.error("Consultant ID not found"),
+                                  h(),
+                                  e.a(2)
+                                );
+                              case 1:
+                                return (
+                                  (e.n = 2),
+                                  W({
+                                    consultantId: o,
+                                    callType: "PHONE",
+                                  }).unwrap()
+                                );
+                              case 2:
+                                ((l = e.v),
+                                  (i =
+                                    (null == l ||
+                                    null === (n = l.data) ||
+                                    void 0 === n
+                                      ? void 0
+                                      : n.call) ||
+                                    (null == l ? void 0 : l.call)),
+                                  (a =
+                                    (null == l ||
+                                    null === (r = l.data) ||
+                                    void 0 === r
+                                      ? void 0
+                                      : r.tokens) ||
+                                    (null == l ? void 0 : l.tokens)),
+                                  M({
+                                    callId: i.id,
+                                    roomName: i.roomName,
+                                    userToken: a.user.token,
+                                    status: "pending",
+                                  }),
+                                  (0, f.Ay)("Calling consultant...", {
+                                    icon: "📞",
+                                  }),
+                                  (e.n = 4));
+                                break;
+                              case 3:
+                                ((e.p = 3),
+                                  (u = e.v),
+                                  console.error("❌ initiateCall error:", u),
+                                  (ne.current = !1),
+                                  f.Ay.error(
+                                    (null == u ||
+                                    null === (c = u.data) ||
+                                    void 0 === c
+                                      ? void 0
+                                      : c.message) ||
+                                      (null == u ? void 0 : u.message) ||
+                                      "Failed to start call",
+                                  ),
+                                  h());
+                              case 4:
+                                return e.a(2);
+                            }
+                        },
+                        e,
+                        null,
+                        [[0, 3]],
+                      );
+                    }),
+                  );
+                  return function () {
+                    return e.apply(this, arguments);
+                  };
+                })();
+                e();
+              }
+            },
+            [b, y],
+          );
+          var oe,
+            le,
+            ie,
+            ae = function () {
+              (Q.current && (clearInterval(Q.current), (Q.current = null)),
+                S(0),
+                z(0),
+                C(!1),
+                M(null),
+                L(null),
+                v.T.disconnect(),
+                (ee.current = !1),
+                (Z.current = !1),
+                (ne.current = !1),
+                h());
+            };
+          return b
+            ? $
+              ? (0, m.jsx)("div", {
+                  className:
+                    "fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]",
+                  children: (0, m.jsxs)("div", {
+                    className:
+                      "bg-[#2D2D2D] w-full max-w-md rounded-2xl p-8 flex flex-col items-center",
+                    children: [
+                      (0, m.jsx)("div", {
+                        className:
+                          "animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-400 mb-4",
+                      }),
+                      (0, m.jsxs)("p", {
+                        className: "text-white text-lg",
+                        children: [
+                          "Connecting to ",
+                          null == y ? void 0 : y.name,
+                          "...",
+                        ],
+                      }),
+                    ],
+                  }),
+                })
+              : (0, m.jsx)("div", {
+                  className:
+                    "fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4",
+                  children: P
+                    ? (0, m.jsx)(c.A, {
+                        consultant: y,
+                        seconds: w,
+                        callId:
+                          null === (n = X.current) || void 0 === n
+                            ? void 0
+                            : n.callId,
+                        onClose: ae,
+                      })
+                    : (0, m.jsxs)("div", {
+                        className:
+                          "bg-[#2D2D2D] w-full max-w-md rounded-2xl p-6 flex flex-col items-center",
+                        children: [
+                          (0, m.jsx)("div", {
+                            className:
+                              "w-20 h-20 rounded-full bg-[#D1C4E9] flex items-center justify-center mb-4 text-[#5E35B1] text-3xl font-bold",
+                            children:
+                              (null == y ||
+                              null === (t = y.name) ||
+                              void 0 === t
+                                ? void 0
+                                : t.charAt(0)) || "C",
+                          }),
+                          (0, m.jsx)("h2", {
+                            className: "text-white font-bold text-xl mb-1",
+                            children: null == y ? void 0 : y.name,
+                          }),
+                          (0, m.jsx)("p", {
+                            className:
+                              "text-sm font-semibold mb-6 uppercase tracking-wider ".concat(
+                                "active" === (null == F ? void 0 : F.status)
+                                  ? "text-green-400"
+                                  : "text-yellow-400",
+                              ),
+                            children:
+                              "active" === (null == F ? void 0 : F.status)
+                                ? "● In Progress"
+                                : "● Waiting for answer...",
+                          }),
+                          (0, m.jsx)("div", {
+                            className:
+                              "text-5xl font-bold text-white mb-8 font-mono",
+                            children:
+                              ((oe = w),
+                              (le = Math.floor(oe / 60)),
+                              (ie = oe % 60),
+                              ""
+                                .concat(String(le).padStart(2, "0"), ":")
+                                .concat(String(ie).padStart(2, "0"))),
+                          }),
+                          (0, m.jsxs)("div", {
+                            className:
+                              "bg-white/10 px-6 py-3 rounded-xl mb-8 text-center",
+                            children: [
+                              (0, m.jsx)("p", {
+                                className:
+                                  "text-xs text-gray-400 mb-1 uppercase",
+                                children: "Current Billing",
+                              }),
+                              (0, m.jsxs)("p", {
+                                className: "text-white font-bold text-xl",
+                                children: ["€", _.toFixed(2)],
+                              }),
+                            ],
+                          }),
+                          (0, m.jsxs)("div", {
+                            className: "flex items-center gap-4",
+                            children: [
+                              (0, m.jsx)("button", {
+                                onClick: function () {
+                                  var e = !A;
+                                  (I(e), e ? v.T.mute() : v.T.unmute());
+                                },
+                                className:
+                                  "w-12 h-12 rounded-full flex items-center justify-center ".concat(
+                                    A ? "bg-red-500" : "bg-white/10",
+                                    " text-white",
+                                  ),
+                                children: A
+                                  ? (0, m.jsx)(o.A, { size: 20 })
+                                  : (0, m.jsx)(l.A, { size: 20 }),
+                              }),
+                              (0, m.jsx)("button", {
+                                onClick: re,
+                                disabled: Y,
+                                className:
+                                  "w-14 h-14 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-full flex items-center justify-center",
+                                children: (0, m.jsx)(i.A, { size: 22 }),
+                              }),
+                              (0, m.jsx)("button", {
+                                className:
+                                  "w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center",
+                                children: (0, m.jsx)(a.A, { size: 20 }),
+                              }),
+                            ],
+                          }),
+                        ],
+                      }),
+                })
+            : null;
+        });
+      O.displayName = "AudioCallModal";
+      const A = O;
+    },
+    65173(e, t, n) {
+      n.d(t, { A: () => x });
+      var r = n(96540),
+        o = n(48697),
+        l = n(45773),
+        i = n(19869),
+        a = n(41181),
+        c = n(69215).q.injectEndpoints({
+          endpoints: function (e) {
+            return {
+              createReview: e.mutation({
+                query: function (e) {
+                  return { url: "/reviews", method: "POST", body: e };
+                },
+                invalidatesTags: ["Review"],
+              }),
+            };
+          },
+        }).useCreateReviewMutation,
+        u = n(71468),
+        s = n(90888),
+        d = n(74848);
+      function f() {
+        var e,
+          t,
+          n = "function" == typeof Symbol ? Symbol : {},
+          r = n.iterator || "@@iterator",
+          o = n.toStringTag || "@@toStringTag";
+        function l(n, r, o, l) {
+          var c = r && r.prototype instanceof a ? r : a,
+            u = Object.create(c.prototype);
+          return (
+            v(
+              u,
+              "_invoke",
+              (function (n, r, o) {
+                var l,
+                  a,
+                  c,
+                  u = 0,
+                  s = o || [],
+                  d = !1,
+                  f = {
+                    p: 0,
+                    n: 0,
+                    v: e,
+                    a: v,
+                    f: v.bind(e, 4),
+                    d: function (t, n) {
+                      return ((l = t), (a = 0), (c = e), (f.n = n), i);
+                    },
+                  };
+                function v(n, r) {
+                  for (
+                    a = n, c = r, t = 0;
+                    !d && u && !o && t < s.length;
+                    t++
+                  ) {
+                    var o,
+                      l = s[t],
+                      v = f.p,
+                      m = l[2];
+                    n > 3
+                      ? (o = m === r) &&
+                        ((c = l[(a = l[4]) ? 5 : ((a = 3), 3)]),
+                        (l[4] = l[5] = e))
+                      : l[0] <= v &&
+                        ((o = n < 2 && v < l[1])
+                          ? ((a = 0), (f.v = r), (f.n = l[1]))
+                          : v < m &&
+                            (o = n < 3 || l[0] > r || r > m) &&
+                            ((l[4] = n), (l[5] = r), (f.n = m), (a = 0)));
+                  }
+                  if (o || n > 1) return i;
+                  throw ((d = !0), r);
+                }
+                return function (o, s, m) {
+                  if (u > 1) throw TypeError("Generator is already running");
+                  for (
+                    d && 1 === s && v(s, m), a = s, c = m;
+                    (t = a < 2 ? e : c) || !d;
+                  ) {
+                    l ||
+                      (a
+                        ? a < 3
+                          ? (a > 1 && (f.n = -1), v(a, c))
+                          : (f.n = c)
+                        : (f.v = c));
+                    try {
+                      if (((u = 2), l)) {
+                        if ((a || (o = "next"), (t = l[o]))) {
+                          if (!(t = t.call(l, c)))
+                            throw TypeError("iterator result is not an object");
+                          if (!t.done) return t;
+                          ((c = t.value), a < 2 && (a = 0));
+                        } else
+                          (1 === a && (t = l.return) && t.call(l),
+                            a < 2 &&
+                              ((c = TypeError(
+                                "The iterator does not provide a '" +
+                                  o +
+                                  "' method",
+                              )),
+                              (a = 1)));
+                        l = e;
+                      } else if ((t = (d = f.n < 0) ? c : n.call(r, f)) !== i)
+                        break;
+                    } catch (t) {
+                      ((l = e), (a = 1), (c = t));
+                    } finally {
+                      u = 1;
+                    }
+                  }
+                  return { value: t, done: d };
+                };
+              })(n, o, l),
+              !0,
+            ),
+            u
+          );
+        }
+        var i = {};
+        function a() {}
+        function c() {}
+        function u() {}
+        t = Object.getPrototypeOf;
+        var s = [][r]
+            ? t(t([][r]()))
+            : (v((t = {}), r, function () {
+                return this;
+              }),
+              t),
+          d = (u.prototype = a.prototype = Object.create(s));
+        function m(e) {
+          return (
+            Object.setPrototypeOf
+              ? Object.setPrototypeOf(e, u)
+              : ((e.__proto__ = u), v(e, o, "GeneratorFunction")),
+            (e.prototype = Object.create(d)),
+            e
+          );
+        }
+        return (
+          (c.prototype = u),
+          v(d, "constructor", u),
+          v(u, "constructor", c),
+          (c.displayName = "GeneratorFunction"),
+          v(u, o, "GeneratorFunction"),
+          v(d),
+          v(d, o, "Generator"),
+          v(d, r, function () {
+            return this;
+          }),
+          v(d, "toString", function () {
+            return "[object Generator]";
+          }),
+          (f = function () {
+            return { w: l, m };
+          })()
+        );
+      }
+      function v(e, t, n, r) {
+        var o = Object.defineProperty;
+        try {
+          o({}, "", {});
+        } catch (e) {
+          o = 0;
+        }
+        ((v = function (e, t, n, r) {
+          function l(t, n) {
+            v(e, t, function (e) {
+              return this._invoke(t, n, e);
+            });
+          }
+          t
+            ? o
+              ? o(e, t, {
+                  value: n,
+                  enumerable: !r,
+                  configurable: !r,
+                  writable: !r,
+                })
+              : (e[t] = n)
+            : (l("next", 0), l("throw", 1), l("return", 2));
+        }),
+          v(e, t, n, r));
+      }
+      function m(e, t, n, r, o, l, i) {
+        try {
+          var a = e[l](i),
+            c = a.value;
+        } catch (e) {
+          return void n(e);
+        }
+        a.done ? t(c) : Promise.resolve(c).then(r, o);
+      }
+      function b(e, t) {
+        return (
+          (function (e) {
+            if (Array.isArray(e)) return e;
+          })(e) ||
+          (function (e, t) {
+            var n =
+              null == e
+                ? null
+                : ("undefined" != typeof Symbol && e[Symbol.iterator]) ||
+                  e["@@iterator"];
+            if (null != n) {
+              var r,
+                o,
+                l,
+                i,
+                a = [],
+                c = !0,
+                u = !1;
+              try {
+                if (((l = (n = n.call(e)).next), 0 === t)) {
+                  if (Object(n) !== n) return;
+                  c = !1;
+                } else
+                  for (
+                    ;
+                    !(c = (r = l.call(n)).done) &&
+                    (a.push(r.value), a.length !== t);
+                    c = !0
+                  );
+              } catch (e) {
+                ((u = !0), (o = e));
+              } finally {
+                try {
+                  if (
+                    !c &&
+                    null != n.return &&
+                    ((i = n.return()), Object(i) !== i)
+                  )
+                    return;
+                } finally {
+                  if (u) throw o;
+                }
+              }
+              return a;
+            }
+          })(e, t) ||
+          p(e, t) ||
+          (function () {
+            throw new TypeError(
+              "Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
+            );
+          })()
+        );
+      }
+      function p(e, t) {
+        if (e) {
+          if ("string" == typeof e) return h(e, t);
+          var n = {}.toString.call(e).slice(8, -1);
+          return (
+            "Object" === n && e.constructor && (n = e.constructor.name),
+            "Map" === n || "Set" === n
+              ? Array.from(e)
+              : "Arguments" === n ||
+                  /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
+                ? h(e, t)
+                : void 0
+          );
+        }
+      }
+      function h(e, t) {
+        (null == t || t > e.length) && (t = e.length);
+        for (var n = 0, r = Array(t); n < t; n++) r[n] = e[n];
+        return r;
+      }
+      var y = (0, r.memo)(function (e) {
+        var t,
+          n,
+          v,
+          y = e.consultant,
+          x = e.seconds,
+          g = e.callId,
+          w = e.onClose,
+          j = b((0, r.useState)(0), 2),
+          N = j[0],
+          S = j[1],
+          k = b((0, r.useState)(""), 2),
+          O = k[0],
+          A = k[1],
+          I = b((0, r.useState)(!1), 2),
+          T = (I[0], I[1]),
+          P =
+            ((0, u.d4)(function (e) {
+              return e.auth;
+            }).user,
+            b(c(), 2)),
+          C = P[0],
+          E = P[1].isLoading,
+          _ = (x || 0) / 60,
+          z = (null == y ? void 0 : y.pricePerMinute) || 2.5,
+          D = (_ * z).toFixed(2),
+          F = Math.floor((x || 0) / 60),
+          M = (x || 0) % 60,
+          R =
+            M > 0
+              ? "".concat(F, " min ").concat(M, " sec")
+              : "".concat(F, " min"),
+          G = new Date().toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: !0,
+          }),
+          L = (function () {
+            var e,
+              t =
+                ((e = f().m(function e() {
+                  var t;
+                  return f().w(
+                    function (e) {
+                      for (;;)
+                        switch ((e.p = e.n)) {
+                          case 0:
+                            return (
+                              (e.p = 0),
+                              (e.n = 1),
+                              C({
+                                consultantId:
+                                  (null == y ? void 0 : y.id) ||
+                                  (null == y ? void 0 : y.userId),
+                                callId: g,
+                                rating: N,
+                                comment: O,
+                              }).unwrap()
+                            );
+                          case 1:
+                            (s.Ay.success("Review submitted!"),
+                              T(!0),
+                              setTimeout(function () {
+                                w();
+                              }, 1500),
+                              (e.n = 3));
+                            break;
+                          case 2:
+                            ((e.p = 2),
+                              (t = e.v),
+                              console.error("Review error:", t),
+                              (0, s.Ay)("Review could not be saved", {
+                                icon: "⚠️",
+                              }),
+                              w());
+                          case 3:
+                            return e.a(2);
+                        }
+                    },
+                    e,
+                    null,
+                    [[0, 2]],
+                  );
+                })),
+                function () {
+                  var t = this,
+                    n = arguments;
+                  return new Promise(function (r, o) {
+                    var l = e.apply(t, n);
+                    function i(e) {
+                      m(l, r, o, i, a, "next", e);
+                    }
+                    function a(e) {
+                      m(l, r, o, i, a, "throw", e);
+                    }
+                    i(void 0);
+                  });
+                });
+            return function () {
+              return t.apply(this, arguments);
+            };
+          })();
+        return (0, d.jsx)("div", {
+          className:
+            "fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4",
+          children: (0, d.jsxs)("div", {
+            className:
+              "relative bg-[#333333] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border-t-4 border-green-500",
+            children: [
+              (0, d.jsx)("button", {
+                onClick: function () {
+                  w();
+                },
+                className:
+                  "absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10",
+                children: (0, d.jsx)(o.A, { size: 20 }),
+              }),
+              (0, d.jsxs)("div", {
+                className: "p-8 flex flex-col items-center",
+                children: [
+                  (0, d.jsx)("div", {
+                    className:
+                      "w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-4",
+                    children: (0, d.jsx)("div", {
+                      className:
+                        "w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white",
+                      children: (0, d.jsx)(l.A, { size: 20, strokeWidth: 4 }),
+                    }),
+                  }),
+                  (0, d.jsx)("h2", {
+                    className: "text-white font-bold text-2xl mb-8",
+                    children: "Consultation Completed",
+                  }),
+                  (0, d.jsxs)("div", {
+                    className:
+                      "w-full bg-white/10 rounded-xl p-4 flex items-center gap-4 mb-6 border border-white/5",
+                    children: [
+                      (0, d.jsx)("img", {
+                        src:
+                          (null == y ? void 0 : y.image) ||
+                          (null == y ? void 0 : y.avatar) ||
+                          (null == y || null === (t = y.user) || void 0 === t
+                            ? void 0
+                            : t.avatar) ||
+                          "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
+                        alt: "",
+                        className:
+                          "w-12 h-12 rounded-full object-cover border border-white/20",
+                        onError: function (e) {
+                          e.target.src =
+                            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop";
+                        },
+                      }),
+                      (0, d.jsxs)("div", {
+                        className: "flex flex-col",
+                        children: [
+                          (0, d.jsx)("p", {
+                            className: "text-white text-lg font-bold",
+                            children:
+                              (null == y ? void 0 : y.name) ||
+                              (null == y ||
+                              null === (n = y.user) ||
+                              void 0 === n
+                                ? void 0
+                                : n.name) ||
+                              "Consultant",
+                          }),
+                          (0, d.jsxs)("div", {
+                            className:
+                              "flex items-center gap-1 text-gray-300 text-base",
+                            children: [
+                              (0, d.jsx)(i.A, { size: 14 }),
+                              (0, d.jsx)("span", {
+                                children: "Call Completed",
+                              }),
+                            ],
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                  (0, d.jsxs)("div", {
+                    className: "grid grid-cols-3 gap-3 w-full mb-6",
+                    children: [
+                      (0, d.jsxs)("div", {
+                        className:
+                          "bg-white/10 rounded-xl py-3 px-1 text-center border border-white/5",
+                        children: [
+                          (0, d.jsx)("p", {
+                            className:
+                              "text-base text-gray-400 mb-1 uppercase font-medium",
+                            children: "Duration",
+                          }),
+                          (0, d.jsx)("p", {
+                            className: "text-white font-bold text-lg",
+                            children: R,
+                          }),
+                        ],
+                      }),
+                      (0, d.jsxs)("div", {
+                        className:
+                          "bg-white/10 rounded-xl py-3 px-1 text-center border border-white/5",
+                        children: [
+                          (0, d.jsx)("p", {
+                            className:
+                              "text-base text-gray-400 mb-1 uppercase font-medium",
+                            children: "Cost",
+                          }),
+                          (0, d.jsxs)("p", {
+                            className: "text-white font-bold text-lg",
+                            children: ["€", D],
+                          }),
+                        ],
+                      }),
+                      (0, d.jsxs)("div", {
+                        className:
+                          "bg-white/10 rounded-xl py-3 px-1 text-center border border-white/5",
+                        children: [
+                          (0, d.jsx)("p", {
+                            className:
+                              "text-base text-gray-400 mb-1 uppercase font-medium",
+                            children: "Rate/min",
+                          }),
+                          (0, d.jsxs)("p", {
+                            className: "text-white font-bold text-lg",
+                            children: ["€", z.toFixed(2)],
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                  (0, d.jsx)("p", {
+                    className: "text-base text-gray-400 mb-6 font-medium",
+                    children: G,
+                  }),
+                  (0, d.jsx)("p", {
+                    className: "text-white text-lg font-bold mb-4",
+                    children: "Rate your experience",
+                  }),
+                  (0, d.jsx)("div", {
+                    className: "flex justify-center gap-2 mb-4",
+                    children: ((v = Array(5)),
+                    (function (e) {
+                      if (Array.isArray(e)) return h(e);
+                    })(v) ||
+                      (function (e) {
+                        if (
+                          ("undefined" != typeof Symbol &&
+                            null != e[Symbol.iterator]) ||
+                          null != e["@@iterator"]
+                        )
+                          return Array.from(e);
+                      })(v) ||
+                      p(v) ||
+                      (function () {
+                        throw new TypeError(
+                          "Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
+                        );
+                      })()).map(function (e, t) {
+                      return (0, d.jsx)(
+                        "button",
+                        {
+                          onClick: function () {
+                            return S(t + 1);
+                          },
+                          className: "transition-transform active:scale-90",
+                          children: (0, d.jsx)(a.A, {
+                            size: 28,
+                            fill: t < N ? "#FFFFFF" : "none",
+                            className:
+                              t < N
+                                ? "text-white"
+                                : "text-white/30 hover:text-white",
+                          }),
+                        },
+                        t,
+                      );
+                    }),
+                  }),
+                  (0, d.jsx)("div", {
+                    className: "w-full text-left mb-2",
+                    children: (0, d.jsx)("label", {
+                      className: "text-white text-lg font-bold block",
+                      children: "Review",
+                    }),
+                  }),
+                  (0, d.jsx)("textarea", {
+                    value: O,
+                    onChange: function (e) {
+                      return A(e.target.value);
+                    },
+                    placeholder: "Write here...",
+                    className:
+                      "w-full bg-[#444444] border border-white/10 rounded-xl p-4 text-base text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/30 h-32 mb-4 resize-none transition-all",
+                  }),
+                  (0, d.jsx)("button", {
+                    onClick: L,
+                    disabled: E,
+                    className:
+                      "w-full bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white py-3.5 rounded-xl font-bold text-base transition-all",
+                    children: E ? "Submitting..." : "Submit Review",
+                  }),
+                ],
+              }),
+            ],
+          }),
+        });
+      });
+      y.displayName = "CallFeedbackModal";
+      const x = y;
+    },
+    78283(e, t, n) {
+      n.d(t, { A: () => T });
+      var r = n(96540),
+        o = n(84910),
+        l = n(68614),
+        i = n(97869),
+        a = n(43850),
+        c = n(50802),
+        u = n(55584),
+        s = n(65173),
+        d = n(44127),
+        f = n(71468),
+        v = n(85843),
+        m = n(58841),
+        b = n(90888),
+        p = n(74848);
+      function h(e) {
+        return (
+          (h =
+            "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
+              ? function (e) {
+                  return typeof e;
+                }
+              : function (e) {
+                  return e &&
+                    "function" == typeof Symbol &&
+                    e.constructor === Symbol &&
+                    e !== Symbol.prototype
+                    ? "symbol"
+                    : typeof e;
+                }),
+          h(e)
+        );
+      }
+      function y(e, t) {
+        var n = Object.keys(e);
+        if (Object.getOwnPropertySymbols) {
+          var r = Object.getOwnPropertySymbols(e);
+          (t &&
+            (r = r.filter(function (t) {
+              return Object.getOwnPropertyDescriptor(e, t).enumerable;
+            })),
+            n.push.apply(n, r));
+        }
+        return n;
+      }
+      function x(e) {
+        for (var t = 1; t < arguments.length; t++) {
+          var n = null != arguments[t] ? arguments[t] : {};
+          t % 2
+            ? y(Object(n), !0).forEach(function (t) {
+                g(e, t, n[t]);
+              })
+            : Object.getOwnPropertyDescriptors
+              ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n))
+              : y(Object(n)).forEach(function (t) {
+                  Object.defineProperty(
+                    e,
+                    t,
+                    Object.getOwnPropertyDescriptor(n, t),
+                  );
+                });
+        }
+        return e;
+      }
+      function g(e, t, n) {
+        return (
+          (t = (function (e) {
+            var t = (function (e) {
+              if ("object" != h(e) || !e) return e;
+              var t = e[Symbol.toPrimitive];
+              if (void 0 !== t) {
+                var n = t.call(e, "string");
+                if ("object" != h(n)) return n;
+                throw new TypeError(
+                  "@@toPrimitive must return a primitive value.",
+                );
+              }
+              return String(e);
+            })(e);
+            return "symbol" == h(t) ? t : t + "";
+          })(t)) in e
+            ? Object.defineProperty(e, t, {
+                value: n,
+                enumerable: !0,
+                configurable: !0,
+                writable: !0,
+              })
+            : (e[t] = n),
+          e
+        );
+      }
+      function w() {
+        var e,
+          t,
+          n = "function" == typeof Symbol ? Symbol : {},
+          r = n.iterator || "@@iterator",
+          o = n.toStringTag || "@@toStringTag";
+        function l(n, r, o, l) {
+          var c = r && r.prototype instanceof a ? r : a,
+            u = Object.create(c.prototype);
+          return (
+            j(
+              u,
+              "_invoke",
+              (function (n, r, o) {
+                var l,
+                  a,
+                  c,
+                  u = 0,
+                  s = o || [],
+                  d = !1,
+                  f = {
+                    p: 0,
+                    n: 0,
+                    v: e,
+                    a: v,
+                    f: v.bind(e, 4),
+                    d: function (t, n) {
+                      return ((l = t), (a = 0), (c = e), (f.n = n), i);
+                    },
+                  };
+                function v(n, r) {
+                  for (
+                    a = n, c = r, t = 0;
+                    !d && u && !o && t < s.length;
+                    t++
+                  ) {
+                    var o,
+                      l = s[t],
+                      v = f.p,
+                      m = l[2];
+                    n > 3
+                      ? (o = m === r) &&
+                        ((c = l[(a = l[4]) ? 5 : ((a = 3), 3)]),
+                        (l[4] = l[5] = e))
+                      : l[0] <= v &&
+                        ((o = n < 2 && v < l[1])
+                          ? ((a = 0), (f.v = r), (f.n = l[1]))
+                          : v < m &&
+                            (o = n < 3 || l[0] > r || r > m) &&
+                            ((l[4] = n), (l[5] = r), (f.n = m), (a = 0)));
+                  }
+                  if (o || n > 1) return i;
+                  throw ((d = !0), r);
+                }
+                return function (o, s, m) {
+                  if (u > 1) throw TypeError("Generator is already running");
+                  for (
+                    d && 1 === s && v(s, m), a = s, c = m;
+                    (t = a < 2 ? e : c) || !d;
+                  ) {
+                    l ||
+                      (a
+                        ? a < 3
+                          ? (a > 1 && (f.n = -1), v(a, c))
+                          : (f.n = c)
+                        : (f.v = c));
+                    try {
+                      if (((u = 2), l)) {
+                        if ((a || (o = "next"), (t = l[o]))) {
+                          if (!(t = t.call(l, c)))
+                            throw TypeError("iterator result is not an object");
+                          if (!t.done) return t;
+                          ((c = t.value), a < 2 && (a = 0));
+                        } else
+                          (1 === a && (t = l.return) && t.call(l),
+                            a < 2 &&
+                              ((c = TypeError(
+                                "The iterator does not provide a '" +
+                                  o +
+                                  "' method",
+                              )),
+                              (a = 1)));
+                        l = e;
+                      } else if ((t = (d = f.n < 0) ? c : n.call(r, f)) !== i)
+                        break;
+                    } catch (t) {
+                      ((l = e), (a = 1), (c = t));
+                    } finally {
+                      u = 1;
+                    }
+                  }
+                  return { value: t, done: d };
+                };
+              })(n, o, l),
+              !0,
+            ),
+            u
+          );
+        }
+        var i = {};
+        function a() {}
+        function c() {}
+        function u() {}
+        t = Object.getPrototypeOf;
+        var s = [][r]
+            ? t(t([][r]()))
+            : (j((t = {}), r, function () {
+                return this;
+              }),
+              t),
+          d = (u.prototype = a.prototype = Object.create(s));
+        function f(e) {
+          return (
+            Object.setPrototypeOf
+              ? Object.setPrototypeOf(e, u)
+              : ((e.__proto__ = u), j(e, o, "GeneratorFunction")),
+            (e.prototype = Object.create(d)),
+            e
+          );
+        }
+        return (
+          (c.prototype = u),
+          j(d, "constructor", u),
+          j(u, "constructor", c),
+          (c.displayName = "GeneratorFunction"),
+          j(u, o, "GeneratorFunction"),
+          j(d),
+          j(d, o, "Generator"),
+          j(d, r, function () {
+            return this;
+          }),
+          j(d, "toString", function () {
+            return "[object Generator]";
+          }),
+          (w = function () {
+            return { w: l, m: f };
+          })()
+        );
+      }
+      function j(e, t, n, r) {
+        var o = Object.defineProperty;
+        try {
+          o({}, "", {});
+        } catch (e) {
+          o = 0;
+        }
+        ((j = function (e, t, n, r) {
+          function l(t, n) {
+            j(e, t, function (e) {
+              return this._invoke(t, n, e);
+            });
+          }
+          t
+            ? o
+              ? o(e, t, {
+                  value: n,
+                  enumerable: !r,
+                  configurable: !r,
+                  writable: !r,
+                })
+              : (e[t] = n)
+            : (l("next", 0), l("throw", 1), l("return", 2));
+        }),
+          j(e, t, n, r));
+      }
+      function N(e, t, n, r, o, l, i) {
+        try {
+          var a = e[l](i),
+            c = a.value;
+        } catch (e) {
+          return void n(e);
+        }
+        a.done ? t(c) : Promise.resolve(c).then(r, o);
+      }
+      function S(e) {
+        return function () {
+          var t = this,
+            n = arguments;
+          return new Promise(function (r, o) {
+            var l = e.apply(t, n);
+            function i(e) {
+              N(l, r, o, i, a, "next", e);
+            }
+            function a(e) {
+              N(l, r, o, i, a, "throw", e);
+            }
+            i(void 0);
+          });
+        };
+      }
+      function k(e, t) {
+        return (
+          (function (e) {
+            if (Array.isArray(e)) return e;
+          })(e) ||
+          (function (e, t) {
+            var n =
+              null == e
+                ? null
+                : ("undefined" != typeof Symbol && e[Symbol.iterator]) ||
+                  e["@@iterator"];
+            if (null != n) {
+              var r,
+                o,
+                l,
+                i,
+                a = [],
+                c = !0,
+                u = !1;
+              try {
+                if (((l = (n = n.call(e)).next), 0 === t)) {
+                  if (Object(n) !== n) return;
+                  c = !1;
+                } else
+                  for (
+                    ;
+                    !(c = (r = l.call(n)).done) &&
+                    (a.push(r.value), a.length !== t);
+                    c = !0
+                  );
+              } catch (e) {
+                ((u = !0), (o = e));
+              } finally {
+                try {
+                  if (
+                    !c &&
+                    null != n.return &&
+                    ((i = n.return()), Object(i) !== i)
+                  )
+                    return;
+                } finally {
+                  if (u) throw o;
+                }
+              }
+              return a;
+            }
+          })(e, t) ||
+          (function (e, t) {
+            if (e) {
+              if ("string" == typeof e) return O(e, t);
+              var n = {}.toString.call(e).slice(8, -1);
+              return (
+                "Object" === n && e.constructor && (n = e.constructor.name),
+                "Map" === n || "Set" === n
+                  ? Array.from(e)
+                  : "Arguments" === n ||
+                      /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
+                    ? O(e, t)
+                    : void 0
+              );
+            }
+          })(e, t) ||
+          (function () {
+            throw new TypeError(
+              "Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
+            );
+          })()
+        );
+      }
+      function O(e, t) {
+        (null == t || t > e.length) && (t = e.length);
+        for (var n = 0, r = Array(t); n < t; n++) r[n] = e[n];
+        return r;
+      }
+      var A = "video-call-modal",
+        I = (0, r.memo)(function (e) {
+          var t,
+            n = e.isOpen,
+            h = e.onClose,
+            y = e.consultant,
+            g = e.callData,
+            j = k((0, r.useState)(0), 2),
+            N = j[0],
+            O = j[1],
+            I = k((0, r.useState)(!1), 2),
+            T = I[0],
+            P = I[1],
+            C = k((0, r.useState)(!1), 2),
+            E = C[0],
+            _ = C[1],
+            z = k((0, r.useState)(!1), 2),
+            D = z[0],
+            F = z[1],
+            M = k((0, r.useState)(0), 2),
+            R = M[0],
+            G = M[1],
+            L = k((0, r.useState)(null), 2),
+            U = L[0],
+            B = L[1],
+            V = k((0, r.useState)(null), 2),
+            H = V[0],
+            W = V[1],
+            $ = k((0, r.useState)(!1), 2),
+            q = $[0],
+            J = $[1],
+            Y = (0, f.d4)(function (e) {
+              return e.auth;
+            }),
+            K = Y.user,
+            Q = Y.token,
+            X = k((0, v.sl)(), 2),
+            Z = X[0],
+            ee = X[1].isLoading,
+            te = k((0, v.Mm)(), 2),
+            ne = te[0],
+            re = te[1].isLoading,
+            oe = k((0, v.H3)(), 1)[0],
+            le = k((0, v.JP)(), 1)[0],
+            ie = (0, r.useRef)(null),
+            ae = (0, r.useRef)(null),
+            ce = (0, r.useRef)(null),
+            ue = (0, r.useRef)(null),
+            se = (0, r.useRef)(!1),
+            de = (0, r.useRef)(!1),
+            fe = (0, r.useRef)(!1),
+            ve = (0, r.useRef)(null);
+          ue.current = U;
+          var me = (0, v.is)(null == U ? void 0 : U.callId, {
+            skip: !(null != U && U.callId) || D,
+            pollingInterval: 2e3,
+          }).data;
+          ((0, r.useEffect)(
+            function () {
+              var e;
+              if (
+                null != me &&
+                null !== (e = me.data) &&
+                void 0 !== e &&
+                e.durationSeconds &&
+                !D &&
+                !se.current
+              ) {
+                var t = me.data.durationSeconds;
+                if (t > 0 && 0 === N) {
+                  O(t);
+                  var n = ((null == y ? void 0 : y.pricePerMinute) || 2.5) / 60;
+                  G(Number((t * n).toFixed(2)));
+                }
+              }
+            },
+            [me, D, null == y ? void 0 : y.pricePerMinute, N],
+          ),
+            (0, r.useEffect)(
+              function () {
+                return (
+                  n &&
+                    !D &&
+                    "active" === (null == U ? void 0 : U.status) &&
+                    H &&
+                    !se.current &&
+                    (ce.current && clearInterval(ce.current),
+                    (ce.current = setInterval(function () {
+                      var e;
+                      if (
+                        !se.current &&
+                        "active" ===
+                          (null === (e = ue.current) || void 0 === e
+                            ? void 0
+                            : e.status)
+                      ) {
+                        var t = Math.floor((Date.now() - H) / 1e3);
+                        O(t);
+                        var n =
+                          ((null == y ? void 0 : y.pricePerMinute) || 2.5) / 60;
+                        G(Number((t * n).toFixed(2)));
+                      }
+                    }, 1e3))),
+                  function () {
+                    ce.current &&
+                      (clearInterval(ce.current), (ce.current = null));
+                  }
+                );
+              },
+              [
+                n,
+                D,
+                null == U ? void 0 : U.status,
+                H,
+                null == y ? void 0 : y.pricePerMinute,
+              ],
+            ),
+            (0, r.useEffect)(
+              function () {
+                g &&
+                  !U &&
+                  n &&
+                  !se.current &&
+                  B({
+                    callId: g.callId,
+                    roomName: g.roomName,
+                    userToken: g.token,
+                    status: "pending",
+                    isIncoming: !0,
+                  });
+              },
+              [g, n],
+            ));
+          var be = (0, r.useCallback)(function () {
+              var e =
+                arguments.length > 0 && void 0 !== arguments[0]
+                  ? arguments[0]
+                  : 5e3;
+              return new Promise(function (t, n) {
+                var r = Date.now(),
+                  o = function () {
+                    ie.current && ae.current
+                      ? t({ local: ie.current, remote: ae.current })
+                      : Date.now() - r > e
+                        ? n(
+                            new Error(
+                              "Video ref elements not available after " +
+                                e +
+                                "ms",
+                            ),
+                          )
+                        : requestAnimationFrame(o);
+                  };
+                o();
+              });
+            }, []),
+            pe = (0, r.useCallback)(
+              (function () {
+                var e = S(
+                  w().m(function e(t, n) {
+                    var r, o, l, i;
+                    return w().w(
+                      function (e) {
+                        for (;;)
+                          switch ((e.p = e.n)) {
+                            case 0:
+                              if (n && t) {
+                                e.n = 1;
+                                break;
+                              }
+                              return (
+                                console.error(
+                                  "connectVideo: missing token or roomName",
+                                ),
+                                e.a(2, !1)
+                              );
+                            case 1:
+                              return ((e.p = 1), (e.n = 2), be(5e3));
+                            case 2:
+                              return (
+                                (r = e.v),
+                                (o = r.local),
+                                (l = r.remote),
+                                (e.n = 3),
+                                m.T.connectVideo(n, t, o, l)
+                              );
+                            case 3:
+                              return (
+                                J(!0),
+                                console.log("✅ Video connected successfully"),
+                                e.a(2, !0)
+                              );
+                            case 4:
+                              return (
+                                (e.p = 4),
+                                (i = e.v),
+                                console.error("❌ Video connect error:", i),
+                                b.Ay.error("Failed to connect video"),
+                                e.a(2, !1)
+                              );
+                          }
+                      },
+                      e,
+                      null,
+                      [[1, 4]],
+                    );
+                  }),
+                );
+                return function (t, n) {
+                  return e.apply(this, arguments);
+                };
+              })(),
+              [be],
+            );
+          ((0, r.useEffect)(
+            function () {
+              if (
+                "active" === (null == U ? void 0 : U.status) &&
+                !q &&
+                !se.current &&
+                ve.current
+              ) {
+                var e = ve.current,
+                  t = e.roomName,
+                  n = e.tokenToUse;
+                ((ve.current = null), pe(t, n));
+              }
+            },
+            [null == U ? void 0 : U.status, q, pe],
+          ),
+            (0, r.useEffect)(
+              function () {
+                if (n && null != K && K.id && Q) {
+                  d.z.connect(K.id, Q);
+                  var e = (function () {
+                    var e = S(
+                      w().m(function e(t) {
+                        var n, r, o, l, i;
+                        return w().w(function (e) {
+                          for (;;)
+                            switch (e.n) {
+                              case 0:
+                                if (!se.current && !de.current) {
+                                  e.n = 1;
+                                  break;
+                                }
+                                return e.a(2);
+                              case 1:
+                                ((de.current = !0),
+                                  (o = t.actualStartTime
+                                    ? new Date(t.actualStartTime).getTime()
+                                    : Date.now()),
+                                  W(o),
+                                  O(0),
+                                  G(0),
+                                  (l =
+                                    t.roomName ||
+                                    (null === (n = ue.current) || void 0 === n
+                                      ? void 0
+                                      : n.roomName)),
+                                  (i =
+                                    t.token ||
+                                    (null === (r = ue.current) || void 0 === r
+                                      ? void 0
+                                      : r.userToken)),
+                                  B(function (e) {
+                                    return x(
+                                      x({}, e),
+                                      {},
+                                      {
+                                        status: "active",
+                                        roomName:
+                                          t.roomName ||
+                                          (null == e ? void 0 : e.roomName),
+                                        callId:
+                                          t.callId ||
+                                          (null == e ? void 0 : e.callId),
+                                        userToken:
+                                          t.token ||
+                                          (null == e ? void 0 : e.userToken),
+                                      },
+                                    );
+                                  }),
+                                  b.Ay.success(
+                                    "Call accepted! Connecting video...",
+                                  ),
+                                  (ve.current = {
+                                    roomName: l,
+                                    tokenToUse: i,
+                                  }));
+                              case 2:
+                                return e.a(2);
+                            }
+                        }, e);
+                      }),
+                    );
+                    return function (t) {
+                      return e.apply(this, arguments);
+                    };
+                  })();
+                  return (
+                    d.z.on("call_accepted", A, e),
+                    d.z.on("call_rejected", A, function () {
+                      se.current ||
+                        (ce.current &&
+                          (clearInterval(ce.current), (ce.current = null)),
+                        b.Ay.error("Call was rejected by consultant"),
+                        setTimeout(function () {
+                          se.current || Ne();
+                        }, 500));
+                    }),
+                    d.z.on("call_ended", A, function (e) {
+                      if (!se.current) {
+                        (ce.current &&
+                          (clearInterval(ce.current), (ce.current = null)),
+                          m.T.disconnect());
+                        var t = (null == e ? void 0 : e.durationSeconds) || N;
+                        (O(t),
+                          t > 0
+                            ? F(!0)
+                            : setTimeout(function () {
+                                se.current || Ne();
+                              }, 500));
+                      }
+                    }),
+                    function () {
+                      (d.z.off("call_accepted", A),
+                        d.z.off("call_rejected", A),
+                        d.z.off("call_ended", A),
+                        (de.current = !1));
+                    }
+                  );
+                }
+              },
+              [n, null == K ? void 0 : K.id, Q],
+            ),
+            (0, r.useEffect)(
+              function () {
+                if (n && y && !g && !se.current && !fe.current) {
+                  fe.current = !0;
+                  var e = (function () {
+                    var e = S(
+                      w().m(function e() {
+                        var t, n, r, o, l, i, a, c, u;
+                        return w().w(
+                          function (e) {
+                            for (;;)
+                              switch ((e.p = e.n)) {
+                                case 0:
+                                  if (
+                                    ((e.p = 0),
+                                    (o =
+                                      (null === (t = y.user) || void 0 === t
+                                        ? void 0
+                                        : t.id) || y.id))
+                                  ) {
+                                    e.n = 1;
+                                    break;
+                                  }
+                                  return (
+                                    b.Ay.error("Consultant ID not found"),
+                                    Ne(),
+                                    e.a(2)
+                                  );
+                                case 1:
+                                  return (
+                                    (e.n = 2),
+                                    Z({
+                                      consultantId: o,
+                                      callType: "VIDEO",
+                                    }).unwrap()
+                                  );
+                                case 2:
+                                  ((l = e.v),
+                                    (i =
+                                      (null == l ||
+                                      null === (n = l.data) ||
+                                      void 0 === n
+                                        ? void 0
+                                        : n.call) ||
+                                      (null == l ? void 0 : l.call)),
+                                    (a =
+                                      (null == l ||
+                                      null === (r = l.data) ||
+                                      void 0 === r
+                                        ? void 0
+                                        : r.tokens) ||
+                                      (null == l ? void 0 : l.tokens)),
+                                    B({
+                                      callId: i.id,
+                                      roomName: i.roomName,
+                                      userToken: a.user.token,
+                                      status: "pending",
+                                      isIncoming: !1,
+                                    }),
+                                    (0, b.Ay)("Calling consultant...", {
+                                      icon: "📹",
+                                    }),
+                                    (e.n = 4));
+                                  break;
+                                case 3:
+                                  ((e.p = 3),
+                                    (u = e.v),
+                                    console.error("❌ initiateCall error:", u),
+                                    (fe.current = !1),
+                                    b.Ay.error(
+                                      (null == u ||
+                                      null === (c = u.data) ||
+                                      void 0 === c
+                                        ? void 0
+                                        : c.message) ||
+                                        "Failed to start video call",
+                                    ),
+                                    Ne());
+                                case 4:
+                                  return e.a(2);
+                              }
+                          },
+                          e,
+                          null,
+                          [[0, 3]],
+                        );
+                      }),
+                    );
+                    return function () {
+                      return e.apply(this, arguments);
+                    };
+                  })();
+                  e();
+                }
+              },
+              [n, y, g],
+            ));
+          var he,
+            ye,
+            xe,
+            ge,
+            we = (function () {
+              var e = S(
+                w().m(function e() {
+                  var t, n, r, o, l;
+                  return w().w(
+                    function (e) {
+                      for (;;)
+                        switch ((e.p = e.n)) {
+                          case 0:
+                            if (!se.current) {
+                              e.n = 1;
+                              break;
+                            }
+                            return e.a(2);
+                          case 1:
+                            if (
+                              ((se.current = !0),
+                              ce.current &&
+                                (clearInterval(ce.current),
+                                (ce.current = null)),
+                              m.T.disconnect(),
+                              (e.p = 2),
+                              null === (t = ue.current) ||
+                                void 0 === t ||
+                                !t.callId)
+                            ) {
+                              e.n = 7;
+                              break;
+                            }
+                            if ("pending" !== ue.current.status) {
+                              e.n = 4;
+                              break;
+                            }
+                            return ((e.n = 3), oe(ue.current.callId).unwrap());
+                          case 3:
+                            (Ne(), (e.n = 6));
+                            break;
+                          case 4:
+                            return ((e.n = 5), ne(ue.current.callId).unwrap());
+                          case 5:
+                            ((r = e.v),
+                              (o =
+                                (null == r ||
+                                null === (n = r.data) ||
+                                void 0 === n
+                                  ? void 0
+                                  : n.durationSeconds) ||
+                                (null == r ? void 0 : r.durationSeconds) ||
+                                N),
+                              O(o),
+                              o > 0 ? (F(!0), (se.current = !1)) : Ne());
+                          case 6:
+                            e.n = 8;
+                            break;
+                          case 7:
+                            Ne();
+                          case 8:
+                            e.n = 10;
+                            break;
+                          case 9:
+                            ((e.p = 9),
+                              (l = e.v),
+                              console.error("End call error:", l),
+                              N > 0 ? (F(!0), (se.current = !1)) : Ne());
+                          case 10:
+                            return e.a(2);
+                        }
+                    },
+                    e,
+                    null,
+                    [[2, 9]],
+                  );
+                }),
+              );
+              return function () {
+                return e.apply(this, arguments);
+              };
+            })(),
+            je = (function () {
+              var e = S(
+                w().m(function e() {
+                  var t, n, r, o, l, i;
+                  return w().w(
+                    function (e) {
+                      for (;;)
+                        switch ((e.p = e.n)) {
+                          case 0:
+                            if (null != U && U.callId && !se.current) {
+                              e.n = 1;
+                              break;
+                            }
+                            return e.a(2);
+                          case 1:
+                            return (
+                              (e.p = 1),
+                              (e.n = 2),
+                              le(U.callId).unwrap()
+                            );
+                          case 2:
+                            ((r = e.v),
+                              (o =
+                                (null == r ||
+                                null === (t = r.data) ||
+                                void 0 === t
+                                  ? void 0
+                                  : t.consultantToken) ||
+                                (null == r ? void 0 : r.consultantToken) ||
+                                U.userToken),
+                              (l =
+                                (null == r ||
+                                null === (n = r.data) ||
+                                void 0 === n ||
+                                null === (n = n.call) ||
+                                void 0 === n
+                                  ? void 0
+                                  : n.roomName) || U.roomName),
+                              B(function (e) {
+                                return x(
+                                  x({}, e),
+                                  {},
+                                  { userToken: o, status: "active" },
+                                );
+                              }),
+                              W(Date.now()),
+                              b.Ay.success("Call accepted, connecting..."),
+                              (ve.current = { roomName: l, tokenToUse: o }),
+                              (e.n = 4));
+                            break;
+                          case 3:
+                            ((e.p = 3),
+                              (i = e.v),
+                              console.error("Failed to accept call:", i),
+                              b.Ay.error("Failed to accept call"));
+                          case 4:
+                            return e.a(2);
+                        }
+                    },
+                    e,
+                    null,
+                    [[1, 3]],
+                  );
+                }),
+              );
+              return function () {
+                return e.apply(this, arguments);
+              };
+            })(),
+            Ne = function () {
+              (ce.current && (clearInterval(ce.current), (ce.current = null)),
+                ae.current && (ae.current.innerHTML = ""),
+                ie.current && (ie.current.innerHTML = ""),
+                (ve.current = null),
+                O(0),
+                G(0),
+                F(!1),
+                B(null),
+                W(null),
+                J(!1),
+                m.T.disconnect(),
+                (se.current = !1),
+                (de.current = !1),
+                (fe.current = !1),
+                h());
+            };
+          return n
+            ? ee
+              ? (0, p.jsx)("div", {
+                  className:
+                    "fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]",
+                  children: (0, p.jsxs)("div", {
+                    className:
+                      "bg-gray-900 w-full max-w-md rounded-2xl p-8 flex flex-col items-center",
+                    children: [
+                      (0, p.jsx)("div", {
+                        className:
+                          "animate-spin rounded-full h-10 w-10 border-b-2 border-green-400 mb-4",
+                      }),
+                      (0, p.jsxs)("p", {
+                        className: "text-white text-lg",
+                        children: [
+                          "Connecting video call to ",
+                          null == y ? void 0 : y.name,
+                          "...",
+                        ],
+                      }),
+                    ],
+                  }),
+                })
+              : D
+                ? (0, p.jsx)(s.A, {
+                    consultant: y,
+                    seconds: N,
+                    callId:
+                      null === (he = ue.current) || void 0 === he
+                        ? void 0
+                        : he.callId,
+                    onClose: Ne,
+                  })
+                : (0, p.jsx)("div", {
+                    className:
+                      "fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[9999] p-4",
+                    onClick: function (e) {
+                      return e.stopPropagation();
+                    },
+                    children: (0, p.jsxs)("div", {
+                      className:
+                        "relative w-full max-w-sm aspect-[3/4] max-h-[80vh] rounded-2xl overflow-hidden bg-gray-900 shadow-2xl border border-white/10",
+                      onClick: function (e) {
+                        return e.stopPropagation();
+                      },
+                      children: [
+                        (0, p.jsx)("div", {
+                          ref: ae,
+                          className:
+                            "absolute inset-0 w-full h-full bg-gray-800",
+                        }),
+                        "active" !== (null == U ? void 0 : U.status) &&
+                          (0, p.jsxs)("div", {
+                            className:
+                              "absolute inset-0 w-full h-full flex flex-col items-center justify-center z-[5]",
+                            children: [
+                              (0, p.jsx)("div", {
+                                className:
+                                  "w-24 h-24 rounded-full bg-[#D1C4E9] flex items-center justify-center text-[#5E35B1] text-3xl font-bold mb-4",
+                                children:
+                                  (null == y ||
+                                  null === (t = y.name) ||
+                                  void 0 === t
+                                    ? void 0
+                                    : t.charAt(0)) || "C",
+                              }),
+                              (0, p.jsx)("p", {
+                                className: "text-white font-semibold text-lg",
+                                children: null == y ? void 0 : y.name,
+                              }),
+                              (0, p.jsx)("p", {
+                                className:
+                                  "text-yellow-400 text-sm mt-2 animate-pulse",
+                                children:
+                                  null != U && U.isIncoming
+                                    ? "● Incoming call..."
+                                    : "● Waiting for answer...",
+                              }),
+                              (null == U ? void 0 : U.isIncoming) &&
+                                (0, p.jsxs)("div", {
+                                  className: "flex gap-4 mt-6",
+                                  children: [
+                                    (0, p.jsx)("button", {
+                                      onClick: je,
+                                      className:
+                                        "px-6 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white font-semibold",
+                                      children: "Accept",
+                                    }),
+                                    (0, p.jsx)("button", {
+                                      onClick: we,
+                                      className:
+                                        "px-6 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold",
+                                      children: "Decline",
+                                    }),
+                                  ],
+                                }),
+                            ],
+                          }),
+                        "active" === (null == U ? void 0 : U.status) &&
+                          !q &&
+                          (0, p.jsx)("div", {
+                            className:
+                              "absolute inset-0 w-full h-full flex items-center justify-center z-[5]",
+                            children: (0, p.jsxs)("div", {
+                              className: "text-center",
+                              children: [
+                                (0, p.jsx)("div", {
+                                  className:
+                                    "animate-spin rounded-full h-10 w-10 border-b-2 border-green-400 mx-auto mb-4",
+                                }),
+                                (0, p.jsx)("p", {
+                                  className: "text-white",
+                                  children: "Connecting video...",
+                                }),
+                              ],
+                            }),
+                          }),
+                        (0, p.jsx)("div", {
+                          className:
+                            "absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none z-[6]",
+                        }),
+                        "active" === (null == U ? void 0 : U.status) &&
+                          (0, p.jsxs)("div", {
+                            className:
+                              "absolute top-4 right-4 w-20 h-28 rounded-xl overflow-hidden border-2 border-white/20 shadow-lg bg-gray-700 z-20",
+                            children: [
+                              (0, p.jsx)("div", {
+                                ref: ie,
+                                className: "w-full h-full",
+                              }),
+                              E &&
+                                (0, p.jsx)("div", {
+                                  className:
+                                    "absolute inset-0 bg-gray-800 flex items-center justify-center z-[2]",
+                                  children: (0, p.jsx)(a.A, {
+                                    size: 20,
+                                    className: "text-white/60",
+                                  }),
+                                }),
+                            ],
+                          }),
+                        (0, p.jsx)("div", {
+                          className: "absolute top-4 left-4 z-20",
+                          children: (0, p.jsxs)("div", {
+                            className:
+                              "bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 border border-white/10",
+                            children: [
+                              (0, p.jsx)("div", {
+                                className: "w-2 h-2 rounded-full ".concat(
+                                  "active" === (null == U ? void 0 : U.status)
+                                    ? "bg-green-400 animate-pulse"
+                                    : "bg-yellow-400 animate-pulse",
+                                ),
+                              }),
+                              (0, p.jsx)("p", {
+                                className:
+                                  "text-xs font-bold text-white tracking-wide",
+                                children:
+                                  "active" === (null == U ? void 0 : U.status)
+                                    ? ""
+                                        .concat(
+                                          ((ye = N),
+                                          (xe = Math.floor(ye / 60)),
+                                          (ge = ye % 60),
+                                          ""
+                                            .concat(
+                                              String(xe).padStart(2, "0"),
+                                              ":",
+                                            )
+                                            .concat(
+                                              String(ge).padStart(2, "0"),
+                                            )),
+                                          " | €",
+                                        )
+                                        .concat(R.toFixed(2))
+                                    : null != U && U.isIncoming
+                                      ? "Incoming call from ".concat(
+                                          null == y ? void 0 : y.name,
+                                          "...",
+                                        )
+                                      : "Calling ".concat(
+                                          null == y ? void 0 : y.name,
+                                          "...",
+                                        ),
+                              }),
+                            ],
+                          }),
+                        }),
+                        "active" === (null == U ? void 0 : U.status) &&
+                          (0, p.jsx)("div", {
+                            className: "absolute bottom-8 left-0 right-0 z-20",
+                            children: (0, p.jsxs)("div", {
+                              className:
+                                "flex items-center justify-center gap-3 px-4",
+                              children: [
+                                (0, p.jsx)("button", {
+                                  onClick: function () {
+                                    var e = !T;
+                                    (P(e), e ? m.T.mute() : m.T.unmute());
+                                  },
+                                  className:
+                                    "w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-xl transition-all ".concat(
+                                      T
+                                        ? "bg-red-500/90 text-white"
+                                        : "bg-white/15 text-white hover:bg-white/30",
+                                    ),
+                                  children: T
+                                    ? (0, p.jsx)(o.A, { size: 18 })
+                                    : (0, p.jsx)(l.A, { size: 18 }),
+                                }),
+                                (0, p.jsx)("button", {
+                                  onClick: function () {
+                                    var e = !E;
+                                    (_(e),
+                                      e
+                                        ? m.T.disableVideo()
+                                        : m.T.enableVideo());
+                                  },
+                                  className:
+                                    "w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-xl transition-all ".concat(
+                                      E
+                                        ? "bg-red-500/90 text-white"
+                                        : "bg-white/15 text-white hover:bg-white/30",
+                                    ),
+                                  children: E
+                                    ? (0, p.jsx)(a.A, { size: 18 })
+                                    : (0, p.jsx)(c.A, { size: 18 }),
+                                }),
+                                (0, p.jsx)("button", {
+                                  className:
+                                    "w-11 h-11 rounded-full bg-white/15 text-white hover:bg-white/30 flex items-center justify-center backdrop-blur-xl transition-all",
+                                  children: (0, p.jsx)(u.A, { size: 18 }),
+                                }),
+                                (0, p.jsx)("button", {
+                                  onClick: we,
+                                  disabled: re,
+                                  className:
+                                    "w-13 h-13 bg-red-500 hover:bg-red-600 disabled:opacity-50 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:scale-105",
+                                  children: (0, p.jsx)(i.A, {
+                                    size: 22,
+                                    fill: "currentColor",
+                                  }),
+                                }),
+                              ],
+                            }),
+                          }),
+                        (0, p.jsx)("div", {
+                          className:
+                            "absolute bottom-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-white/20 rounded-full",
+                        }),
+                      ],
+                    }),
+                  })
+            : null;
+        });
+      I.displayName = "VideoCallModal";
+      const T = I;
+    },
+    77632(e, t, n) {
+      n.d(t, { Cx: () => l, D1: () => o, e8: () => r });
+      var r = function () {
+          var e =
+            arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : "";
+          switch (null == e ? void 0 : e.toUpperCase()) {
+            case "ONLINE":
+              return "Available Now";
+            case "BUSY":
+              return "Busy";
+            default:
+              return "Offline";
+          }
+        },
+        o = function (e) {
+          switch (e) {
+            case "Available Now":
+              return "bg-green-500/90";
+            case "Busy":
+              return "bg-yellow-500/90";
+            default:
+              return "bg-gray-400/80";
+          }
+        },
+        l = function (e) {
+          switch (e) {
+            case "Online":
+              return "bg-[#05BC27] text-white";
+            case "Busy":
+              return "bg-green-500/60 text-white";
+            default:
+              return "bg-gray-100 text-gray-500";
+          }
+        };
+    },
+  },
+]);

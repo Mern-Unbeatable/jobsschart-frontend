@@ -16,7 +16,8 @@ import toast from "react-hot-toast";
 const DonationFormSection = memo(({ formData, setFormData }) => {
   const { t } = useTranslation();
   const fileInputRef = useRef(null);
-  const [createCheckout, { isLoading: isCheckingOut }] = useCreateCheckoutMutation();
+  const [createCheckout, { isLoading: isCheckingOut }] =
+    useCreateCheckoutMutation();
 
   const isBusiness = formData.donorType === "business";
 
@@ -33,7 +34,12 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.phone || !formData.amount) {
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.amount
+    ) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -49,7 +55,12 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
       data.append("donationData[benefit]", formData.benefit);
 
       if (formData.donorType === "business") {
-        data.append("donationData[businessType]", formData.businessType === "online" ? "ONLINE_BUSINESS" : "LOCAL_BUSINESS");
+        data.append(
+          "donationData[businessType]",
+          formData.businessType === "online"
+            ? "ONLINE_BUSINESS"
+            : "LOCAL_BUSINESS",
+        );
         data.append("donationData[businessName]", formData.businessName);
         data.append("donationData[description]", formData.description);
         if (formData.businessType === "online") {
@@ -70,7 +81,9 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
       }
     } catch (err) {
       toast.error(
-        err?.data?.message || err?.message || "Payment failed. Please try again."
+        err?.data?.message ||
+          err?.message ||
+          "Payment failed. Please try again.",
       );
     }
   };
@@ -231,7 +244,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   }
                   className={`flex-1 py-6 rounded-lg border-2 flex flex-col items-center gap-2 transition-all ${
                     formData.donorType === "business"
-                      ? "border-[#E2AB0B] bg-[#FCF7E7]"
+                      ? "border-green-500/60 bg-[#FCF7E7]"
                       : "border-gray-100 bg-white"
                   }`}
                 >
@@ -349,11 +362,17 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                           : t("donationForm.fields.location.placeholder")
                       }
                       className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded text-sm focus:outline-none"
-                      value={formData.businessType === "online" ? formData.websiteUrl : formData.location}
+                      value={
+                        formData.businessType === "online"
+                          ? formData.websiteUrl
+                          : formData.location
+                      }
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          [formData.businessType === "online" ? "websiteUrl" : "location"]: e.target.value,
+                          [formData.businessType === "online"
+                            ? "websiteUrl"
+                            : "location"]: e.target.value,
                         })
                       }
                     />
@@ -431,7 +450,9 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                 disabled={isCheckingOut}
                 className="bg-[#EAB308] hover:bg-[#d99a00] text-white text-sm font-bold py-3 px-8 rounded transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                {isCheckingOut && <Loader2 className="animate-spin h-5 w-5 text-white" />}
+                {isCheckingOut && (
+                  <Loader2 className="animate-spin h-5 w-5 text-white" />
+                )}
                 {isCheckingOut
                   ? "Processing..."
                   : t("donationForm.button", {

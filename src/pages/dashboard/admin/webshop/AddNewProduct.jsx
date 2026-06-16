@@ -218,7 +218,8 @@ const AdminAddNewProduct = () => {
         // productCategory is only accepted by POST (create), NOT by PATCH (update)
         if (mode !== "edit") {
           const mappedCategory = CATEGORY_MAP[form.category] || form.category;
-          if (mappedCategory) formData.append("productCategory", mappedCategory);
+          if (mappedCategory)
+            formData.append("productCategory", mappedCategory);
         }
 
         // Gallery handling:
@@ -244,7 +245,6 @@ const AdminAddNewProduct = () => {
           });
         }
 
-
         if (mode === "edit") {
           await updateProduct({
             id: sourceProduct.id,
@@ -259,7 +259,10 @@ const AdminAddNewProduct = () => {
         navigate(ROUTES.ADMIN_WEBSHOP);
       } catch (err) {
         toast.error(
-          err?.data?.message || err?.data?.error || err?.message || "Failed to save product.",
+          err?.data?.message ||
+            err?.data?.error ||
+            err?.message ||
+            "Failed to save product.",
         );
       }
     },
@@ -286,7 +289,7 @@ const AdminAddNewProduct = () => {
         <button
           type="button"
           onClick={() => navigate(ROUTES.ADMIN_WEBSHOP)}
-          className="inline-flex items-center gap-2 text-sm font-medium text-[#E2AB0B] w-fit hover:opacity-80 transition-opacity cursor-pointer"
+          className="inline-flex items-center gap-2 text-sm font-medium text-green-500/60 w-fit hover:opacity-80 transition-opacity cursor-pointer"
         >
           <ArrowLeft size={16} />
           Back
@@ -308,7 +311,7 @@ const AdminAddNewProduct = () => {
               value={form.title}
               onChange={(e) => handleChange("title", e.target.value)}
               placeholder="Enter product title"
-              className="h-12 rounded-lg border border-black/40 px-4 text-sm text-[#333] placeholder:text-[#8A8A8A] focus:outline-none focus:ring-2 focus:ring-[#E2AB0B]/30"
+              className="h-12 rounded-lg border border-black/40 px-4 text-sm text-[#333] placeholder:text-[#8A8A8A] focus:outline-none focus:ring-2 focus:ring-green-500/60/30"
             />
           </label>
 
@@ -320,7 +323,7 @@ const AdminAddNewProduct = () => {
               <select
                 value={form.category}
                 onChange={(e) => handleChange("category", e.target.value)}
-                className="h-12 w-full rounded-lg border border-black/40 px-4 pr-10 text-sm text-[#333] focus:outline-none focus:ring-2 focus:ring-[#E2AB0B]/30 appearance-none bg-white"
+                className="h-12 w-full rounded-lg border border-black/40 px-4 pr-10 text-sm text-[#333] focus:outline-none focus:ring-2 focus:ring-green-500/60/30 appearance-none bg-white"
               >
                 <option value="">Select product category</option>
                 {CATEGORY_OPTIONS.map((option) => (
@@ -343,7 +346,7 @@ const AdminAddNewProduct = () => {
               value={form.price}
               onChange={(e) => handleChange("price", e.target.value)}
               placeholder="18.00"
-              className="h-12 rounded-lg border border-black/40 px-4 text-sm text-[#333] placeholder:text-[#989DA1] focus:outline-none focus:ring-2 focus:ring-[#E2AB0B]/30"
+              className="h-12 rounded-lg border border-black/40 px-4 text-sm text-[#333] placeholder:text-[#989DA1] focus:outline-none focus:ring-2 focus:ring-green-500/60/30"
             />
           </label>
 
@@ -354,7 +357,7 @@ const AdminAddNewProduct = () => {
               value={form.stock}
               onChange={(e) => handleChange("stock", e.target.value)}
               placeholder="25"
-              className="h-12 rounded-lg border border-black/40 px-4 text-sm text-[#333] placeholder:text-[#989DA1] focus:outline-none focus:ring-2 focus:ring-[#E2AB0B]/30"
+              className="h-12 rounded-lg border border-black/40 px-4 text-sm text-[#333] placeholder:text-[#989DA1] focus:outline-none focus:ring-2 focus:ring-green-500/60/30"
             />
           </label>
         </div>
@@ -368,7 +371,7 @@ const AdminAddNewProduct = () => {
             value={form.description}
             onChange={(e) => handleChange("description", e.target.value)}
             placeholder="Write detailed product description"
-            className="min-h-40 rounded-lg border border-[#8A8A8A] px-4 py-3 text-sm text-[#333] placeholder:text-[#8A8A8A] focus:outline-none focus:ring-2 focus:ring-[#E2AB0B]/30 resize-y"
+            className="min-h-40 rounded-lg border border-[#8A8A8A] px-4 py-3 text-sm text-[#333] placeholder:text-[#8A8A8A] focus:outline-none focus:ring-2 focus:ring-green-500/60/30 resize-y"
           />
         </label>
 
@@ -381,7 +384,7 @@ const AdminAddNewProduct = () => {
             value={form.features}
             onChange={(e) => handleChange("features", e.target.value)}
             placeholder="Enter product features..."
-            className="min-h-40 rounded-lg border border-[#8A8A8A] px-4 py-3 text-sm text-[#333] placeholder:text-[#8A8A8A] focus:outline-none focus:ring-2 focus:ring-[#E2AB0B]/30 resize-y"
+            className="min-h-40 rounded-lg border border-[#8A8A8A] px-4 py-3 text-sm text-[#333] placeholder:text-[#8A8A8A] focus:outline-none focus:ring-2 focus:ring-green-500/60/30 resize-y"
           />
         </label>
 
@@ -394,7 +397,7 @@ const AdminAddNewProduct = () => {
             value={form.inside}
             onChange={(e) => handleChange("inside", e.target.value)}
             placeholder="List what's included in the package"
-            className="min-h-40 rounded-lg border border-[#8A8A8A] px-4 py-3 text-sm text-[#333] placeholder:text-[#8A8A8A] focus:outline-none focus:ring-2 focus:ring-[#E2AB0B]/30 resize-y"
+            className="min-h-40 rounded-lg border border-[#8A8A8A] px-4 py-3 text-sm text-[#333] placeholder:text-[#8A8A8A] focus:outline-none focus:ring-2 focus:ring-green-500/60/30 resize-y"
           />
         </label>
 
@@ -407,7 +410,7 @@ const AdminAddNewProduct = () => {
             value={form.benefits}
             onChange={(e) => handleChange("benefits", e.target.value)}
             placeholder="Enter product benefits"
-            className="min-h-40 rounded-lg border border-[#8A8A8A] px-4 py-3 text-sm text-[#333] placeholder:text-[#8A8A8A] focus:outline-none focus:ring-2 focus:ring-[#E2AB0B]/30 resize-y"
+            className="min-h-40 rounded-lg border border-[#8A8A8A] px-4 py-3 text-sm text-[#333] placeholder:text-[#8A8A8A] focus:outline-none focus:ring-2 focus:ring-green-500/60/30 resize-y"
           />
         </label>
 
@@ -435,7 +438,7 @@ const AdminAddNewProduct = () => {
                 (e.key === "Enter" || e.key === " ") &&
                 fileInputRef.current?.click()
               }
-              className="min-h-72 rounded-lg border-2 border-dashed border-black/40 flex flex-col items-center justify-center px-4 py-8 cursor-pointer hover:border-[#E2AB0B] transition-colors select-none"
+              className="min-h-72 rounded-lg border-2 border-dashed border-black/40 flex flex-col items-center justify-center px-4 py-8 cursor-pointer hover:border-green-500/60 transition-colors select-none"
             >
               <ImagePlus size={34} className="text-[#94A3B8]" />
               <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm font-medium text-[#94A3B8]">
@@ -499,7 +502,7 @@ const AdminAddNewProduct = () => {
                       (e.key === "Enter" || e.key === " ") &&
                       fileInputRef.current?.click()
                     }
-                    className="w-44 h-28 rounded-xl border-2 border-dashed border-black/25 flex flex-col items-center justify-center gap-1.5 text-[#94A3B8] hover:border-[#E2AB0B] hover:text-[#E2AB0B] transition-colors cursor-pointer"
+                    className="w-44 h-28 rounded-xl border-2 border-dashed border-black/25 flex flex-col items-center justify-center gap-1.5 text-[#94A3B8] hover:border-green-500/60 hover:text-green-500/60 transition-colors cursor-pointer"
                   >
                     <ImagePlus size={22} />
                     <span className="text-xs font-medium">Add more</span>
@@ -521,7 +524,7 @@ const AdminAddNewProduct = () => {
             onMouseLeave={() =>
               gsap.to(saveBtnRef.current, { scale: 1, duration: 0.12 })
             }
-            className="bg-[#E2AB0B] text-white px-6 py-2.5 rounded text-base font-normal hover:bg-[#c99809] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-green-500/60 text-white px-6 py-2.5 rounded text-base font-normal hover:bg-[#c99809] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? "Saving..." : mode === "edit" ? "Update" : "Save"}
           </button>

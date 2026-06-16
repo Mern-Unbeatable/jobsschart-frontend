@@ -53,7 +53,7 @@ const CtaContact = () => (
 
               <button
                 type="submit"
-                className="mt-6 w-full rounded-md bg-[#E2AB0B] px-4 py-3 text-sm font-semibold text-white hover:bg-[#e5a834] transition-colors"
+                className="mt-6 w-full rounded-md bg-green-500/60 px-4 py-3 text-sm font-semibold text-white hover:bg-[#e5a834] transition-colors"
               >
                 Send Message
               </button>

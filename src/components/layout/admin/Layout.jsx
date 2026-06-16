@@ -78,15 +78,17 @@ const Layout = () => {
             <p className="text-base capitalize text-[#6b7280]">{userRole}</p>
           </div> */}
 
-            <div className='flex items-center gap-3'>
-              <div className='flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#E2AB0B] bg-purple-100'>
-                <User size={24} className='text-[#6E35AE]' />
-              </div>
-              <div className='text-left'>
-                <p className='text-base font-semibold text-[#0f172a]'>{userName}</p>
-                <p className='text-base capitalize text-[#6b7280]'>{userRole}</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-green-500/60 bg-purple-100">
+              <User size={24} className="text-[#6E35AE]" />
             </div>
+            <div className="text-left">
+              <p className="text-base font-semibold text-[#0f172a]">
+                {userName}
+              </p>
+              <p className="text-base capitalize text-[#6b7280]">{userRole}</p>
+            </div>
+          </div>
         </header>
 
         <header className="lg:hidden shrink-0 border-b border-gray-100 bg-white px-4 shadow-sm">

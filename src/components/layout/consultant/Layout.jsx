@@ -26,10 +26,10 @@ const Layout = () => {
       setActiveCall(event.detail);
     };
 
-    window.addEventListener('open-call-window', handleOpenCall);
+    window.addEventListener("open-call-window", handleOpenCall);
 
     return () => {
-      window.removeEventListener('open-call-window', handleOpenCall);
+      window.removeEventListener("open-call-window", handleOpenCall);
     };
   }, []);
 
@@ -66,22 +66,18 @@ const Layout = () => {
       {/* Incoming Call Notification */}
       <IncomingCallNotification />
 
-
-
       {/* Active Call Room - Only render when activeCall exists */}
       {activeCall && (
-        <CallRoom
-          callData={activeCall}
-          onClose={() => setActiveCall(null)}
-        />
+        <CallRoom callData={activeCall} onClose={() => setActiveCall(null)} />
       )}
 
       {/* Overlay */}
       <div
-        className={`fixed inset-0 z-20 bg-black/40 backdrop-blur-sm lg:hidden transition-opacity duration-300 ${sidebarOpen
-          ? "opacity-100 pointer-events-auto"
-          : "opacity-0 pointer-events-none"
-          }`}
+        className={`fixed inset-0 z-20 bg-black/40 backdrop-blur-sm lg:hidden transition-opacity duration-300 ${
+          sidebarOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
         onClick={() => setSidebarOpen(false)}
         aria-hidden="true"
       />
@@ -112,7 +108,7 @@ const Layout = () => {
           <div className="h-10 w-10" aria-hidden="true" />
 
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#E2AB0B] bg-purple-100">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-green-500/60 bg-purple-100">
               <User size={24} className="text-[#6E35AE]" />
             </div>
             <div className="text-left">
@@ -153,13 +149,15 @@ const Layout = () => {
         </header>
 
         <div
-          className={`flex-1 min-h-0 ${isChatPage ? "overflow-hidden" : "overflow-y-auto"
-            }`}
+          className={`flex-1 min-h-0 ${
+            isChatPage ? "overflow-hidden" : "overflow-y-auto"
+          }`}
           data-lenis-prevent
         >
           <div
-            className={`w-full px-6 py-4 sm:px-6 sm:py-6 lg:px-10 lg:py-8 ${isChatPage ? "h-full min-h-0" : ""
-              }`}
+            className={`w-full px-6 py-4 sm:px-6 sm:py-6 lg:px-10 lg:py-8 ${
+              isChatPage ? "h-full min-h-0" : ""
+            }`}
           >
             <Outlet />
           </div>

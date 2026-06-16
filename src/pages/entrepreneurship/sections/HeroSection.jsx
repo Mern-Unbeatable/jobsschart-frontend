@@ -37,7 +37,7 @@ const HeroSection = memo(() => {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               to={ROUTES.CONSULTANTS}
-              className="rounded bg-[#E2AB0B] px-8 py-3 text-sm font-medium text-white shadow-lg transition-transform hover:-translate-y-0.5"
+              className="rounded bg-green-500/60 px-8 py-3 text-sm font-medium text-white shadow-lg transition-transform hover:-translate-y-0.5"
             >
               {t("entrepreneurshipPage.primaryCta")}
             </Link>

@@ -13,7 +13,7 @@ const TabBar = memo(({ TABS, activeTab, onTabChange }) => {
           onClick={() => onTabChange(tab)}
           className={`flex-1 sm:flex-none px-5 py-1.5 rounded-md text-base font-medium transition-colors ${
             activeTab === tab
-              ? 'bg-[#E2AB0B] text-white'
+              ? 'bg-green-500/60 text-white'
               : 'text-[#545454] hover:bg-gray-100'
           }`}
         >

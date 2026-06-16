@@ -176,7 +176,7 @@
 //                 <div className='grid grid-cols-3 gap-3'>
 //                     {[
 //                         { type: 'CHAT', label: 'Chat', Icon: MessageSquare, color: 'bg-[#333333]' },
-//                         { type: 'AUDIO', label: 'Audio', Icon: Phone, color: 'bg-[#E2AB0B]' },
+//                         { type: 'AUDIO', label: 'Audio', Icon: Phone, color: 'bg-green-500/60' },
 //                         { type: 'VIDEO', label: 'Video', Icon: Video, color: 'bg-[#6E35AE]' },
 //                     ].map(({ type, label, Icon, color }) => (
 //                         <button
@@ -849,7 +849,7 @@
 //                 <button
 //                     onClick={() => setShowStartModal(true)}
 //                     title='Start Audio session'
-//                     className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#E2AB0B] hover:bg-[#d99a00] text-white text-xs font-semibold transition-colors'
+//                     className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/60 hover:bg-[#d99a00] text-white text-xs font-semibold transition-colors'
 //                 >
 //                     <Phone size={13} /> Call
 //                 </button>

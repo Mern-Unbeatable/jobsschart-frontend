@@ -71,7 +71,7 @@ function ActionsDropdown({ anchorEl, onClose, onSeeDetails, onStatusChange, curr
       <button
         type='button'
         onClick={onSeeDetails}
-        className='w-full text-left px-4 py-2.5 text-sm font-semibold text-white bg-[#E2AB0B] hover:bg-[#c99508] transition-colors'
+        className='w-full text-left px-4 py-2.5 text-sm font-semibold text-white bg-green-500/60 transition-colors'
       >
         See Details
       </button>

@@ -1,10 +1,10 @@
-import React, { memo, useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useSEO } from '../../hooks/useSEO';
-import { useCreateCheckoutMutation } from '../../features/api/paymentApi';
-import toast from 'react-hot-toast';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../../features/slices/authSlice';
+import React, { memo, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useSEO } from "../../hooks/useSEO";
+import { useCreateCheckoutMutation } from "../../features/api/paymentApi";
+import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../features/slices/authSlice";
 
 const Checkout = memo(() => {
   const navigate = useNavigate();
@@ -13,33 +13,34 @@ const Checkout = memo(() => {
   const user = useSelector(selectUser);
 
   const [formData, setFormData] = useState({
-    fullName: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    address: '',
-    city: '',
-    postalCode: '',
-    country: 'Switzerland',
+    fullName: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    address: "",
+    city: "",
+    postalCode: "",
+    country: "Switzerland",
   });
 
   useEffect(() => {
     if (user) {
       setFormData((prev) => ({
         ...prev,
-        fullName: prev.fullName || user.name || '',
-        email: prev.email || user.email || '',
-        phone: prev.phone || user.phone || '',
+        fullName: prev.fullName || user.name || "",
+        email: prev.email || user.email || "",
+        phone: prev.phone || user.phone || "",
       }));
     }
   }, [user]);
 
   useSEO({
-    title: 'Checkout',
-    description: 'Complete your purchase',
-    keywords: ['checkout', 'purchase', 'order'],
+    title: "Checkout",
+    description: "Complete your purchase",
+    keywords: ["checkout", "purchase", "order"],
   });
 
-  const [createCheckout, { isLoading: isCheckingOut }] = useCreateCheckoutMutation();
+  const [createCheckout, { isLoading: isCheckingOut }] =
+    useCreateCheckoutMutation();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,13 +60,13 @@ const Checkout = memo(() => {
       !formData.city ||
       !formData.postalCode
     ) {
-      toast.error('Please fill in all required fields.');
+      toast.error("Please fill in all required fields.");
       return;
     }
 
     try {
       const payload = {
-        type: 'WEBSHOP',
+        type: "WEBSHOP",
         cartItems: [
           {
             productId: product.id,
@@ -86,23 +87,25 @@ const Checkout = memo(() => {
       if (result?.url) {
         window.location.href = result.url;
       } else {
-        toast.error('Could not initiate payment. Please try again.');
+        toast.error("Could not initiate payment. Please try again.");
       }
     } catch (err) {
       toast.error(
-        err?.data?.message || err?.message || 'Payment failed. Please try again.'
+        err?.data?.message ||
+          err?.message ||
+          "Payment failed. Please try again.",
       );
     }
   };
 
   if (!product) {
     return (
-      <div className='min-h-screen bg-[#FBFDFF] flex items-center justify-center'>
-        <div className='text-center'>
-          <h1 className='text-3xl font-bold mb-4'>No product selected</h1>
+      <div className="min-h-screen bg-[#FBFDFF] flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-4">No product selected</h1>
           <button
-            onClick={() => navigate('/webshop')}
-            className='bg-[#E2AB0B] text-white px-6 py-2 rounded-lg'
+            onClick={() => navigate("/webshop")}
+            className="bg-green-500/60 text-white px-6 py-2 rounded-lg"
           >
             Back to Webshop
           </button>
@@ -111,193 +114,219 @@ const Checkout = memo(() => {
     );
   }
 
-  const productImage = product.gallery?.[0] || product.image || '';
+  const productImage = product.gallery?.[0] || product.image || "";
 
   return (
-    <div className='min-h-screen bg-[#FBFDFF] pt-8 md:pt-12 pb-14'>
-      <div className='container mx-auto px-4 lg:px-6'>
-
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-12'>
+    <div className="min-h-screen bg-[#FBFDFF] pt-8 md:pt-12 pb-14">
+      <div className="container mx-auto px-4 lg:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left: Customer Information */}
-          <div className='lg:col-span-2'>
-            <h2 className='text-2xl md:text-3xl font-bold text-gray-800 mb-4'>
+          <div className="lg:col-span-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
               Customer Information
             </h2>
 
-            <div className='space-y-6'>
+            <div className="space-y-6">
               {/* Full Name */}
               <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>
-                  Full Name <span className='text-red-500'>*</span>
+                <label className="block text-base font-semibold text-gray-700 mb-2">
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type='text'
-                  name='fullName'
+                  type="text"
+                  name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
-                  placeholder='Enter your full name...'
-                  className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
+                  placeholder="Enter your full name..."
+                  className="w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-green-500/60"
                 />
               </div>
 
               {/* Email Address */}
               <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>
-                  Email Address <span className='text-red-500'>*</span>
+                <label className="block text-base font-semibold text-gray-700 mb-2">
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type='email'
-                  name='email'
+                  type="email"
+                  name="email"
                   value={formData.email}
                   onChange={handleChange}
                   disabled
-                  placeholder='name@example.com'
-                  className='w-full px-4 py-3 border border-[#00000033] bg-gray-100 cursor-not-allowed rounded-lg focus:outline-none'
+                  placeholder="name@example.com"
+                  className="w-full px-4 py-3 border border-[#00000033] bg-gray-100 cursor-not-allowed rounded-lg focus:outline-none"
                 />
               </div>
 
               {/* Phone Number */}
               <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>
-                  Phone Number <span className='text-red-500'>*</span>
+                <label className="block text-base font-semibold text-gray-700 mb-2">
+                  Phone Number <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type='tel'
-                  name='phone'
+                  type="tel"
+                  name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder='Enter your phone number...'
-                  className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
+                  placeholder="Enter your phone number..."
+                  className="w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-green-500/60"
                 />
               </div>
 
               {/* Detailed Address */}
               <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>
-                  Street Address <span className='text-red-500'>*</span>
+                <label className="block text-base font-semibold text-gray-700 mb-2">
+                  Street Address <span className="text-red-500">*</span>
                 </label>
                 <textarea
-                  name='address'
+                  name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder='Street name, House no. Apartment...'
-                  rows='3'
-                  className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
+                  placeholder="Street name, House no. Apartment..."
+                  rows="3"
+                  className="w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-green-500/60"
                 />
               </div>
 
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* City */}
                 <div>
-                  <label className='block text-base font-semibold text-gray-700 mb-2'>
-                    City <span className='text-red-500'>*</span>
+                  <label className="block text-base font-semibold text-gray-700 mb-2">
+                    City <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type='text'
-                    name='city'
+                    type="text"
+                    name="city"
                     value={formData.city}
                     onChange={handleChange}
-                    placeholder='Zurich'
-                    className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
+                    placeholder="Zurich"
+                    className="w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-green-500/60"
                   />
                 </div>
 
                 {/* Postal Code */}
                 <div>
-                  <label className='block text-base font-semibold text-gray-700 mb-2'>
-                    Postal Code <span className='text-red-500'>*</span>
+                  <label className="block text-base font-semibold text-gray-700 mb-2">
+                    Postal Code <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type='text'
-                    name='postalCode'
+                    type="text"
+                    name="postalCode"
                     value={formData.postalCode}
                     onChange={handleChange}
-                    placeholder='8001'
-                    className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
+                    placeholder="8001"
+                    className="w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-green-500/60"
                   />
                 </div>
               </div>
 
               {/* Country */}
               <div>
-                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                <label className="block text-base font-semibold text-gray-700 mb-2">
                   Country
                 </label>
                 <input
-                  type='text'
-                  name='country'
+                  type="text"
+                  name="country"
                   value={formData.country}
                   onChange={handleChange}
-                  placeholder='Switzerland'
-                  className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
+                  placeholder="Switzerland"
+                  className="w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-green-500/60"
                 />
               </div>
             </div>
           </div>
 
           {/* Right: Order Summary */}
-          <div className='lg:col-span-1'>
-            <div className='bg-green-50 rounded-lg p-4 md:p-6 sticky top-34'>
-              <h2 className='text-2xl font-bold text-gray-800 mb-4'>Order Summary</h2>
+          <div className="lg:col-span-1">
+            <div className="bg-green-50 rounded-lg p-4 md:p-6 sticky top-34">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Order Summary
+              </h2>
 
               {/* Product preview */}
-              <div className='flex items-center gap-3 mb-4 pb-4 border-b border-green-400'>
+              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-green-400">
                 {productImage && (
                   <img
                     src={productImage}
                     alt={product.name}
-                    className='w-16 h-16 rounded-lg object-cover border border-gray-200 shrink-0'
+                    className="w-16 h-16 rounded-lg object-cover border border-gray-200 shrink-0"
                   />
                 )}
-                <div className='flex-1 min-w-0'>
-                  <p className='text-sm font-semibold text-gray-800 truncate'>{product.name}</p>
-                  <p className='text-xs text-gray-500'>Qty: {quantity}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-800 truncate">
+                    {product.name}
+                  </p>
+                  <p className="text-xs text-gray-500">Qty: {quantity}</p>
                 </div>
-                <span className='text-sm font-bold text-gray-900'>
+                <span className="text-sm font-bold text-gray-900">
                   €{(parseFloat(product.price || 0) * quantity).toFixed(2)}
                 </span>
               </div>
 
-              <div className='space-y-4 mb-6 border-b border-green-400 pb-4'>
+              <div className="space-y-4 mb-6 border-b border-green-400 pb-4">
                 {/* Subtotal */}
-                <div className='flex justify-between items-center'>
-                  <span className='text-gray-600'>Subtotal ({quantity} items)</span>
-                  <span className='font-semibold text-gray-900'>€{subtotal.toFixed(2)}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">
+                    Subtotal ({quantity} items)
+                  </span>
+                  <span className="font-semibold text-gray-900">
+                    €{subtotal.toFixed(2)}
+                  </span>
                 </div>
 
                 {/* Delivery Fee */}
-                <div className='flex justify-between items-center'>
-                  <span className='text-gray-600'>Delivery Fee</span>
-                  <span className='font-semibold text-gray-900'>€{deliveryFee.toFixed(2)}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Delivery Fee</span>
+                  <span className="font-semibold text-gray-900">
+                    €{deliveryFee.toFixed(2)}
+                  </span>
                 </div>
               </div>
 
               {/* Total */}
-              <div className='flex justify-between items-center mb-6'>
-                <span className='text-lg font-bold text-gray-800'>Total</span>
-                <span className='text-2xl font-bold text-gray-900'>€{total.toFixed(2)}</span>
+              <div className="flex justify-between items-center mb-6">
+                <span className="text-lg font-bold text-gray-800">Total</span>
+                <span className="text-2xl font-bold text-gray-900">
+                  €{total.toFixed(2)}
+                </span>
               </div>
 
               {/* Confirm Purchase → Stripe Redirect */}
               <button
                 onClick={handleConfirmPurchase}
                 disabled={isCheckingOut}
-                className='w-full bg-green-500/60 text-white font-bold py-3 rounded-lg transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed'
+                className="w-full bg-green-500/60 text-white font-bold py-3 rounded-lg transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isCheckingOut ? (
-                  <span className='flex items-center justify-center gap-2'>
-                    <svg className='animate-spin h-5 w-5' viewBox='0 0 24 24' fill='none'>
-                      <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
-                      <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v8z' />
+                  <span className="flex items-center justify-center gap-2">
+                    <svg
+                      className="animate-spin h-5 w-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      />
                     </svg>
                     Redirecting to Payment...
                   </span>
                 ) : (
-                  'Confirm & Pay'
+                  "Confirm & Pay"
                 )}
               </button>
 
-              <p className='text-sm text-gray-400 text-center mt-3'>
+              <p className="text-sm text-gray-400 text-center mt-3">
                 You will be redirected to Stripe for secure payment.
               </p>
             </div>
@@ -305,14 +334,14 @@ const Checkout = memo(() => {
         </div>
 
         {/* Ads Placeholder */}
-        <div className='w-full mt-24 bg-gray-50 rounded-2xl py-20 flex items-center justify-center border border-gray-200'>
-          <span className='text-gray-400 font-bold text-2xl'>Ads</span>
+        <div className="w-full mt-24 bg-gray-50 rounded-2xl py-20 flex items-center justify-center border border-gray-200">
+          <span className="text-gray-400 font-bold text-2xl">Ads</span>
         </div>
       </div>
     </div>
   );
 });
 
-Checkout.displayName = 'Checkout';
+Checkout.displayName = "Checkout";
 
 export default Checkout;
