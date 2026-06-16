@@ -1,23 +1,37 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSEO } from '../../hooks/useSEO';
 import { useCreateCheckoutMutation } from '../../features/api/paymentApi';
 import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../features/slices/authSlice';
 
 const Checkout = memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
   const { product, quantity } = location.state || {};
+  const user = useSelector(selectUser);
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
+    fullName: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
     address: '',
     city: '',
     postalCode: '',
     country: 'Switzerland',
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        fullName: prev.fullName || user.name || '',
+        email: prev.email || user.email || '',
+        phone: prev.phone || user.phone || '',
+      }));
+    }
+  }, [user]);
 
   useSEO({
     title: 'Checkout',
@@ -136,8 +150,9 @@ const Checkout = memo(() => {
                   name='email'
                   value={formData.email}
                   onChange={handleChange}
+                  disabled
                   placeholder='name@example.com'
-                  className='w-full px-4 py-3 border border-[#00000033] bg-white rounded-lg focus:outline-none focus:border-[#E2AB0B]'
+                  className='w-full px-4 py-3 border border-[#00000033] bg-gray-100 cursor-not-allowed rounded-lg focus:outline-none'
                 />
               </div>
 
