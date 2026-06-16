@@ -19,6 +19,14 @@ export const donationApi = baseApi.injectEndpoints({
       providesTags: ['Donation'],
       transformResponse: (response) => response.data,
     }),
+    getDonationById: builder.query({
+      query: (id) => ({
+        url: `/donations/${id}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, id) => [{ type: 'Donation', id }],
+      transformResponse: (response) => response.data,
+    }),
     deleteDonation: builder.mutation({
       query: (id) => ({
         url: `/donations/${id}`,
@@ -33,5 +41,6 @@ export const donationApi = baseApi.injectEndpoints({
 export const {
   useGetDonationsQuery,
   useGetDonationStatsQuery,
+  useGetDonationByIdQuery,
   useDeleteDonationMutation,
 } = donationApi;

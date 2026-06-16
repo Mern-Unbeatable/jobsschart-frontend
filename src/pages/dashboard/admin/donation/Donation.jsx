@@ -178,7 +178,7 @@ const AdminDonation = () => {
         />
       </DonationTable>
       {detailDonor && (
-        <DonationDetailModal donor={detailDonor} onClose={handleCloseDetail} />
+        <DonationDetailModal donorId={detailDonor.id} onClose={handleCloseDetail} />
       )}
     </div>
   );
