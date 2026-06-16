@@ -26,7 +26,7 @@ const Pagination = memo(({ page, totalResults, pageSize, totalPages, onPageChang
   return (
     <div className="flex flex-col sm:flex-row items-center sm:items-center justify-center sm:justify-between px-5 py-4 gap-3 border-t border-gray-100">
       <p className="text-base text-green-500/60">
-        Showing {startResult}–{endResult} of {totalResults} results
+        Showing {startResult} to {endResult} of {totalResults} results
       </p>
       <div className="flex items-center gap-2">
         <PagBtn onClick={() => onPageChange(page - 1)} disabled={page === 1}>

@@ -6,7 +6,7 @@ const ACTION_MENU_WIDTH = 160;
 const ACTION_MENU_HEIGHT = 120;
 const VIEWPORT_GAP = 12;
 
-function ActionsDropdown({ anchorEl, onStatusChange, onDelete }) {
+function ActionsDropdown({ anchorEl, currentStatus, onStatusChange, onDelete }) {
   const menuRef = useRef(null);
   const [pos, setPos] = useState({ top: 0, left: 0 });
 
@@ -59,15 +59,17 @@ function ActionsDropdown({ anchorEl, onStatusChange, onDelete }) {
       <div className="px-4 pt-2 pb-1 text-xs font-bold text-gray-400 uppercase tracking-widest">
         Status
       </div>
-      {["Active", "Suspended"].map((s) => (
-        <button
-          key={s}
-          onClick={() => onStatusChange(s)}
-          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          {s}
-        </button>
-      ))}
+      {["Active", "Suspended"]
+        .filter((s) => s !== currentStatus)
+        .map((s) => (
+          <button
+            key={s}
+            onClick={() => onStatusChange(s)}
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            {s}
+          </button>
+        ))}
       {/* <div className="border-t border-gray-100">
         <button
           onClick={onDelete}

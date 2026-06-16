@@ -88,6 +88,7 @@ const UsersTable = memo(({
                     {openMenuId === u.id && (
                       <ActionsDropdown
                         anchorEl={btnRefs.current[u.id]}
+                        currentStatus={u.status}
                         onStatusChange={(s) => handleStatusChange(u.id, s)}
                         onDelete={() => {
                           setDeleteTarget({ id: u.id, name: u.name });
@@ -142,6 +143,7 @@ const UsersTable = memo(({
                 {openMenuId === `m-${u.id}` && (
                   <ActionsDropdown
                     anchorEl={btnRefs.current[`m-${u.id}`]}
+                    currentStatus={u.status}
                     onStatusChange={(s) => handleStatusChange(u.id, s)}
                     onDelete={() => {
                       setDeleteTarget({ id: u.id, name: u.name });

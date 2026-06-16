@@ -4,6 +4,7 @@ import UsersTable from "./components/UsersTable";
 import Pagination from "./components/Pagination";
 import DeleteModal from "./components/DeleteModal";
 import { useGetAllUsersQuery, useUpdateUserStatusMutation, useDeleteUserMutation } from "../../../../features/api/userApi";
+import Swal from "sweetalert2";
 
 const PAGE_SIZE = 6;
 
@@ -58,6 +59,25 @@ const AdminUsers = () => {
   };
 
   const handleStatusChange = useCallback(async (id, newStatus) => {
+    const user = users.find((u) => u.id === id);
+    if (!user) return;
+
+    const actionText = newStatus === "Active" ? "activate" : "suspend";
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `Do you want to ${actionText} the user ${user.name}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: newStatus === "Active" ? "#22c55e" : "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: `Yes, ${actionText}!`,
+    });
+
+    if (!result.isConfirmed) {
+      setOpenMenuId(null);
+      return;
+    }
+
     try {
       const apiStatus = newStatus === "Active" ? "ACTIVE" : "SUSPENDED";
       await updateUserStatus({ id, status: apiStatus }).unwrap();
@@ -65,7 +85,7 @@ const AdminUsers = () => {
     } catch (err) {
       console.error("Failed to update user status:", err);
     }
-  }, [updateUserStatus]);
+  }, [users, updateUserStatus]);
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
