@@ -62,7 +62,7 @@ function ActionsDropdown({ anchorEl, onSeeDetails, onStatusChange, onDelete }) {
       <button
         type="button"
         onClick={onSeeDetails}
-        className="w-full text-left px-4 py-3 text-sm font-semibold text-white bg-green-500/60 hover:bg-[#c99508] transition-colors cursor-pointer"
+        className="w-full text-left px-4 py-3 text-sm font-semibold text-white bg-green-500/60  transition-colors cursor-pointer"
       >
         See Details
       </button>
@@ -79,7 +79,7 @@ function ActionsDropdown({ anchorEl, onSeeDetails, onStatusChange, onDelete }) {
           {s}
         </button>
       ))}
-      <div className="border-t border-gray-100">
+      {/* <div className="border-t border-gray-100">
         <button
           type="button"
           onClick={onDelete}
@@ -87,7 +87,7 @@ function ActionsDropdown({ anchorEl, onSeeDetails, onStatusChange, onDelete }) {
         >
           Delete
         </button>
-      </div>
+      </div> */}
     </div>,
     document.body,
   );

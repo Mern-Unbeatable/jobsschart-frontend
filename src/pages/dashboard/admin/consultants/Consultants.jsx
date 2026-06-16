@@ -6,6 +6,7 @@ import DeleteModal from "./components/DeleteModal";
 import ConsultantDetail from "./components/ConsultantDetail";
 import { useGetAllConsultantsQuery, useApproveConsultantMutation } from "../../../../features/api/consultantApi";
 import { useUpdateUserStatusMutation, useDeleteUserMutation } from "../../../../features/api/userApi";
+import Swal from "sweetalert2";
 
 const PAGE_SIZE = 7;
 
@@ -102,6 +103,23 @@ const AdminConsultants = () => {
   const handleStatusChange = useCallback(async (id, newStatus) => {
     const consultant = consultants.find((c) => c.id === id);
     if (!consultant) return;
+
+    if (newStatus === "Approved") {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: `Do you want to approve ${consultant.name} as a consultant?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#22c55e",
+        cancelButtonColor: "#ef4444",
+        confirmButtonText: "Yes, approve!",
+      });
+
+      if (!result.isConfirmed) {
+        setOpenMenuId(null);
+        return;
+      }
+    }
 
     try {
       if (newStatus === "Approved") {
