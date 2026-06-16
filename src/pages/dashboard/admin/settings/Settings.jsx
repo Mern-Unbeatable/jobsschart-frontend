@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import CategorySection from './components/CategorySection';
 import TopicsSection from './components/TopicsSection';
@@ -12,6 +12,12 @@ import {
   useUpdatePackageMutation,
   useDeletePackageMutation,
 } from '../../../../features/api/packageApi';
+
+import {
+  useGetAllBlogCategoriesQuery,
+  useCreateBlogCategoryMutation,
+  useDeleteBlogCategoryMutation,
+} from '../../../../features/api/blogApi';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -64,7 +70,15 @@ const EMPTY_PRICE_FORM = {
 const Settings = () => {
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
   const [topics, setTopics] = useState(INITIAL_TOPICS);
-  const [blogCategories, setBlogCategories] = useState(INITIAL_BLOG_CATEGORIES);
+
+  // RTK Query hooks for blog category operations
+  const { data: blogCatsData, isLoading: isBlogCatsLoading } = useGetAllBlogCategoriesQuery();
+  const [createBlogCategory] = useCreateBlogCategoryMutation();
+  const [deleteBlogCategory] = useDeleteBlogCategoryMutation();
+
+  const blogCategories = useMemo(() => {
+    return blogCatsData?.categories || [];
+  }, [blogCatsData]);
 
   // RTK Query hooks for package operations
   const { data: packagesData, isLoading: isPackagesLoading } = useGetAllPackagesQuery();
@@ -176,24 +190,28 @@ const Settings = () => {
 
   // ── Blog Category handlers
 
-  const handleDeleteBlogCategory = useCallback((id) => {
-    setBlogCategories((prev) => prev.filter((bc) => bc.id !== id));
-    toast.success('Blog category deleted');
-  }, []);
+  const handleDeleteBlogCategory = useCallback(async (id) => {
+    try {
+      await deleteBlogCategory(id).unwrap();
+      toast.success('Blog category deleted successfully');
+    } catch (error) {
+      toast.error(error?.data?.message || 'Failed to delete blog category');
+    }
+  }, [deleteBlogCategory]);
 
-  const handleSaveBlogCategory = useCallback(() => {
+  const handleSaveBlogCategory = useCallback(async () => {
     if (!tagInput.trim()) {
       setTagError('Blog category name is required');
       return;
     }
-    nextIdRef.current += 1;
-    setBlogCategories((prev) => [
-      ...prev,
-      { id: nextIdRef.current, name: tagInput.trim() },
-    ]);
-    toast.success('Blog category added');
-    handleCloseModal();
-  }, [tagInput, handleCloseModal]);
+    try {
+      await createBlogCategory({ name: tagInput.trim() }).unwrap();
+      toast.success('Blog category added successfully');
+      handleCloseModal();
+    } catch (error) {
+      toast.error(error?.data?.message || 'Failed to add blog category');
+    }
+  }, [tagInput, createBlogCategory, handleCloseModal]);
 
   // ── Pricing handlers
 

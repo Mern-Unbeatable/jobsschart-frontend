@@ -14,4 +14,5 @@ export const tagList = [
   "Package",
   "Donation",
   "Order",
+  "BlogCategory",
 ];
