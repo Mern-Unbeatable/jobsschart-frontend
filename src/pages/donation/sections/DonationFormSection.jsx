@@ -136,11 +136,12 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   <input
                     type="email"
                     placeholder={t("donationForm.fields.email.placeholder")}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#EAB308]"
+                    className="w-full px-4 py-3 border border-gray-200 bg-gray-100 cursor-not-allowed rounded-md text-sm focus:outline-none"
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
+                    disabled
                   />
                 </div>
                 <div>
