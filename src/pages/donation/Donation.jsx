@@ -12,8 +12,13 @@ const Donation = memo(() => {
     phone: "",
     amount: "",
     donorType: "individual",
-    randomDonor: false,
-    visibilityBoost: false,
+    benefit: "Feed a Family",
+    businessType: "local",
+    businessName: "",
+    description: "",
+    websiteUrl: "",
+    location: "",
+    image: null,
   });
 
   useSEO({

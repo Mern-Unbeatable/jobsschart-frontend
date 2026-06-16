@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
   User,
@@ -8,11 +8,72 @@ import {
   MapPin,
   Link,
   UploadCloud,
+  Loader2,
 } from "lucide-react";
+import { useCreateCheckoutMutation } from "../../../features/api/paymentApi";
+import toast from "react-hot-toast";
 
 const DonationFormSection = memo(({ formData, setFormData }) => {
   const { t } = useTranslation();
+  const fileInputRef = useRef(null);
+  const [createCheckout, { isLoading: isCheckingOut }] = useCreateCheckoutMutation();
+
   const isBusiness = formData.donorType === "business";
+
+  const handleFileClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.phone || !formData.amount) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      const data = new FormData();
+      data.append("type", "DONATION");
+      data.append("donationData[donorType]", formData.donorType.toUpperCase());
+      data.append("donationData[name]", formData.name);
+      data.append("donationData[email]", formData.email);
+      data.append("donationData[phone]", formData.phone);
+      data.append("donationData[amount]", formData.amount);
+      data.append("donationData[benefit]", formData.benefit);
+
+      if (formData.donorType === "business") {
+        data.append("donationData[businessType]", formData.businessType === "online" ? "ONLINE_BUSINESS" : "LOCAL_BUSINESS");
+        data.append("donationData[businessName]", formData.businessName);
+        data.append("donationData[description]", formData.description);
+        if (formData.businessType === "online") {
+          data.append("donationData[websiteUrl]", formData.websiteUrl);
+        } else {
+          data.append("donationData[location]", formData.location);
+        }
+        if (formData.image) {
+          data.append("donationData[image]", formData.image);
+        }
+      }
+
+      const result = await createCheckout(data).unwrap();
+      if (result?.url) {
+        window.location.href = result.url;
+      } else {
+        toast.error("Could not initiate payment. Please try again.");
+      }
+    } catch (err) {
+      toast.error(
+        err?.data?.message || err?.message || "Payment failed. Please try again."
+      );
+    }
+  };
 
   return (
     <div className="container  mx-auto px-4 lg:px-6 py-14 lg:py-20">
@@ -49,7 +110,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
         </div>
 
         <div className="p-4 lg:p-6">
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Standard Inputs */}
             <div className="grid grid-cols-1 gap-6">
               <div>
@@ -77,6 +138,9 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                     placeholder={t("donationForm.fields.email.placeholder")}
                     className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#EAB308]"
                     value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                   />
                 </div>
                 <div>
@@ -88,20 +152,45 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                     placeholder={t("donationForm.fields.phone.placeholder")}
                     className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#EAB308]"
                     value={formData.phone}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-base  text-gray-600 mb-2">
-                  {t("donationForm.fields.amount.label")}
-                </label>
-                <input
-                  type="number"
-                  placeholder={t("donationForm.fields.amount.placeholder")}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#EAB308]"
-                  value={formData.amount}
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-base  text-gray-600 mb-2">
+                    {t("donationForm.fields.amount.label")}
+                  </label>
+                  <input
+                    type="number"
+                    placeholder={t("donationForm.fields.amount.placeholder")}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#EAB308]"
+                    value={formData.amount}
+                    onChange={(e) =>
+                      setFormData({ ...formData, amount: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="block text-base text-gray-600 mb-2">
+                    Benefit / Support Cause
+                  </label>
+                  <select
+                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#EAB308] bg-white"
+                    value={formData.benefit}
+                    onChange={(e) =>
+                      setFormData({ ...formData, benefit: e.target.value })
+                    }
+                  >
+                    <option value="Feed a Family">Feed a Family</option>
+                    <option value="Support Education">Support Education</option>
+                    <option value="Medical Support">Medical Support</option>
+                    <option value="General Fund">General Fund</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -203,6 +292,10 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                       "donationForm.fields.businessName.placeholder",
                     )}
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded text-sm focus:outline-none"
+                    value={formData.businessName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, businessName: e.target.value })
+                    }
                   />
                 </div>
 
@@ -211,14 +304,21 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                     <label className="block text-base font-bold text-gray-600">
                       {t("donationForm.fields.description.label")}
                     </label>
-                    <span className="text-[10px] text-gray-400">0/200</span>
+                    <span className="text-[10px] text-gray-400">
+                      {formData.description.length}/200
+                    </span>
                   </div>
                   <textarea
                     rows={3}
+                    maxLength={200}
                     placeholder={t(
                       "donationForm.fields.description.placeholder",
                     )}
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded text-sm focus:outline-none resize-none"
+                    value={formData.description}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                   />
                 </div>
 
@@ -248,6 +348,13 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                           : t("donationForm.fields.location.placeholder")
                       }
                       className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded text-sm focus:outline-none"
+                      value={formData.businessType === "online" ? formData.websiteUrl : formData.location}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          [formData.businessType === "online" ? "websiteUrl" : "location"]: e.target.value,
+                        })
+                      }
                     />
                   </div>
                 </div>
@@ -256,11 +363,38 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   <label className="block text-base font-bold text-gray-600 mb-2">
                     {t("donationForm.fields.image.label")}
                   </label>
-                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-white hover:border-[#EAB308] cursor-pointer transition-colors">
-                    <UploadCloud size={28} className="text-gray-300" />
-                    <p className="text-[11px] text-gray-400 font-medium">
-                      {t("donationForm.fields.image.placeholder")}
-                    </p>
+                  <div
+                    onClick={handleFileClick}
+                    className="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-white hover:border-[#EAB308] cursor-pointer transition-colors"
+                  >
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    {formData.image ? (
+                      <div className="flex flex-col items-center gap-2">
+                        {formData.image instanceof File && (
+                          <img
+                            src={URL.createObjectURL(formData.image)}
+                            alt="Preview"
+                            className="w-24 h-24 object-cover rounded-lg border border-gray-200"
+                          />
+                        )}
+                        <span className="text-xs text-gray-500 font-medium">
+                          {formData.image.name}
+                        </span>
+                      </div>
+                    ) : (
+                      <>
+                        <UploadCloud size={28} className="text-gray-300" />
+                        <p className="text-[11px] text-gray-400 font-medium">
+                          {t("donationForm.fields.image.placeholder")}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -291,8 +425,17 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
             </div>
 
             <div className="pt-4">
-              <button className="bg-[#EAB308] hover:bg-[#d99a00] text-white text-sm font-bold py-3 px-8 rounded  transition-all active:scale-95">
-                {t("donationForm.button", { amount: formData.amount || "100" })}
+              <button
+                type="submit"
+                disabled={isCheckingOut}
+                className="bg-[#EAB308] hover:bg-[#d99a00] text-white text-sm font-bold py-3 px-8 rounded transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isCheckingOut && <Loader2 className="animate-spin h-5 w-5 text-white" />}
+                {isCheckingOut
+                  ? "Processing..."
+                  : t("donationForm.button", {
+                      amount: formData.amount || "100",
+                    })}
               </button>
             </div>
           </form>
