@@ -47,7 +47,7 @@ const Register = lazy(() => import('../pages/auth/regester/Regester'));
 const Dashboard = lazy(() => import('../pages/dashboard/admin/Dashboard'));
 const Emails = lazy(() => import('../pages/dashboard/admin/Emails'));
 const Leads = lazy(() => import('../pages/dashboard/admin/Leads'));
-const Orders = lazy(() => import('../pages/dashboard/admin/Orders'));
+const Orders = lazy(() => import('../pages/dashboard/admin/order/Orders'));
 const MarketplaceOrders = lazy(() => import('../pages/dashboard/admin/MarketplaceOrders'));
 const CaseStudies = lazy(() => import('../pages/dashboard/admin/CaseStudies'));
 const Blog = lazy(() => import('../pages/dashboard/admin/Blog'));
