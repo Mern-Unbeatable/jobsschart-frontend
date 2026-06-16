@@ -1,9 +1,19 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import FilterTabs from "./components/FilterTabs";
 import UsersTable from "./components/UsersTable";
 import Pagination from "./components/Pagination";
 import DeleteModal from "./components/DeleteModal";
-import { useGetAllUsersQuery, useUpdateUserStatusMutation, useDeleteUserMutation } from "../../../../features/api/userApi";
+import {
+  useGetAllUsersQuery,
+  useUpdateUserStatusMutation,
+  useDeleteUserMutation,
+} from "../../../../features/api/userApi";
 import Swal from "sweetalert2";
 
 const PAGE_SIZE = 6;
@@ -16,7 +26,7 @@ const mapBackendUser = (u) => {
     email: u.email || "N/A",
     phone: u.phone || "N/A",
     status,
-    raw: u
+    raw: u,
   };
 };
 
@@ -58,34 +68,37 @@ const AdminUsers = () => {
     setPage(1);
   };
 
-  const handleStatusChange = useCallback(async (id, newStatus) => {
-    const user = users.find((u) => u.id === id);
-    if (!user) return;
+  const handleStatusChange = useCallback(
+    async (id, newStatus) => {
+      const user = users.find((u) => u.id === id);
+      if (!user) return;
 
-    const actionText = newStatus === "Active" ? "activate" : "suspend";
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: `Do you want to ${actionText} the user ${user.name}?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: newStatus === "Active" ? "#22c55e" : "#ef4444",
-      cancelButtonColor: "#6b7280",
-      confirmButtonText: `Yes, ${actionText}!`,
-    });
+      const actionText = newStatus === "Active" ? "activate" : "suspend";
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: `Do you want to ${actionText} the user ${user.name}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: newStatus === "Active" ? "#22c55e" : "#ef4444",
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: `Yes, ${actionText}!`,
+      });
 
-    if (!result.isConfirmed) {
-      setOpenMenuId(null);
-      return;
-    }
+      if (!result.isConfirmed) {
+        setOpenMenuId(null);
+        return;
+      }
 
-    try {
-      const apiStatus = newStatus === "Active" ? "ACTIVE" : "SUSPENDED";
-      await updateUserStatus({ id, status: apiStatus }).unwrap();
-      setOpenMenuId(null);
-    } catch (err) {
-      console.error("Failed to update user status:", err);
-    }
-  }, [users, updateUserStatus]);
+      try {
+        const apiStatus = newStatus === "Active" ? "ACTIVE" : "SUSPENDED";
+        await updateUserStatus({ id, status: apiStatus }).unwrap();
+        setOpenMenuId(null);
+      } catch (err) {
+        console.error("Failed to update user status:", err);
+      }
+    },
+    [users, updateUserStatus],
+  );
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
@@ -109,7 +122,9 @@ const AdminUsers = () => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-red-500 font-semibold text-lg">Failed to fetch users.</p>
+        <p className="text-red-500 font-semibold text-lg">
+          Failed to fetch users.
+        </p>
         <button
           onClick={() => window.location.reload()}
           className="px-5 py-2 bg-green-500/60 text-white rounded-lg hover:opacity-90 transition-opacity"
