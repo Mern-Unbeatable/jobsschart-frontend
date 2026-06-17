@@ -62,7 +62,7 @@ const AdminDonation = lazy(() => import('../pages/dashboard/admin/donation/Donat
 const AdminAds = lazy(() => import('../pages/dashboard/admin/AdsManagement'));
 const AdminAdsPublished = lazy(() => import('../pages/dashboard/admin/PublishedAds'));
 const AdminSession = lazy(() => import('../pages/dashboard/admin/Session'));
-const AdminPayout = lazy(() => import('../pages/dashboard/admin/Payout'));
+const AdminPayout = lazy(() => import('../pages/dashboard/admin/payout/Payout'));
 const AdminSettings = lazy(() => import('../pages/dashboard/admin/settings/Settings'));
 const AdminProfile = lazy(() => import('../pages/dashboard/admin/Profile'));
 const AdminFaq = lazy(() => import('../pages/dashboard/admin/Faq'));
