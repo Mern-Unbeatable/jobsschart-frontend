@@ -73,7 +73,7 @@ const CommonSidebar = ({
       bgCard: 'bg-yellow-200',
       textCard: 'text-yellow-700',
       activeNav:
-        'bg-yellow-100 text-yellow-700 border-transparent shadow-[inset_3px_0_0_0_#EAB308]',
+        'bg-green-100 text-yellow-700 border-transparent shadow-[inset_3px_0_0_0_#EAB308]',
       hoverNav:
         'hover:bg-yellow-50/40 hover:text-gray-900 hover:border-yellow-100',
       activeIcon: 'bg-yellow-100 text-yellow-600',
@@ -88,9 +88,9 @@ const CommonSidebar = ({
       bgGradient: 'from-orange-50 to-orange-100/50',
       borderColor: 'border-orange-100',
       bgCard: 'bg-gray-50',
-      textCard: 'text-gray-900',
+      textCard: 'text-gry-900',
       activeNav:
-        'bg-orange-100 text-orange-700 border-transparent shadow-[inset_3px_0_0_0_#ea580c]',
+        'bg-green-100 text-green-500 border-transparent shadow-[inset_3px_0_0_0_#ea580c]',
       hoverNav:
         'hover:bg-orange-50/40 hover:text-gray-900 hover:border-orange-100',
       activeIcon: 'bg-orange-100 text-orange-600',

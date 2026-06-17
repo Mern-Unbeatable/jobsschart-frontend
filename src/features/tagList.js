@@ -17,4 +17,5 @@ export const tagList = [
   "BlogCategory",
   "Blog",
   "Topic",
+  "Category",
 ];

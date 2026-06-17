@@ -25,6 +25,12 @@ import {
   useDeleteTopicMutation,
 } from '../../../../features/api/topicApi';
 
+import {
+  useGetCategoriesQuery,
+  useCreateCategoryMutation,
+  useDeleteCategoryMutation,
+} from '../../../../features/api/categoryApi';
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const MODAL_CLOSE_ANIMATION_MS = 240;
@@ -74,7 +80,14 @@ const EMPTY_PRICE_FORM = {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 const Settings = () => {
-  const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+  // RTK Query hooks for category operations
+  const { data: categoriesData, isLoading: isCategoriesLoading } = useGetCategoriesQuery();
+  const [createCategory] = useCreateCategoryMutation();
+  const [deleteCategory] = useDeleteCategoryMutation();
+
+  const categories = useMemo(() => {
+    return categoriesData?.categories || categoriesData || [];
+  }, [categoriesData]);
 
   // RTK Query hooks for topic operations
   const { data: topicsData, isLoading: isTopicsLoading } = useGetAllTopicsQuery();
@@ -162,24 +175,28 @@ const Settings = () => {
 
   // ── Category handlers
 
-  const handleDeleteCategory = useCallback((id) => {
-    setCategories((prev) => prev.filter((c) => c.id !== id));
-    toast.success('Category deleted');
-  }, []);
+  const handleDeleteCategory = useCallback(async (id) => {
+    try {
+      await deleteCategory(id).unwrap();
+      toast.success('Category deleted successfully');
+    } catch (error) {
+      toast.error(error?.data?.message || 'Failed to delete category');
+    }
+  }, [deleteCategory]);
 
-  const handleSaveCategory = useCallback(() => {
+  const handleSaveCategory = useCallback(async () => {
     if (!tagInput.trim()) {
       setTagError('Category name is required');
       return;
     }
-    nextIdRef.current += 1;
-    setCategories((prev) => [
-      ...prev,
-      { id: nextIdRef.current, name: tagInput.trim() },
-    ]);
-    toast.success('Category added');
-    handleCloseModal();
-  }, [tagInput, handleCloseModal]);
+    try {
+      await createCategory({ name: tagInput.trim() }).unwrap();
+      toast.success('Category added successfully');
+      handleCloseModal();
+    } catch (error) {
+      toast.error(error?.data?.message || 'Failed to add category');
+    }
+  }, [tagInput, createCategory, handleCloseModal]);
 
   // ── Topics handlers
 
@@ -358,11 +375,17 @@ const Settings = () => {
       {/* Sections */}
       <div className='flex flex-col gap-5'>
         {/* Category */}
-        <CategorySection
-          categories={categories}
-          onAddClick={() => openModal('category')}
-          onDeleteCategory={handleDeleteCategory}
-        />
+        {isCategoriesLoading ? (
+          <div className="flex justify-center items-center py-8 bg-white border border-gray-200 rounded-xl p-6">
+            <span className="text-gray-500 font-medium">Loading categories...</span>
+          </div>
+        ) : (
+          <CategorySection
+            categories={categories}
+            onAddClick={() => openModal('category')}
+            onDeleteCategory={handleDeleteCategory}
+          />
+        )}
 
         {/* Topics */}
         {isTopicsLoading ? (

@@ -15,13 +15,17 @@ const CategorySection = ({ categories, onAddClick, onDeleteCategory }) => (
     </div>
     <hr className="border-gray-100 mb-4" />
     <div className="flex flex-wrap gap-3">
-      {categories.map((cat) => (
-        <TagPill
-          key={cat.id}
-          name={cat.name}
-          onDelete={() => onDeleteCategory(cat.id)}
-        />
-      ))}
+      {categories.length === 0 ? (
+        <span className="text-gray-400 text-base text-center italic py-2 w-full">No categories added</span>
+      ) : (
+        categories.map((cat) => (
+          <TagPill
+            key={cat.id}
+            name={cat.name}
+            onDelete={() => onDeleteCategory(cat.id)}
+          />
+        ))
+      )}
     </div>
   </section>
 );
