@@ -1,2 +1,1662 @@
 /*! For license information please see 2996.9c42b79b.chunk.js.LICENSE.txt */
-"use strict";(self.webpackChunkreact_webpack_tailwind_app=self.webpackChunkreact_webpack_tailwind_app||[]).push([[2996],{4803(e,t,r){r.d(t,{Jt:()=>s,MR:()=>c,_l:()=>l,aT:()=>o});var n=r(69215),a=["id"],i=n.q.injectEndpoints({endpoints:function(e){return{getAllPackages:e.query({query:function(){return{url:"/packages",method:"GET",params:arguments.length>0&&void 0!==arguments[0]?arguments[0]:{}}},providesTags:["Package"],transformResponse:function(e){return e.data}}),getActivePackages:e.query({query:function(){return{url:"/packages/active",method:"GET",params:arguments.length>0&&void 0!==arguments[0]?arguments[0]:{}}},providesTags:["Package"],transformResponse:function(e){return e.data}}),getPackageBySlug:e.query({query:function(e){return{url:"/packages/slug/".concat(e),method:"GET"}},providesTags:function(e,t,r){return[{type:"Package",id:r}]},transformResponse:function(e){return e.data}}),getPackageById:e.query({query:function(e){return{url:"/packages/".concat(e),method:"GET"}},providesTags:function(e,t,r){return[{type:"Package",id:r}]},transformResponse:function(e){return e.data}}),createPackage:e.mutation({query:function(e){return{url:"/packages",method:"POST",body:e}},invalidatesTags:["Package"],transformResponse:function(e){return e.data}}),updatePackage:e.mutation({query:function(e){var t=e.id,r=function(e,t){if(null==e)return{};var r,n,a=function(e,t){if(null==e)return{};var r={};for(var n in e)if({}.hasOwnProperty.call(e,n)){if(-1!==t.indexOf(n))continue;r[n]=e[n]}return r}(e,t);if(Object.getOwnPropertySymbols){var i=Object.getOwnPropertySymbols(e);for(n=0;n<i.length;n++)r=i[n],-1===t.indexOf(r)&&{}.propertyIsEnumerable.call(e,r)&&(a[r]=e[r])}return a}(e,a);return{url:"/packages/".concat(t),method:"PATCH",body:r}},invalidatesTags:function(e,t,r){return[{type:"Package",id:r.id}]},transformResponse:function(e){return e.data}}),deletePackage:e.mutation({query:function(e){return{url:"/packages/".concat(e),method:"DELETE"}},invalidatesTags:["Package"],transformResponse:function(e){return e.data}})}}}),o=i.useGetAllPackagesQuery,s=(i.useGetActivePackagesQuery,i.useGetPackageBySlugQuery,i.useGetPackageByIdQuery,i.useCreatePackageMutation),c=i.useUpdatePackageMutation,l=i.useDeletePackageMutation},72996(e,t,r){r.r(t),r.d(t,{default:()=>L});var n=r(96540),a=r(90888),i=r(32708),o=r(74848);const s=function(e){var t=e.name,r=e.onDelete;return(0,o.jsxs)("div",{className:"inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg bg-white text-base text-gray-700",children:[(0,o.jsx)("span",{children:t}),(0,o.jsx)("button",{type:"button",onClick:r,className:"text-gray-400 hover:text-red-500 transition-colors","aria-label":"Delete ".concat(t),children:(0,o.jsx)(i.A,{size:15})})]})},c=function(e){var t=e.categories,r=e.onAddClick,n=e.onDeleteCategory;return(0,o.jsxs)("section",{className:"bg-white border border-gray-200 rounded-xl p-6",children:[(0,o.jsxs)("div",{className:"flex items-center justify-between mb-4",children:[(0,o.jsx)("h2",{className:"text-xl font-semibold text-gray-800",children:"Category"}),(0,o.jsx)("button",{type:"button",onClick:r,className:"px-4 py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-medium rounded-lg transition-colors",children:"Add Category"})]}),(0,o.jsx)("hr",{className:"border-gray-100 mb-4"}),(0,o.jsx)("div",{className:"flex flex-wrap gap-3",children:t.map(function(e){return(0,o.jsx)(s,{name:e.name,onDelete:function(){return n(e.id)}},e.id)})})]})},l=function(e){var t=e.topics,r=e.onAddClick,n=e.onDeleteTopic;return(0,o.jsxs)("section",{className:"bg-white border border-gray-200 rounded-xl p-6",children:[(0,o.jsxs)("div",{className:"flex items-center justify-between mb-4",children:[(0,o.jsx)("h2",{className:"text-xl font-semibold text-gray-800",children:"Topics"}),(0,o.jsx)("button",{type:"button",onClick:r,className:"px-4 py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-medium rounded-lg transition-colors",children:"Add Topics"})]}),(0,o.jsx)("hr",{className:"border-gray-100 mb-4"}),(0,o.jsx)("div",{className:"flex flex-wrap gap-3",children:t.map(function(e){return(0,o.jsx)(s,{name:e.name,onDelete:function(){return n(e.id)}},e.id)})})]})},u=function(e){var t=e.blogCategories,r=e.onAddClick,n=e.onDeleteBlogCategory;return(0,o.jsxs)("section",{className:"bg-white border border-gray-200 rounded-xl p-6",children:[(0,o.jsxs)("div",{className:"flex items-center justify-between mb-4",children:[(0,o.jsx)("h2",{className:"text-xl font-semibold text-gray-800",children:"Blog Category"}),(0,o.jsx)("button",{type:"button",onClick:r,className:"px-4 py-2.5 bg-green-500/60 hover:bg-amber-600 text-white text-base font-medium rounded-lg transition-colors",children:"Add Category"})]}),(0,o.jsx)("hr",{className:"border-gray-100 mb-4"}),(0,o.jsx)("div",{className:"flex flex-wrap gap-3",children:t.map(function(e){return(0,o.jsx)(s,{name:e.name,onDelete:function(){return n(e.id)}},e.id)})})]})};var d=r(45773),f=r(25005);const g=function(e){var t=e.plan,r=e.onEdit,n=e.onDelete;return(0,o.jsxs)("div",{className:"flex flex-col border border-gray-200 rounded-xl p-6 gap-5",children:[(0,o.jsxs)("div",{className:"flex justify-between items-start",children:[(0,o.jsx)("h3",{className:"text-2xl font-bold text-gray-900",children:t.name}),void 0!==t.credits&&(0,o.jsxs)("span",{className:"px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full",children:[t.credits," Credits"]})]}),(0,o.jsxs)("div",{className:"flex items-baseline gap-1",children:[(0,o.jsxs)("span",{className:"text-3xl font-bold text-gray-900",children:["€",t.price]}),void 0!==t.minutes&&t.minutes>0&&(0,o.jsxs)("span",{className:"text-base text-gray-500",children:["/",t.minutes," minutes"]})]}),t.description&&(0,o.jsx)("p",{className:"text-sm text-gray-500 italic",children:t.description}),(0,o.jsx)("ul",{className:"flex flex-col gap-2 flex-1",children:t.features.map(function(e,t){return(0,o.jsxs)("li",{className:"flex items-center gap-2 text-base text-gray-700",children:[(0,o.jsx)(d.A,{size:15,className:"text-green-500 shrink-0"}),e]},t)})}),(0,o.jsxs)("div",{className:"flex gap-3",children:[(0,o.jsxs)("button",{type:"button",onClick:r,className:"flex items-center justify-center gap-2 flex-1 py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-medium rounded-lg transition-colors",children:[(0,o.jsx)(f.A,{size:14}),"Edit"]}),(0,o.jsxs)("button",{type:"button",onClick:n,className:"flex items-center justify-center gap-2 flex-1 py-2.5 border border-purple-200 text-purple-500 hover:bg-purple-50 text-base font-medium rounded-lg transition-colors",children:[(0,o.jsx)(i.A,{size:14}),"Delete"]})]})]})},m=function(e){var t=e.pricingPlans,r=e.onAddClick,n=e.onEditPlan,a=e.onDeletePlan;return(0,o.jsxs)("section",{className:"bg-white border border-gray-200 rounded-xl p-6",children:[(0,o.jsxs)("div",{className:"flex items-center justify-between mb-4",children:[(0,o.jsx)("h2",{className:"text-xl font-semibold text-gray-800",children:"Pricing"}),(0,o.jsx)("button",{type:"button",onClick:r,className:"px-4 py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-medium rounded-lg transition-colors",children:"Add Price"})]}),(0,o.jsx)("hr",{className:"border-gray-100 mb-4"}),(0,o.jsx)("div",{className:"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6",children:t.map(function(e){return(0,o.jsx)(g,{plan:e,onEdit:function(){return n(e)},onDelete:function(){return a(e.id)}},e.id)})})]})};var p=r(48697);function b(e){return b="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},b(e)}function y(e,t){var r=Object.keys(e);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);t&&(n=n.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),r.push.apply(r,n)}return r}function x(e){for(var t=1;t<arguments.length;t++){var r=null!=arguments[t]?arguments[t]:{};t%2?y(Object(r),!0).forEach(function(t){h(e,t,r[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(r)):y(Object(r)).forEach(function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(r,t))})}return e}function h(e,t,r){return(t=function(e){var t=function(e){if("object"!=b(e)||!e)return e;var t=e[Symbol.toPrimitive];if(void 0!==t){var r=t.call(e,"string");if("object"!=b(r))return r;throw new TypeError("@@toPrimitive must return a primitive value.")}return String(e)}(e);return"symbol"==b(t)?t:t+""}(t))in e?Object.defineProperty(e,t,{value:r,enumerable:!0,configurable:!0,writable:!0}):e[t]=r,e}const v=function(e){var t=e.isPriceModal,r=e.editingPlanId,n=e.priceForm,a=e.setPriceForm,i=e.priceErrors,s=e.handleSavePrice,c=e.tagConfig,l=e.tagInput,u=e.setTagInput,d=e.tagError,f=e.setTagError,g=e.tagSaveHandler,m=e.handleCloseModal,b=e.overlayClass,y=e.panelClass,h=e.isModalClosing;return(0,o.jsx)("div",{className:"fixed inset-0 z-50 flex items-center justify-center bg-black/50 ".concat(b," ").concat(h?"pointer-events-none":""),onClick:m,children:(0,o.jsx)("div",{className:"bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 ".concat(y),onClick:function(e){return e.stopPropagation()},children:t?(0,o.jsxs)("div",{className:"p-6 flex flex-col gap-4",children:[(0,o.jsxs)("div",{className:"flex items-center justify-between",children:[(0,o.jsx)("h3",{className:"text-xl font-semibold text-gray-900",children:null!==r?"Edit Price":"Add Price"}),(0,o.jsx)("button",{type:"button",onClick:m,className:"text-gray-400 hover:text-gray-600 transition-colors","aria-label":"Close modal",children:(0,o.jsx)(p.A,{size:20})})]}),(0,o.jsxs)("div",{className:"flex flex-col gap-1",children:[(0,o.jsx)("label",{className:"text-base font-medium text-gray-700",children:"Name"}),(0,o.jsx)("input",{type:"text",placeholder:"Name",value:n.name,onChange:function(e){return a(function(t){return x(x({},t),{},{name:e.target.value})})},className:"w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"}),i.name&&(0,o.jsx)("p",{className:"text-xs text-red-500",children:i.name})]}),(0,o.jsxs)("div",{className:"flex flex-col gap-1",children:[(0,o.jsx)("label",{className:"text-base font-medium text-gray-700",children:"Price (€)"}),(0,o.jsx)("input",{type:"number",step:"0.01",min:"0",placeholder:"0.00",value:n.price,onChange:function(e){return a(function(t){return x(x({},t),{},{price:e.target.value})})},className:"w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"}),i.price&&(0,o.jsx)("p",{className:"text-xs text-red-500",children:i.price})]}),(0,o.jsxs)("div",{className:"flex flex-col gap-1",children:[(0,o.jsx)("label",{className:"text-base font-medium text-gray-700",children:"Minutes"}),(0,o.jsx)("input",{type:"number",min:"0",placeholder:"0",value:n.minutes,onChange:function(e){return a(function(t){return x(x({},t),{},{minutes:e.target.value})})},className:"w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"}),i.minutes&&(0,o.jsx)("p",{className:"text-xs text-red-500",children:i.minutes})]}),(0,o.jsxs)("div",{className:"flex flex-col gap-1",children:[(0,o.jsx)("label",{className:"text-base font-medium text-gray-700",children:"Credits"}),(0,o.jsx)("input",{type:"number",min:"0",placeholder:"0",value:n.credits,onChange:function(e){return a(function(t){return x(x({},t),{},{credits:e.target.value})})},className:"w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"}),i.credits&&(0,o.jsx)("p",{className:"text-xs text-red-500",children:i.credits})]}),(0,o.jsxs)("div",{className:"flex flex-col gap-1",children:[(0,o.jsx)("label",{className:"text-base font-medium text-gray-700",children:"Description"}),(0,o.jsx)("input",{type:"text",placeholder:"Description",value:n.description,onChange:function(e){return a(function(t){return x(x({},t),{},{description:e.target.value})})},className:"w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"}),i.description&&(0,o.jsx)("p",{className:"text-xs text-red-500",children:i.description})]}),(0,o.jsxs)("div",{className:"flex flex-col gap-1",children:[(0,o.jsx)("label",{className:"text-base font-medium text-gray-700",children:"Features (One per line)"}),(0,o.jsx)("textarea",{placeholder:"Write Features",rows:4,value:n.featured,onChange:function(e){return a(function(t){return x(x({},t),{},{featured:e.target.value})})},className:"w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"}),i.featured&&(0,o.jsx)("p",{className:"text-xs text-red-500",children:i.featured})]}),(0,o.jsx)("button",{type:"button",onClick:s,className:"w-full py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-semibold rounded-lg transition-colors",children:"Save"})]}):(0,o.jsxs)("div",{className:"p-6 flex flex-col gap-4",children:[(0,o.jsxs)("div",{className:"flex items-center justify-between",children:[(0,o.jsx)("h3",{className:"text-xl font-semibold text-gray-900",children:null==c?void 0:c.title}),(0,o.jsx)("button",{type:"button",onClick:m,className:"text-gray-400 hover:text-gray-600 transition-colors","aria-label":"Close modal",children:(0,o.jsx)(p.A,{size:20})})]}),(0,o.jsxs)("div",{className:"flex flex-col gap-1",children:[(0,o.jsx)("input",{type:"text",placeholder:null==c?void 0:c.placeholder,value:l,onChange:function(e){u(e.target.value),d&&f("")},className:"w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"}),d&&(0,o.jsx)("p",{className:"text-xs text-red-500",children:d})]}),(0,o.jsx)("button",{type:"button",onClick:g,className:"w-full py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-semibold rounded-lg transition-colors",children:"Save"})]})})})};var j=r(4803),N=r(69215).q.injectEndpoints({endpoints:function(e){return{getAllBlogCategories:e.query({query:function(){return{url:"/blogs/categories",method:"GET"}},providesTags:["BlogCategory"],transformResponse:function(e){return e.data}}),createBlogCategory:e.mutation({query:function(e){return{url:"/blogs/categories",method:"POST",body:e}},invalidatesTags:["BlogCategory"],transformResponse:function(e){return e.data}}),deleteBlogCategory:e.mutation({query:function(e){return{url:"/blogs/categories/".concat(e),method:"DELETE"}},invalidatesTags:["BlogCategory"],transformResponse:function(e){return e.data}})}}}),w=N.useGetAllBlogCategoriesQuery,C=N.useCreateBlogCategoryMutation,k=N.useDeleteBlogCategoryMutation;function P(e){return P="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},P(e)}function O(e,t){var r=Object.keys(e);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);t&&(n=n.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),r.push.apply(r,n)}return r}function S(e){for(var t=1;t<arguments.length;t++){var r=null!=arguments[t]?arguments[t]:{};t%2?O(Object(r),!0).forEach(function(t){A(e,t,r[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(r)):O(Object(r)).forEach(function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(r,t))})}return e}function A(e,t,r){return(t=function(e){var t=function(e){if("object"!=P(e)||!e)return e;var t=e[Symbol.toPrimitive];if(void 0!==t){var r=t.call(e,"string");if("object"!=P(r))return r;throw new TypeError("@@toPrimitive must return a primitive value.")}return String(e)}(e);return"symbol"==P(t)?t:t+""}(t))in e?Object.defineProperty(e,t,{value:r,enumerable:!0,configurable:!0,writable:!0}):e[t]=r,e}function T(){var e,t,r="function"==typeof Symbol?Symbol:{},n=r.iterator||"@@iterator",a=r.toStringTag||"@@toStringTag";function i(r,n,a,i){var c=n&&n.prototype instanceof s?n:s,l=Object.create(c.prototype);return E(l,"_invoke",function(r,n,a){var i,s,c,l=0,u=a||[],d=!1,f={p:0,n:0,v:e,a:g,f:g.bind(e,4),d:function(t,r){return i=t,s=0,c=e,f.n=r,o}};function g(r,n){for(s=r,c=n,t=0;!d&&l&&!a&&t<u.length;t++){var a,i=u[t],g=f.p,m=i[2];r>3?(a=m===n)&&(c=i[(s=i[4])?5:(s=3,3)],i[4]=i[5]=e):i[0]<=g&&((a=r<2&&g<i[1])?(s=0,f.v=n,f.n=i[1]):g<m&&(a=r<3||i[0]>n||n>m)&&(i[4]=r,i[5]=n,f.n=m,s=0))}if(a||r>1)return o;throw d=!0,n}return function(a,u,m){if(l>1)throw TypeError("Generator is already running");for(d&&1===u&&g(u,m),s=u,c=m;(t=s<2?e:c)||!d;){i||(s?s<3?(s>1&&(f.n=-1),g(s,c)):f.n=c:f.v=c);try{if(l=2,i){if(s||(a="next"),t=i[a]){if(!(t=t.call(i,c)))throw TypeError("iterator result is not an object");if(!t.done)return t;c=t.value,s<2&&(s=0)}else 1===s&&(t=i.return)&&t.call(i),s<2&&(c=TypeError("The iterator does not provide a '"+a+"' method"),s=1);i=e}else if((t=(d=f.n<0)?c:r.call(n,f))!==o)break}catch(t){i=e,s=1,c=t}finally{l=1}}return{value:t,done:d}}}(r,a,i),!0),l}var o={};function s(){}function c(){}function l(){}t=Object.getPrototypeOf;var u=[][n]?t(t([][n]())):(E(t={},n,function(){return this}),t),d=l.prototype=s.prototype=Object.create(u);function f(e){return Object.setPrototypeOf?Object.setPrototypeOf(e,l):(e.__proto__=l,E(e,a,"GeneratorFunction")),e.prototype=Object.create(d),e}return c.prototype=l,E(d,"constructor",l),E(l,"constructor",c),c.displayName="GeneratorFunction",E(l,a,"GeneratorFunction"),E(d),E(d,a,"Generator"),E(d,n,function(){return this}),E(d,"toString",function(){return"[object Generator]"}),(T=function(){return{w:i,m:f}})()}function E(e,t,r,n){var a=Object.defineProperty;try{a({},"",{})}catch(e){a=0}E=function(e,t,r,n){function i(t,r){E(e,t,function(e){return this._invoke(t,r,e)})}t?a?a(e,t,{value:r,enumerable:!n,configurable:!n,writable:!n}):e[t]=r:(i("next",0),i("throw",1),i("return",2))},E(e,t,r,n)}function D(e,t,r,n,a,i,o){try{var s=e[i](o),c=s.value}catch(e){return void r(e)}s.done?t(c):Promise.resolve(c).then(n,a)}function q(e){return function(){var t=this,r=arguments;return new Promise(function(n,a){var i=e.apply(t,r);function o(e){D(i,n,a,o,s,"next",e)}function s(e){D(i,n,a,o,s,"throw",e)}o(void 0)})}}function B(e){return function(e){if(Array.isArray(e))return R(e)}(e)||function(e){if("undefined"!=typeof Symbol&&null!=e[Symbol.iterator]||null!=e["@@iterator"])return Array.from(e)}(e)||G(e)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function M(e,t){return function(e){if(Array.isArray(e))return e}(e)||function(e,t){var r=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=r){var n,a,i,o,s=[],c=!0,l=!1;try{if(i=(r=r.call(e)).next,0===t){if(Object(r)!==r)return;c=!1}else for(;!(c=(n=i.call(r)).done)&&(s.push(n.value),s.length!==t);c=!0);}catch(e){l=!0,a=e}finally{try{if(!c&&null!=r.return&&(o=r.return(),Object(o)!==o))return}finally{if(l)throw a}}return s}}(e,t)||G(e,t)||function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function G(e,t){if(e){if("string"==typeof e)return R(e,t);var r={}.toString.call(e).slice(8,-1);return"Object"===r&&e.constructor&&(r=e.constructor.name),"Map"===r||"Set"===r?Array.from(e):"Arguments"===r||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r)?R(e,t):void 0}}function R(e,t){(null==t||t>e.length)&&(t=e.length);for(var r=0,n=Array(t);r<t;r++)n[r]=e[r];return n}var I={category:{title:"Category name",placeholder:"Category name"},topics:{title:"Topics name",placeholder:"Topics name"},blogCategory:{title:"Blog category",placeholder:"Category name"}},_=[{id:1,name:"Relationship advice"},{id:2,name:"Compatibility check"},{id:3,name:"Stress management"}],F=[{id:1,name:"How to stay consistent in life?"},{id:2,name:"How to switch career?"}],z={name:"",price:"",minutes:"0",credits:"0",description:"",featured:""};const L=function(){var e=M((0,n.useState)(_),2),t=e[0],r=e[1],i=M((0,n.useState)(F),2),s=i[0],d=i[1],f=w(),g=f.data,p=(f.isLoading,M(C(),1)[0]),b=M(k(),1)[0],y=(0,n.useMemo)(function(){return(null==g?void 0:g.categories)||[]},[g]),x=(0,j.aT)(),h=x.data,N=x.isLoading,P=M((0,j.Jt)(),2),O=P[0],A=(P[1].isLoading,M((0,j.MR)(),2)),E=A[0],D=(A[1].isLoading,M((0,j._l)(),2)),G=D[0],R=(D[1].isLoading,M((0,n.useState)(null),2)),L=R[0],H=R[1],Q=M((0,n.useState)(!1),2),J=Q[0],U=Q[1],$=M((0,n.useState)(null),2),W=$[0],K=$[1],V=M((0,n.useState)(""),2),X=V[0],Y=V[1],Z=M((0,n.useState)(""),2),ee=Z[0],te=Z[1],re=M((0,n.useState)(z),2),ne=re[0],ae=re[1],ie=M((0,n.useState)({}),2),oe=ie[0],se=ie[1],ce=(0,n.useRef)(null),le=(0,n.useRef)(100);(0,n.useEffect)(function(){return function(){ce.current&&clearTimeout(ce.current)}},[]);var ue=(0,n.useCallback)(function(){U(!0),ce.current=setTimeout(function(){H(null),U(!1),K(null),Y(""),te(""),ae(z),se({})},240)},[]),de=(0,n.useCallback)(function(e){ce.current&&clearTimeout(ce.current),U(!1),K(null),Y(""),te(""),ae(z),se({}),H(e)},[]),fe=(0,n.useCallback)(function(e){ce.current&&clearTimeout(ce.current),U(!1),K(e.id),ae({name:e.name,price:String(e.price),minutes:String(e.minutes||0),credits:String(e.credits||0),description:e.description||"",featured:(e.features||[]).join("\n")}),se({}),H("price")},[]),ge=(0,n.useCallback)(function(e){r(function(t){return t.filter(function(t){return t.id!==e})}),a.Ay.success("Category deleted")},[]),me=(0,n.useCallback)(function(){X.trim()?(le.current+=1,r(function(e){return[].concat(B(e),[{id:le.current,name:X.trim()}])}),a.Ay.success("Category added"),ue()):te("Category name is required")},[X,ue]),pe=(0,n.useCallback)(function(e){d(function(t){return t.filter(function(t){return t.id!==e})}),a.Ay.success("Topic deleted")},[]),be=(0,n.useCallback)(function(){X.trim()?(le.current+=1,d(function(e){return[].concat(B(e),[{id:le.current,name:X.trim()}])}),a.Ay.success("Topic added"),ue()):te("Topic name is required")},[X,ue]),ye=(0,n.useCallback)(function(){var e=q(T().m(function e(t){var r,n;return T().w(function(e){for(;;)switch(e.p=e.n){case 0:return e.p=0,e.n=1,b(t).unwrap();case 1:a.Ay.success("Blog category deleted successfully"),e.n=3;break;case 2:e.p=2,n=e.v,a.Ay.error((null==n||null===(r=n.data)||void 0===r?void 0:r.message)||"Failed to delete blog category");case 3:return e.a(2)}},e,null,[[0,2]])}));return function(t){return e.apply(this,arguments)}}(),[b]),xe=(0,n.useCallback)(q(T().m(function e(){var t,r;return T().w(function(e){for(;;)switch(e.p=e.n){case 0:if(X.trim()){e.n=1;break}return te("Blog category name is required"),e.a(2);case 1:return e.p=1,e.n=2,p({name:X.trim()}).unwrap();case 2:a.Ay.success("Blog category added successfully"),ue(),e.n=4;break;case 3:e.p=3,r=e.v,a.Ay.error((null==r||null===(t=r.data)||void 0===t?void 0:t.message)||"Failed to add blog category");case 4:return e.a(2)}},e,null,[[1,3]])})),[X,p,ue]),he=(0,n.useCallback)(function(){var e=q(T().m(function e(t){var r,n;return T().w(function(e){for(;;)switch(e.p=e.n){case 0:return e.p=0,e.n=1,G(t).unwrap();case 1:a.Ay.success("Pricing package deleted successfully"),e.n=3;break;case 2:e.p=2,n=e.v,a.Ay.error((null==n||null===(r=n.data)||void 0===r?void 0:r.message)||"Failed to delete package");case 3:return e.a(2)}},e,null,[[0,2]])}));return function(t){return e.apply(this,arguments)}}(),[G]),ve=(0,n.useCallback)(q(T().m(function e(){var t,r,n,i,o,s;return T().w(function(e){for(;;)switch(e.p=e.n){case 0:if(t={},ne.name.trim()||(t.name="Name is required"),ne.price.trim()?(isNaN(Number(ne.price))||Number(ne.price)<0)&&(t.price="Enter a valid price"):t.price="Price is required",ne.minutes.trim()?(isNaN(Number(ne.minutes))||Number(ne.minutes)<0)&&(t.minutes="Enter valid minutes"):t.minutes="Minutes is required",ne.credits.trim()?(isNaN(Number(ne.credits))||Number(ne.credits)<0)&&(t.credits="Enter valid credits"):t.credits="Credits are required",ne.featured.trim()||(t.featured="At least one feature is required"),!(Object.keys(t).length>0)){e.n=1;break}return se(t),e.a(2);case 1:if(r=ne.featured.split("\n").map(function(e){return e.trim()}).filter(Boolean),n=ne.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)+/g,""),i={name:ne.name.trim(),slug:n,price:Number(ne.price),minutes:Number(ne.minutes),credits:Number(ne.credits),description:ne.description.trim(),features:r},e.p=2,null===W){e.n=4;break}return e.n=3,E(S({id:W},i)).unwrap();case 3:a.Ay.success("Pricing package updated successfully"),e.n=6;break;case 4:return e.n=5,O(i).unwrap();case 5:a.Ay.success("Pricing package created successfully");case 6:ue(),e.n=8;break;case 7:e.p=7,s=e.v,a.Ay.error((null==s||null===(o=s.data)||void 0===o?void 0:o.message)||"Failed to save pricing package");case 8:return e.a(2)}},e,null,[[2,7]])})),[ne,W,O,E,ue]),je=null!==L,Ne="price"===L,we=!Ne&&L?I[L]:null,Ce="category"===L?me:"topics"===L?be:xe,ke=J?"animate-modal-overlay-out":"animate-modal-overlay",Pe=J?"animate-modal-panel-out":"animate-modal-panel",Oe=(null==h?void 0:h.packages)||[];return(0,o.jsxs)("div",{className:"flex flex-col gap-5",children:[(0,o.jsxs)("div",{children:[(0,o.jsx)("h1",{className:"dashboard-page-title",children:"Powerful Settings Control for Complete Store Management"}),(0,o.jsx)("p",{className:"dashboard-page-subtitle mt-1",children:"Customize categories, models, and pricing rules with full flexibility from your admin settings panel."})]}),(0,o.jsxs)("div",{className:"flex flex-col gap-5",children:[(0,o.jsx)(c,{categories:t,onAddClick:function(){return de("category")},onDeleteCategory:ge}),(0,o.jsx)(l,{topics:s,onAddClick:function(){return de("topics")},onDeleteTopic:pe}),(0,o.jsx)(u,{blogCategories:y,onAddClick:function(){return de("blogCategory")},onDeleteBlogCategory:ye}),N?(0,o.jsx)("div",{className:"flex justify-center items-center py-8",children:(0,o.jsx)("span",{className:"text-gray-500 font-medium",children:"Loading pricing packages..."})}):(0,o.jsx)(m,{pricingPlans:Oe,onAddClick:function(){return de("price")},onEditPlan:fe,onDeletePlan:he})]}),je&&(0,o.jsx)(v,{isPriceModal:Ne,editingPlanId:W,priceForm:ne,setPriceForm:ae,priceErrors:oe,handleSavePrice:ve,tagConfig:we,tagInput:X,setTagInput:Y,tagError:ee,setTagError:te,tagSaveHandler:Ce,handleCloseModal:ue,overlayClass:ke,panelClass:Pe,isModalClosing:J})]})}}}]);
+"use strict";
+(self.webpackChunkreact_webpack_tailwind_app =
+  self.webpackChunkreact_webpack_tailwind_app || []).push([
+  [2996],
+  {
+    4803(e, t, r) {
+      r.d(t, { Jt: () => s, MR: () => c, _l: () => l, aT: () => o });
+      var n = r(69215),
+        a = ["id"],
+        i = n.q.injectEndpoints({
+          endpoints: function (e) {
+            return {
+              getAllPackages: e.query({
+                query: function () {
+                  return {
+                    url: "/packages",
+                    method: "GET",
+                    params:
+                      arguments.length > 0 && void 0 !== arguments[0]
+                        ? arguments[0]
+                        : {},
+                  };
+                },
+                providesTags: ["Package"],
+                transformResponse: function (e) {
+                  return e.data;
+                },
+              }),
+              getActivePackages: e.query({
+                query: function () {
+                  return {
+                    url: "/packages/active",
+                    method: "GET",
+                    params:
+                      arguments.length > 0 && void 0 !== arguments[0]
+                        ? arguments[0]
+                        : {},
+                  };
+                },
+                providesTags: ["Package"],
+                transformResponse: function (e) {
+                  return e.data;
+                },
+              }),
+              getPackageBySlug: e.query({
+                query: function (e) {
+                  return { url: "/packages/slug/".concat(e), method: "GET" };
+                },
+                providesTags: function (e, t, r) {
+                  return [{ type: "Package", id: r }];
+                },
+                transformResponse: function (e) {
+                  return e.data;
+                },
+              }),
+              getPackageById: e.query({
+                query: function (e) {
+                  return { url: "/packages/".concat(e), method: "GET" };
+                },
+                providesTags: function (e, t, r) {
+                  return [{ type: "Package", id: r }];
+                },
+                transformResponse: function (e) {
+                  return e.data;
+                },
+              }),
+              createPackage: e.mutation({
+                query: function (e) {
+                  return { url: "/packages", method: "POST", body: e };
+                },
+                invalidatesTags: ["Package"],
+                transformResponse: function (e) {
+                  return e.data;
+                },
+              }),
+              updatePackage: e.mutation({
+                query: function (e) {
+                  var t = e.id,
+                    r = (function (e, t) {
+                      if (null == e) return {};
+                      var r,
+                        n,
+                        a = (function (e, t) {
+                          if (null == e) return {};
+                          var r = {};
+                          for (var n in e)
+                            if ({}.hasOwnProperty.call(e, n)) {
+                              if (-1 !== t.indexOf(n)) continue;
+                              r[n] = e[n];
+                            }
+                          return r;
+                        })(e, t);
+                      if (Object.getOwnPropertySymbols) {
+                        var i = Object.getOwnPropertySymbols(e);
+                        for (n = 0; n < i.length; n++)
+                          ((r = i[n]),
+                            -1 === t.indexOf(r) &&
+                              {}.propertyIsEnumerable.call(e, r) &&
+                              (a[r] = e[r]));
+                      }
+                      return a;
+                    })(e, a);
+                  return {
+                    url: "/packages/".concat(t),
+                    method: "PATCH",
+                    body: r,
+                  };
+                },
+                invalidatesTags: function (e, t, r) {
+                  return [{ type: "Package", id: r.id }];
+                },
+                transformResponse: function (e) {
+                  return e.data;
+                },
+              }),
+              deletePackage: e.mutation({
+                query: function (e) {
+                  return { url: "/packages/".concat(e), method: "DELETE" };
+                },
+                invalidatesTags: ["Package"],
+                transformResponse: function (e) {
+                  return e.data;
+                },
+              }),
+            };
+          },
+        }),
+        o = i.useGetAllPackagesQuery,
+        s =
+          (i.useGetActivePackagesQuery,
+          i.useGetPackageBySlugQuery,
+          i.useGetPackageByIdQuery,
+          i.useCreatePackageMutation),
+        c = i.useUpdatePackageMutation,
+        l = i.useDeletePackageMutation;
+    },
+    72996(e, t, r) {
+      (r.r(t), r.d(t, { default: () => L }));
+      var n = r(96540),
+        a = r(90888),
+        i = r(32708),
+        o = r(74848);
+      const s = function (e) {
+          var t = e.name,
+            r = e.onDelete;
+          return (0, o.jsxs)("div", {
+            className:
+              "inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg bg-white text-base text-gray-700",
+            children: [
+              (0, o.jsx)("span", { children: t }),
+              (0, o.jsx)("button", {
+                type: "button",
+                onClick: r,
+                className: "text-gray-400 hover:text-red-500 transition-colors",
+                "aria-label": "Delete ".concat(t),
+                children: (0, o.jsx)(i.A, { size: 15 }),
+              }),
+            ],
+          });
+        },
+        c = function (e) {
+          var t = e.categories,
+            r = e.onAddClick,
+            n = e.onDeleteCategory;
+          return (0, o.jsxs)("section", {
+            className: "bg-white border border-gray-200 rounded-xl p-6",
+            children: [
+              (0, o.jsxs)("div", {
+                className: "flex items-center justify-between mb-4",
+                children: [
+                  (0, o.jsx)("h2", {
+                    className: "text-xl font-semibold text-gray-800",
+                    children: "Category",
+                  }),
+                  (0, o.jsx)("button", {
+                    type: "button",
+                    onClick: r,
+                    className:
+                      "px-4 py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-medium rounded-lg transition-colors",
+                    children: "Add Category",
+                  }),
+                ],
+              }),
+              (0, o.jsx)("hr", { className: "border-gray-100 mb-4" }),
+              (0, o.jsx)("div", {
+                className: "flex flex-wrap gap-3",
+                children: t.map(function (e) {
+                  return (0, o.jsx)(
+                    s,
+                    {
+                      name: e.name,
+                      onDelete: function () {
+                        return n(e.id);
+                      },
+                    },
+                    e.id,
+                  );
+                }),
+              }),
+            ],
+          });
+        },
+        l = function (e) {
+          var t = e.topics,
+            r = e.onAddClick,
+            n = e.onDeleteTopic;
+          return (0, o.jsxs)("section", {
+            className: "bg-white border border-gray-200 rounded-xl p-6",
+            children: [
+              (0, o.jsxs)("div", {
+                className: "flex items-center justify-between mb-4",
+                children: [
+                  (0, o.jsx)("h2", {
+                    className: "text-xl font-semibold text-gray-800",
+                    children: "Topics",
+                  }),
+                  (0, o.jsx)("button", {
+                    type: "button",
+                    onClick: r,
+                    className:
+                      "px-4 py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-medium rounded-lg transition-colors",
+                    children: "Add Topics",
+                  }),
+                ],
+              }),
+              (0, o.jsx)("hr", { className: "border-gray-100 mb-4" }),
+              (0, o.jsx)("div", {
+                className: "flex flex-wrap gap-3",
+                children: t.map(function (e) {
+                  return (0, o.jsx)(
+                    s,
+                    {
+                      name: e.name,
+                      onDelete: function () {
+                        return n(e.id);
+                      },
+                    },
+                    e.id,
+                  );
+                }),
+              }),
+            ],
+          });
+        },
+        u = function (e) {
+          var t = e.blogCategories,
+            r = e.onAddClick,
+            n = e.onDeleteBlogCategory;
+          return (0, o.jsxs)("section", {
+            className: "bg-white border border-gray-200 rounded-xl p-6",
+            children: [
+              (0, o.jsxs)("div", {
+                className: "flex items-center justify-between mb-4",
+                children: [
+                  (0, o.jsx)("h2", {
+                    className: "text-xl font-semibold text-gray-800",
+                    children: "Blog Category",
+                  }),
+                  (0, o.jsx)("button", {
+                    type: "button",
+                    onClick: r,
+                    className:
+                      "px-4 py-2.5 bg-green-500/60  text-white text-base font-medium rounded-lg transition-colors",
+                    children: "Add Category",
+                  }),
+                ],
+              }),
+              (0, o.jsx)("hr", { className: "border-gray-100 mb-4" }),
+              (0, o.jsx)("div", {
+                className: "flex flex-wrap gap-3",
+                children: t.map(function (e) {
+                  return (0, o.jsx)(
+                    s,
+                    {
+                      name: e.name,
+                      onDelete: function () {
+                        return n(e.id);
+                      },
+                    },
+                    e.id,
+                  );
+                }),
+              }),
+            ],
+          });
+        };
+      var d = r(45773),
+        f = r(25005);
+      const g = function (e) {
+          var t = e.plan,
+            r = e.onEdit,
+            n = e.onDelete;
+          return (0, o.jsxs)("div", {
+            className:
+              "flex flex-col border border-gray-200 rounded-xl p-6 gap-5",
+            children: [
+              (0, o.jsxs)("div", {
+                className: "flex justify-between items-start",
+                children: [
+                  (0, o.jsx)("h3", {
+                    className: "text-2xl font-bold text-gray-900",
+                    children: t.name,
+                  }),
+                  void 0 !== t.credits &&
+                    (0, o.jsxs)("span", {
+                      className:
+                        "px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full",
+                      children: [t.credits, " Credits"],
+                    }),
+                ],
+              }),
+              (0, o.jsxs)("div", {
+                className: "flex items-baseline gap-1",
+                children: [
+                  (0, o.jsxs)("span", {
+                    className: "text-3xl font-bold text-gray-900",
+                    children: ["€", t.price],
+                  }),
+                  void 0 !== t.minutes &&
+                    t.minutes > 0 &&
+                    (0, o.jsxs)("span", {
+                      className: "text-base text-gray-500",
+                      children: ["/", t.minutes, " minutes"],
+                    }),
+                ],
+              }),
+              t.description &&
+                (0, o.jsx)("p", {
+                  className: "text-sm text-gray-500 italic",
+                  children: t.description,
+                }),
+              (0, o.jsx)("ul", {
+                className: "flex flex-col gap-2 flex-1",
+                children: t.features.map(function (e, t) {
+                  return (0, o.jsxs)(
+                    "li",
+                    {
+                      className:
+                        "flex items-center gap-2 text-base text-gray-700",
+                      children: [
+                        (0, o.jsx)(d.A, {
+                          size: 15,
+                          className: "text-green-500 shrink-0",
+                        }),
+                        e,
+                      ],
+                    },
+                    t,
+                  );
+                }),
+              }),
+              (0, o.jsxs)("div", {
+                className: "flex gap-3",
+                children: [
+                  (0, o.jsxs)("button", {
+                    type: "button",
+                    onClick: r,
+                    className:
+                      "flex items-center justify-center gap-2 flex-1 py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-medium rounded-lg transition-colors",
+                    children: [(0, o.jsx)(f.A, { size: 14 }), "Edit"],
+                  }),
+                  (0, o.jsxs)("button", {
+                    type: "button",
+                    onClick: n,
+                    className:
+                      "flex items-center justify-center gap-2 flex-1 py-2.5 border border-purple-200 text-purple-500 hover:bg-purple-50 text-base font-medium rounded-lg transition-colors",
+                    children: [(0, o.jsx)(i.A, { size: 14 }), "Delete"],
+                  }),
+                ],
+              }),
+            ],
+          });
+        },
+        m = function (e) {
+          var t = e.pricingPlans,
+            r = e.onAddClick,
+            n = e.onEditPlan,
+            a = e.onDeletePlan;
+          return (0, o.jsxs)("section", {
+            className: "bg-white border border-gray-200 rounded-xl p-6",
+            children: [
+              (0, o.jsxs)("div", {
+                className: "flex items-center justify-between mb-4",
+                children: [
+                  (0, o.jsx)("h2", {
+                    className: "text-xl font-semibold text-gray-800",
+                    children: "Pricing",
+                  }),
+                  (0, o.jsx)("button", {
+                    type: "button",
+                    onClick: r,
+                    className:
+                      "px-4 py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-medium rounded-lg transition-colors",
+                    children: "Add Price",
+                  }),
+                ],
+              }),
+              (0, o.jsx)("hr", { className: "border-gray-100 mb-4" }),
+              (0, o.jsx)("div", {
+                className:
+                  "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6",
+                children: t.map(function (e) {
+                  return (0, o.jsx)(
+                    g,
+                    {
+                      plan: e,
+                      onEdit: function () {
+                        return n(e);
+                      },
+                      onDelete: function () {
+                        return a(e.id);
+                      },
+                    },
+                    e.id,
+                  );
+                }),
+              }),
+            ],
+          });
+        };
+      var p = r(48697);
+      function b(e) {
+        return (
+          (b =
+            "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
+              ? function (e) {
+                  return typeof e;
+                }
+              : function (e) {
+                  return e &&
+                    "function" == typeof Symbol &&
+                    e.constructor === Symbol &&
+                    e !== Symbol.prototype
+                    ? "symbol"
+                    : typeof e;
+                }),
+          b(e)
+        );
+      }
+      function y(e, t) {
+        var r = Object.keys(e);
+        if (Object.getOwnPropertySymbols) {
+          var n = Object.getOwnPropertySymbols(e);
+          (t &&
+            (n = n.filter(function (t) {
+              return Object.getOwnPropertyDescriptor(e, t).enumerable;
+            })),
+            r.push.apply(r, n));
+        }
+        return r;
+      }
+      function x(e) {
+        for (var t = 1; t < arguments.length; t++) {
+          var r = null != arguments[t] ? arguments[t] : {};
+          t % 2
+            ? y(Object(r), !0).forEach(function (t) {
+                h(e, t, r[t]);
+              })
+            : Object.getOwnPropertyDescriptors
+              ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(r))
+              : y(Object(r)).forEach(function (t) {
+                  Object.defineProperty(
+                    e,
+                    t,
+                    Object.getOwnPropertyDescriptor(r, t),
+                  );
+                });
+        }
+        return e;
+      }
+      function h(e, t, r) {
+        return (
+          (t = (function (e) {
+            var t = (function (e) {
+              if ("object" != b(e) || !e) return e;
+              var t = e[Symbol.toPrimitive];
+              if (void 0 !== t) {
+                var r = t.call(e, "string");
+                if ("object" != b(r)) return r;
+                throw new TypeError(
+                  "@@toPrimitive must return a primitive value.",
+                );
+              }
+              return String(e);
+            })(e);
+            return "symbol" == b(t) ? t : t + "";
+          })(t)) in e
+            ? Object.defineProperty(e, t, {
+                value: r,
+                enumerable: !0,
+                configurable: !0,
+                writable: !0,
+              })
+            : (e[t] = r),
+          e
+        );
+      }
+      const v = function (e) {
+        var t = e.isPriceModal,
+          r = e.editingPlanId,
+          n = e.priceForm,
+          a = e.setPriceForm,
+          i = e.priceErrors,
+          s = e.handleSavePrice,
+          c = e.tagConfig,
+          l = e.tagInput,
+          u = e.setTagInput,
+          d = e.tagError,
+          f = e.setTagError,
+          g = e.tagSaveHandler,
+          m = e.handleCloseModal,
+          b = e.overlayClass,
+          y = e.panelClass,
+          h = e.isModalClosing;
+        return (0, o.jsx)("div", {
+          className:
+            "fixed inset-0 z-50 flex items-center justify-center bg-black/50 "
+              .concat(b, " ")
+              .concat(h ? "pointer-events-none" : ""),
+          onClick: m,
+          children: (0, o.jsx)("div", {
+            className:
+              "bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 ".concat(y),
+            onClick: function (e) {
+              return e.stopPropagation();
+            },
+            children: t
+              ? (0, o.jsxs)("div", {
+                  className: "p-6 flex flex-col gap-4",
+                  children: [
+                    (0, o.jsxs)("div", {
+                      className: "flex items-center justify-between",
+                      children: [
+                        (0, o.jsx)("h3", {
+                          className: "text-xl font-semibold text-gray-900",
+                          children: null !== r ? "Edit Price" : "Add Price",
+                        }),
+                        (0, o.jsx)("button", {
+                          type: "button",
+                          onClick: m,
+                          className:
+                            "text-gray-400 hover:text-gray-600 transition-colors",
+                          "aria-label": "Close modal",
+                          children: (0, o.jsx)(p.A, { size: 20 }),
+                        }),
+                      ],
+                    }),
+                    (0, o.jsxs)("div", {
+                      className: "flex flex-col gap-1",
+                      children: [
+                        (0, o.jsx)("label", {
+                          className: "text-base font-medium text-gray-700",
+                          children: "Name",
+                        }),
+                        (0, o.jsx)("input", {
+                          type: "text",
+                          placeholder: "Name",
+                          value: n.name,
+                          onChange: function (e) {
+                            return a(function (t) {
+                              return x(x({}, t), {}, { name: e.target.value });
+                            });
+                          },
+                          className:
+                            "w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400",
+                        }),
+                        i.name &&
+                          (0, o.jsx)("p", {
+                            className: "text-xs text-red-500",
+                            children: i.name,
+                          }),
+                      ],
+                    }),
+                    (0, o.jsxs)("div", {
+                      className: "flex flex-col gap-1",
+                      children: [
+                        (0, o.jsx)("label", {
+                          className: "text-base font-medium text-gray-700",
+                          children: "Price (€)",
+                        }),
+                        (0, o.jsx)("input", {
+                          type: "number",
+                          step: "0.01",
+                          min: "0",
+                          placeholder: "0.00",
+                          value: n.price,
+                          onChange: function (e) {
+                            return a(function (t) {
+                              return x(x({}, t), {}, { price: e.target.value });
+                            });
+                          },
+                          className:
+                            "w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400",
+                        }),
+                        i.price &&
+                          (0, o.jsx)("p", {
+                            className: "text-xs text-red-500",
+                            children: i.price,
+                          }),
+                      ],
+                    }),
+                    (0, o.jsxs)("div", {
+                      className: "flex flex-col gap-1",
+                      children: [
+                        (0, o.jsx)("label", {
+                          className: "text-base font-medium text-gray-700",
+                          children: "Minutes",
+                        }),
+                        (0, o.jsx)("input", {
+                          type: "number",
+                          min: "0",
+                          placeholder: "0",
+                          value: n.minutes,
+                          onChange: function (e) {
+                            return a(function (t) {
+                              return x(
+                                x({}, t),
+                                {},
+                                { minutes: e.target.value },
+                              );
+                            });
+                          },
+                          className:
+                            "w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400",
+                        }),
+                        i.minutes &&
+                          (0, o.jsx)("p", {
+                            className: "text-xs text-red-500",
+                            children: i.minutes,
+                          }),
+                      ],
+                    }),
+                    (0, o.jsxs)("div", {
+                      className: "flex flex-col gap-1",
+                      children: [
+                        (0, o.jsx)("label", {
+                          className: "text-base font-medium text-gray-700",
+                          children: "Credits",
+                        }),
+                        (0, o.jsx)("input", {
+                          type: "number",
+                          min: "0",
+                          placeholder: "0",
+                          value: n.credits,
+                          onChange: function (e) {
+                            return a(function (t) {
+                              return x(
+                                x({}, t),
+                                {},
+                                { credits: e.target.value },
+                              );
+                            });
+                          },
+                          className:
+                            "w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400",
+                        }),
+                        i.credits &&
+                          (0, o.jsx)("p", {
+                            className: "text-xs text-red-500",
+                            children: i.credits,
+                          }),
+                      ],
+                    }),
+                    (0, o.jsxs)("div", {
+                      className: "flex flex-col gap-1",
+                      children: [
+                        (0, o.jsx)("label", {
+                          className: "text-base font-medium text-gray-700",
+                          children: "Description",
+                        }),
+                        (0, o.jsx)("input", {
+                          type: "text",
+                          placeholder: "Description",
+                          value: n.description,
+                          onChange: function (e) {
+                            return a(function (t) {
+                              return x(
+                                x({}, t),
+                                {},
+                                { description: e.target.value },
+                              );
+                            });
+                          },
+                          className:
+                            "w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400",
+                        }),
+                        i.description &&
+                          (0, o.jsx)("p", {
+                            className: "text-xs text-red-500",
+                            children: i.description,
+                          }),
+                      ],
+                    }),
+                    (0, o.jsxs)("div", {
+                      className: "flex flex-col gap-1",
+                      children: [
+                        (0, o.jsx)("label", {
+                          className: "text-base font-medium text-gray-700",
+                          children: "Features (One per line)",
+                        }),
+                        (0, o.jsx)("textarea", {
+                          placeholder: "Write Features",
+                          rows: 4,
+                          value: n.featured,
+                          onChange: function (e) {
+                            return a(function (t) {
+                              return x(
+                                x({}, t),
+                                {},
+                                { featured: e.target.value },
+                              );
+                            });
+                          },
+                          className:
+                            "w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none",
+                        }),
+                        i.featured &&
+                          (0, o.jsx)("p", {
+                            className: "text-xs text-red-500",
+                            children: i.featured,
+                          }),
+                      ],
+                    }),
+                    (0, o.jsx)("button", {
+                      type: "button",
+                      onClick: s,
+                      className:
+                        "w-full py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-semibold rounded-lg transition-colors",
+                      children: "Save",
+                    }),
+                  ],
+                })
+              : (0, o.jsxs)("div", {
+                  className: "p-6 flex flex-col gap-4",
+                  children: [
+                    (0, o.jsxs)("div", {
+                      className: "flex items-center justify-between",
+                      children: [
+                        (0, o.jsx)("h3", {
+                          className: "text-xl font-semibold text-gray-900",
+                          children: null == c ? void 0 : c.title,
+                        }),
+                        (0, o.jsx)("button", {
+                          type: "button",
+                          onClick: m,
+                          className:
+                            "text-gray-400 hover:text-gray-600 transition-colors",
+                          "aria-label": "Close modal",
+                          children: (0, o.jsx)(p.A, { size: 20 }),
+                        }),
+                      ],
+                    }),
+                    (0, o.jsxs)("div", {
+                      className: "flex flex-col gap-1",
+                      children: [
+                        (0, o.jsx)("input", {
+                          type: "text",
+                          placeholder: null == c ? void 0 : c.placeholder,
+                          value: l,
+                          onChange: function (e) {
+                            (u(e.target.value), d && f(""));
+                          },
+                          className:
+                            "w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400",
+                        }),
+                        d &&
+                          (0, o.jsx)("p", {
+                            className: "text-xs text-red-500",
+                            children: d,
+                          }),
+                      ],
+                    }),
+                    (0, o.jsx)("button", {
+                      type: "button",
+                      onClick: g,
+                      className:
+                        "w-full py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-semibold rounded-lg transition-colors",
+                      children: "Save",
+                    }),
+                  ],
+                }),
+          }),
+        });
+      };
+      var j = r(4803),
+        N = r(69215).q.injectEndpoints({
+          endpoints: function (e) {
+            return {
+              getAllBlogCategories: e.query({
+                query: function () {
+                  return { url: "/blogs/categories", method: "GET" };
+                },
+                providesTags: ["BlogCategory"],
+                transformResponse: function (e) {
+                  return e.data;
+                },
+              }),
+              createBlogCategory: e.mutation({
+                query: function (e) {
+                  return { url: "/blogs/categories", method: "POST", body: e };
+                },
+                invalidatesTags: ["BlogCategory"],
+                transformResponse: function (e) {
+                  return e.data;
+                },
+              }),
+              deleteBlogCategory: e.mutation({
+                query: function (e) {
+                  return {
+                    url: "/blogs/categories/".concat(e),
+                    method: "DELETE",
+                  };
+                },
+                invalidatesTags: ["BlogCategory"],
+                transformResponse: function (e) {
+                  return e.data;
+                },
+              }),
+            };
+          },
+        }),
+        w = N.useGetAllBlogCategoriesQuery,
+        C = N.useCreateBlogCategoryMutation,
+        k = N.useDeleteBlogCategoryMutation;
+      function P(e) {
+        return (
+          (P =
+            "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
+              ? function (e) {
+                  return typeof e;
+                }
+              : function (e) {
+                  return e &&
+                    "function" == typeof Symbol &&
+                    e.constructor === Symbol &&
+                    e !== Symbol.prototype
+                    ? "symbol"
+                    : typeof e;
+                }),
+          P(e)
+        );
+      }
+      function O(e, t) {
+        var r = Object.keys(e);
+        if (Object.getOwnPropertySymbols) {
+          var n = Object.getOwnPropertySymbols(e);
+          (t &&
+            (n = n.filter(function (t) {
+              return Object.getOwnPropertyDescriptor(e, t).enumerable;
+            })),
+            r.push.apply(r, n));
+        }
+        return r;
+      }
+      function S(e) {
+        for (var t = 1; t < arguments.length; t++) {
+          var r = null != arguments[t] ? arguments[t] : {};
+          t % 2
+            ? O(Object(r), !0).forEach(function (t) {
+                A(e, t, r[t]);
+              })
+            : Object.getOwnPropertyDescriptors
+              ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(r))
+              : O(Object(r)).forEach(function (t) {
+                  Object.defineProperty(
+                    e,
+                    t,
+                    Object.getOwnPropertyDescriptor(r, t),
+                  );
+                });
+        }
+        return e;
+      }
+      function A(e, t, r) {
+        return (
+          (t = (function (e) {
+            var t = (function (e) {
+              if ("object" != P(e) || !e) return e;
+              var t = e[Symbol.toPrimitive];
+              if (void 0 !== t) {
+                var r = t.call(e, "string");
+                if ("object" != P(r)) return r;
+                throw new TypeError(
+                  "@@toPrimitive must return a primitive value.",
+                );
+              }
+              return String(e);
+            })(e);
+            return "symbol" == P(t) ? t : t + "";
+          })(t)) in e
+            ? Object.defineProperty(e, t, {
+                value: r,
+                enumerable: !0,
+                configurable: !0,
+                writable: !0,
+              })
+            : (e[t] = r),
+          e
+        );
+      }
+      function T() {
+        var e,
+          t,
+          r = "function" == typeof Symbol ? Symbol : {},
+          n = r.iterator || "@@iterator",
+          a = r.toStringTag || "@@toStringTag";
+        function i(r, n, a, i) {
+          var c = n && n.prototype instanceof s ? n : s,
+            l = Object.create(c.prototype);
+          return (
+            E(
+              l,
+              "_invoke",
+              (function (r, n, a) {
+                var i,
+                  s,
+                  c,
+                  l = 0,
+                  u = a || [],
+                  d = !1,
+                  f = {
+                    p: 0,
+                    n: 0,
+                    v: e,
+                    a: g,
+                    f: g.bind(e, 4),
+                    d: function (t, r) {
+                      return ((i = t), (s = 0), (c = e), (f.n = r), o);
+                    },
+                  };
+                function g(r, n) {
+                  for (
+                    s = r, c = n, t = 0;
+                    !d && l && !a && t < u.length;
+                    t++
+                  ) {
+                    var a,
+                      i = u[t],
+                      g = f.p,
+                      m = i[2];
+                    r > 3
+                      ? (a = m === n) &&
+                        ((c = i[(s = i[4]) ? 5 : ((s = 3), 3)]),
+                        (i[4] = i[5] = e))
+                      : i[0] <= g &&
+                        ((a = r < 2 && g < i[1])
+                          ? ((s = 0), (f.v = n), (f.n = i[1]))
+                          : g < m &&
+                            (a = r < 3 || i[0] > n || n > m) &&
+                            ((i[4] = r), (i[5] = n), (f.n = m), (s = 0)));
+                  }
+                  if (a || r > 1) return o;
+                  throw ((d = !0), n);
+                }
+                return function (a, u, m) {
+                  if (l > 1) throw TypeError("Generator is already running");
+                  for (
+                    d && 1 === u && g(u, m), s = u, c = m;
+                    (t = s < 2 ? e : c) || !d;
+                  ) {
+                    i ||
+                      (s
+                        ? s < 3
+                          ? (s > 1 && (f.n = -1), g(s, c))
+                          : (f.n = c)
+                        : (f.v = c));
+                    try {
+                      if (((l = 2), i)) {
+                        if ((s || (a = "next"), (t = i[a]))) {
+                          if (!(t = t.call(i, c)))
+                            throw TypeError("iterator result is not an object");
+                          if (!t.done) return t;
+                          ((c = t.value), s < 2 && (s = 0));
+                        } else
+                          (1 === s && (t = i.return) && t.call(i),
+                            s < 2 &&
+                              ((c = TypeError(
+                                "The iterator does not provide a '" +
+                                  a +
+                                  "' method",
+                              )),
+                              (s = 1)));
+                        i = e;
+                      } else if ((t = (d = f.n < 0) ? c : r.call(n, f)) !== o)
+                        break;
+                    } catch (t) {
+                      ((i = e), (s = 1), (c = t));
+                    } finally {
+                      l = 1;
+                    }
+                  }
+                  return { value: t, done: d };
+                };
+              })(r, a, i),
+              !0,
+            ),
+            l
+          );
+        }
+        var o = {};
+        function s() {}
+        function c() {}
+        function l() {}
+        t = Object.getPrototypeOf;
+        var u = [][n]
+            ? t(t([][n]()))
+            : (E((t = {}), n, function () {
+                return this;
+              }),
+              t),
+          d = (l.prototype = s.prototype = Object.create(u));
+        function f(e) {
+          return (
+            Object.setPrototypeOf
+              ? Object.setPrototypeOf(e, l)
+              : ((e.__proto__ = l), E(e, a, "GeneratorFunction")),
+            (e.prototype = Object.create(d)),
+            e
+          );
+        }
+        return (
+          (c.prototype = l),
+          E(d, "constructor", l),
+          E(l, "constructor", c),
+          (c.displayName = "GeneratorFunction"),
+          E(l, a, "GeneratorFunction"),
+          E(d),
+          E(d, a, "Generator"),
+          E(d, n, function () {
+            return this;
+          }),
+          E(d, "toString", function () {
+            return "[object Generator]";
+          }),
+          (T = function () {
+            return { w: i, m: f };
+          })()
+        );
+      }
+      function E(e, t, r, n) {
+        var a = Object.defineProperty;
+        try {
+          a({}, "", {});
+        } catch (e) {
+          a = 0;
+        }
+        ((E = function (e, t, r, n) {
+          function i(t, r) {
+            E(e, t, function (e) {
+              return this._invoke(t, r, e);
+            });
+          }
+          t
+            ? a
+              ? a(e, t, {
+                  value: r,
+                  enumerable: !n,
+                  configurable: !n,
+                  writable: !n,
+                })
+              : (e[t] = r)
+            : (i("next", 0), i("throw", 1), i("return", 2));
+        }),
+          E(e, t, r, n));
+      }
+      function D(e, t, r, n, a, i, o) {
+        try {
+          var s = e[i](o),
+            c = s.value;
+        } catch (e) {
+          return void r(e);
+        }
+        s.done ? t(c) : Promise.resolve(c).then(n, a);
+      }
+      function q(e) {
+        return function () {
+          var t = this,
+            r = arguments;
+          return new Promise(function (n, a) {
+            var i = e.apply(t, r);
+            function o(e) {
+              D(i, n, a, o, s, "next", e);
+            }
+            function s(e) {
+              D(i, n, a, o, s, "throw", e);
+            }
+            o(void 0);
+          });
+        };
+      }
+      function B(e) {
+        return (
+          (function (e) {
+            if (Array.isArray(e)) return R(e);
+          })(e) ||
+          (function (e) {
+            if (
+              ("undefined" != typeof Symbol && null != e[Symbol.iterator]) ||
+              null != e["@@iterator"]
+            )
+              return Array.from(e);
+          })(e) ||
+          G(e) ||
+          (function () {
+            throw new TypeError(
+              "Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
+            );
+          })()
+        );
+      }
+      function M(e, t) {
+        return (
+          (function (e) {
+            if (Array.isArray(e)) return e;
+          })(e) ||
+          (function (e, t) {
+            var r =
+              null == e
+                ? null
+                : ("undefined" != typeof Symbol && e[Symbol.iterator]) ||
+                  e["@@iterator"];
+            if (null != r) {
+              var n,
+                a,
+                i,
+                o,
+                s = [],
+                c = !0,
+                l = !1;
+              try {
+                if (((i = (r = r.call(e)).next), 0 === t)) {
+                  if (Object(r) !== r) return;
+                  c = !1;
+                } else
+                  for (
+                    ;
+                    !(c = (n = i.call(r)).done) &&
+                    (s.push(n.value), s.length !== t);
+                    c = !0
+                  );
+              } catch (e) {
+                ((l = !0), (a = e));
+              } finally {
+                try {
+                  if (
+                    !c &&
+                    null != r.return &&
+                    ((o = r.return()), Object(o) !== o)
+                  )
+                    return;
+                } finally {
+                  if (l) throw a;
+                }
+              }
+              return s;
+            }
+          })(e, t) ||
+          G(e, t) ||
+          (function () {
+            throw new TypeError(
+              "Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
+            );
+          })()
+        );
+      }
+      function G(e, t) {
+        if (e) {
+          if ("string" == typeof e) return R(e, t);
+          var r = {}.toString.call(e).slice(8, -1);
+          return (
+            "Object" === r && e.constructor && (r = e.constructor.name),
+            "Map" === r || "Set" === r
+              ? Array.from(e)
+              : "Arguments" === r ||
+                  /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r)
+                ? R(e, t)
+                : void 0
+          );
+        }
+      }
+      function R(e, t) {
+        (null == t || t > e.length) && (t = e.length);
+        for (var r = 0, n = Array(t); r < t; r++) n[r] = e[r];
+        return n;
+      }
+      var I = {
+          category: { title: "Category name", placeholder: "Category name" },
+          topics: { title: "Topics name", placeholder: "Topics name" },
+          blogCategory: {
+            title: "Blog category",
+            placeholder: "Category name",
+          },
+        },
+        _ = [
+          { id: 1, name: "Relationship advice" },
+          { id: 2, name: "Compatibility check" },
+          { id: 3, name: "Stress management" },
+        ],
+        F = [
+          { id: 1, name: "How to stay consistent in life?" },
+          { id: 2, name: "How to switch career?" },
+        ],
+        z = {
+          name: "",
+          price: "",
+          minutes: "0",
+          credits: "0",
+          description: "",
+          featured: "",
+        };
+      const L = function () {
+        var e = M((0, n.useState)(_), 2),
+          t = e[0],
+          r = e[1],
+          i = M((0, n.useState)(F), 2),
+          s = i[0],
+          d = i[1],
+          f = w(),
+          g = f.data,
+          p = (f.isLoading, M(C(), 1)[0]),
+          b = M(k(), 1)[0],
+          y = (0, n.useMemo)(
+            function () {
+              return (null == g ? void 0 : g.categories) || [];
+            },
+            [g],
+          ),
+          x = (0, j.aT)(),
+          h = x.data,
+          N = x.isLoading,
+          P = M((0, j.Jt)(), 2),
+          O = P[0],
+          A = (P[1].isLoading, M((0, j.MR)(), 2)),
+          E = A[0],
+          D = (A[1].isLoading, M((0, j._l)(), 2)),
+          G = D[0],
+          R = (D[1].isLoading, M((0, n.useState)(null), 2)),
+          L = R[0],
+          H = R[1],
+          Q = M((0, n.useState)(!1), 2),
+          J = Q[0],
+          U = Q[1],
+          $ = M((0, n.useState)(null), 2),
+          W = $[0],
+          K = $[1],
+          V = M((0, n.useState)(""), 2),
+          X = V[0],
+          Y = V[1],
+          Z = M((0, n.useState)(""), 2),
+          ee = Z[0],
+          te = Z[1],
+          re = M((0, n.useState)(z), 2),
+          ne = re[0],
+          ae = re[1],
+          ie = M((0, n.useState)({}), 2),
+          oe = ie[0],
+          se = ie[1],
+          ce = (0, n.useRef)(null),
+          le = (0, n.useRef)(100);
+        (0, n.useEffect)(function () {
+          return function () {
+            ce.current && clearTimeout(ce.current);
+          };
+        }, []);
+        var ue = (0, n.useCallback)(function () {
+            (U(!0),
+              (ce.current = setTimeout(function () {
+                (H(null), U(!1), K(null), Y(""), te(""), ae(z), se({}));
+              }, 240)));
+          }, []),
+          de = (0, n.useCallback)(function (e) {
+            (ce.current && clearTimeout(ce.current),
+              U(!1),
+              K(null),
+              Y(""),
+              te(""),
+              ae(z),
+              se({}),
+              H(e));
+          }, []),
+          fe = (0, n.useCallback)(function (e) {
+            (ce.current && clearTimeout(ce.current),
+              U(!1),
+              K(e.id),
+              ae({
+                name: e.name,
+                price: String(e.price),
+                minutes: String(e.minutes || 0),
+                credits: String(e.credits || 0),
+                description: e.description || "",
+                featured: (e.features || []).join("\n"),
+              }),
+              se({}),
+              H("price"));
+          }, []),
+          ge = (0, n.useCallback)(function (e) {
+            (r(function (t) {
+              return t.filter(function (t) {
+                return t.id !== e;
+              });
+            }),
+              a.Ay.success("Category deleted"));
+          }, []),
+          me = (0, n.useCallback)(
+            function () {
+              X.trim()
+                ? ((le.current += 1),
+                  r(function (e) {
+                    return [].concat(B(e), [
+                      { id: le.current, name: X.trim() },
+                    ]);
+                  }),
+                  a.Ay.success("Category added"),
+                  ue())
+                : te("Category name is required");
+            },
+            [X, ue],
+          ),
+          pe = (0, n.useCallback)(function (e) {
+            (d(function (t) {
+              return t.filter(function (t) {
+                return t.id !== e;
+              });
+            }),
+              a.Ay.success("Topic deleted"));
+          }, []),
+          be = (0, n.useCallback)(
+            function () {
+              X.trim()
+                ? ((le.current += 1),
+                  d(function (e) {
+                    return [].concat(B(e), [
+                      { id: le.current, name: X.trim() },
+                    ]);
+                  }),
+                  a.Ay.success("Topic added"),
+                  ue())
+                : te("Topic name is required");
+            },
+            [X, ue],
+          ),
+          ye = (0, n.useCallback)(
+            (function () {
+              var e = q(
+                T().m(function e(t) {
+                  var r, n;
+                  return T().w(
+                    function (e) {
+                      for (;;)
+                        switch ((e.p = e.n)) {
+                          case 0:
+                            return ((e.p = 0), (e.n = 1), b(t).unwrap());
+                          case 1:
+                            (a.Ay.success("Blog category deleted successfully"),
+                              (e.n = 3));
+                            break;
+                          case 2:
+                            ((e.p = 2),
+                              (n = e.v),
+                              a.Ay.error(
+                                (null == n ||
+                                null === (r = n.data) ||
+                                void 0 === r
+                                  ? void 0
+                                  : r.message) ||
+                                  "Failed to delete blog category",
+                              ));
+                          case 3:
+                            return e.a(2);
+                        }
+                    },
+                    e,
+                    null,
+                    [[0, 2]],
+                  );
+                }),
+              );
+              return function (t) {
+                return e.apply(this, arguments);
+              };
+            })(),
+            [b],
+          ),
+          xe = (0, n.useCallback)(
+            q(
+              T().m(function e() {
+                var t, r;
+                return T().w(
+                  function (e) {
+                    for (;;)
+                      switch ((e.p = e.n)) {
+                        case 0:
+                          if (X.trim()) {
+                            e.n = 1;
+                            break;
+                          }
+                          return (te("Blog category name is required"), e.a(2));
+                        case 1:
+                          return (
+                            (e.p = 1),
+                            (e.n = 2),
+                            p({ name: X.trim() }).unwrap()
+                          );
+                        case 2:
+                          (a.Ay.success("Blog category added successfully"),
+                            ue(),
+                            (e.n = 4));
+                          break;
+                        case 3:
+                          ((e.p = 3),
+                            (r = e.v),
+                            a.Ay.error(
+                              (null == r ||
+                              null === (t = r.data) ||
+                              void 0 === t
+                                ? void 0
+                                : t.message) || "Failed to add blog category",
+                            ));
+                        case 4:
+                          return e.a(2);
+                      }
+                  },
+                  e,
+                  null,
+                  [[1, 3]],
+                );
+              }),
+            ),
+            [X, p, ue],
+          ),
+          he = (0, n.useCallback)(
+            (function () {
+              var e = q(
+                T().m(function e(t) {
+                  var r, n;
+                  return T().w(
+                    function (e) {
+                      for (;;)
+                        switch ((e.p = e.n)) {
+                          case 0:
+                            return ((e.p = 0), (e.n = 1), G(t).unwrap());
+                          case 1:
+                            (a.Ay.success(
+                              "Pricing package deleted successfully",
+                            ),
+                              (e.n = 3));
+                            break;
+                          case 2:
+                            ((e.p = 2),
+                              (n = e.v),
+                              a.Ay.error(
+                                (null == n ||
+                                null === (r = n.data) ||
+                                void 0 === r
+                                  ? void 0
+                                  : r.message) || "Failed to delete package",
+                              ));
+                          case 3:
+                            return e.a(2);
+                        }
+                    },
+                    e,
+                    null,
+                    [[0, 2]],
+                  );
+                }),
+              );
+              return function (t) {
+                return e.apply(this, arguments);
+              };
+            })(),
+            [G],
+          ),
+          ve = (0, n.useCallback)(
+            q(
+              T().m(function e() {
+                var t, r, n, i, o, s;
+                return T().w(
+                  function (e) {
+                    for (;;)
+                      switch ((e.p = e.n)) {
+                        case 0:
+                          if (
+                            ((t = {}),
+                            ne.name.trim() || (t.name = "Name is required"),
+                            ne.price.trim()
+                              ? (isNaN(Number(ne.price)) ||
+                                  Number(ne.price) < 0) &&
+                                (t.price = "Enter a valid price")
+                              : (t.price = "Price is required"),
+                            ne.minutes.trim()
+                              ? (isNaN(Number(ne.minutes)) ||
+                                  Number(ne.minutes) < 0) &&
+                                (t.minutes = "Enter valid minutes")
+                              : (t.minutes = "Minutes is required"),
+                            ne.credits.trim()
+                              ? (isNaN(Number(ne.credits)) ||
+                                  Number(ne.credits) < 0) &&
+                                (t.credits = "Enter valid credits")
+                              : (t.credits = "Credits are required"),
+                            ne.featured.trim() ||
+                              (t.featured = "At least one feature is required"),
+                            !(Object.keys(t).length > 0))
+                          ) {
+                            e.n = 1;
+                            break;
+                          }
+                          return (se(t), e.a(2));
+                        case 1:
+                          if (
+                            ((r = ne.featured
+                              .split("\n")
+                              .map(function (e) {
+                                return e.trim();
+                              })
+                              .filter(Boolean)),
+                            (n = ne.name
+                              .toLowerCase()
+                              .replace(/[^a-z0-9]+/g, "-")
+                              .replace(/(^-|-$)+/g, "")),
+                            (i = {
+                              name: ne.name.trim(),
+                              slug: n,
+                              price: Number(ne.price),
+                              minutes: Number(ne.minutes),
+                              credits: Number(ne.credits),
+                              description: ne.description.trim(),
+                              features: r,
+                            }),
+                            (e.p = 2),
+                            null === W)
+                          ) {
+                            e.n = 4;
+                            break;
+                          }
+                          return ((e.n = 3), E(S({ id: W }, i)).unwrap());
+                        case 3:
+                          (a.Ay.success("Pricing package updated successfully"),
+                            (e.n = 6));
+                          break;
+                        case 4:
+                          return ((e.n = 5), O(i).unwrap());
+                        case 5:
+                          a.Ay.success("Pricing package created successfully");
+                        case 6:
+                          (ue(), (e.n = 8));
+                          break;
+                        case 7:
+                          ((e.p = 7),
+                            (s = e.v),
+                            a.Ay.error(
+                              (null == s ||
+                              null === (o = s.data) ||
+                              void 0 === o
+                                ? void 0
+                                : o.message) ||
+                                "Failed to save pricing package",
+                            ));
+                        case 8:
+                          return e.a(2);
+                      }
+                  },
+                  e,
+                  null,
+                  [[2, 7]],
+                );
+              }),
+            ),
+            [ne, W, O, E, ue],
+          ),
+          je = null !== L,
+          Ne = "price" === L,
+          we = !Ne && L ? I[L] : null,
+          Ce = "category" === L ? me : "topics" === L ? be : xe,
+          ke = J ? "animate-modal-overlay-out" : "animate-modal-overlay",
+          Pe = J ? "animate-modal-panel-out" : "animate-modal-panel",
+          Oe = (null == h ? void 0 : h.packages) || [];
+        return (0, o.jsxs)("div", {
+          className: "flex flex-col gap-5",
+          children: [
+            (0, o.jsxs)("div", {
+              children: [
+                (0, o.jsx)("h1", {
+                  className: "dashboard-page-title",
+                  children:
+                    "Powerful Settings Control for Complete Store Management",
+                }),
+                (0, o.jsx)("p", {
+                  className: "dashboard-page-subtitle mt-1",
+                  children:
+                    "Customize categories, models, and pricing rules with full flexibility from your admin settings panel.",
+                }),
+              ],
+            }),
+            (0, o.jsxs)("div", {
+              className: "flex flex-col gap-5",
+              children: [
+                (0, o.jsx)(c, {
+                  categories: t,
+                  onAddClick: function () {
+                    return de("category");
+                  },
+                  onDeleteCategory: ge,
+                }),
+                (0, o.jsx)(l, {
+                  topics: s,
+                  onAddClick: function () {
+                    return de("topics");
+                  },
+                  onDeleteTopic: pe,
+                }),
+                (0, o.jsx)(u, {
+                  blogCategories: y,
+                  onAddClick: function () {
+                    return de("blogCategory");
+                  },
+                  onDeleteBlogCategory: ye,
+                }),
+                N
+                  ? (0, o.jsx)("div", {
+                      className: "flex justify-center items-center py-8",
+                      children: (0, o.jsx)("span", {
+                        className: "text-gray-500 font-medium",
+                        children: "Loading pricing packages...",
+                      }),
+                    })
+                  : (0, o.jsx)(m, {
+                      pricingPlans: Oe,
+                      onAddClick: function () {
+                        return de("price");
+                      },
+                      onEditPlan: fe,
+                      onDeletePlan: he,
+                    }),
+              ],
+            }),
+            je &&
+              (0, o.jsx)(v, {
+                isPriceModal: Ne,
+                editingPlanId: W,
+                priceForm: ne,
+                setPriceForm: ae,
+                priceErrors: oe,
+                handleSavePrice: ve,
+                tagConfig: we,
+                tagInput: X,
+                setTagInput: Y,
+                tagError: ee,
+                setTagError: te,
+                tagSaveHandler: Ce,
+                handleCloseModal: ue,
+                overlayClass: ke,
+                panelClass: Pe,
+                isModalClosing: J,
+              }),
+          ],
+        });
+      };
+    },
+  },
+]);
