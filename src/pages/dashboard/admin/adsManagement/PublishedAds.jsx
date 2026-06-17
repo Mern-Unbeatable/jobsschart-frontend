@@ -3,8 +3,8 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { MoreVertical, ArrowLeft } from "lucide-react";
 import { gsap } from "gsap";
-import { ROUTES } from "../../../config";
-import PublishedAdDetailsModal from "./PublishedAdDetailsModal";
+import { ROUTES } from "../../../../config";
+import PublishedAdDetailsModal from "../PublishedAdDetailsModal";
 
 const ACTION_MENU_WIDTH = 144;
 const ACTION_MENU_HEIGHT = 96;
