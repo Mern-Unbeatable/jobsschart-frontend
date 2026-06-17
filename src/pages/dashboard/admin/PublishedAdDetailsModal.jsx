@@ -283,7 +283,12 @@ export default function PublishedAdDetailsModal({
             >
               <Download size={14} className="text-white" />
             </button>
+          </div>
+        </div>
 
+        {/* Sticky Footer */}
+        <div className="px-5 py-4 border-t border-[#E7F1F1] bg-white shrink-0 flex justify-end">
+          {isPublishFlow ? (
             <button
               type="button"
               aria-label="Confirm published ad"
