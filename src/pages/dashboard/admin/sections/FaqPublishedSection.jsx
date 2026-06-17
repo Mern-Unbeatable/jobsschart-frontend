@@ -41,37 +41,43 @@ const FaqPublishedSection = ({ activeTab, onTabChange, faqs, onEdit, onDelete })
         </div>
 
         <div className='divide-y divide-[#f4f1f8] bg-white'>
-          {faqs.map((faq) => (
-            <div
-              key={faq.id}
-              className='grid grid-cols-1 sm:grid-cols-[1fr_auto] items-center gap-4 sm:gap-0 px-6 py-7 transition-colors hover:bg-[#fcfbff] sm:px-8'
-            >
+          {faqs.length === 0 ? (
+            <p className="px-6 py-12 text-center text-base text-gray-500">
+              No FAQs found.
+            </p>
+          ) : (
+            faqs.map((faq) => (
+              <div
+                key={faq.id}
+                className='grid grid-cols-1 sm:grid-cols-[1fr_auto] items-center gap-4 sm:gap-0 px-6 py-7 transition-colors hover:bg-[#fcfbff] sm:px-8'
+              >
                 <div className='min-w-0 pr-6'>
-                <p className='text-base font-semibold text-[#242424]'>
-                  {faq.question}
-                </p>
-              </div>
+                  <p className='text-base font-semibold text-[#242424]'>
+                    {faq.question}
+                  </p>
+                </div>
 
                 <div className='flex items-center justify-start sm:justify-end gap-3 text-[#78748a]'>
-                <button
-                  type='button'
-                  onClick={() => onEdit(faq)}
-                  className='rounded-md p-1.5 transition-colors hover:bg-[#f3eefc] hover:text-[#7b5cb1]'
-                  aria-label={`Edit FAQ ${faq.id}`}
-                >
-                  <PenLine size={16} aria-hidden='true' />
-                </button>
-                <button
-                  type='button'
-                  onClick={() => onDelete(faq.id)}
-                  className='rounded-md p-1.5 transition-colors hover:bg-red-50 hover:text-red-600'
-                  aria-label={`Delete FAQ ${faq.id}`}
-                >
-                  <Trash2 size={16} aria-hidden='true' />
-                </button>
+                  <button
+                    type='button'
+                    onClick={() => onEdit(faq)}
+                    className='rounded-md p-1.5 transition-colors hover:bg-[#f3eefc] hover:text-[#7b5cb1]'
+                    aria-label={`Edit FAQ ${faq.id}`}
+                  >
+                    <PenLine size={16} aria-hidden='true' />
+                  </button>
+                  <button
+                    type='button'
+                    onClick={() => onDelete(faq.id)}
+                    className='rounded-md p-1.5 transition-colors hover:bg-red-50 hover:text-red-600'
+                    aria-label={`Delete FAQ ${faq.id}`}
+                  >
+                    <Trash2 size={16} aria-hidden='true' />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
