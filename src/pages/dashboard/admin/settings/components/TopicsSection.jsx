@@ -15,13 +15,17 @@ const TopicsSection = ({ topics, onAddClick, onDeleteTopic }) => (
     </div>
     <hr className="border-gray-100 mb-4" />
     <div className="flex flex-wrap gap-3">
-      {topics.map((topic) => (
-        <TagPill
-          key={topic.id}
-          name={topic.name}
-          onDelete={() => onDeleteTopic(topic.id)}
-        />
-      ))}
+      {topics.length === 0 ? (
+        <span className="text-gray-400 text-base text-center italic py-2 w-full">No topics added</span>
+      ) : (
+        topics.map((topic) => (
+          <TagPill
+            key={topic.id}
+            name={topic.name}
+            onDelete={() => onDeleteTopic(topic.id)}
+          />
+        ))
+      )}
     </div>
   </section>
 );

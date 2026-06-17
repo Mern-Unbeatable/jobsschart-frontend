@@ -19,6 +19,12 @@ import {
   useDeleteBlogCategoryMutation,
 } from '../../../../features/api/blogApi';
 
+import {
+  useGetAllTopicsQuery,
+  useCreateTopicMutation,
+  useDeleteTopicMutation,
+} from '../../../../features/api/topicApi';
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const MODAL_CLOSE_ANIMATION_MS = 240;
@@ -69,7 +75,15 @@ const EMPTY_PRICE_FORM = {
 
 const Settings = () => {
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
-  const [topics, setTopics] = useState(INITIAL_TOPICS);
+
+  // RTK Query hooks for topic operations
+  const { data: topicsData, isLoading: isTopicsLoading } = useGetAllTopicsQuery();
+  const [createTopic] = useCreateTopicMutation();
+  const [deleteTopic] = useDeleteTopicMutation();
+
+  const topics = useMemo(() => {
+    return topicsData?.topics || topicsData || [];
+  }, [topicsData]);
 
   // RTK Query hooks for blog category operations
   const { data: blogCatsData, isLoading: isBlogCatsLoading } = useGetAllBlogCategoriesQuery();
@@ -169,24 +183,28 @@ const Settings = () => {
 
   // ── Topics handlers
 
-  const handleDeleteTopic = useCallback((id) => {
-    setTopics((prev) => prev.filter((t) => t.id !== id));
-    toast.success('Topic deleted');
-  }, []);
+  const handleDeleteTopic = useCallback(async (id) => {
+    try {
+      await deleteTopic(id).unwrap();
+      toast.success('Topic deleted successfully');
+    } catch (error) {
+      toast.error(error?.data?.message || 'Failed to delete topic');
+    }
+  }, [deleteTopic]);
 
-  const handleSaveTopic = useCallback(() => {
+  const handleSaveTopic = useCallback(async () => {
     if (!tagInput.trim()) {
       setTagError('Topic name is required');
       return;
     }
-    nextIdRef.current += 1;
-    setTopics((prev) => [
-      ...prev,
-      { id: nextIdRef.current, name: tagInput.trim() },
-    ]);
-    toast.success('Topic added');
-    handleCloseModal();
-  }, [tagInput, handleCloseModal]);
+    try {
+      await createTopic({ name: tagInput.trim() }).unwrap();
+      toast.success('Topic added successfully');
+      handleCloseModal();
+    } catch (error) {
+      toast.error(error?.data?.message || 'Failed to add topic');
+    }
+  }, [tagInput, createTopic, handleCloseModal]);
 
   // ── Blog Category handlers
 
@@ -347,11 +365,17 @@ const Settings = () => {
         />
 
         {/* Topics */}
-        <TopicsSection
-          topics={topics}
-          onAddClick={() => openModal('topics')}
-          onDeleteTopic={handleDeleteTopic}
-        />
+        {isTopicsLoading ? (
+          <div className="flex justify-center items-center py-8 bg-white border border-gray-200 rounded-xl p-6">
+            <span className="text-gray-500 font-medium">Loading topics...</span>
+          </div>
+        ) : (
+          <TopicsSection
+            topics={topics}
+            onAddClick={() => openModal('topics')}
+            onDeleteTopic={handleDeleteTopic}
+          />
+        )}
 
         {/* Blog Category */}
         <BlogCategorySection
