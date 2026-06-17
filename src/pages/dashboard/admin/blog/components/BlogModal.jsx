@@ -98,8 +98,7 @@ const BlogModal = ({
               onChange={(e) => {
                 const cleanedSlug = e.target.value
                   .toLowerCase()
-                  .replace(/[^a-z0-9-]+/g, "-")
-                  .replace(/^-+|-+$/g, "");
+                  .replace(/[^a-z0-9-]/g, "");
                 onChangeField("slug", cleanedSlug);
               }}
               placeholder="enter-blog-slug-here"

@@ -39,9 +39,11 @@ const Blog = () => {
   const [deleteBlog] = useDeleteBlogMutation();
 
   const [activeCategory, setActiveCategory] = useState("All");
+  const [lastError, setLastError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalClosing, setIsModalClosing] = useState(false);
   const [editingBlogId, setEditingBlogId] = useState(null);
+  const [editingBlog, setEditingBlog] = useState(null);
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [pendingReset, setPendingReset] = useState(false);
   const closeTimerRef = useRef(null);
@@ -121,7 +123,9 @@ const Blog = () => {
     setIsModalClosing(false);
     setPendingReset(false);
     setEditingBlogId(null);
+    setEditingBlog(null);
     setFormData(EMPTY_FORM);
+    setLastError(null);
     setIsModalOpen(true);
   };
 
@@ -133,6 +137,7 @@ const Blog = () => {
     setIsModalClosing(false);
     setPendingReset(false);
     setEditingBlogId(blog.id);
+    setEditingBlog(blog);
     setFormData({
       title: blog.title,
       slug: blog.slug || "",
@@ -142,6 +147,7 @@ const Blog = () => {
       imageFile: null,
       status: blog.status || "PUBLISHED",
     });
+    setLastError(null);
     setIsModalOpen(true);
   };
 
@@ -185,6 +191,7 @@ const Blog = () => {
 
   const handleSave = async (event) => {
     event.preventDefault();
+    setLastError(null);
 
     const preparedTitle = formData.title.trim();
     const preparedContent = formData.content.trim();
@@ -194,19 +201,56 @@ const Blog = () => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-    if (!preparedTitle || !preparedContent || !formData.categoryId) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
     const formDataToSend = new FormData();
-    formDataToSend.append("title", preparedTitle);
-    formDataToSend.append("slug", preparedSlug);
-    formDataToSend.append("categoryId", formData.categoryId);
-    formDataToSend.append("content", preparedContent);
-    formDataToSend.append("status", formData.status);
-    if (formData.imageFile) {
-      formDataToSend.append("image", formData.imageFile);
+
+    if (editingBlogId) {
+      // For editing mode, only append fields that have actually changed
+      let hasChanges = false;
+      if (preparedTitle !== editingBlog?.title) {
+        formDataToSend.append("title", preparedTitle);
+        hasChanges = true;
+      }
+      if (preparedSlug !== editingBlog?.slug) {
+        formDataToSend.append("slug", preparedSlug);
+        hasChanges = true;
+      }
+      if (formData.categoryId !== editingBlog?.categoryId) {
+        formDataToSend.append("categoryId", formData.categoryId);
+        hasChanges = true;
+      }
+      if (preparedContent !== editingBlog?.description) {
+        formDataToSend.append("content", preparedContent);
+        hasChanges = true;
+      }
+      if (formData.status !== editingBlog?.status) {
+        formDataToSend.append("status", formData.status);
+        hasChanges = true;
+      }
+      if (formData.imageFile) {
+        formDataToSend.append("image", formData.imageFile);
+        hasChanges = true;
+      }
+
+      if (!hasChanges) {
+        toast.error("No changes detected");
+        handleCloseModal();
+        return;
+      }
+    } else {
+      // For create mode, require all fields and append everything
+      if (!preparedTitle || !preparedContent || !formData.categoryId) {
+        toast.error("Please fill in all required fields");
+        return;
+      }
+
+      formDataToSend.append("title", preparedTitle);
+      formDataToSend.append("slug", preparedSlug);
+      formDataToSend.append("categoryId", formData.categoryId);
+      formDataToSend.append("content", preparedContent);
+      formDataToSend.append("status", formData.status);
+      if (formData.imageFile) {
+        formDataToSend.append("image", formData.imageFile);
+      }
     }
 
     try {
@@ -221,15 +265,13 @@ const Blog = () => {
       handleCloseModal();
     } catch (err) {
       console.error("Save blog API error:", err);
-      if (err?.data?.errors) {
-        console.error("Nested validation errors:", err.data.errors);
-        const details = Array.isArray(err.data.errors)
-          ? err.data.errors.map((e) => `${e.field || e.path || ""}: ${e.message || e}`).join(", ")
-          : JSON.stringify(err.data.errors);
-        toast.error(`Validation Error: ${details}`);
-      } else {
-        toast.error(err?.data?.message || "Failed to save blog");
-      }
+      const details = err?.data?.errors
+        ? (Array.isArray(err.data.errors)
+            ? err.data.errors.map((e) => typeof e === "object" ? JSON.stringify(e) : String(e)).join(" | ")
+            : JSON.stringify(err.data.errors))
+        : (err?.data?.message || JSON.stringify(err?.data || err));
+      setLastError(details);
+      toast.error(`Save Failed: ${details}`);
     }
   };
 
@@ -240,6 +282,7 @@ const Blog = () => {
       {/* Blog Page Header */}
       <BlogHeader onAddClick={handleOpenCreate} />
 
+    
       {/* Category Filters */}
       <CategoryFilters
         categories={filterCategoriesList}

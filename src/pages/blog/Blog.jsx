@@ -1,53 +1,55 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import BlogHeader from './sections/BlogHeader';
 import BlogCategories from './sections/BlogCategories';
 import BlogGrid from './sections/BlogGrid';
-import AdsSection from './sections/AdsSection';
 import CommonAdsSection from '../../components/CommonAdsSection';
+import {
+  useGetBlogsQuery,
+  useGetAllBlogCategoriesQuery,
+} from '../../features/api/blogApi';
 
 const BlogContent = memo(() => {
   const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState('all');
 
-  const categories = [
-    { value: 'all', label: t('blog.page.categories.all') },
-    { value: 'spiritual-guidance', label: t('blog.page.categories.spiritualGuidance') },
-    { value: 'consultancy-tips', label: t('blog.page.categories.consultancyTips') },
-    { value: 'platform-updates', label: t('blog.page.categories.platformUpdates') },
-    { value: 'articles', label: t('blog.page.categories.articles') },
-  ];
+  const { data: categoriesData } = useGetAllBlogCategoriesQuery();
+  const { data: blogsData, isLoading: isBlogsLoading } = useGetBlogsQuery();
 
-  const blogs = [
-    {
-      image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&auto=format&fit=crop",
-      date: t('blog.page.posts.commonDate'),
-      author: "Sarah Jenkins",
-      title: t('blog.page.posts.innerPeace.title'),
-      desc: t('blog.page.posts.innerPeace.description')
-    },
-    {
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop",
-      date: t('blog.page.posts.commonDate'),
-      author: "Sarah Jenkins",
-      title: t('blog.page.posts.consultancyTips.title'),
-      desc: t('blog.page.posts.consultancyTips.description')
-    },
-    {
-      image: "https://images.unsplash.com/photo-1580894732230-2838963bc3c3?w=800&auto=format&fit=crop",
-      date: t('blog.page.posts.commonDate'),
-      author: "Sarah Jenkins",
-      title: t('blog.page.posts.platformUpdate.title'),
-      desc: t('blog.page.posts.platformUpdate.description')
-    },
-    {
-      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&auto=format&fit=crop",
-      date: t('blog.page.posts.commonDate'),
-      author: "Sarah Jenkins",
-      title: t('blog.page.posts.innerPeace.title'),
-      desc: t('blog.page.posts.innerPeace.description')
-    }
-  ];
+  const blogCategories = useMemo(() => {
+    return categoriesData?.categories || [];
+  }, [categoriesData]);
+
+  const categories = useMemo(() => {
+    return [
+      { value: 'all', label: t('blog.page.categories.all') },
+      ...blogCategories.map((c) => ({ value: c.id, label: c.name })),
+    ];
+  }, [blogCategories, t]);
+
+  const filteredBlogs = useMemo(() => {
+    const rawBlogs = blogsData?.blogs || [];
+    const normalized = rawBlogs.map((b) => ({
+      id: b.id,
+      image: Array.isArray(b.image)
+        ? b.image[0] || null
+        : b.image || null,
+      date: b.createdAt
+        ? new Date(b.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })
+        : "N/A",
+      author: b.user?.name || "Admin",
+      title: b.title,
+      desc: b.content || "",
+      categoryId: b.categoryId,
+    }));
+
+    if (activeCategory === 'all') return normalized;
+    return normalized.filter((blog) => blog.categoryId === activeCategory);
+  }, [blogsData, activeCategory]);
 
   return (
     <div className='bg-[#FBFDFF] py-14 md:py-20   '>
@@ -63,7 +65,18 @@ const BlogContent = memo(() => {
         />
 
         {/* Blog Grid */}
-        <BlogGrid blogs={blogs} />
+        {isBlogsLoading ? (
+          <div className="py-24 text-center text-base text-gray-400 flex flex-col items-center justify-center gap-3">
+            <div className="w-8 h-8 border-4 border-[#EAB308] border-t-transparent rounded-full animate-spin" />
+            <span>Loading blogs...</span>
+          </div>
+        ) : filteredBlogs.length === 0 ? (
+          <div className="py-24 text-center text-base text-gray-400">
+            No blogs found in this category.
+          </div>
+        ) : (
+          <BlogGrid blogs={filteredBlogs} />
+        )}
 
         
         <CommonAdsSection 
