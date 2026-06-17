@@ -245,9 +245,7 @@ const CommonSidebar = ({
                   }}
                   className={({ isActive }) =>
                     `group flex items-center gap-3 px-5 py-3 text-base font-medium transition-colors duration-150 ${isActive
-                      ? actualRole === 'consultant'
-                        ? 'bg-yellow-50 text-yellow-700 border-l-4 border-yellow-500'
-                        : 'bg-green-50 text-green-600 border-l-4 border-green-500'
+                      ? 'bg-green-50 text-green-600 border-l-4 border-green-500'
                       : 'text-gray-600 border-l-4 border-transparent hover:bg-gray-50 hover:text-gray-900'
                     }`
                   }
@@ -258,9 +256,7 @@ const CommonSidebar = ({
                         size={18}
                         aria-hidden='true'
                         className={`shrink-0 transition-colors ${isActive
-                          ? actualRole === 'consultant'
-                            ? 'text-yellow-600'
-                            : 'text-green-600'
+                          ? 'text-green-600'
                           : 'text-gray-400 group-hover:text-gray-500'
                           }`}
                       />
@@ -269,10 +265,7 @@ const CommonSidebar = ({
                         <ChevronRight
                           size={16}
                           aria-hidden='true'
-                          className={`shrink-0 animate-nav-arrow ${actualRole === 'consultant'
-                            ? 'text-yellow-500'
-                            : 'text-green-600'
-                            }`}
+                          className='shrink-0 animate-nav-arrow text-green-600'
                         />
                       )}
                     </>
