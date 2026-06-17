@@ -20,4 +20,5 @@ export const tagList = [
   "Category",
   "Payout",
   "Session",
+  "Campaign",
 ];
