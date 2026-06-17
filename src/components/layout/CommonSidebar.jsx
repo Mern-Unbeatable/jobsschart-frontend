@@ -96,14 +96,14 @@ const CommonSidebar = ({
       activeIcon: 'bg-orange-100 text-orange-600',
       hoverIcon: 'hover:bg-orange-50/40',
       collapseHover: 'hover:bg-orange-50/40',
-      arrowColor: 'text-orange-500 drop-shadow-[0_0_6px_#f97316]',
+      arrowColor: 'text-green-500 drop-shadow-[0_0_6px_#f97316]',
       avatarBg: 'from-orange-400 to-orange-600',
       avatarInitial: 'A',
     },
   };
 
   const config = roleConfig[actualRole] || roleConfig.user;
-  const useStructuredNav = actualRole === 'admin' || actualRole === 'consultant';
+  const useStructuredNav = true;
 
   const handleLogout = async () => {
     try {
@@ -222,49 +222,7 @@ const CommonSidebar = ({
         </div>
       </div>
 
-      {/* User Profile - user only */}
-      {user && actualRole === 'user' && !useStructuredNav && (
-        <div
-          className={`flex items-center gap-3 px-5 py-4 bg-linear-to-br ${config.bgGradient} ${config.borderColor}`}
-        >
-          <div
-            className={`w-10 h-10 rounded-full bg-linear-to-br ${config.avatarBg} flex items-center justify-center font-semibold shrink-0 text-white`}
-          >
-            {config.avatarInitial}
-          </div>
-          <div className='overflow-hidden'>
-            <p className='text-sm font-semibold text-gray-900 truncate'>
-              {user.name || 'User'}
-            </p>
-            <p className='text-xs text-gray-500 truncate'>{user.email}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Navigation - User */}
-      {actualRole === 'user' && !useStructuredNav && (
-        <nav
-          className='flex-1 px-4 py-4 space-y-1.5 overflow-y-auto'
-          aria-label='Main navigation'
-        >
-          {navItems.map(({ name, path, icon: Icon }) => (
-            <NavLink
-              key={path}
-              to={path}
-              end={path === navItems[0]?.path}
-              onClick={onClose}
-              className={({ isActive }) =>
-                getNavClass(isActive, config.activeNav, config.hoverNav)
-              }
-            >
-              <Icon size={20} className='shrink-0' aria-hidden='true' />
-              <span>{name}</span>
-            </NavLink>
-          ))}
-        </nav>
-      )}
-
-      {/* Navigation - Admin & Consultant */}
+      {/* Navigation - Admin & Consultant & User */}
       {useStructuredNav && (
         <nav
           className='flex-1 overflow-y-auto px-0 py-4'
@@ -289,7 +247,7 @@ const CommonSidebar = ({
                     `group flex items-center gap-3 px-5 py-3 text-base font-medium transition-colors duration-150 ${isActive
                       ? actualRole === 'consultant'
                         ? 'bg-yellow-50 text-yellow-700 border-l-4 border-yellow-500'
-                        : 'bg-orange-50 text-orange-600 border-l-4 border-orange-500'
+                        : 'bg-green-50 text-green-600 border-l-4 border-green-500'
                       : 'text-gray-600 border-l-4 border-transparent hover:bg-gray-50 hover:text-gray-900'
                     }`
                   }
@@ -302,7 +260,7 @@ const CommonSidebar = ({
                         className={`shrink-0 transition-colors ${isActive
                           ? actualRole === 'consultant'
                             ? 'text-yellow-600'
-                            : 'text-orange-500'
+                            : 'text-green-600'
                           : 'text-gray-400 group-hover:text-gray-500'
                           }`}
                       />
@@ -313,7 +271,7 @@ const CommonSidebar = ({
                           aria-hidden='true'
                           className={`shrink-0 animate-nav-arrow ${actualRole === 'consultant'
                             ? 'text-yellow-500'
-                            : 'text-orange-400'
+                            : 'text-green-600'
                             }`}
                         />
                       )}
