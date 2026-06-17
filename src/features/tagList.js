@@ -19,4 +19,5 @@ export const tagList = [
   "Topic",
   "Category",
   "Payout",
+  "Session",
 ];

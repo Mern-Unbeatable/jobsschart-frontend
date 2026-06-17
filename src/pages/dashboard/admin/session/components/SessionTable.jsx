@@ -40,38 +40,48 @@ export default function SessionTable({ visibleRows, getTypeColor }) {
               </td>
             </tr>
           ) : (
-            visibleRows.map((row) => (
-              <tr
-                key={row.id}
-                className="border-b border-[#E4E4E4] last:border-b-0"
-              >
-                <td className="px-4 py-4 text-base text-[#0C0C0C]">
-                  {row.consultantName}
-                </td>
-                <td className="px-4 py-4 text-base text-[#0C0C0C]">
-                  {row.clientName}
-                </td>
-                <td
-                  className={`px-4 py-4 text-base font-medium ${getTypeColor(row.type)}`}
+            visibleRows.map((row) => {
+              const consultantName = row.consultantName || row.consultant?.user?.name || row.consultant?.name || "N/A";
+              const clientName = row.clientName || row.client?.name || row.user?.name || "N/A";
+              const type = row.type || "N/A";
+              const duration = row.duration ? (typeof row.duration === 'number' ? `${row.duration} mins` : row.duration) : "N/A";
+              const earnings = row.earnings || (row.earningsAmount !== undefined ? `$${row.earningsAmount}` : (row.amount !== undefined ? `$${row.amount}` : "N/A"));
+              const date = row.date || (row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "N/A");
+              const status = row.status || "Completed";
+
+              return (
+                <tr
+                  key={row.id}
+                  className="border-b border-[#E4E4E4] last:border-b-0"
                 >
-                  {row.type}
-                </td>
-                <td className="px-4 py-4 text-base text-[#373737]">
-                  {row.duration}
-                </td>
-                <td className="px-4 py-4 text-base text-[#0C0C0C]">
-                  {row.earnings}
-                </td>
-                <td className="px-4 py-4 text-base text-[#373737]">
-                  {row.date}
-                </td>
-                <td className="px-4 py-4">
-                  <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-[#EDFFF2] text-[#07BC27]">
-                    {row.status}
-                  </span>
-                </td>
-              </tr>
-            ))
+                  <td className="px-4 py-4 text-base text-[#0C0C0C]">
+                    {consultantName}
+                  </td>
+                  <td className="px-4 py-4 text-base text-[#0C0C0C]">
+                    {clientName}
+                  </td>
+                  <td
+                    className={`px-4 py-4 text-base font-medium ${getTypeColor(type)}`}
+                  >
+                    {type}
+                  </td>
+                  <td className="px-4 py-4 text-base text-[#373737]">
+                    {duration}
+                  </td>
+                  <td className="px-4 py-4 text-base text-[#0C0C0C]">
+                    {earnings}
+                  </td>
+                  <td className="px-4 py-4 text-base text-[#373737]">
+                    {date}
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-[#EDFFF2] text-[#07BC27]">
+                      {status}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })
           )}
         </tbody>
       </table>
