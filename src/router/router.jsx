@@ -93,7 +93,7 @@ const AdminSettings = lazy(
   () => import("../pages/dashboard/admin/settings/Settings"),
 );
 const AdminProfile = lazy(() => import("../pages/dashboard/admin/Profile"));
-const AdminFaq = lazy(() => import("../pages/dashboard/admin/Faq"));
+const AdminFaq = lazy(() => import("../pages/dashboard/admin/faq/Faq"));
 
 // User pages
 const UserDashboard = lazy(() => import("../pages/dashboard/user/Dashboard"));

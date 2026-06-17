@@ -1,41 +1,22 @@
 import React, { useState } from 'react';
-import FaqHeader from './sections/FaqHeader';
-import FaqPublishedSection from './sections/FaqPublishedSection';
-import FaqPendingQuestionsSection from './sections/FaqPendingQuestionsSection';
-import FaqArticleModal from './sections/FaqArticleModal';
-import FaqAnswerModal from './sections/FaqAnswerModal';
+import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
+import FaqHeader from '../sections/FaqHeader';
+import FaqPublishedSection from '../sections/FaqPublishedSection';
+import FaqPendingQuestionsSection from '../sections/FaqPendingQuestionsSection';
+import FaqArticleModal from '../sections/FaqArticleModal';
+import FaqAnswerModal from '../sections/FaqAnswerModal';
+import {
+  useGetFaqsQuery,
+  useCreateFaqMutation,
+  useUpdateFaqMutation,
+  useDeleteFaqMutation,
+} from '../../../../features/api/faqApi';
 
 const FAQ_TABS = [
   {
     id: 'published',
     label: 'Published FAQs',
-  },
-];
-
-const FAQ_DATA = [
-  {
-    id: 1,
-    question: 'How do I start my first consultation?',
-    answer:
-      'Consultants can register by clicking "Become a Consultant" on the homepage, filling in their professional details, and submitting for verification. Our team reviews all submissions within 2-3 business days.',
-    createdBy: 'Admin User',
-    createdAt: 'Oct 15, 2023',
-  },
-  {
-    id: 2,
-    question: 'How does the credit and billing system work?',
-    answer:
-      'We support credit/debit cards (Visa, Mastercard, Amex), digital wallets, and bank transfers. All payments are processed securely through our payment gateway partners.',
-    createdBy: 'Admin User',
-    createdAt: 'Oct 14, 2023',
-  },
-  {
-    id: 3,
-    question: 'Can I request a refund for a missed session?',
-    answer:
-      'All disputes are handled by our dedicated support team. We investigate both parties\' claims and make a fair decision within 5 business days. Users can appeal the decision if needed.',
-    createdBy: 'Admin User',
-    createdAt: 'Oct 13, 2023',
   },
 ];
 
@@ -52,7 +33,6 @@ const PENDING_QUESTIONS = [
 
 const AdminFaq = () => {
   const [activeTab, setActiveTab] = useState('published');
-  const [faqs, setFaqs] = useState(FAQ_DATA);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState('create');
   const [editingFaqId, setEditingFaqId] = useState(null);
@@ -62,6 +42,13 @@ const AdminFaq = () => {
   const [selectedPendingQuestion, setSelectedPendingQuestion] = useState(null);
   const [publishQuestionTitle, setPublishQuestionTitle] = useState('');
   const [publishAnswerContent, setPublishAnswerContent] = useState('');
+
+  const { data, isLoading } = useGetFaqsQuery();
+  const [createFaq] = useCreateFaqMutation();
+  const [updateFaq] = useUpdateFaqMutation();
+  const [deleteFaq] = useDeleteFaqMutation();
+
+  const faqs = data?.faqs || [];
 
   const openEditor = (faq = null) => {
     setEditorMode(faq ? 'edit' : 'create');
@@ -79,39 +66,59 @@ const AdminFaq = () => {
     setDraftAnswer('');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!draftQuestion.trim() || !draftAnswer.trim()) {
       return;
     }
 
-    if (editorMode === 'edit') {
-      setFaqs(
-        faqs.map((faq) =>
-          faq.id === editingFaqId
-            ? { ...faq, question: draftQuestion, answer: draftAnswer }
-            : faq,
-        ),
-      );
-    } else {
-      const nextId = faqs.length ? Math.max(...faqs.map((faq) => faq.id)) + 1 : 1;
-
-      setFaqs([
-        {
-          id: nextId,
+    try {
+      if (editorMode === 'edit') {
+        const loadingToast = toast.loading("Updating FAQ...");
+        await updateFaq({
+          id: editingFaqId,
           question: draftQuestion,
           answer: draftAnswer,
-          createdBy: 'Admin User',
-          createdAt: 'Just now',
-        },
-        ...faqs,
-      ]);
+        }).unwrap();
+        toast.dismiss(loadingToast);
+        toast.success("FAQ updated successfully");
+      } else {
+        const loadingToast = toast.loading("Creating FAQ...");
+        await createFaq({
+          question: draftQuestion,
+          answer: draftAnswer,
+          sortOrder: 1,
+        }).unwrap();
+        toast.dismiss(loadingToast);
+        toast.success("FAQ created successfully");
+      }
+      closeEditor();
+    } catch (err) {
+      toast.dismiss();
+      toast.error(err?.data?.message || "Failed to save FAQ");
     }
-
-    closeEditor();
   };
 
-  const handleDelete = (id) => {
-    setFaqs(faqs.filter((faq) => faq.id !== id));
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You will not be able to recover this FAQ!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      confirmButtonColor: "#EF4444",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const loadingToast = toast.loading("Deleting FAQ...");
+      await deleteFaq(id).unwrap();
+      toast.dismiss(loadingToast);
+      toast.success("FAQ deleted successfully");
+    } catch (err) {
+      toast.dismiss();
+      toast.error(err?.data?.message || "Failed to delete FAQ");
+    }
   };
 
   const openAnswerModal = (pendingQuestion) => {
@@ -128,26 +135,34 @@ const AdminFaq = () => {
     setPublishAnswerContent('');
   };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!publishQuestionTitle.trim() || !publishAnswerContent.trim()) {
       return;
     }
 
-    const nextId = faqs.length ? Math.max(...faqs.map((faq) => faq.id)) + 1 : 1;
-
-    setFaqs([
-      {
-        id: nextId,
+    try {
+      const loadingToast = toast.loading("Publishing FAQ...");
+      await createFaq({
         question: publishQuestionTitle,
         answer: publishAnswerContent,
-        createdBy: 'Admin User',
-        createdAt: 'Just now',
-      },
-      ...faqs,
-    ]);
-
-    closeAnswerModal();
+        sortOrder: 1,
+      }).unwrap();
+      toast.dismiss(loadingToast);
+      toast.success("FAQ published successfully");
+      closeAnswerModal();
+    } catch (err) {
+      toast.dismiss();
+      toast.error(err?.data?.message || "Failed to publish FAQ");
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500/60" />
+      </div>
+    );
+  }
 
   return (
     <section className='space-y-4 sm:space-y-5'>
