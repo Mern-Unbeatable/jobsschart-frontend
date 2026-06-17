@@ -81,7 +81,7 @@ const AdminAds = lazy(
   () => import("../pages/dashboard/admin/adsManagement/AdsManagement"),
 );
 const AdminAdsPublished = lazy(
-  () => import("../pages/dashboard/admin/PublishedAds"),
+  () => import("../pages/dashboard/admin/adsManagement/PublishedAds"),
 );
 const AdminSession = lazy(
   () => import("../pages/dashboard/admin/session/Session"),
