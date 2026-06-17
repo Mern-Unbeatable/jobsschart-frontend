@@ -40,7 +40,7 @@ const BlogCard = ({ blog, onEdit, onDelete }) => {
           {blog.description}
         </p>
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
+        <div className="mt-auto pt-5 grid grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => onEdit(blog)}

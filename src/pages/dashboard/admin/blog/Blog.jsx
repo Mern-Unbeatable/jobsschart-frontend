@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 import BlogHeader from "./components/BlogHeader";
 import CategoryFilters from "./components/CategoryFilters";
 import BlogCard from "./components/BlogCard";
@@ -145,6 +146,18 @@ const Blog = () => {
   };
 
   const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       await deleteBlog(id).unwrap();
       toast.success("Blog deleted successfully");
