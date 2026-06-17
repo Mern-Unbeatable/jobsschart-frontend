@@ -10,7 +10,7 @@ const BlogModal = ({
   onChangeImage,
   onSave,
   onClose,
-  categories,
+  categories = [],
 }) => {
   const fileInputRef = useRef(null);
 
@@ -66,26 +66,23 @@ const BlogModal = ({
         <form className="space-y-3" onSubmit={onSave}>
           <label className="block">
             <span className="mb-1 block text-base text-[#333333]">
-              Name
-            </span>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => onChangeField("name", e.target.value)}
-              placeholder="Enter your name"
-              className="w-full rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent placeholder:text-[#8A8A8A] focus:ring-green-500/60"
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-1 block text-base text-[#333333]">
               Title
             </span>
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => onChangeField("title", e.target.value)}
-              placeholder="Enter membership title here"
+              onChange={(e) => {
+                onChangeField("title", e.target.value);
+                // Auto-generate slug from title if not in edit mode
+                if (!isEditMode) {
+                  const generatedSlug = e.target.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/(^-|-$)+/g, "");
+                  onChangeField("slug", generatedSlug);
+                }
+              }}
+              placeholder="Enter blog title here"
               className="w-full rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent placeholder:text-[#8A8A8A] focus:ring-green-500/60"
               required
             />
@@ -93,36 +90,68 @@ const BlogModal = ({
 
           <label className="block">
             <span className="mb-1 block text-base text-[#333333]">
-              Category
+              Slug
             </span>
-            <select
-              value={formData.category}
-              onChange={(e) =>
-                onChangeField("category", e.target.value)
-              }
-              className="w-full rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent focus:ring-green-500/60"
-            >
-              {categories.filter((item) => item !== "All").map(
-                (category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ),
-              )}
-            </select>
+            <input
+              type="text"
+              value={formData.slug}
+              onChange={(e) => onChangeField("slug", e.target.value)}
+              placeholder="enter-blog-slug-here"
+              className="w-full rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent placeholder:text-[#8A8A8A] focus:ring-green-500/60"
+              required
+            />
           </label>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block text-base text-[#333333]">
+                Category
+              </span>
+              <select
+                value={formData.categoryId}
+                onChange={(e) =>
+                  onChangeField("categoryId", e.target.value)
+                }
+                className="w-full rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent focus:ring-green-500/60"
+                required
+              >
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-base text-[#333333]">
+                Status
+              </span>
+              <select
+                value={formData.status}
+                onChange={(e) =>
+                  onChangeField("status", e.target.value)
+                }
+                className="w-full rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent focus:ring-green-500/60"
+              >
+                <option value="PUBLISHED">Published</option>
+                <option value="DRAFT">Draft</option>
+              </select>
+            </label>
+          </div>
 
           <label className="block">
             <span className="mb-1 block text-base text-[#333333]">
-              Description
+              Content
             </span>
             <textarea
-              value={formData.description}
+              value={formData.content}
               onChange={(e) =>
-                onChangeField("description", e.target.value)
+                onChangeField("content", e.target.value)
               }
               rows={4}
-              placeholder="Write detailed product description"
+              placeholder="Write detailed blog content here"
               className="w-full resize-none rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent placeholder:text-[#8A8A8A] focus:ring-green-500/60"
               required
             />

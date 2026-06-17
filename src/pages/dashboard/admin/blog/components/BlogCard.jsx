@@ -3,13 +3,19 @@ import { CalendarDays, User, PenLine, Trash2 } from "lucide-react";
 
 const BlogCard = ({ blog, onEdit, onDelete }) => {
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-green-500/60/30 bg-white p-4">
-      <img
-        src={blog.image}
-        alt={blog.title}
-        className="h-48 w-full rounded-lg object-cover sm:h-56 lg:h-64"
-        loading="lazy"
-      />
+    <article className="flex h-full flex-col rounded-2xl border border-green-500/60 bg-white p-4">
+      {blog.image ? (
+        <img
+          src={blog.image}
+          alt={blog.title}
+          className="h-48 w-full rounded-lg object-cover sm:h-56 lg:h-64"
+          loading="lazy"
+        />
+      ) : (
+        <div className="flex h-48 w-full items-center justify-center rounded-lg bg-gray-100 text-sm font-medium text-gray-400 sm:h-56 lg:h-64 border border-dashed border-gray-300">
+          No Image
+        </div>
+      )}
 
       <div className="flex flex-1 flex-col pt-4">
         <div className="flex flex-wrap items-center gap-3 text-sm text-[#545454]">

@@ -5,78 +5,38 @@ import React, {
   useRef,
   useState,
 } from "react";
+import toast from "react-hot-toast";
 import BlogHeader from "./components/BlogHeader";
 import CategoryFilters from "./components/CategoryFilters";
 import BlogCard from "./components/BlogCard";
 import BlogModal from "./components/BlogModal";
-
-const BLOG_CATEGORIES = [
-  "All",
-  "Spiritual Guidance",
-  "Consultancy Tips",
-  "Platform Updates",
-  "Articles",
-];
-
-const INITIAL_BLOG_ITEMS = [
-  {
-    id: 1,
-    category: "Spiritual Guidance",
-    title: "Finding Inner Peace in a Chaotic World",
-    description:
-      "Discover practical steps to maintain your spiritual balance amidst the daily hustle and bustle of modern life.",
-    date: "Oct 24, 2023",
-    author: "Sarah Jenkins",
-    image:
-      "https://www.figma.com/api/mcp/asset/4c79d3c9-261a-4ed8-9dfe-5cf588879408",
-  },
-  {
-    id: 2,
-    category: "Consultancy Tips",
-    title: "5 Tips for Better Business Consultancy",
-    description:
-      "Learn the core principles that will help you build trust and deliver exceptional value to your clients.",
-    date: "Oct 24, 2023",
-    author: "Sarah Jenkins",
-    image:
-      "https://www.figma.com/api/mcp/asset/7c063aa3-f477-4dd5-8818-e5bbd51980eb",
-  },
-  {
-    id: 3,
-    category: "Platform Updates",
-    title: "SoulGuide Platform Update: Version 2.0",
-    description:
-      "We are excited to announce new features including real-time chat and enhanced spiritual matching algorithms.",
-    date: "Oct 24, 2023",
-    author: "Sarah Jenkins",
-    image:
-      "https://www.figma.com/api/mcp/asset/1764a59e-6ca6-4456-bbec-f4bffb8f55c4",
-  },
-  {
-    id: 4,
-    category: "Articles",
-    title: "Finding Inner Peace in a Chaotic World",
-    description:
-      "Discover practical steps to maintain your spiritual balance amidst the daily hustle and bustle of modern life.",
-    date: "Oct 24, 2023",
-    author: "Sarah Jenkins",
-    image:
-      "https://www.figma.com/api/mcp/asset/77d56286-0319-4293-8d0e-48ca15ff077f",
-  },
-];
+import {
+  useGetBlogsQuery,
+  useGetAllBlogCategoriesQuery,
+  useCreateBlogMutation,
+  useUpdateBlogMutation,
+  useDeleteBlogMutation,
+} from "../../../../features/api/blogApi";
 
 const EMPTY_FORM = {
-  name: "",
   title: "",
-  category: "Spiritual Guidance",
-  description: "",
+  slug: "",
+  categoryId: "",
+  content: "",
   image: "",
+  imageFile: null,
+  status: "PUBLISHED",
 };
 
 const MODAL_CLOSE_ANIMATION_MS = 280;
 
 const Blog = () => {
-  const [blogs, setBlogs] = useState(INITIAL_BLOG_ITEMS);
+  const { data: blogsData, isLoading: isBlogsLoading } = useGetBlogsQuery();
+  const { data: categoriesData } = useGetAllBlogCategoriesQuery();
+  const [createBlog] = useCreateBlogMutation();
+  const [updateBlog] = useUpdateBlogMutation();
+  const [deleteBlog] = useDeleteBlogMutation();
+
   const [activeCategory, setActiveCategory] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalClosing, setIsModalClosing] = useState(false);
@@ -85,10 +45,42 @@ const Blog = () => {
   const [pendingReset, setPendingReset] = useState(false);
   const closeTimerRef = useRef(null);
 
+  const blogCategories = useMemo(() => {
+    return categoriesData?.categories || [];
+  }, [categoriesData]);
+
+  const filterCategoriesList = useMemo(() => {
+    return ["All", ...blogCategories.map((c) => c.name)];
+  }, [blogCategories]);
+
+  const normalizedBlogs = useMemo(() => {
+    const rawBlogs = blogsData?.blogs || [];
+    return rawBlogs.map((b) => ({
+      id: b.id,
+      category: b.category?.name || "Uncategorized",
+      categoryId: b.categoryId,
+      title: b.title,
+      description: b.content || "",
+      slug: b.slug,
+      status: b.status,
+      date: b.createdAt
+        ? new Date(b.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })
+        : "N/A",
+      author: b.user?.name || "Admin",
+      image: Array.isArray(b.image)
+        ? b.image[0] || null
+        : b.image || null,
+    }));
+  }, [blogsData]);
+
   const filteredBlogs = useMemo(() => {
-    if (activeCategory === "All") return blogs;
-    return blogs.filter((blog) => blog.category === activeCategory);
-  }, [activeCategory, blogs]);
+    if (activeCategory === "All") return normalizedBlogs;
+    return normalizedBlogs.filter((blog) => blog.category === activeCategory);
+  }, [activeCategory, normalizedBlogs]);
 
   const handleCloseModal = useCallback(() => {
     if (!isModalOpen || isModalClosing) return;
@@ -141,17 +133,24 @@ const Blog = () => {
     setPendingReset(false);
     setEditingBlogId(blog.id);
     setFormData({
-      name: blog.author,
       title: blog.title,
-      category: blog.category,
-      description: blog.description,
-      image: blog.image,
+      slug: blog.slug || "",
+      categoryId: blog.categoryId || "",
+      content: blog.description || "",
+      image: blog.image || "",
+      imageFile: null,
+      status: blog.status || "PUBLISHED",
     });
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    setBlogs((prevBlogs) => prevBlogs.filter((blog) => blog.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteBlog(id).unwrap();
+      toast.success("Blog deleted successfully");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to delete blog");
+    }
   };
 
   const handleFieldChange = (field, value) => {
@@ -162,6 +161,8 @@ const Blog = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    setFormData((prev) => ({ ...prev, imageFile: file }));
+
     const reader = new FileReader();
     reader.onload = () => {
       setFormData((prev) => ({ ...prev, image: String(reader.result || "") }));
@@ -169,57 +170,41 @@ const Blog = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleSave = (event) => {
+  const handleSave = async (event) => {
     event.preventDefault();
 
     const preparedTitle = formData.title.trim();
-    const preparedDescription = formData.description.trim();
-    const preparedAuthor = formData.name.trim() || "Admin";
+    const preparedContent = formData.content.trim();
+    const preparedSlug = formData.slug.trim();
 
-    if (!preparedTitle || !preparedDescription) return;
-
-    if (editingBlogId) {
-      setBlogs((prevBlogs) =>
-        prevBlogs.map((blog) =>
-          blog.id === editingBlogId
-            ? {
-                ...blog,
-                author: preparedAuthor,
-                title: preparedTitle,
-                category: formData.category,
-                description: preparedDescription,
-                image: formData.image || blog.image,
-              }
-            : blog,
-        ),
-      );
-    } else {
-      const nextId = blogs.length
-        ? Math.max(...blogs.map((blog) => blog.id)) + 1
-        : 1;
-
-      setBlogs((prevBlogs) => [
-        {
-          id: nextId,
-          author: preparedAuthor,
-          title: preparedTitle,
-          category: formData.category,
-          description: preparedDescription,
-          image:
-            formData.image ||
-            "https://www.figma.com/api/mcp/asset/4c79d3c9-261a-4ed8-9dfe-5cf588879408",
-          date: new Date().toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          }),
-        },
-        ...prevBlogs,
-      ]);
+    if (!preparedTitle || !preparedContent || !formData.categoryId) {
+      toast.error("Please fill in all required fields");
+      return;
     }
 
-    setPendingReset(true);
-    handleCloseModal();
+    const formDataToSend = new FormData();
+    formDataToSend.append("title", preparedTitle);
+    formDataToSend.append("slug", preparedSlug);
+    formDataToSend.append("categoryId", formData.categoryId);
+    formDataToSend.append("content", preparedContent);
+    formDataToSend.append("status", formData.status);
+    if (formData.imageFile) {
+      formDataToSend.append("image", formData.imageFile);
+    }
+
+    try {
+      if (editingBlogId) {
+        await updateBlog({ id: editingBlogId, body: formDataToSend }).unwrap();
+        toast.success("Blog updated successfully");
+      } else {
+        await createBlog(formDataToSend).unwrap();
+        toast.success("Blog created successfully");
+      }
+      setPendingReset(true);
+      handleCloseModal();
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to save blog");
+    }
   };
 
   const isEditMode = Boolean(editingBlogId);
@@ -231,22 +216,33 @@ const Blog = () => {
 
       {/* Category Filters */}
       <CategoryFilters
-        categories={BLOG_CATEGORIES}
+        categories={filterCategoriesList}
         activeCategory={activeCategory}
         onSelectCategory={setActiveCategory}
       />
 
       {/* Blog Cards Grid */}
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {filteredBlogs.map((blog) => (
-          <BlogCard
-            key={blog.id}
-            blog={blog}
-            onEdit={handleOpenEdit}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+      {isBlogsLoading ? (
+        <div className="py-24 text-center text-base text-gray-400 flex flex-col items-center justify-center gap-3">
+          <div className="w-8 h-8 border-4 border-green-500/60 border-t-transparent rounded-full animate-spin" />
+          <span>Loading blogs...</span>
+        </div>
+      ) : filteredBlogs.length === 0 ? (
+        <div className="py-24 text-center text-base text-gray-400">
+          No blogs found in this category.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {filteredBlogs.map((blog) => (
+            <BlogCard
+              key={blog.id}
+              blog={blog}
+              onEdit={handleOpenEdit}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Blog Form Modal */}
       <BlogModal
@@ -258,7 +254,7 @@ const Blog = () => {
         onChangeImage={handleImageChange}
         onSave={handleSave}
         onClose={handleCloseModal}
-        categories={BLOG_CATEGORIES}
+        categories={blogCategories}
       />
     </section>
   );

@@ -15,4 +15,5 @@ export const tagList = [
   "Donation",
   "Order",
   "BlogCategory",
+  "Blog",
 ];
