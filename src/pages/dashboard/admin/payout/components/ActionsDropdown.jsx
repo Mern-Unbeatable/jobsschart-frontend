@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 
-export default function ActionsDropdown({ anchorEl, onClose, onMarkComplete, onMarkPending }) {
+export default function ActionsDropdown({ anchorEl, onClose, onApprove, onReject }) {
   const dropRef = useRef(null);
 
   useEffect(() => {
@@ -32,23 +32,23 @@ export default function ActionsDropdown({ anchorEl, onClose, onMarkComplete, onM
       style={{ position: "absolute" }}
     >
       <div className="px-3 py-2 text-sm text-[#9CA3AF] bg-[#F6FBFF]">
-        Checkmark
+        Actions
       </div>
       <button
         type="button"
-        aria-label="Mark payout as complete"
-        onClick={onMarkComplete}
+        aria-label="Approve payout"
+        onClick={onApprove}
         className="w-full text-left px-3 py-2 text-sm text-white bg-green-500/60 hover:brightness-95 transition-colors"
       >
-        Complete
+        Approve
       </button>
       <button
         type="button"
-        aria-label="Mark payout as pending"
-        onClick={onMarkPending}
-        className="w-full text-left px-3 py-2 text-sm text-[#333333] hover:bg-gray-50 transition-colors"
+        aria-label="Reject payout"
+        onClick={onReject}
+        className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100"
       >
-        Pending
+        Reject
       </button>
     </div>,
     document.body,

@@ -18,4 +18,5 @@ export const tagList = [
   "Blog",
   "Topic",
   "Category",
+  "Payout",
 ];
