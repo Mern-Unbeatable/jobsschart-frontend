@@ -7,8 +7,8 @@ const BlogGrid = memo(({ blogs }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const handleReadMore = (blogId) => {
-    navigate(`/blog/${blogId}`);
+  const handleReadMore = (slug) => {
+    navigate(`/blog/${slug}`);
   };
 
   return (
@@ -54,7 +54,7 @@ const BlogGrid = memo(({ blogs }) => {
             </p>
 
             <button 
-              onClick={() => handleReadMore(blog.id)}
+              onClick={() => handleReadMore(blog.slug)}
               className='w-full bg-[#EAB308] hover:bg-[#d99a00] text-white py-2.5 rounded-md text-sm flex items-center justify-center gap-2 transition-colors shadow-sm uppercase tracking-wider mt-auto'
             >
               {t('blog.card.readMore')} <ArrowRight size={14} />

@@ -45,6 +45,7 @@ const BlogContent = memo(() => {
       title: b.title,
       desc: b.content || "",
       categoryId: b.categoryId,
+      slug: b.slug,
     }));
 
     if (activeCategory === 'all') return normalized;

@@ -68,6 +68,15 @@ export const blogApi = baseApi.injectEndpoints({
       invalidatesTags: ['Blog'],
       transformResponse: (response) => response.data,
     }),
+
+    getBlogBySlug: builder.query({
+      query: (slug) => ({
+        url: `/blogs/slug/${slug}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, slug) => [{ type: 'Blog', id: slug }],
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
@@ -79,4 +88,5 @@ export const {
   useCreateBlogMutation,
   useUpdateBlogMutation,
   useDeleteBlogMutation,
+  useGetBlogBySlugQuery,
 } = blogApi;
