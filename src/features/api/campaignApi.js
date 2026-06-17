@@ -20,10 +20,20 @@ export const campaignApi = baseApi.injectEndpoints({
       invalidatesTags: ['Campaign'],
       transformResponse: (response) => response.data,
     }),
+    approveCampaign: builder.mutation({
+      query: ({ id, placements }) => ({
+        url: `/ad-campaigns/admin/${id}/approve`,
+        method: 'POST',
+        body: { placements },
+      }),
+      invalidatesTags: ['Campaign'],
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
 export const {
   useGetCampaignsQuery,
   useDeleteCampaignMutation,
+  useApproveCampaignMutation,
 } = campaignApi;
