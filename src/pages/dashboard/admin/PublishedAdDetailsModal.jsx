@@ -126,9 +126,10 @@ export default function PublishedAdDetailsModal({
     >
       <div
         ref={panelRef}
-        className="bg-white border border-[#E7F1F1] rounded-[10px] w-full max-w-175 max-h-[90vh] overflow-y-auto animate-modal-panel"
+        className="bg-white border border-[#E7F1F1] rounded-[10px] w-full max-w-175 max-h-[90vh] flex flex-col overflow-hidden animate-modal-panel"
       >
-        <div className="flex items-center justify-between px-5 pt-5 pb-4">
+        {/* Sticky Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#E7F1F1] bg-white shrink-0">
           <h2 className="text-3xl font-semibold text-[#212121]">Ads Details</h2>
           <button
             type="button"
@@ -140,7 +141,8 @@ export default function PublishedAdDetailsModal({
           </button>
         </div>
 
-        <div className="flex flex-col gap-4 px-5">
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <p className="text-sm font-medium text-[#4A5565]">Full Name</p>
             <p className="text-lg text-[#0A0A0A]">{ad.name}</p>
@@ -236,7 +238,7 @@ export default function PublishedAdDetailsModal({
                 {isAdsPageOpen && (
                   <div
                     ref={listRef}
-                    className="absolute left-0 top-full mt-2 w-full bg-white rounded-md shadow-lg border border-[#E4E4E4] overflow-hidden z-10 opacity-0"
+                    className="absolute left-0 bottom-full mb-2 w-full bg-white rounded-md shadow-lg border border-[#E4E4E4] overflow-hidden z-10 opacity-0"
                   >
                     <div className="max-h-56 overflow-y-auto">
                       {ADS_PAGE_OPTIONS.map((option) => (
@@ -266,7 +268,7 @@ export default function PublishedAdDetailsModal({
             </div>
           )}
 
-          <div className="relative h-53.25 rounded-2xl overflow-hidden">
+          <div className="relative h-53.25 rounded-2xl overflow-hidden shrink-0">
             <img
               src="/images/donation-proof.jpg"
               alt="Donation proof"
@@ -281,31 +283,27 @@ export default function PublishedAdDetailsModal({
             >
               <Download size={14} className="text-white" />
             </button>
-          </div>
 
-          <div className="pb-5">
-            {isPublishFlow ? (
-              <button
-                type="button"
-                aria-label="Confirm published ad"
-                onClick={handleConfirm}
-                className="px-6 py-3 rounded bg-green-500/60 text-white text-base font-medium hover:brightness-95 transition-all"
-                style={{ fontFamily: "'Crimson Pro', serif" }}
-              >
-                Confirm
-              </button>
-            ) : (
-              <button
-                type="button"
-                aria-label="Close ad details"
-                onClick={onClose}
-                className="px-6 py-3 rounded bg-green-500/60 text-white text-base font-medium hover:brightness-95 transition-all"
-                style={{ fontFamily: "'Crimson Pro', serif" }}
-              >
-                Close
-              </button>
-            )}
-          </div>
+            <button
+              type="button"
+              aria-label="Confirm published ad"
+              onClick={handleConfirm}
+              className="px-6 py-3 rounded bg-green-500/60 text-white text-base font-medium hover:brightness-95 transition-all"
+              style={{ fontFamily: "'Crimson Pro', serif" }}
+            >
+              Confirm
+            </button>
+          ) : (
+            <button
+              type="button"
+              aria-label="Close ad details"
+              onClick={onClose}
+              className="px-6 py-3 rounded bg-green-500/60 text-white text-base font-medium hover:brightness-95 transition-all"
+              style={{ fontFamily: "'Crimson Pro', serif" }}
+            >
+              Close
+            </button>
+          )}
         </div>
       </div>
     </div>,
