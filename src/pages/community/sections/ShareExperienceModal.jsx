@@ -60,7 +60,7 @@ const ShareExperienceModal = memo(({ isOpen, onClose }) => {
             <input
               type="text"
               placeholder={t("community.modal.placeholders.title")}
-              className="w-full px-4 py-3 bg-[#EAEAEA] border-none rounded-lg text-sm placeholder-gray-500 focus:ring-1 focus:ring-[#EAB308] outline-none"
+              className="w-full px-4 py-3 bg-[#EAEAEA] border-none rounded-lg text-sm placeholder-gray-500 focus:ring-1 focus:ring-green-500/60 outline-none"
             />
           </div>
 
@@ -72,7 +72,7 @@ const ShareExperienceModal = memo(({ isOpen, onClose }) => {
             <textarea
               placeholder={t("community.modal.placeholders.description")}
               rows="4"
-              className="w-full px-4 py-3 bg-[#EAEAEA] border-none rounded-lg text-sm placeholder-gray-500 focus:ring-1 focus:ring-[#EAB308] outline-none resize-none"
+              className="w-full px-4 py-3 bg-[#EAEAEA] border-none rounded-lg text-sm placeholder-gray-500 focus:ring-1 focus:ring-green-500/60 outline-none resize-none"
             />
           </div>
 

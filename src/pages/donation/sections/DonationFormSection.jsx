@@ -133,7 +133,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                 <input
                   type="text"
                   placeholder={t("donationForm.fields.name.placeholder")}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#EAB308]"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-green-500/60"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -164,7 +164,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   <input
                     type="tel"
                     placeholder={t("donationForm.fields.phone.placeholder")}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#EAB308]"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-green-500/60"
                     value={formData.phone}
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
@@ -181,7 +181,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   <input
                     type="number"
                     placeholder={t("donationForm.fields.amount.placeholder")}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#EAB308]"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-green-500/60"
                     value={formData.amount}
                     onChange={(e) =>
                       setFormData({ ...formData, amount: e.target.value })
@@ -193,7 +193,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                     Benefit / Support Cause
                   </label>
                   <select
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#EAB308] bg-white"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-green-500/60 bg-white"
                     value={formData.benefit}
                     onChange={(e) =>
                       setFormData({ ...formData, benefit: e.target.value })
@@ -221,7 +221,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   }
                   className={`flex-1 py-6 rounded-lg border-2 flex flex-col items-center gap-2 transition-all ${
                     formData.donorType === "individual"
-                      ? "border-[#EAB308] bg-[#FFFBEB]/50"
+                      ? "border-green-500/60 bg-[#FFFBEB]/50"
                       : "border-gray-100 bg-white"
                   }`}
                 >
@@ -229,7 +229,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                     size={20}
                     className={
                       formData.donorType === "individual"
-                        ? "text-[#EAB308]"
+                        ? "text-green-500/60"
                         : "text-gray-400"
                     }
                   />
@@ -252,7 +252,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                     size={20}
                     className={
                       formData.donorType === "business"
-                        ? "text-[#EAB308]"
+                        ? "text-green-500/60"
                         : "text-gray-400"
                     }
                   />
@@ -385,7 +385,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   </label>
                   <div
                     onClick={handleFileClick}
-                    className="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-white hover:border-[#EAB308] cursor-pointer transition-colors"
+                    className="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-white hover:border-green-500/60 cursor-pointer transition-colors"
                   >
                     <input
                       type="file"
@@ -448,7 +448,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
               <button
                 type="submit"
                 disabled={isCheckingOut}
-                className="bg-[#EAB308] hover:bg-[#d99a00] text-white text-sm font-bold py-3 px-8 rounded transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="bg-green-500/60 hover:bg-[#d99a00] text-white text-sm font-bold py-3 px-8 rounded transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {isCheckingOut && (
                   <Loader2 className="animate-spin h-5 w-5 text-white" />

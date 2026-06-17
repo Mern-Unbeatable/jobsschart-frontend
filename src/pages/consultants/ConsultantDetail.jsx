@@ -241,7 +241,7 @@ const ConsultantDetail = memo(() => {
                           fill={starIdx < rev.rating ? "#EAB308" : "none"}
                           className={
                             starIdx < rev.rating
-                              ? "text-[#EAB308]"
+                              ? "text-green-500/60"
                               : "text-gray-200"
                           }
                         />

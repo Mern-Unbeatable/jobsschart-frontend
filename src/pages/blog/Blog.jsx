@@ -1,17 +1,17 @@
-import React, { memo, useState, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import BlogHeader from './sections/BlogHeader';
-import BlogCategories from './sections/BlogCategories';
-import BlogGrid from './sections/BlogGrid';
-import CommonAdsSection from '../../components/CommonAdsSection';
+import React, { memo, useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import BlogHeader from "./sections/BlogHeader";
+import BlogCategories from "./sections/BlogCategories";
+import BlogGrid from "./sections/BlogGrid";
+import CommonAdsSection from "../../components/CommonAdsSection";
 import {
   useGetBlogsQuery,
   useGetAllBlogCategoriesQuery,
-} from '../../features/api/blogApi';
+} from "../../features/api/blogApi";
 
 const BlogContent = memo(() => {
   const { t } = useTranslation();
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState("all");
 
   const { data: categoriesData } = useGetAllBlogCategoriesQuery();
   const { data: blogsData, isLoading: isBlogsLoading } = useGetBlogsQuery();
@@ -22,7 +22,7 @@ const BlogContent = memo(() => {
 
   const categories = useMemo(() => {
     return [
-      { value: 'all', label: t('blog.page.categories.all') },
+      { value: "all", label: t("blog.page.categories.all") },
       ...blogCategories.map((c) => ({ value: c.id, label: c.name })),
     ];
   }, [blogCategories, t]);
@@ -31,9 +31,7 @@ const BlogContent = memo(() => {
     const rawBlogs = blogsData?.blogs || [];
     const normalized = rawBlogs.map((b) => ({
       id: b.id,
-      image: Array.isArray(b.image)
-        ? b.image[0] || null
-        : b.image || null,
+      image: Array.isArray(b.image) ? b.image[0] || null : b.image || null,
       date: b.createdAt
         ? new Date(b.createdAt).toLocaleDateString("en-US", {
             month: "short",
@@ -48,18 +46,18 @@ const BlogContent = memo(() => {
       slug: b.slug,
     }));
 
-    if (activeCategory === 'all') return normalized;
+    if (activeCategory === "all") return normalized;
     return normalized.filter((blog) => blog.categoryId === activeCategory);
   }, [blogsData, activeCategory]);
 
   return (
-    <div className='bg-[#FBFDFF] py-14 md:py-20   '>
-      <div className='container mx-auto px-4 md:px-6'>
+    <div className="bg-[#FBFDFF] py-14 md:py-20   ">
+      <div className="container mx-auto px-4 md:px-6">
         {/* Header Section */}
         <BlogHeader />
 
         {/* Category Tabs */}
-        <BlogCategories 
+        <BlogCategories
           categories={categories}
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}
@@ -68,7 +66,7 @@ const BlogContent = memo(() => {
         {/* Blog Grid */}
         {isBlogsLoading ? (
           <div className="py-24 text-center text-base text-gray-400 flex flex-col items-center justify-center gap-3">
-            <div className="w-8 h-8 border-4 border-[#EAB308] border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-green-500/60 border-t-transparent rounded-full animate-spin" />
             <span>Loading blogs...</span>
           </div>
         ) : filteredBlogs.length === 0 ? (
@@ -79,19 +77,18 @@ const BlogContent = memo(() => {
           <BlogGrid blogs={filteredBlogs} />
         )}
 
-        
-        <CommonAdsSection 
-          wrapperClassName='mt-16'
-      containerClassName='container mx-auto'
-      boxClassName='w-full h-44 bg-[#F1F5F9] rounded-xl border border-dashed border-gray-300 flex items-center justify-center group hover:bg-gray-50 transition-colors'
-      title={t('blog.page.adsTitle')}
-      titleClassName='text-xl font-semibold text-gray-600'
+        <CommonAdsSection
+          wrapperClassName="mt-16"
+          containerClassName="container mx-auto"
+          boxClassName="w-full h-44 bg-[#F1F5F9] rounded-xl border border-dashed border-gray-300 flex items-center justify-center group hover:bg-gray-50 transition-colors"
+          title={t("blog.page.adsTitle")}
+          titleClassName="text-xl font-semibold text-gray-600"
         />
       </div>
     </div>
   );
 });
 
-BlogContent.displayName = 'BlogContent';
+BlogContent.displayName = "BlogContent";
 
 export default BlogContent;
