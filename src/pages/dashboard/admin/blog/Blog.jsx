@@ -188,7 +188,11 @@ const Blog = () => {
 
     const preparedTitle = formData.title.trim();
     const preparedContent = formData.content.trim();
-    const preparedSlug = formData.slug.trim();
+    const preparedSlug = formData.slug
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
     if (!preparedTitle || !preparedContent || !formData.categoryId) {
       toast.error("Please fill in all required fields");
@@ -216,7 +220,16 @@ const Blog = () => {
       setPendingReset(true);
       handleCloseModal();
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to save blog");
+      console.error("Save blog API error:", err);
+      if (err?.data?.errors) {
+        console.error("Nested validation errors:", err.data.errors);
+        const details = Array.isArray(err.data.errors)
+          ? err.data.errors.map((e) => `${e.field || e.path || ""}: ${e.message || e}`).join(", ")
+          : JSON.stringify(err.data.errors);
+        toast.error(`Validation Error: ${details}`);
+      } else {
+        toast.error(err?.data?.message || "Failed to save blog");
+      }
     }
   };
 

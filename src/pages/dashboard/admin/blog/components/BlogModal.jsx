@@ -78,7 +78,7 @@ const BlogModal = ({
                   const generatedSlug = e.target.value
                     .toLowerCase()
                     .replace(/[^a-z0-9]+/g, "-")
-                    .replace(/(^-|-$)+/g, "");
+                    .replace(/^-+|-+$/g, "");
                   onChangeField("slug", generatedSlug);
                 }
               }}
@@ -95,7 +95,13 @@ const BlogModal = ({
             <input
               type="text"
               value={formData.slug}
-              onChange={(e) => onChangeField("slug", e.target.value)}
+              onChange={(e) => {
+                const cleanedSlug = e.target.value
+                  .toLowerCase()
+                  .replace(/[^a-z0-9-]+/g, "-")
+                  .replace(/^-+|-+$/g, "");
+                onChangeField("slug", cleanedSlug);
+              }}
               placeholder="enter-blog-slug-here"
               className="w-full rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent placeholder:text-[#8A8A8A] focus:ring-green-500/60"
               required
