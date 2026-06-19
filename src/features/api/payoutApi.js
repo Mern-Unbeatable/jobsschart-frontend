@@ -32,6 +32,16 @@ export const payoutApi = baseApi.injectEndpoints({
     }),
 
 
+    requestPayout: builder.mutation({
+      query: (body) => ({
+        url: '/payouts/request',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Payout'],
+      transformResponse: (response) => response.data,
+    }),
+
     approvePayout: builder.mutation({
       query: ({ id, adminNote }) => ({
         url: `/payouts/admin/${id}/approve`,
@@ -60,5 +70,7 @@ export const {
   useGetMyPayoutsQuery,
   useApprovePayoutMutation,
   useRejectPayoutMutation,
+  useRequestPayoutMutation,
 } = payoutApi;
+
 

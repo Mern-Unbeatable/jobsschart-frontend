@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import PayoutSummary from "./components/PayoutSummary";
 import PaymentHistoryTable from "./components/PaymentHistoryTable";
 import WithdrawModal from "./components/WithdrawModal";
-import { useGetPayoutBalanceQuery, useGetMyPayoutsQuery } from "../../../../features/api/payoutApi";
+import { useGetPayoutBalanceQuery, useGetMyPayoutsQuery, useRequestPayoutMutation } from "../../../../features/api/payoutApi";
 
 const MODAL_CLOSE_ANIMATION_MS = 280;
 const PAGE_SIZE = 10;
@@ -21,6 +21,8 @@ const ConsultantPayout = memo(() => {
     page: currentPage,
     limit: PAGE_SIZE,
   });
+
+  const [requestPayout, { isLoading: isSubmitting }] = useRequestPayoutMutation();
 
   const payouts = payoutsData?.payouts || [];
   const totalResults = payoutsData?.meta?.total || 0;
@@ -54,10 +56,56 @@ const ConsultantPayout = memo(() => {
     }, MODAL_CLOSE_ANIMATION_MS);
   }, []);
 
-  const handleSubmitWithdrawal = useCallback(() => {
-    toast.success("Withdrawal request submitted successfully.");
-    handleCloseModal();
-  }, [handleCloseModal]);
+  const handleSubmitWithdrawal = useCallback(async (formData) => {
+    const amountVal = parseFloat(formData.amount);
+    
+    if (isNaN(amountVal) || amountVal <= 0) {
+      toast.error("Please enter a valid amount.");
+      return;
+    }
+
+    const availableBalance = balanceData?.availableBalance ?? 0;
+    const minimumPayout = balanceData?.minimumPayout ?? 10;
+
+    if (amountVal > availableBalance) {
+      toast.error(`Requested amount exceeds available balance of €${availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`);
+      return;
+    }
+
+    if (amountVal < minimumPayout) {
+      toast.error(`Minimum withdrawal amount is €${minimumPayout.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`);
+      return;
+    }
+
+    if (!formData.businessName) {
+      toast.error("Please enter the business or organisation name.");
+      return;
+    }
+
+    if (!formData.routingNumber) {
+      toast.error("Please enter the routing number.");
+      return;
+    }
+
+    if (!formData.accountNumber) {
+      toast.error("Please enter the account number.");
+      return;
+    }
+
+    const toastId = toast.loading("Submitting withdrawal request...");
+    try {
+      await requestPayout({
+        amount: amountVal,
+        organisationName: formData.businessName,
+        routingNumber: formData.routingNumber,
+        accountNumber: formData.accountNumber,
+      }).unwrap();
+      toast.success("Withdrawal request submitted successfully.", { id: toastId });
+      handleCloseModal();
+    } catch (error) {
+      toast.error(error?.message || error?.data?.message || "Failed to submit withdrawal request.", { id: toastId });
+    }
+  }, [balanceData, requestPayout, handleCloseModal]);
 
   useEffect(
     () => () => {
@@ -125,6 +173,7 @@ const ConsultantPayout = memo(() => {
         isClosing={isModalClosing}
         onClose={handleCloseModal}
         onSubmit={handleSubmitWithdrawal}
+        isSubmitting={isSubmitting}
       />
     </>
   );

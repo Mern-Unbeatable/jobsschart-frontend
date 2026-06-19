@@ -6,6 +6,7 @@ export default function WithdrawModal({
   isClosing,
   onClose,
   onSubmit,
+  isSubmitting = false,
 }) {
   const [amount, setAmount] = useState("");
   const [businessName, setBusinessName] = useState("");
@@ -54,7 +55,8 @@ export default function WithdrawModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9d9d9] text-[#2d3036] transition-colors duration-200 hover:bg-[#cfcfcf]"
+            disabled={isSubmitting}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9d9d9] text-[#2d3036] transition-colors duration-200 hover:bg-[#cfcfcf] disabled:opacity-50"
             aria-label="Close modal"
           >
             ×
@@ -79,6 +81,7 @@ export default function WithdrawModal({
                 onChange={(event) => setAmount(event.target.value)}
                 placeholder="Enter withdrawal amount"
                 className="h-full w-full border-none bg-transparent text-base font-medium text-black placeholder:text-[#9ca3af] outline-none"
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -97,6 +100,7 @@ export default function WithdrawModal({
               onChange={(event) => setBusinessName(event.target.value)}
               placeholder="Enter business or organisation name"
               className="h-11.75 w-full rounded-lg border border-[#cdcdcd] px-4 text-base text-black placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-green-500/60"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -114,6 +118,7 @@ export default function WithdrawModal({
               onChange={(event) => setRoutingNumber(event.target.value)}
               placeholder="Enter routing number"
               className="h-11.75 w-full rounded-lg border border-[#cdcdcd] px-4 text-base text-black placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-green-500/60"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -131,6 +136,7 @@ export default function WithdrawModal({
               onChange={(event) => setAccountNumber(event.target.value)}
               placeholder="Enter your account number"
               className="h-11.75 w-full rounded-lg border border-[#cdcdcd] px-4 text-base font-medium text-black placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-green-500/60"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -138,16 +144,18 @@ export default function WithdrawModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-green-500/60 px-9 py-3 text-base font-medium text-[#24272d] transition-all duration-200 ease-in-out hover:bg-[#fcf7e7]"
+              disabled={isSubmitting}
+              className="rounded-xl border border-green-500/60 px-9 py-3 text-base font-medium text-[#24272d] transition-all duration-200 ease-in-out hover:bg-[#fcf7e7] disabled:opacity-50"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="rounded-xl bg-green-500/60 px-9 py-3 text-base font-medium text-white transition-all duration-200 ease-in-out"
+              disabled={isSubmitting}
+              className="rounded-xl bg-green-500/60 px-9 py-3 text-base font-medium text-white transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </div>
         </form>
