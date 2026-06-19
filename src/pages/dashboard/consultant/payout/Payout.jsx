@@ -151,9 +151,7 @@ const ConsultantPayout = memo(() => {
             Manage your earnings and payment information
           </p>
         </div>
-
         <PayoutSummary onWithdrawClick={handleOpenModal} balanceData={balanceData} />
-
         <PaymentHistoryTable
           payouts={payouts}
           isLoading={isPayoutsLoading}
@@ -166,8 +164,6 @@ const ConsultantPayout = memo(() => {
           onNext={handleNextPage}
         />
       </div>
-
-
       <WithdrawModal
         isOpen={isModalOpen}
         isClosing={isModalClosing}
