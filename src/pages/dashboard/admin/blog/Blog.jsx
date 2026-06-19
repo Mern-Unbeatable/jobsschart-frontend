@@ -204,7 +204,7 @@ const Blog = () => {
     const formDataToSend = new FormData();
 
     if (editingBlogId) {
-      // For editing mode, only append fields that have actually changed
+
       let hasChanges = false;
       if (preparedTitle !== editingBlog?.title) {
         formDataToSend.append("title", preparedTitle);
