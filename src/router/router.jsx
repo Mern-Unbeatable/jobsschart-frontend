@@ -107,7 +107,7 @@ const UserSettings = lazy(() => import("../pages/dashboard/user/Settings"));
 
 // Consultant pages
 const ConsultantDashboard = lazy(
-  () => import("../pages/dashboard/consultant/Dashboard"),
+  () => import("../pages/dashboard/consultant/dashboard/Dashboard"),
 );
 const ConsultantSchedule = lazy(
   () => import("../pages/dashboard/consultant/Schedule"),

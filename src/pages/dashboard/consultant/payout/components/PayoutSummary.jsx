@@ -1,30 +1,6 @@
 import React, { memo } from "react";
 import { Euro, WalletCards, ArrowUpRight } from "lucide-react";
 
-const PAYOUT_SUMMARY = [
-  {
-    id: "available",
-    title: "Available Balance",
-    amount: "€1250.00",
-    icon: Euro,
-    showWithdraw: true,
-  },
-  {
-    id: "pending",
-    title: "Pending Amount",
-    amount: "€250.00",
-    icon: ArrowUpRight,
-    showWithdraw: false,
-  },
-  {
-    id: "total",
-    title: "Total Earnings",
-    amount: "€84250.00",
-    icon: WalletCards,
-    showWithdraw: false,
-  },
-];
-
 const SummaryCard = memo(
   ({ title, amount, icon: Icon, showWithdraw, onWithdrawClick }) => (
     <div className="bg-white border border-gray-100 rounded-[10px] p-6 flex flex-col gap-3">
@@ -52,10 +28,38 @@ const SummaryCard = memo(
 
 SummaryCard.displayName = "SummaryCard";
 
-export default function PayoutSummary({ onWithdrawClick }) {
+export default function PayoutSummary({ onWithdrawClick, balanceData }) {
+  const available = balanceData?.availableBalance ?? 0;
+  const pending = balanceData?.pendingPayoutAmount ?? 0;
+  const total = balanceData?.totalEarned ?? 0;
+
+  const summaryItems = [
+    {
+      id: "available",
+      title: "Available Balance",
+      amount: `€${available.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      icon: Euro,
+      showWithdraw: true,
+    },
+    {
+      id: "pending",
+      title: "Pending Amount",
+      amount: `€${pending.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      icon: ArrowUpRight,
+      showWithdraw: false,
+    },
+    {
+      id: "total",
+      title: "Total Earnings",
+      amount: `€${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      icon: WalletCards,
+      showWithdraw: false,
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {PAYOUT_SUMMARY.map((item) => (
+      {summaryItems.map((item) => (
         <SummaryCard
           key={item.id}
           title={item.title}
@@ -68,3 +72,4 @@ export default function PayoutSummary({ onWithdrawClick }) {
     </div>
   );
 }
+

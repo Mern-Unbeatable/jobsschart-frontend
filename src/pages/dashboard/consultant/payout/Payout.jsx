@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 import PayoutSummary from "./components/PayoutSummary";
 import PaymentHistoryTable from "./components/PaymentHistoryTable";
 import WithdrawModal from "./components/WithdrawModal";
+import { useGetPayoutBalanceQuery } from "../../../../features/api/payoutApi";
 
 const MODAL_CLOSE_ANIMATION_MS = 280;
 
@@ -10,6 +11,8 @@ const ConsultantPayout = memo(() => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalClosing, setIsModalClosing] = useState(false);
   const closeTimerRef = useRef(null);
+
+  const { data: balanceData, isLoading: isBalanceLoading } = useGetPayoutBalanceQuery();
 
   const handleOpenModal = useCallback(() => {
     if (closeTimerRef.current) {
@@ -60,6 +63,14 @@ const ConsultantPayout = memo(() => {
     };
   }, [isModalOpen, handleCloseModal]);
 
+  if (isBalanceLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500/60" />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex flex-col gap-9">
@@ -70,10 +81,11 @@ const ConsultantPayout = memo(() => {
           </p>
         </div>
 
-        <PayoutSummary onWithdrawClick={handleOpenModal} />
+        <PayoutSummary onWithdrawClick={handleOpenModal} balanceData={balanceData} />
 
         <PaymentHistoryTable />
       </div>
+
 
       <WithdrawModal
         isOpen={isModalOpen}

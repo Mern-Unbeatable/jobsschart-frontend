@@ -12,6 +12,15 @@ export const payoutApi = baseApi.injectEndpoints({
       transformResponse: (response) => response.data,
     }),
 
+    getPayoutBalance: builder.query({
+      query: () => ({
+        url: '/payouts/balance',
+        method: 'GET',
+      }),
+      providesTags: ['Payout'],
+      transformResponse: (response) => response.data,
+    }),
+
     approvePayout: builder.mutation({
       query: ({ id, adminNote }) => ({
         url: `/payouts/admin/${id}/approve`,
@@ -36,6 +45,8 @@ export const payoutApi = baseApi.injectEndpoints({
 
 export const {
   useGetPayoutsQuery,
+  useGetPayoutBalanceQuery,
   useApprovePayoutMutation,
   useRejectPayoutMutation,
 } = payoutApi;
+
