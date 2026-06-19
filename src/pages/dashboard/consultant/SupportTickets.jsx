@@ -6,11 +6,11 @@ import RecentTicketsSection from './sections/RecentTicketsSection';
 const SupportTickets = () => {
   return (
     <section className='space-y-4'>
-      <div>
-        <h1 className='text-2xl font-semibold text-[#2f2f2f] sm:text-3xl'>
+      <div className='space-y-2'>
+        <h1 className='dashboard-page-title text-[#2f2f2f] '>
           Support Tickets
         </h1>
-        <p className='mt-1 text-sm text-gray-500 sm:text-base'>
+        <p className='mt-1 dashboard-page-subtitle text-gray-500'>
           Feel free to solve your doubts anytime
         </p>
       </div>

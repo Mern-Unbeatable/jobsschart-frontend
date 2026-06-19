@@ -129,7 +129,7 @@ const ConsultantEarnings = lazy(
   () => import("../pages/dashboard/consultant/Earnings"),
 );
 const ConsultantPayout = lazy(
-  () => import("../pages/dashboard/consultant/Payout"),
+  () => import("../pages/dashboard/consultant/payout/Payout"),
 );
 const ConsultantSettings = lazy(
   () => import("../pages/dashboard/consultant/Settings"),
