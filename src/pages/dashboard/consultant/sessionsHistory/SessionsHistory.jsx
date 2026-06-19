@@ -3,101 +3,23 @@ import SessionsMetrics from "./components/SessionsMetrics";
 import FilterTabs from "./components/FilterTabs";
 import SessionsTable from "./components/SessionsTable";
 import SessionDetailsModal from "./components/SessionDetailsModal";
+import { useGetConsultantSessionsQuery } from "../../../../features/api/sessionApi";
 
 const MODAL_CLOSE_ANIMATION_MS = 280;
-
-const SESSIONS = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "james.h@email.com",
-    type: "Video",
-    duration: "45 mins",
-    earnings: "45.00",
-    date: "Apr 24, 2024",
-    rating: 5,
-    status: "Completed",
-    consultantName: "Dr. Sarah Johnson",
-    reviewText:
-      "I had a really great consultation experience. The session was very insightful and helpful. The consultant listened carefully, understood my situation, and provided clear guidance that I can actually apply in my life. The conversation felt comfortable and genuine, and I truly appreciate the time and attention given during the session.",
-  },
-  {
-    id: 2,
-    name: "John Doe",
-    email: "james.h@email.com",
-    type: "Phone",
-    duration: "30 mins",
-    earnings: "30.00",
-    date: "Apr 23, 2024",
-    rating: 5,
-    status: "Completed",
-    consultantName: "Dr. Sarah Johnson",
-    reviewText:
-      "Great phone consultation. The consultant was very professional and attentive throughout the session. I received practical advice that I could apply immediately.",
-  },
-  {
-    id: 3,
-    name: "John Doe",
-    email: "james.h@email.com",
-    type: "Video",
-    duration: "60 mins",
-    earnings: "60.00",
-    date: "Apr 22, 2024",
-    rating: 5,
-    status: "Completed",
-    consultantName: "Dr. Sarah Johnson",
-    reviewText:
-      "Excellent video session. Very thorough and detailed discussion. The consultant took time to explain everything clearly and made sure all my questions were answered.",
-  },
-  {
-    id: 4,
-    name: "John Doe",
-    email: "james.h@email.com",
-    type: "Chat",
-    duration: "25 mins",
-    earnings: "25.00",
-    date: "Apr 21, 2024",
-    rating: 5,
-    status: "Completed",
-    consultantName: "Dr. Sarah Johnson",
-    reviewText:
-      "The chat session was very convenient. Quick and to the point with helpful suggestions. Would definitely book again for follow-up questions.",
-  },
-  {
-    id: 5,
-    name: "John Doe",
-    email: "james.h@email.com",
-    type: "Video",
-    duration: "50 mins",
-    earnings: "50.00",
-    date: "Apr 20, 2024",
-    rating: 5,
-    status: "Completed",
-    consultantName: "Dr. Sarah Johnson",
-    reviewText:
-      "Amazing session. The consultant was well prepared, knowledgeable and supportive. I left the session feeling confident and with a clear action plan.",
-  },
-  {
-    id: 6,
-    name: "John Doe",
-    email: "james.h@email.com",
-    type: "Video",
-    duration: "50 mins",
-    earnings: "50.00",
-    date: "Apr 20, 2024",
-    rating: 5,
-    status: "Completed",
-    consultantName: "Dr. Sarah Johnson",
-    reviewText:
-      "Wonderful consultation experience. The session was engaging and productive. I highly recommend booking with this consultant for insightful and practical guidance.",
-  },
-];
+const PAGE_SIZE = 10;
 
 const ConsultantSessionsHistory = () => {
   const [activeFilter, setActiveFilter] = useState("All");
   const [selectedSession, setSelectedSession] = useState(null);
   const [isModalClosing, setIsModalClosing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const closeTimerRef = useRef(null);
+
+  const { data, isLoading } = useGetConsultantSessionsQuery({
+    page: currentPage,
+    limit: PAGE_SIZE,
+    type: activeFilter === "All" ? undefined : activeFilter.toUpperCase(),
+  });
 
   const closeModal = useCallback(() => {
     setIsModalClosing(true);
@@ -114,10 +36,33 @@ const ConsultantSessionsHistory = () => {
     [],
   );
 
-  const filtered =
-    activeFilter === "All"
-      ? SESSIONS
-      : SESSIONS.filter((s) => s.type === activeFilter);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeFilter]);
+
+  const sessions = data?.sessions || [];
+  const summary = data?.summary || {};
+  const totalSessions = data?.meta?.total || 0;
+  const totalPages = data?.meta?.totalPages || 1;
+
+  const pageStart = totalSessions === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const pageEnd = Math.min(currentPage * PAGE_SIZE, totalSessions);
+
+  const handlePrevPage = useCallback(() => {
+    setCurrentPage((prev) => Math.max(1, prev - 1));
+  }, []);
+
+  const handleNextPage = useCallback(() => {
+    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+  }, [totalPages]);
+
+  if (isLoading && currentPage === 1) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500/60" />
+      </div>
+    );
+  }
 
   return (
     <section className="space-y-8">
@@ -130,15 +75,21 @@ const ConsultantSessionsHistory = () => {
       </div>
 
       {/* Metric cards */}
-      <SessionsMetrics />
+      <SessionsMetrics summaryData={summary} />
 
       {/* Filter tabs */}
       <FilterTabs activeFilter={activeFilter} onFilterChange={setActiveFilter} />
 
       {/* Table */}
       <SessionsTable
-        filtered={filtered}
-        totalSessions={SESSIONS.length}
+        filtered={sessions}
+        totalSessions={totalSessions}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        pageStart={pageStart}
+        pageEnd={pageEnd}
+        onPrev={handlePrevPage}
+        onNext={handleNextPage}
         onViewDetails={setSelectedSession}
       />
 

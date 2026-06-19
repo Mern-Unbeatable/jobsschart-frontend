@@ -1,37 +1,41 @@
 import React, { memo } from "react";
 import { Euro, Clock, Star } from "lucide-react";
 
-const METRICS = [
-  {
-    icon: Euro,
-    iconBg: "bg-[#e9f9ef]",
-    iconColor: "text-green-500",
-    value: "€345",
-    label: "Total Earnings",
-    filled: false,
-  },
-  {
-    icon: Clock,
-    iconBg: "bg-[#fff5e5]",
-    iconColor: "text-green-500/60",
-    value: "225m",
-    label: "Total Minutes",
-    filled: false,
-  },
-  {
-    icon: Star,
-    iconBg: "bg-[#fcf7e7]",
-    iconColor: "text-green-500/60",
-    value: "4.8",
-    label: "Avg. Rating",
-    filled: true,
-  },
-];
+const SessionsMetrics = memo(({ summaryData }) => {
+  const earnings = summaryData?.totalEarnings ?? 0;
+  const minutes = summaryData?.totalMinutes ?? 0;
+  const rating = summaryData?.averageRating ?? 0;
 
-const SessionsMetrics = memo(() => {
+  const metrics = [
+    {
+      icon: Euro,
+      iconBg: "bg-[#e9f9ef]",
+      iconColor: "text-green-500",
+      value: `€${earnings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      label: "Total Earnings",
+      filled: false,
+    },
+    {
+      icon: Clock,
+      iconBg: "bg-[#fff5e5]",
+      iconColor: "text-green-500/60",
+      value: `${minutes}m`,
+      label: "Total Minutes",
+      filled: false,
+    },
+    {
+      icon: Star,
+      iconBg: "bg-[#fcf7e7]",
+      iconColor: "text-green-500/60",
+      value: rating.toFixed(1),
+      label: "Avg. Rating",
+      filled: true,
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-      {METRICS.map(
+      {metrics.map(
         ({ icon: Icon, iconBg, iconColor, value, label, filled }) => (
           <div
             key={label}

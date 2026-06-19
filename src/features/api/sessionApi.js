@@ -11,9 +11,20 @@ export const sessionApi = baseApi.injectEndpoints({
       providesTags: ['Session'],
       transformResponse: (response) => response.data,
     }),
+    getConsultantSessions: builder.query({
+      query: (params) => ({
+        url: '/sessions/consultant/my',
+        method: 'GET',
+        params,
+      }),
+      providesTags: ['Session'],
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
 export const {
   useGetSessionsQuery,
+  useGetConsultantSessionsQuery,
 } = sessionApi;
+
