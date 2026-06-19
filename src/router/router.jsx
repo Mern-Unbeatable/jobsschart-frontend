@@ -113,7 +113,7 @@ const ConsultantSchedule = lazy(
   () => import("../pages/dashboard/consultant/Schedule"),
 );
 const ConsultantSessionsHistory = lazy(
-  () => import("../pages/dashboard/consultant/SessionsHistory"),
+  () => import("../pages/dashboard/consultant/sessionsHistory/SessionsHistory"),
 );
 const UserChatPage = lazy(() => import("../pages/dashboard/consultant/Chat"));
 const ConsultantProfile = lazy(
