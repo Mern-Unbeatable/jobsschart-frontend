@@ -126,7 +126,7 @@ const ConsultantBookings = lazy(
   () => import("../pages/dashboard/consultant/Bookings"),
 );
 const ConsultantEarnings = lazy(
-  () => import("../pages/dashboard/consultant/Earnings"),
+  () => import("../pages/dashboard/consultant/earnings/Earnings"),
 );
 const ConsultantPayout = lazy(
   () => import("../pages/dashboard/consultant/payout/Payout"),

@@ -91,7 +91,17 @@ export const consultantApi = baseApi.injectEndpoints({
             transformResponse: (response) => response.data,
         }),
 
+        getMyEarningsDashboard: builder.query({
+            query: () => ({
+                url: '/consultants/me/earnings/dashboard',
+                method: 'GET',
+            }),
+            providesTags: ['Earnings'],
+            transformResponse: (response) => response.data,
+        }),
+
         getMyStats: builder.query({
+
             query: () => ({
                 url: '/consultants/me/stats',
                 method: 'GET',
@@ -181,6 +191,7 @@ export const {
     useUpdateMyConsultantProfileMutation,
     useUpdateOnlineStatusMutation,
     useGetMyEarningsQuery,
+    useGetMyEarningsDashboardQuery,
     useGetMyStatsQuery,
 
     // Availability slots (protected)
