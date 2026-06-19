@@ -28,6 +28,7 @@ const INITIAL_PROFILE = {
 const ConsultantProfile = memo(() => {
   const [profile, setProfile] = useState(INITIAL_PROFILE);
   const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
@@ -165,6 +166,10 @@ const ConsultantProfile = memo(() => {
   }, [profile, updateMyConsultantProfile, updateProfile, refetchProfile]);
 
   const handleChangePassword = useCallback(async () => {
+    if (!passwordForm.currentPassword) {
+      toast.error("Please enter your current password.");
+      return;
+    }
     if (!passwordForm.newPassword) {
       toast.error("Please enter a new password.");
       return;
@@ -176,10 +181,14 @@ const ConsultantProfile = memo(() => {
 
     const loadingToast = toast.loading("Updating password...");
     try {
-      await changePassword({ password: passwordForm.newPassword }).unwrap();
+      await changePassword({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+        confirmPassword: passwordForm.confirmPassword,
+      }).unwrap();
       toast.dismiss(loadingToast);
       toast.success("Password updated successfully.");
-      setPasswordForm({ newPassword: "", confirmPassword: "" });
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
       toast.dismiss(loadingToast);
       toast.error(err?.data?.message || "Failed to update password.");
@@ -224,13 +233,15 @@ const ConsultantProfile = memo(() => {
             onRemove={handleRemoveTimeSlot}
             onChange={handleSlotChange}
           />
-
-          <ChangePasswordForm
-            passwordForm={passwordForm}
-            onChange={handlePasswordChange}
-            onSubmit={handleChangePassword}
-          />
         </div>
+      </div>
+
+      <div className="rounded-[20px] border border-gray-100 bg-white px-6 py-8 lg:px-10 lg:py-12">
+        <ChangePasswordForm
+          passwordForm={passwordForm}
+          onChange={handlePasswordChange}
+          onSubmit={handleChangePassword}
+        />
       </div>
     </section>
   );

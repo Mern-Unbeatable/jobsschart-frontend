@@ -111,7 +111,7 @@ const SummaryCard = memo(
         <button
           type="button"
           onClick={onWithdrawClick}
-          className="mt-1 bg-green-500/60 text-white text-base font-medium rounded-xl px-9 py-2 transition-all duration-200 ease-in-out hover:bg-[#ce9c0a]"
+          className="mt-1 bg-green-500/60 text-white text-base font-medium rounded-xl px-9 py-2 transition-all duration-200 ease-in-out "
         >
           Withdraw Funds
         </button>
@@ -444,7 +444,7 @@ const ConsultantPayout = memo(() => {
                   <button
                     type="button"
                     onClick={handleSubmitWithdrawal}
-                    className="rounded-xl bg-green-500/60 px-9 py-3 text-base font-medium text-white transition-all duration-200 ease-in-out hover:bg-[#ce9c0a]"
+                    className="rounded-xl bg-green-500/60 px-9 py-3 text-base font-medium text-white transition-all duration-200 ease-in-out "
                   >
                     Submit
                   </button>

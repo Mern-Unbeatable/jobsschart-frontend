@@ -468,7 +468,7 @@ const ChatPanel = memo(
                 <button
                   type="button"
                   onClick={handleMarkAsComplete}
-                  className="shrink-0 h-10 px-4 rounded-full bg-green-500/60 text-white text-sm font-medium transition-colors duration-150 hover:bg-[#CE9C0A]"
+                  className="shrink-0 h-10 px-4 rounded-full bg-green-500/60 text-white text-sm font-medium transition-colors duration-150 "
                 >
                   Mark As Complete
                 </button>

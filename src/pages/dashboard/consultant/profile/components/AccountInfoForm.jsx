@@ -16,7 +16,10 @@ export default function AccountInfoForm({ profile, onChange, onUpdate }) {
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <div className="space-y-3">
-          <label htmlFor="profile-name" className="block text-base text-[#464646]">
+          <label
+            htmlFor="profile-name"
+            className="block text-base text-[#464646]"
+          >
             Name
           </label>
           <input
@@ -29,7 +32,10 @@ export default function AccountInfoForm({ profile, onChange, onUpdate }) {
         </div>
 
         <div className="space-y-3">
-          <label htmlFor="profile-email" className="block text-base text-[#464646]">
+          <label
+            htmlFor="profile-email"
+            className="block text-base text-[#464646]"
+          >
             Email
           </label>
           <input
@@ -43,7 +49,10 @@ export default function AccountInfoForm({ profile, onChange, onUpdate }) {
       </div>
 
       <div className="space-y-3">
-        <label htmlFor="profile-phone" className="block text-base text-[#464646]">
+        <label
+          htmlFor="profile-phone"
+          className="block text-base text-[#464646]"
+        >
           Phone Number
         </label>
         <input
@@ -56,7 +65,10 @@ export default function AccountInfoForm({ profile, onChange, onUpdate }) {
       </div>
 
       <div className="space-y-3">
-        <label htmlFor="profile-about" className="block text-base text-[#464646]">
+        <label
+          htmlFor="profile-about"
+          className="block text-base text-[#464646]"
+        >
           About Me
         </label>
         <textarea
@@ -69,7 +81,10 @@ export default function AccountInfoForm({ profile, onChange, onUpdate }) {
       </div>
 
       <div className="space-y-3">
-        <label htmlFor="profile-expertise" className="block text-base text-[#464646]">
+        <label
+          htmlFor="profile-expertise"
+          className="block text-base text-[#464646]"
+        >
           Areas Of Expertise
         </label>
         <textarea
@@ -83,7 +98,10 @@ export default function AccountInfoForm({ profile, onChange, onUpdate }) {
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <div className="space-y-3">
-          <label htmlFor="profile-experience" className="block text-base text-[#464646]">
+          <label
+            htmlFor="profile-experience"
+            className="block text-base text-[#464646]"
+          >
             Experience
           </label>
           <input
@@ -96,7 +114,10 @@ export default function AccountInfoForm({ profile, onChange, onUpdate }) {
         </div>
 
         <div className="space-y-3">
-          <label htmlFor="profile-language" className="block text-base text-[#464646]">
+          <label
+            htmlFor="profile-language"
+            className="block text-base text-[#464646]"
+          >
             Language
           </label>
           <input
@@ -109,7 +130,10 @@ export default function AccountInfoForm({ profile, onChange, onUpdate }) {
         </div>
 
         <div className="space-y-3">
-          <label htmlFor="profile-location" className="block text-base text-[#464646]">
+          <label
+            htmlFor="profile-location"
+            className="block text-base text-[#464646]"
+          >
             Location
           </label>
           <input
@@ -126,7 +150,7 @@ export default function AccountInfoForm({ profile, onChange, onUpdate }) {
         <button
           type="button"
           onClick={onUpdate}
-          className="h-8 rounded bg-green-500/60 px-4 text-sm font-medium text-white transition-colors duration-200 hover:bg-[#ce9c0a]"
+          className="h-8 rounded bg-green-500/60 px-4 text-sm font-medium text-white transition-colors duration-200 "
         >
           Update Profile
         </button>
