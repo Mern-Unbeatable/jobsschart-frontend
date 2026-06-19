@@ -85,6 +85,27 @@ export const userApi = baseApi.injectEndpoints({
       transformResponse: (response) => response.data,
     }),
 
+    getDashboardStats: builder.query({
+      query: () => ({
+        url: '/admin/stats',
+        method: 'GET',
+      }),
+      providesTags: ['AdminStats'],
+      transformResponse: (response) => response.data,
+    }),
+
+    getRevenueChart: builder.query({
+      query: (params) => ({
+        url: '/admin/revenue-chart',
+        method: 'GET',
+        params,
+      }),
+      providesTags: ['AdminStats'],
+      transformResponse: (response) => response.data,
+    }),
+
+
+
     getUserById: builder.query({
       query: (id) => ({
         url: `/users/admin/users/${id}`,
@@ -162,6 +183,8 @@ export const {
   // Admin hooks
   useGetAllUsersQuery,
   useGetAdminStatsQuery,
+  useGetDashboardStatsQuery,
+  useGetRevenueChartQuery,
   useGetUserByIdQuery,
   useUpdateUserStatusMutation,
   useUpdateUserRoleMutation,
@@ -174,5 +197,7 @@ export const {
   useLazyGetMyCreditHistoryQuery,
   useLazyGetAllUsersQuery,
   useLazyGetAdminStatsQuery,
+  useLazyGetDashboardStatsQuery,
+  useLazyGetRevenueChartQuery,
   useLazyGetUserByIdQuery,
 } = userApi;

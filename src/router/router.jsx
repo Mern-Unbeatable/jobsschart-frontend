@@ -50,7 +50,7 @@ const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/auth/regester/Regester"));
 
 // Admin pages
-const Dashboard = lazy(() => import("../pages/dashboard/admin/Dashboard"));
+const Dashboard = lazy(() => import("../pages/dashboard/admin/dashboard/Dashboard"));
 const Emails = lazy(() => import("../pages/dashboard/admin/Emails"));
 const Leads = lazy(() => import("../pages/dashboard/admin/Leads"));
 const Orders = lazy(() => import("../pages/dashboard/admin/order/Orders"));
