@@ -182,7 +182,7 @@ const PrivacyPolicy = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800 antialiased pt-24 pb-16">
+    <div className="min-h-screen bg-gray-50 text-gray-800 antialiased pt-16 pb-16">
       
       {/* Background Gradient Decorative Elements */}
       <div className="absolute top-0 left-0 right-0 h-[380px] bg-gradient-to-br from-purple-900/10 via-purple-600/5 to-transparent pointer-events-none" />
