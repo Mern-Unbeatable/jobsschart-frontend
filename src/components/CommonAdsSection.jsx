@@ -52,22 +52,25 @@ const CommonAdsSection = memo(
     }
 
     if (campaign) {
-      const imageSrc = campaign.image || "/jbossAdvertising.webp";
       const description = campaign.description || "";
       const displayLink = campaign.linkUrl
         ? campaign.linkUrl.replace(/https?:\/\/(www\.)?/, "")
         : "";
 
       const content = (
-        <div className='w-full h-44 md:h-56 lg:h-72 relative rounded-xl overflow-hidden shadow-md border border-gray-200 group hover:shadow-lg transition-all duration-300'>
+        <div className={`w-full h-44 md:h-56 lg:h-72 relative rounded-xl overflow-hidden shadow-md border border-gray-200 group hover:shadow-lg transition-all duration-300 ${!campaign.image ? 'bg-green-500/60' : ''}`}>
           {/* Background Image */}
-          <img
-            src={imageSrc}
-            alt={campaign.title || 'Advertisement'}
-            className='w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500'
-          />
-          {/* Dark Overlay */}
-          <div className='absolute inset-0 bg-black/50 transition-opacity duration-300 group-hover:bg-black/60'></div>
+          {campaign.image && (
+            <>
+              <img
+                src={campaign.image}
+                alt={campaign.title || 'Advertisement'}
+                className='w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500'
+              />
+              {/* Dark Overlay */}
+              <div className='absolute inset-0 bg-black/50 transition-opacity duration-300 group-hover:bg-black/60'></div>
+            </>
+          )}
 
           {/* Centered Content Overlay */}
           <div className='absolute inset-0 flex flex-col items-center justify-center p-4 md:p-6 text-center text-white z-10'>
