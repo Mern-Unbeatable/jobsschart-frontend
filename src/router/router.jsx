@@ -48,6 +48,7 @@ const FaqPage = lazy(() => import("../pages/FAQ"));
 const BlogDetail = lazy(() => import("../pages/blog/BlogDetail"));
 const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/auth/regester/Regester"));
+const TermsConditions = lazy(() => import("../pages/TermsConditions"));
 
 // Admin pages
 const Dashboard = lazy(() => import("../pages/dashboard/admin/dashboard/Dashboard"));
@@ -221,6 +222,7 @@ const router = createBrowserRouter(
         <Route path={ROUTES.FAQ} element={<FaqPage />} />
         <Route path={ROUTES.BLOG_DETAIL} element={<BlogDetail />} />
         <Route path={ROUTES.ABOUT} element={<About />} />
+        <Route path={ROUTES.TERMS} element={<TermsConditions />} />
         <Route path={ROUTES.SERVICES} element={<Services />} />
         <Route path={ROUTES.COMMUNITY} element={<Community />} />
       </Route>

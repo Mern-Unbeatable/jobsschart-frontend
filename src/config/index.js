@@ -21,6 +21,7 @@ export const APP_CONFIG = {
 export const ROUTES = {
   HOME: '/',
   ABOUT: '/about',
+  TERMS: '/terms-and-conditions',
   SERVICES: '/services',
   ENTREPRENEURSHIP: '/entrepreneurship',
   COMMUNITY: '/community',

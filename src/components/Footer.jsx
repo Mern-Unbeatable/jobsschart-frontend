@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Youtube, ExternalLink,MapPin } from 'lucide-react';
+import { ROUTES } from '../config';
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -39,12 +41,12 @@ const Footer = () => {
         <div>
           <h3 className="text-white font-bold text-lg mb-6">{t('footer.customerService.title')}</h3>
           <ul className="space-y-3 text-sm font-medium">
-            <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.terms')}</a></li>
+            <li><Link to={ROUTES.TERMS} className="hover:text-white transition-colors">{t('footer.customerService.links.terms')}</Link></li>
             <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.privacy')}</a></li>
             <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.cookies')}</a></li>
             <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.contact')}</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.antiSpam')}</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.refund')}</a></li>
+            {/* <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.antiSpam')}</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.refund')}</a></li> */}
             <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.faq')}</a></li>
           </ul>
         </div>
@@ -113,7 +115,7 @@ const Footer = () => {
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-base font-medium">
           <span>{t('footer.bottomBar.copyright')}</span>
           <div className="flex gap-6 items-center">
-            <a href="#" className="hover:underline underline-offset-4">{t('footer.bottomBar.links.terms')}</a>
+            <Link to={ROUTES.TERMS} className="hover:underline underline-offset-4">{t('footer.bottomBar.links.terms')}</Link>
             <a href="#" className="hover:underline underline-offset-4">{t('footer.bottomBar.links.privacy')}</a>
             <a href="#" className="hover:underline underline-offset-4">{t('footer.bottomBar.links.cookies')}</a>
           </div>
