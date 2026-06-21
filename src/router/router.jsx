@@ -50,6 +50,8 @@ const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/auth/regester/Regester"));
 const TermsConditions = lazy(() => import("../pages/TermsConditions"));
 const PrivacyPolicy = lazy(() => import("../pages/PrivacyPolicy"));
+const CookiePolicy = lazy(() => import("../pages/CookiePolicy"));
+const Contact = lazy(() => import("../pages/Contact"));
 
 // Admin pages
 const Dashboard = lazy(() => import("../pages/dashboard/admin/dashboard/Dashboard"));
@@ -225,6 +227,8 @@ const router = createBrowserRouter(
         <Route path={ROUTES.ABOUT} element={<About />} />
         <Route path={ROUTES.TERMS} element={<TermsConditions />} />
         <Route path={ROUTES.PRIVACY} element={<PrivacyPolicy />} />
+        <Route path={ROUTES.COOKIES} element={<CookiePolicy />} />
+        <Route path={ROUTES.CONTACT} element={<Contact />} />
         <Route path={ROUTES.SERVICES} element={<Services />} />
         <Route path={ROUTES.COMMUNITY} element={<Community />} />
       </Route>

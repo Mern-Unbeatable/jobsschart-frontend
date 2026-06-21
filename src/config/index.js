@@ -23,6 +23,8 @@ export const ROUTES = {
   ABOUT: '/about',
   TERMS: '/terms-and-conditions',
   PRIVACY: '/privacy-policy',
+  COOKIES: '/cookie-policy',
+  CONTACT: '/contact',
   SERVICES: '/services',
   ENTREPRENEURSHIP: '/entrepreneurship',
   COMMUNITY: '/community',
