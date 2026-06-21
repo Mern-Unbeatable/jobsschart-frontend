@@ -112,16 +112,16 @@ export default function PublishedAds() {
 
       const placementMapping = {
         "Home Page": "HOME",
-        "Consultants Page": "CONSULTANTS",
-        "Consultants Details Page": "CONSULTANT_DETAILS",
-        "Credit Page": "CREDIT",
+        "Consultants Page": "CONSULTATION",
+        "Consultants Details Page": "CONSULTATION",
+        "Credit Page": "GLOBAL",
         "Webshop Page": "WEBSHOP",
-        "Webshop Details Page": "WEBSHOP_DETAILS",
-        "Checkout Page": "CHECKOUT",
+        "Webshop Details Page": "WEBSHOP",
+        "Checkout Page": "GLOBAL",
         "Donation Page": "DONATION",
-        "Community Page": "COMMUNITY",
-        "Blog Page": "BLOG",
-        "Blog Details Page": "BLOG_DETAILS",
+        "Community Page": "GLOBAL",
+        "Blog Page": "GLOBAL",
+        "Blog Details Page": "GLOBAL",
       };
 
       const backendPlacement = placementMapping[selectedAdsPage] || "HOME";
