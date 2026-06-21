@@ -35,7 +35,7 @@ const Webshop = memo(() => {
   }));
 
   return (
-    <div className='min-h-screen bg-[#FBFDFF] pt-8 md:pt-12 pb-14 mb:pb-20'>
+    <div className=' bg-[#FBFDFF] pt-8 md:pt-12 pb-14 md:pb-16 lg:pb-20'>
       <WebshopHero selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
       <WebshopGrid
         products={products}
