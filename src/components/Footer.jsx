@@ -45,8 +45,6 @@ const Footer = () => {
             <li><Link to={ROUTES.PRIVACY} className="hover:text-white transition-colors">{t('footer.customerService.links.privacy')}</Link></li>
             <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.cookies')}</a></li>
             <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.contact')}</a></li>
-            {/* <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.antiSpam')}</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.refund')}</a></li> */}
             <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.faq')}</a></li>
           </ul>
         </div>
