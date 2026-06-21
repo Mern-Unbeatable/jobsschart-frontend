@@ -12,6 +12,15 @@ export const campaignApi = baseApi.injectEndpoints({
       transformResponse: (response) => response.data,
     }),
 
+    getActiveCampaigns: builder.query({
+      query: () => ({
+        url: '/ad-campaigns/active',
+        method: 'GET',
+      }),
+      providesTags: ['Campaign'],
+      transformResponse: (response) => response.data,
+    }),
+
     deleteCampaign: builder.mutation({
       query: (id) => ({
         url: `/ad-campaigns/admin/${id}`,
@@ -35,6 +44,7 @@ export const campaignApi = baseApi.injectEndpoints({
 
 export const {
   useGetCampaignsQuery,
+  useGetActiveCampaignsQuery,
   useDeleteCampaignMutation,
   useApproveCampaignMutation,
 } = campaignApi;
