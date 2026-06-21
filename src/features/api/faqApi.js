@@ -50,6 +50,17 @@ export const faqApi = baseApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
+      invalidatesTags: ['Faq'],
+      transformResponse: (response) => response.data,
+    }),
+
+    getMyQuestions: builder.query({
+      query: (params) => ({
+        url: '/community-questions/my-questions',
+        method: 'GET',
+        params,
+      }),
+      providesTags: ['Faq'],
       transformResponse: (response) => response.data,
     }),
   }),
@@ -61,4 +72,5 @@ export const {
   useUpdateFaqMutation,
   useDeleteFaqMutation,
   useCreateCommunityQuestionMutation,
+  useGetMyQuestionsQuery,
 } = faqApi;

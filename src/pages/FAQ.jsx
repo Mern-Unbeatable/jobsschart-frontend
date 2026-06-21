@@ -12,14 +12,6 @@ const stats = [
   { label: "Avg. Response Time", value: "< 2h" },
 ];
 
-const pending = [
-  {
-    id: "p1",
-    title:
-      "Can I sync my external SAP calendar directly with the EliteConsult portal?",
-    body: "I've been trying to automate my bookings but can't find the API key or calendar integration settings.",
-  },
-];
 
 const FAQ = () => {
   const { data, isLoading } = useGetFaqsQuery({ limit: 100 });
@@ -46,7 +38,7 @@ const FAQ = () => {
           <FaqList faqs={faqs} />
         )}
         
-        <PendingQuestions items={pending} />
+        <PendingQuestions />
         <CtaContact />
       </main>
     </div>
