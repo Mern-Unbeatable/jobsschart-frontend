@@ -49,8 +49,8 @@ const FaqAnswerModal = ({
               Original Consultant Question
             </div>
 
-            <div className="rounded-lg border-l-4 border-[#7a5ab6] bg-[#f4f1f8] px-3 py-3 text-base leading-6 sm:leading-7 text-[#54505f]">
-              {pendingQuestion.quote}
+            <div className="rounded-lg border-l-4 border-[#7a5ab6] bg-[#f4f1f8] px-3 py-3 text-base leading-6 sm:leading-7 text-[#54505f] break-words">
+              {pendingQuestion.question}
             </div>
           </div>
 

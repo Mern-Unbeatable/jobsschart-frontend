@@ -11,23 +11,14 @@ import {
   useCreateFaqMutation,
   useUpdateFaqMutation,
   useDeleteFaqMutation,
+  useGetAllCommunityQuestionsAdminQuery,
+  useAnswerCommunityQuestionAdminMutation,
 } from '../../../../features/api/faqApi';
 
 const FAQ_TABS = [
   {
     id: 'published',
     label: 'Published FAQs',
-  },
-];
-
-const PENDING_QUESTIONS = [
-  {
-    id: 1,
-    question:
-      'Can I sync my external SAP calendar directly with the EliteConsult portal?',
-    quote:
-      'I\'ve been trying to automate my bookings but can\'t find the API key for calendar integration... ',
-    time: '2 hours ago',
   },
 ];
 
@@ -43,12 +34,17 @@ const AdminFaq = () => {
   const [publishQuestionTitle, setPublishQuestionTitle] = useState('');
   const [publishAnswerContent, setPublishAnswerContent] = useState('');
 
-  const { data, isLoading } = useGetFaqsQuery();
+  const { data: faqData, isLoading: isFaqLoading } = useGetFaqsQuery();
+  const { data: questionsData, isLoading: isQuestionsLoading } = useGetAllCommunityQuestionsAdminQuery();
+
   const [createFaq] = useCreateFaqMutation();
   const [updateFaq] = useUpdateFaqMutation();
   const [deleteFaq] = useDeleteFaqMutation();
+  const [answerCommunityQuestion] = useAnswerCommunityQuestionAdminMutation();
 
-  const faqs = data?.faqs || [];
+  const faqs = faqData?.faqs || [];
+  const questions = questionsData?.questions || [];
+  const pendingQuestions = questions.filter((q) => q.status === "PENDING");
 
   const openEditor = (faq = null) => {
     setEditorMode(faq ? 'edit' : 'create');
@@ -123,7 +119,7 @@ const AdminFaq = () => {
 
   const openAnswerModal = (pendingQuestion) => {
     setSelectedPendingQuestion(pendingQuestion);
-    setPublishQuestionTitle(pendingQuestion.question);
+    setPublishQuestionTitle(pendingQuestion.subject || pendingQuestion.question);
     setPublishAnswerContent('');
     setIsAnswerModalOpen(true);
   };
@@ -136,27 +132,27 @@ const AdminFaq = () => {
   };
 
   const handlePublish = async () => {
-    if (!publishQuestionTitle.trim() || !publishAnswerContent.trim()) {
+    if (!publishAnswerContent.trim() || !selectedPendingQuestion?.id) {
+      toast.error("Please provide an answer content.");
       return;
     }
 
     try {
-      const loadingToast = toast.loading("Publishing FAQ...");
-      await createFaq({
-        question: publishQuestionTitle,
+      const loadingToast = toast.loading("Answering question...");
+      await answerCommunityQuestion({
+        id: selectedPendingQuestion.id,
         answer: publishAnswerContent,
-        sortOrder: 1,
       }).unwrap();
       toast.dismiss(loadingToast);
-      toast.success("FAQ published successfully");
+      toast.success("Question answered successfully");
       closeAnswerModal();
     } catch (err) {
       toast.dismiss();
-      toast.error(err?.data?.message || "Failed to publish FAQ");
+      toast.error(err?.data?.message || "Failed to answer question");
     }
   };
 
-  if (isLoading) {
+  if (isFaqLoading || isQuestionsLoading) {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500/60" />
@@ -177,7 +173,7 @@ const AdminFaq = () => {
       />
 
       <FaqPendingQuestionsSection
-        items={PENDING_QUESTIONS}
+        items={pendingQuestions}
         onAnswer={openAnswerModal}
       />
 

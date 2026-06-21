@@ -63,6 +63,26 @@ export const faqApi = baseApi.injectEndpoints({
       providesTags: ['Faq'],
       transformResponse: (response) => response.data,
     }),
+
+    getAllCommunityQuestionsAdmin: builder.query({
+      query: (params) => ({
+        url: '/community-questions/admin/all',
+        method: 'GET',
+        params,
+      }),
+      providesTags: ['Faq'],
+      transformResponse: (response) => response.data,
+    }),
+
+    answerCommunityQuestionAdmin: builder.mutation({
+      query: ({ id, answer }) => ({
+        url: `/community-questions/admin/${id}/answer`,
+        method: 'POST',
+        body: { answer },
+      }),
+      invalidatesTags: ['Faq'],
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
@@ -73,4 +93,6 @@ export const {
   useDeleteFaqMutation,
   useCreateCommunityQuestionMutation,
   useGetMyQuestionsQuery,
+  useGetAllCommunityQuestionsAdminQuery,
+  useAnswerCommunityQuestionAdminMutation,
 } = faqApi;

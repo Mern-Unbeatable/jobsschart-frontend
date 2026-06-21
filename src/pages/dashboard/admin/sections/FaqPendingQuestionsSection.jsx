@@ -21,15 +21,27 @@ const FaqPendingQuestionsSection = ({ items, onAnswer }) => {
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="text-base font-medium leading-6 text-[#33334a]">
+              <h4 className="text-base font-bold leading-6 text-[#33334a]">
+                {item.subject}
+              </h4>
+              <p className="mt-1 text-sm text-[#6f6a81] leading-relaxed">
                 {item.question}
               </p>
-              <p className="mt-1 max-w-2xl text-base italic leading-6 text-[#6f6a81]">
-                “{item.quote}”
-              </p>
-              <p className="mt-1 text-sm font-medium text-[#8b84a3]">
-                {item.time}
-              </p>
+              
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#8b84a3]">
+                <span className="font-medium bg-gray-100 px-2.5 py-0.5 rounded-full text-gray-600 uppercase">
+                  {item.questionType || "USER"}
+                </span>
+                {item.topic && (
+                  <span className="font-medium bg-[#ece3ff] px-2.5 py-0.5 rounded-full text-[#8b6ac1]">
+                    {item.topic}
+                  </span>
+                )}
+                <span>•</span>
+                <span>Asked by <strong className="text-gray-700">{item.user?.name || "Anonymous"}</strong> ({item.user?.email})</span>
+                <span>•</span>
+                <span>{new Date(item.createdAt).toLocaleString()}</span>
+              </div>
 
               <button
                 type="button"
