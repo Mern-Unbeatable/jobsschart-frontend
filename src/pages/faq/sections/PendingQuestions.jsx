@@ -1,9 +1,20 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { HelpCircle } from "lucide-react";
 import { useGetMyQuestionsQuery } from "../../../features/api/faqApi";
+import { selectIsAuthenticated, selectUser } from "../../../features/slices/authSlice";
 
 const PendingQuestions = () => {
-  const { data, isLoading } = useGetMyQuestionsQuery();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectUser);
+
+  const { data, isLoading } = useGetMyQuestionsQuery(undefined, {
+    skip: !isAuthenticated,
+  });
+
+  if (!isAuthenticated || !user || (user.role !== "USER" && user.role !== "CONSULTANT")) {
+    return null;
+  }
 
   const questions = data?.questions || [];
   const pendingQuestions = questions.filter((q) => q.status === "PENDING");
