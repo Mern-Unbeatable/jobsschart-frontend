@@ -101,9 +101,9 @@ const TermsConditions = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800 antialiased py-16">
-{/**header  */}
-      <div className="bg-green-50 py-10 text-center mb-8">
+    <div className="min-h-screen bg-gray-50 text-gray-800 antialiased pb-16">
+      {/**header  */}
+      <div className="bg-green-50 py-16 text-center mb-8">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-green-100/50 text-green-700 text-xs font-semibold uppercase tracking-wider mb-4 border border-green-200/50">
           <ShieldCheck size={14} />
           <span>Juridische Documentatie</span>
