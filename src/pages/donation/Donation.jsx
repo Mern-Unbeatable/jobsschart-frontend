@@ -52,6 +52,7 @@ const Donation = memo(() => {
         containerClassName="container mx-auto pb-14 md:pb-20 px-4 lg:px-6"
         title="Advertisement Area"
         titleClassName="text-black font-bold text-2xl tracking-widest uppercase"
+        placement="DONATION"
       />
     </div>
   );

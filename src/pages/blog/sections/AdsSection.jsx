@@ -12,6 +12,7 @@ const AdsSection = memo(() => {
       boxClassName='w-full h-44 bg-[#F1F5F9] rounded-xl border border-dashed border-gray-300 flex items-center justify-center group hover:bg-gray-50 transition-colors'
       title={t('blog.page.adsTitle')}
       titleClassName='text-xl font-semibold text-gray-600'
+      placement='GLOBAL'
     />
   );
 });

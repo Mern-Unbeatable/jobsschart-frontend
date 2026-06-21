@@ -1,5 +1,5 @@
-import React, { memo } from 'react';
-import { useGetActiveCampaignsQuery } from '../../../features/api/campaignApi';
+import React, { memo } from "react";
+import { useGetActiveCampaignsQuery } from "../../../features/api/campaignApi";
 
 const AdvertisingSection = memo(() => {
   const { data, isLoading } = useGetActiveCampaignsQuery();
@@ -7,17 +7,15 @@ const AdvertisingSection = memo(() => {
   const activeCampaigns = data?.campaigns || [];
   const campaign = activeCampaigns.find(
     (c) =>
-      c.isActive &&
-      c.isEnabled !== false &&
-      c.placements?.includes('HOME')
+      c.isActive && c.isEnabled !== false && c.placements?.includes("HOME"),
   );
 
   if (isLoading) {
     return (
-      <section className='py-14 md:py-20 px-4 bg-gray-100'>
-        <div className='container mx-auto px-4 lg:px-6'>
-          <div className='w-full h-64 sm:h-80 lg:h-96 bg-gray-200 animate-pulse rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center'>
-            <span className='text-gray-400 font-semibold'>Loading Ad...</span>
+      <section className="py-14 md:py-20 px-4 bg-gray-100">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="w-full h-64 sm:h-80 lg:h-96 bg-gray-200 animate-pulse rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+            <span className="text-gray-400 font-semibold">Loading Ad...</span>
           </div>
         </div>
       </section>
@@ -25,47 +23,50 @@ const AdvertisingSection = memo(() => {
   }
 
   // Use dynamic values if campaign exists, otherwise fallback to defaults
-  const imageSrc = campaign?.image || '/jbossAdvertising.webp';
+  const imageSrc = campaign?.image || "/jbossAdvertising.webp";
   const description =
     campaign?.description ||
-    'Turn your website traffic into revenue by enabling targeted advertising. Our platform allows businesses to showcase their products and services directly to your audience through strategically placed ads.';
-  const linkUrl = campaign?.linkUrl || 'https://www.e-commerce.com';
+    "Turn your website traffic into revenue by enabling targeted advertising. Our platform allows businesses to showcase their products and services directly to your audience through strategically placed ads.";
+  const linkUrl = campaign?.linkUrl || "https://www.e-commerce.com";
   const displayLink = campaign?.linkUrl
-    ? campaign.linkUrl.replace(/https?:\/\/(www\.)?/, '')
-    : 'www.e-commerce.com';
+    ? campaign.linkUrl.replace(/https?:\/\/(www\.)?/, "")
+    : "www.e-commerce.com";
 
   return (
-    <section className='py-14 md:py-20  px-4 bg-gray-100'>
-      <div className='container mx-auto px-4 lg:px-6'>
+    <section className="py-14 md:py-20  px-4 bg-gray-100">
+      <div className="container mx-auto px-4 lg:px-6">
         {/* Background Image with Overlay */}
-        <div className='relative rounded-lg overflow-hidden shadow-lg' style={{ border: '2px dotted #333' }}>
+        <div
+          className="relative rounded-lg overflow-hidden shadow-lg"
+          style={{ border: "2px dotted #333" }}
+        >
           {/* Background Image */}
           <img
             src={imageSrc}
-            alt={campaign?.title || 'E-commerce storefront'}
-            className='w-full h-64 sm:h-80 lg:h-96 object-cover'
+            alt={campaign?.title || "E-commerce storefront"}
+            className="w-full h-64 sm:h-80 lg:h-96 object-cover"
           />
 
           {/* Dark Overlay */}
-          <div className='absolute inset-0 bg-black/50'></div>
+          <div className="absolute inset-0 bg-black/50"></div>
 
           {/* Content Overlay */}
-          <div className='absolute inset-0 flex flex-col items-center justify-center px-6 sm:px-12 text-center'>
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-6 sm:px-12 text-center">
             {campaign?.title && (
-              <h3 className='text-white text-xl sm:text-2xl lg:text-3xl font-bold mb-3 tracking-wide'>
+              <h3 className="text-white text-xl sm:text-2xl lg:text-3xl font-bold mb-3 tracking-wide">
                 {campaign.title}
               </h3>
             )}
-            <p className='text-white text-sm sm:text-base lg:text-lg mb-8 max-w-3xl leading-relaxed'>
+            <p className="text-white text-sm sm:text-base lg:text-lg mb-8 max-w-3xl leading-relaxed">
               {description}
             </p>
 
             {linkUrl && (
-              <a 
+              <a
                 href={linkUrl}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-yellow-500 hover:text-yellow-400 text-base sm:text-lg font-semibold transition-colors duration-300'
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-yellow-500 hover:text-yellow-400 text-base sm:text-lg font-semibold transition-colors duration-300"
               >
                 {displayLink}
               </a>
@@ -77,6 +78,6 @@ const AdvertisingSection = memo(() => {
   );
 });
 
-AdvertisingSection.displayName = 'AdvertisingSection';
+AdvertisingSection.displayName = "AdvertisingSection";
 
 export default AdvertisingSection;

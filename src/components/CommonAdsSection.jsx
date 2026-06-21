@@ -10,12 +10,32 @@ const CommonAdsSection = memo(
     const { data, isLoading } = useGetActiveCampaignsQuery();
 
     const activeCampaigns = data?.campaigns || [];
-    const campaign = activeCampaigns.find(
+    
+    // 1. Try to find a campaign with the requested placement
+    let campaign = activeCampaigns.find(
       (c) =>
         c.isActive &&
         c.isEnabled !== false &&
+        placement &&
         c.placements?.includes(placement)
     );
+
+    // 2. Fall back to GLOBAL campaign
+    if (!campaign) {
+      campaign = activeCampaigns.find(
+        (c) =>
+          c.isActive &&
+          c.isEnabled !== false &&
+          c.placements?.includes('GLOBAL')
+      );
+    }
+
+    // 3. Fall back to any active and enabled campaign
+    if (!campaign) {
+      campaign = activeCampaigns.find(
+        (c) => c.isActive && c.isEnabled !== false
+      );
+    }
 
     if (isLoading) {
       return (
@@ -32,21 +52,39 @@ const CommonAdsSection = memo(
     }
 
     if (campaign) {
+      const imageSrc = campaign.image || "/jbossAdvertising.webp";
+      const description = campaign.description || "";
+      const displayLink = campaign.linkUrl
+        ? campaign.linkUrl.replace(/https?:\/\/(www\.)?/, "")
+        : "";
+
       const content = (
-        <div className='w-full h-44 md:h-56 lg:h-72 relative rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 group'>
+        <div className='w-full h-44 md:h-56 lg:h-72 relative rounded-xl overflow-hidden shadow-md border border-gray-200 group hover:shadow-lg transition-all duration-300'>
+          {/* Background Image */}
           <img
-            src={campaign.image}
+            src={imageSrc}
             alt={campaign.title || 'Advertisement'}
             className='w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500'
           />
-          <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
-            <h4 className='font-bold text-base md:text-lg line-clamp-1'>
-              {campaign.title}
-            </h4>
-            {campaign.description && (
-              <p className='text-xs md:text-sm text-gray-200 line-clamp-1 mt-0.5'>
-                {campaign.description}
+          {/* Dark Overlay */}
+          <div className='absolute inset-0 bg-black/50 transition-opacity duration-300 group-hover:bg-black/60'></div>
+
+          {/* Centered Content Overlay */}
+          <div className='absolute inset-0 flex flex-col items-center justify-center p-4 md:p-6 text-center text-white z-10'>
+            {campaign.title && (
+              <h4 className='text-white text-base md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 tracking-wide line-clamp-1 drop-shadow-md'>
+                {campaign.title}
+              </h4>
+            )}
+            {description && (
+              <p className='text-white text-xs md:text-sm lg:text-base mb-2 md:mb-4 max-w-2xl leading-relaxed line-clamp-2 drop-shadow-sm'>
+                {description}
               </p>
+            )}
+            {displayLink && (
+              <span className='text-yellow-500 group-hover:text-yellow-400 text-xs md:text-sm font-semibold transition-colors duration-300 drop-shadow-sm'>
+                {displayLink}
+              </span>
             )}
           </div>
         </div>

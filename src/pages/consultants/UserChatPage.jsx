@@ -194,6 +194,7 @@ const UserChatPage = memo(() => {
       <div className='pb-12'>
         <CommonAdsSection
           containerClassName='container mx-auto px-4 lg:px-6'
+          placement='CONSULTATION'
         />
       </div>
     </div>

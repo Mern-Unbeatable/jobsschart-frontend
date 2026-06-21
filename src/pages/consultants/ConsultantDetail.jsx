@@ -263,6 +263,7 @@ const ConsultantDetail = memo(() => {
           boxClassName="w-full h-48 lg:h-72 bg-[#F1F5F9] rounded-3xl border border-dashed border-gray-300 flex items-center justify-center group"
           title="Advertisement Area"
           titleClassName="text-black font-bold text-xl sm:text-2xl tracking-widest uppercase"
+          placement="CONSULTATION"
         />
 
         <AudioCallModal
