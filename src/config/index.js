@@ -22,6 +22,7 @@ export const ROUTES = {
   HOME: '/',
   ABOUT: '/about',
   TERMS: '/terms-and-conditions',
+  PRIVACY: '/privacy-policy',
   SERVICES: '/services',
   ENTREPRENEURSHIP: '/entrepreneurship',
   COMMUNITY: '/community',

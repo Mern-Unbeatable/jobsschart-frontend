@@ -42,7 +42,7 @@ const Footer = () => {
           <h3 className="text-white font-bold text-lg mb-6">{t('footer.customerService.title')}</h3>
           <ul className="space-y-3 text-sm font-medium">
             <li><Link to={ROUTES.TERMS} className="hover:text-white transition-colors">{t('footer.customerService.links.terms')}</Link></li>
-            <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.privacy')}</a></li>
+            <li><Link to={ROUTES.PRIVACY} className="hover:text-white transition-colors">{t('footer.customerService.links.privacy')}</Link></li>
             <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.cookies')}</a></li>
             <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.contact')}</a></li>
             {/* <li><a href="#" className="hover:text-white transition-colors">{t('footer.customerService.links.antiSpam')}</a></li>
@@ -116,7 +116,7 @@ const Footer = () => {
           <span>{t('footer.bottomBar.copyright')}</span>
           <div className="flex gap-6 items-center">
             <Link to={ROUTES.TERMS} className="hover:underline underline-offset-4">{t('footer.bottomBar.links.terms')}</Link>
-            <a href="#" className="hover:underline underline-offset-4">{t('footer.bottomBar.links.privacy')}</a>
+            <Link to={ROUTES.PRIVACY} className="hover:underline underline-offset-4">{t('footer.bottomBar.links.privacy')}</Link>
             <a href="#" className="hover:underline underline-offset-4">{t('footer.bottomBar.links.cookies')}</a>
           </div>
         </div>
