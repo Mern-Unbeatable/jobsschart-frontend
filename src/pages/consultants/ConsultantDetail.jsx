@@ -150,7 +150,7 @@ const ConsultantDetail = memo(() => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
               <button
                 onClick={() => setShowAudioCall(true)}
-                className="bg-green-500/60 text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all hover:bg-[#d99a00]"
+                className="bg-green-500/60 text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all "
               >
                 <Phone size={20} /> Call Now
               </button>

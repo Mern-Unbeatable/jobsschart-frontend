@@ -448,7 +448,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
               <button
                 type="submit"
                 disabled={isCheckingOut}
-                className="bg-green-500/60 hover:bg-[#d99a00] text-white text-sm font-bold py-3 px-8 rounded transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="bg-green-500/60  text-white text-sm font-bold py-3 px-8 rounded transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {isCheckingOut && (
                   <Loader2 className="animate-spin h-5 w-5 text-white" />

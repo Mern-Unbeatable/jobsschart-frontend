@@ -91,7 +91,7 @@ const PostsList = memo(({ posts }) => {
                 />
                 <button
                   type="button"
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-green-500/60 text-white transition-colors hover:bg-[#D4960A]"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-green-500/60 text-white transition-colors "
                   aria-label={t("community.posts.sendReplyAria")}
                 >
                   <Send size={18} />

@@ -129,7 +129,7 @@ const ShareExperienceModal = memo(({ isOpen, onClose }) => {
           {/* Post Button */}
           <button
             type="submit"
-            className="w-full bg-green-500/60 text-white py-3 rounded-lg text-base font-bold hover:bg-[#d99a00]  transition-all active:scale-[0.98] mt-2"
+            className="w-full bg-green-500/60 text-white py-3 rounded-lg text-base font-bold   transition-all active:scale-[0.98] mt-2"
           >
             {t("community.modal.button")}
           </button>

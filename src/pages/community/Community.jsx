@@ -152,7 +152,7 @@ const CommunityContent = memo(() => {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="self-start bg-green-500/60 text-white px-5 py-2 rounded-lg text-base transition-all hover:bg-[#D4960A]"
+            className="self-start bg-green-500/60 text-white px-5 py-2 rounded-lg text-base transition-all "
           >
             {t("community.page.shareExperience")}
           </button>

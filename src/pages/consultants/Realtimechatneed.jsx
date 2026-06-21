@@ -849,7 +849,7 @@
 //                 <button
 //                     onClick={() => setShowStartModal(true)}
 //                     title='Start Audio session'
-//                     className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/60 hover:bg-[#d99a00] text-white text-xs font-semibold transition-colors'
+//                     className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/60  text-white text-xs font-semibold transition-colors'
 //                 >
 //                     <Phone size={13} /> Call
 //                 </button>
