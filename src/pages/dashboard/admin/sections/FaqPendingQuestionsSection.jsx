@@ -10,7 +10,7 @@ const FaqPendingQuestionsSection = ({ items, onAnswer }) => {
         </h2>
       </div>
 
-      <div className="px-6 py-5 sm:px-8">
+      <div className="px-6 py-5 sm:px-8 space-y-4">
         {items.map((item) => (
           <div
             key={item.id}

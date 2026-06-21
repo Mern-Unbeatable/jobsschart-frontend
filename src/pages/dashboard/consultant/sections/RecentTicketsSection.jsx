@@ -5,6 +5,7 @@ import TicketDetailModal from './TicketDetailModal';
 
 const statusStyles = {
   PENDING: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+  ANSWERED: 'bg-green-100 text-green-800 border border-green-200',
   Open: 'bg-[#f0e8ff] text-[#8b5cf6]',
   Resolved: 'bg-[#ececf6] text-[#6b7280]',
 };
@@ -15,7 +16,6 @@ const RecentTicketsSection = () => {
 
   const { data, isLoading } = useGetMyQuestionsQuery();
   const questions = data?.questions || [];
-  const pendingQuestions = questions.filter((q) => q.status === "PENDING");
 
   const handleOpenTicket = (ticket) => {
     setSelectedTicket(ticket);
@@ -35,14 +35,14 @@ const RecentTicketsSection = () => {
     );
   }
 
-  if (pendingQuestions.length === 0) {
+  if (questions.length === 0) {
     return (
       <section className='space-y-4'>
         <h2 className='text-xl font-semibold text-[#2f2f2f] sm:text-2xl'>
           Recent Support Tickets
         </h2>
         <div className="text-center py-12 text-sm text-gray-500 border border-dashed border-gray-200 rounded-xl bg-white">
-          No pending support tickets found.
+          No support tickets found.
         </div>
       </section>
     );
@@ -56,7 +56,7 @@ const RecentTicketsSection = () => {
         </h2>
 
         <div className='space-y-3'>
-          {pendingQuestions.map((ticket) => (
+          {questions.map((ticket) => (
             <button
               key={ticket.id}
               type='button'
