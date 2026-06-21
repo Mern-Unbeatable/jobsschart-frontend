@@ -1,23 +1,10 @@
 import React, { useState } from 'react';
 import { ChevronRight, MessageSquare } from 'lucide-react';
+import { useGetMyQuestionsQuery } from '../../../../features/api/faqApi';
 import TicketDetailModal from './TicketDetailModal';
 
-const RECENT_TICKETS = [
-  {
-    id: 'TK-8829',
-    title: 'Issue with Stripe Payout Synchronization',
-    meta: 'ID: #TK-8829 • Opened Oct 12, 2023',
-    status: 'Open',
-  },
-  {
-    id: 'TK-8712',
-    title: 'Request for Profile Badge Verification',
-    meta: 'ID: #TK-8712 • Resolved Sep 28, 2023',
-    status: 'Resolved',
-  },
-];
-
 const statusStyles = {
+  PENDING: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
   Open: 'bg-[#f0e8ff] text-[#8b5cf6]',
   Resolved: 'bg-[#ececf6] text-[#6b7280]',
 };
@@ -25,6 +12,10 @@ const statusStyles = {
 const RecentTicketsSection = () => {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { data, isLoading } = useGetMyQuestionsQuery();
+  const questions = data?.questions || [];
+  const pendingQuestions = questions.filter((q) => q.status === "PENDING");
 
   const handleOpenTicket = (ticket) => {
     setSelectedTicket(ticket);
@@ -36,6 +27,27 @@ const RecentTicketsSection = () => {
     setTimeout(() => setSelectedTicket(null), 300);
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6E35AE]" />
+      </div>
+    );
+  }
+
+  if (pendingQuestions.length === 0) {
+    return (
+      <section className='space-y-4'>
+        <h2 className='text-xl font-semibold text-[#2f2f2f] sm:text-2xl'>
+          Recent Support Tickets
+        </h2>
+        <div className="text-center py-12 text-sm text-gray-500 border border-dashed border-gray-200 rounded-xl bg-white">
+          No pending support tickets found.
+        </div>
+      </section>
+    );
+  }
+
   return (
     <>
       <section className='space-y-4'>
@@ -44,7 +56,7 @@ const RecentTicketsSection = () => {
         </h2>
 
         <div className='space-y-3'>
-          {RECENT_TICKETS.map((ticket) => (
+          {pendingQuestions.map((ticket) => (
             <button
               key={ticket.id}
               type='button'
@@ -58,15 +70,17 @@ const RecentTicketsSection = () => {
                   </div>
                   <div className='min-w-0'>
                     <h3 className='truncate text-base font-semibold text-[#2f2f2f] sm:text-base'>
-                      {ticket.title}
+                      {ticket.subject}
                     </h3>
-                    <p className='mt-1 text-sm text-gray-400 sm:text-sm'>{ticket.meta}</p>
+                    <p className='mt-1 text-sm text-gray-400 sm:text-sm'>
+                      ID: #{ticket.id.slice(0, 8)} • Opened {new Date(ticket.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
 
                 <div className='flex shrink-0 items-center gap-3'>
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusStyles[ticket.status]}`}
+                    className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusStyles[ticket.status] || 'bg-gray-100 text-gray-800'}`}
                   >
                     {ticket.status}
                   </span>

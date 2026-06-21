@@ -140,8 +140,15 @@ const TICKET_RESPONSES = {
 const TicketDetailModal = ({ ticket, isOpen, onClose }) => {
   if (!isOpen || !ticket) return null;
 
-  // Defaulting to the SAP ticket for demonstration if the provided ticket ID isn't found
-  const ticketData = TICKET_RESPONSES[ticket.id] || TICKET_RESPONSES['TK-SAP'];
+  const ticketData = {
+    id: ticket.id,
+    question: ticket.question || "No details available",
+    response: {
+      title: ticket.subject ? `Re: ${ticket.subject}` : "Response",
+      date: ticket.answeredAt ? new Date(ticket.answeredAt).toLocaleString() : "",
+      content: ticket.answer || "No response yet. Our admin team will review and answer your question shortly.",
+    },
+  };
 
   // Helper function to render bold text wrapped in **
   const renderFormattedText = (text) => {
@@ -190,7 +197,7 @@ const TicketDetailModal = ({ ticket, isOpen, onClose }) => {
             {/* Custom Question Box with Purple Left Border */}
             <div className="flex overflow-hidden rounded-xl bg-[#F8F9FA]">
               <div className="w-[5px] shrink-0 bg-[#6B4E90]"></div>
-              <div className="p-5 text-[15px] italic leading-relaxed text-[#5A5A5A]">
+              <div className="p-5 text-[15px] italic leading-relaxed text-[#5A5A5A] w-full break-words">
                 {ticketData.question}
               </div>
             </div>
@@ -202,9 +209,11 @@ const TicketDetailModal = ({ ticket, isOpen, onClose }) => {
               <h3 className="text-[26px] font-bold tracking-tight text-gray-900" style={{ fontFamily: 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}>
                 {ticketData.response.title}
               </h3>
-              <p className="whitespace-nowrap text-[13px] font-medium text-gray-500">
-                {ticketData.response.date}
-              </p>
+              {ticketData.response.date && (
+                <p className="whitespace-nowrap text-[13px] font-medium text-gray-500">
+                  {ticketData.response.date}
+                </p>
+              )}
             </div>
             
             <div className="text-[15px] leading-relaxed text-[#4A4A4A]">
