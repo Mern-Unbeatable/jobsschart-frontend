@@ -3,39 +3,9 @@ import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../../features/slices/authSlice';
 import { Euro, TrendingUp, CalendarDays, Star, User, Wifi, WifiOff } from 'lucide-react';
-import { useUpdateOnlineStatusMutation } from '../../../../features/api/consultantApi';
+import { useUpdateOnlineStatusMutation, useGetMyEarningsDashboardQuery } from '../../../../features/api/consultantApi';
 import { socketService } from '../../../../services/socketService';
 import toast from 'react-hot-toast';
-
-const METRICS = [
-  {
-    id: 'today',
-    label: 'Today',
-    value: '€234.50',
-    valueSize: 'text-[28px]',
-    icon: Euro,
-    iconBg: 'bg-[#e9f9ef]',
-    iconColor: 'text-green-600',
-  },
-  {
-    id: 'week',
-    label: 'This Week',
-    value: '€1215.00',
-    valueSize: 'text-[28px]',
-    icon: TrendingUp,
-    iconBg: 'bg-[#fff5e5]',
-    iconColor: 'text-[#ce9c0a]',
-  },
-  {
-    id: 'month',
-    label: 'This Month',
-    value: '€5637.50',
-    valueSize: 'text-[30px]',
-    icon: CalendarDays,
-    iconBg: 'bg-[#e1e5fa]',
-    iconColor: 'text-indigo-500',
-  },
-];
 
 const RECENT_CLIENTS = [
   { id: 1, name: 'Sharah', sessionDate: 'Apr 24, 2026', rating: '5.0' },
@@ -55,6 +25,8 @@ const ConsultantDashboard = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [socketConnected, setSocketConnected] = useState(false);
   const [updateOnlineStatus] = useUpdateOnlineStatusMutation();
+  
+  const { data: dashboardData, isLoading } = useGetMyEarningsDashboardQuery();
 
   const totalPages = Math.ceil(RECENT_CLIENTS.length / CLIENTS_PER_PAGE);
   const totalClients = RECENT_CLIENTS.length;
@@ -75,10 +47,45 @@ const ConsultantDashboard = () => {
     [totalPages],
   );
 
+  const dashboard = dashboardData?.dashboard || {};
 
+  const metrics = [
+    {
+      id: 'today',
+      label: 'Today',
+      value: `€${(dashboard.todayIncome || 0).toFixed(2)}`,
+      valueSize: 'text-[28px]',
+      icon: Euro,
+      iconBg: 'bg-[#e9f9ef]',
+      iconColor: 'text-green-600',
+    },
+    {
+      id: 'week',
+      label: 'This Week',
+      value: `€${(dashboard.weekIncome || 0).toFixed(2)}`,
+      valueSize: 'text-[28px]',
+      icon: TrendingUp,
+      iconBg: 'bg-[#fff5e5]',
+      iconColor: 'text-[#ce9c0a]',
+    },
+    {
+      id: 'month',
+      label: 'This Month',
+      value: `€${(dashboard.monthIncome || 0).toFixed(2)}`,
+      valueSize: 'text-[30px]',
+      icon: CalendarDays,
+      iconBg: 'bg-[#e1e5fa]',
+      iconColor: 'text-indigo-500',
+    },
+  ];
 
-
-
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6E35AE]" />
+      </div>
+    );
+  }
 
   return (
     <section className='space-y-6 sm:space-y-8'>
@@ -97,7 +104,7 @@ const ConsultantDashboard = () => {
 
       {/* Earnings metric cards */}
       <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
-        {METRICS.map(
+        {metrics.map(
           ({ id, label, value, valueSize, icon: Icon, iconBg, iconColor }) => (
             <article
               key={id}
@@ -122,7 +129,7 @@ const ConsultantDashboard = () => {
       </div>
 
       {/* Recent Clients */}
-      <section className='rounded-2xl border border-gray-100 bg-white p-4 sm:p-6 lg:p-8'>
+      <section className='rounded-xl border border-gray-100 bg-white p-4 sm:p-6 lg:p-8'>
         <h2 className='text-[28px] font-medium capitalize text-[#333333]'>
           Recent Clients
         </h2>
@@ -150,8 +157,8 @@ const ConsultantDashboard = () => {
               <div className='flex items-center gap-2'>
                 <Star
                   size={20}
-                  fill='#ce9c0a'
-                  className='text-[#ce9c0a]'
+                  fill='currentColor'
+                  className='text-green-500/60'
                   aria-hidden='true'
                 />
                 <span className='text-sm text-[#464646]'>{client.rating}</span>
@@ -161,7 +168,7 @@ const ConsultantDashboard = () => {
         </div>
 
         <div className='mt-8 flex flex-col gap-4 border-t border-gray-100 pt-6 md:flex-row md:items-center md:justify-between'>
-          <p className='text-center text-sm font-medium text-[#b27d00] sm:text-base md:text-left'>
+          <p className='text-center text-sm font-medium text-green-500/60 sm:text-base md:text-left'>
             Showing {startResult} to {endResult} of {totalClients} results
           </p>
 
@@ -170,7 +177,7 @@ const ConsultantDashboard = () => {
               type='button'
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className='min-w-33 rounded-2xl border border-[#d9a406] px-5 py-2 text-sm font-medium text-[#b27d00] transition-all duration-200 ease-in-out sm:py-2.5 sm:text-base disabled:cursor-not-allowed disabled:opacity-50'
+              className='min-w-33 rounded-2xl border border-green-500/60  px-5 py-2 text-sm font-medium text-green-500/60  transition-all duration-200 ease-in-out sm:py-2.5 sm:text-base disabled:cursor-not-allowed disabled:opacity-50'
             >
               Previous
             </button>
@@ -179,7 +186,7 @@ const ConsultantDashboard = () => {
               type='button'
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className='min-w-33 rounded-2xl border border-[#d9a406] px-5 py-2 text-sm font-medium text-[#b27d00] transition-all duration-200 ease-in-out sm:py-2.5 sm:text-base disabled:cursor-not-allowed disabled:opacity-50'
+              className='min-w-33 rounded-2xl border border-green-500/60  px-5 py-2 text-sm font-medium text-green-500/60  transition-all duration-200 ease-in-out sm:py-2.5 sm:text-base disabled:cursor-not-allowed disabled:opacity-50'
             >
               Next
             </button>
