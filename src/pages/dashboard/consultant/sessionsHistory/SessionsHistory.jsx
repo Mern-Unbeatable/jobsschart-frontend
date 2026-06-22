@@ -78,7 +78,10 @@ const ConsultantSessionsHistory = () => {
       <SessionsMetrics summaryData={summary} />
 
       {/* Filter tabs */}
-      <FilterTabs activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+      <FilterTabs
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
 
       {/* Table */}
       <SessionsTable
