@@ -100,6 +100,15 @@ export const consultantApi = baseApi.injectEndpoints({
             transformResponse: (response) => response.data,
         }),
 
+        getRecentClients: builder.query({
+            query: () => ({
+                url: '/sessions/consultant/recent-clients',
+                method: 'GET',
+            }),
+            providesTags: ['Session'],
+            transformResponse: (response) => response.data,
+        }),
+
         getMyStats: builder.query({
 
             query: () => ({
@@ -193,6 +202,7 @@ export const {
     useGetMyEarningsQuery,
     useGetMyEarningsDashboardQuery,
     useGetMyStatsQuery,
+    useGetRecentClientsQuery,
 
     // Availability slots (protected)
     useGetMyAvailabilitySlotsQuery,

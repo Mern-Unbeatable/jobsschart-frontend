@@ -3,20 +3,21 @@ import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../../features/slices/authSlice';
 import { Euro, TrendingUp, CalendarDays, Star, User, Wifi, WifiOff } from 'lucide-react';
-import { useUpdateOnlineStatusMutation, useGetMyEarningsDashboardQuery } from '../../../../features/api/consultantApi';
+import { useUpdateOnlineStatusMutation, useGetMyEarningsDashboardQuery, useGetRecentClientsQuery } from '../../../../features/api/consultantApi';
 import { socketService } from '../../../../services/socketService';
 import toast from 'react-hot-toast';
 
-const RECENT_CLIENTS = [
-  { id: 1, name: 'Sharah', sessionDate: 'Apr 24, 2026', rating: '5.0' },
-  { id: 2, name: 'zefar', sessionDate: 'Apr 25, 2026', rating: '5.0' },
-  { id: 3, name: 'jony', sessionDate: 'Apr 25, 2026', rating: '5.0' },
-  { id: 4, name: 'Aliza', sessionDate: 'Apr 23, 2026', rating: '5.0' },
-  { id: 5, name: 'Liyana', sessionDate: 'Apr 24, 2026', rating: '5.0' },
-  { id: 6, name: 'Fariha', sessionDate: 'Apr 25, 2026', rating: '5.0' },
-];
-
 const CLIENTS_PER_PAGE = 5;
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
 
 const ConsultantDashboard = () => {
   const user = useSelector(selectUser);
@@ -27,17 +28,20 @@ const ConsultantDashboard = () => {
   const [updateOnlineStatus] = useUpdateOnlineStatusMutation();
   
   const { data: dashboardData, isLoading } = useGetMyEarningsDashboardQuery();
+  const { data: recentClientsData, isLoading: isLoadingRecentClients } = useGetRecentClientsQuery();
 
-  const totalPages = Math.ceil(RECENT_CLIENTS.length / CLIENTS_PER_PAGE);
-  const totalClients = RECENT_CLIENTS.length;
+  const recentClients = recentClientsData || [];
+
+  const totalPages = Math.ceil(recentClients.length / CLIENTS_PER_PAGE);
+  const totalClients = recentClients.length;
   const startResult = totalClients === 0 ? 0 : (currentPage - 1) * CLIENTS_PER_PAGE + 1;
   const endResult = Math.min(currentPage * CLIENTS_PER_PAGE, totalClients);
 
   const paginatedClients = useMemo(() => {
     const startIndex = (currentPage - 1) * CLIENTS_PER_PAGE;
     const endIndex = startIndex + CLIENTS_PER_PAGE;
-    return RECENT_CLIENTS.slice(startIndex, endIndex);
-  }, [currentPage]);
+    return recentClients.slice(startIndex, endIndex);
+  }, [currentPage, recentClients]);
 
   const handlePageChange = useCallback(
     (nextPage) => {
@@ -79,7 +83,7 @@ const ConsultantDashboard = () => {
     },
   ];
 
-  if (isLoading) {
+  if (isLoading || isLoadingRecentClients) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6E35AE]" />
@@ -95,10 +99,7 @@ const ConsultantDashboard = () => {
           <h1 className='dashboard-page-title'>
             Welcome back, {user?.name || 'Sarah'}
           </h1>
-
-
         </div>
-
 
       </div>
 
@@ -135,21 +136,29 @@ const ConsultantDashboard = () => {
         </h2>
 
         <div className='mt-8 flex flex-col gap-5'>
-          {paginatedClients.map((client) => (
+          {paginatedClients.map((item) => (
             <div
-              key={client.id}
+              key={item.client?.id || item.lastSessionId}
               className='flex items-center justify-between rounded-xl border border-gray-100 bg-white p-4 sm:p-5'
             >
               <div className='flex items-center gap-4'>
-                <div className='flex size-11 items-center justify-center rounded bg-[#d9d9d9] text-[#464646]'>
-                  <User size={26} aria-hidden='true' />
+                <div className='flex size-11 items-center justify-center rounded bg-[#d9d9d9] text-[#464646] overflow-hidden'>
+                  {item.client?.avatar ? (
+                    <img
+                      src={item.client.avatar}
+                      alt={item.client.name}
+                      className='h-full w-full object-cover'
+                    />
+                  ) : (
+                    <User size={26} aria-hidden='true' />
+                  )}
                 </div>
                 <div className='flex flex-col gap-1.5'>
                   <p className='text-lg font-medium leading-none text-[#464646]'>
-                    {client.name}
+                    {item.client?.name || 'Unknown Client'}
                   </p>
                   <p className='text-sm text-[#464646]'>
-                    Last session: {client.sessionDate}
+                    Last session: {formatDate(item.lastInteractionAt)}
                   </p>
                 </div>
               </div>
@@ -161,7 +170,9 @@ const ConsultantDashboard = () => {
                   className='text-green-500/60'
                   aria-hidden='true'
                 />
-                <span className='text-sm text-[#464646]'>{client.rating}</span>
+                <span className='text-sm text-[#464646]'>
+                  {item.review?.rating ? `${item.review.rating}.0` : 'N/A'}
+                </span>
               </div>
             </div>
           ))}
