@@ -40,7 +40,21 @@ export const postApi = baseApi.injectEndpoints({
       ],
       transformResponse: (response) => response.data,
     }),
+    toggleLikePost: builder.mutation({
+      query: (postId) => ({
+        url: `/post/${postId}/like`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Posts'],
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
-export const { useGetPostsQuery, useCreatePostMutation, useGetCommentsQuery, useCreateCommentMutation } = postApi;
+export const {
+  useGetPostsQuery,
+  useCreatePostMutation,
+  useGetCommentsQuery,
+  useCreateCommentMutation,
+  useToggleLikePostMutation,
+} = postApi;

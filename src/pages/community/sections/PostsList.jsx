@@ -1,7 +1,9 @@
 import React, { memo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 import { ChevronDown, MessageSquare, Send, ThumbsUp, Loader2 } from "lucide-react";
-import { useGetCommentsQuery, useCreateCommentMutation } from "../../../features/api/postApi";
+import { selectUser } from "../../../features/slices/authSlice";
+import { useGetCommentsQuery, useCreateCommentMutation, useToggleLikePostMutation } from "../../../features/api/postApi";
 
 const PostCommentSection = ({ postId, onClose }) => {
   const { t } = useTranslation();
@@ -98,6 +100,8 @@ const PostCommentSection = ({ postId, onClose }) => {
 const PostsList = memo(({ posts }) => {
   const { t } = useTranslation();
   const [openReplyIndex, setOpenReplyIndex] = useState(null);
+  const currentUser = useSelector(selectUser);
+  const [toggleLikePost] = useToggleLikePostMutation();
 
   const toggleReplies = (index) => {
     setOpenReplyIndex((currentIndex) =>
@@ -105,46 +109,66 @@ const PostsList = memo(({ posts }) => {
     );
   };
 
+  const handleLike = async (postId) => {
+    try {
+      await toggleLikePost(postId).unwrap();
+    } catch (err) {
+      console.error("Failed to toggle like:", err);
+    }
+  };
+
   return (
     <div className="space-y-4">
-      {posts.map((post, idx) => (
-        <div
-          key={post.id || idx}
-          className="border bg-white border-gray-100 rounded-lg p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow"
-        >
-          <span className="text-base text-gray-400 font-medium tracking-tight">
-            {post.user?.name || "Anonymous"}
-          </span>
-          <h3 className="text-2xl text-[#1B1B1B] mt-2 mb-3">{post.title}</h3>
-          <p className="text-gray-500 text-base leading-relaxed mb-6 border-b border-gray-100 pb-6">
-            {post.content}
-          </p>
-          <div className="flex items-center gap-4 text-gray-400">
-            <div className="flex items-center gap-1.5 cursor-pointer hover:text-gray-600">
-              <ThumbsUp size={18} />
-              <span className="text-base font-medium">{post.likesCount || 0}</span>
-            </div>
-            <div className="w-px h-3 bg-gray-200"></div>
-            <button
-              type="button"
-              onClick={() => toggleReplies(idx)}
-              className="flex items-center gap-1.5 cursor-pointer hover:text-gray-600 transition-colors"
-            >
-              <MessageSquare size={18} />
-              <span className="text-base font-medium">
-                {t("community.posts.replyCount", { count: post._count?.comments || 0 })}
-              </span>
-            </button>
-          </div>
+      {posts.map((post, idx) => {
+        const isLikedByMe = post.likes?.some(
+          (like) => like.userId === currentUser?.id || like === currentUser?.id
+        );
 
-          {openReplyIndex === idx && (
-            <PostCommentSection
-              postId={post.id}
-              onClose={() => toggleReplies(idx)}
-            />
-          )}
-        </div>
-      ))}
+        return (
+          <div
+            key={post.id || idx}
+            className="border bg-white border-gray-100 rounded-lg p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow"
+          >
+            <span className="text-base text-gray-400 font-medium tracking-tight">
+              {post.user?.name || "Anonymous"}
+            </span>
+            <h3 className="text-2xl text-[#1B1B1B] mt-2 mb-3">{post.title}</h3>
+            <p className="text-gray-500 text-base leading-relaxed mb-6 border-b border-gray-100 pb-6">
+              {post.content}
+            </p>
+            <div className="flex items-center gap-4 text-gray-400">
+              <button
+                type="button"
+                onClick={() => handleLike(post.id)}
+                className={`flex items-center gap-1.5 cursor-pointer transition-colors ${
+                  isLikedByMe ? "text-green-500/60" : "hover:text-gray-600"
+                }`}
+              >
+                <ThumbsUp size={18} fill={isLikedByMe ? "currentColor" : "none"} />
+                <span className="text-base font-medium">{post.likesCount || 0}</span>
+              </button>
+              <div className="w-px h-3 bg-gray-200"></div>
+              <button
+                type="button"
+                onClick={() => toggleReplies(idx)}
+                className="flex items-center gap-1.5 cursor-pointer hover:text-gray-600 transition-colors"
+              >
+                <MessageSquare size={18} />
+                <span className="text-base font-medium">
+                  {t("community.posts.replyCount", { count: post._count?.comments || 0 })}
+                </span>
+              </button>
+            </div>
+
+            {openReplyIndex === idx && (
+              <PostCommentSection
+                postId={post.id}
+                onClose={() => toggleReplies(idx)}
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 });
