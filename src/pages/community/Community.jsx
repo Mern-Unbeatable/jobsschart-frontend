@@ -1,15 +1,22 @@
 import React, { memo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import Pagination from "../../components/Pagination";
 import CommonAdsSection from "../../components/CommonAdsSection";
 import CategoriesSidebar from "./sections/CategoriesSidebar";
 import TabFilter from "./sections/TabFilter";
 import PostsList from "./sections/PostsList";
 import ShareExperienceModal from "./sections/ShareExperienceModal";
+import { ROUTES } from "../../config";
+import { selectIsAuthenticated } from "../../features/slices/authSlice";
 import { useGetPostsQuery } from "../../features/api/postApi";
 
 const CommunityContent = memo(() => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const [activeTab, setActiveTab] = useState("all");
   const [activeCategory, setActiveCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,6 +38,26 @@ const CommunityContent = memo(() => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setCurrentPage(1);
+  };
+
+  const handleShareExperience = () => {
+    if (!isAuthenticated) {
+      Swal.fire({
+        title: "Login Required",
+        text: "Please login to share your experience.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#22c55e",
+        cancelButtonColor: "#ef4444",
+        confirmButtonText: "Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate(ROUTES.LOGIN);
+        }
+      });
+      return;
+    }
+    setIsModalOpen(true);
   };
 
   const tabs = [
@@ -85,7 +112,7 @@ const CommunityContent = memo(() => {
             </p>
           </div>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleShareExperience}
             className="self-start bg-green-500/60 text-white px-5 py-2 rounded-lg text-base transition-all"
           >
             {t("community.page.shareExperience")}

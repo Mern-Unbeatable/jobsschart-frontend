@@ -1,12 +1,17 @@
 import React, { memo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import { ChevronDown, MessageSquare, Send, ThumbsUp, Loader2 } from "lucide-react";
-import { selectUser } from "../../../features/slices/authSlice";
+import { ROUTES } from "../../../config";
+import { selectUser, selectIsAuthenticated } from "../../../features/slices/authSlice";
 import { useGetCommentsQuery, useCreateCommentMutation, useToggleLikePostMutation } from "../../../features/api/postApi";
 
 const PostCommentSection = ({ postId, onClose }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const { data: commentsData, isLoading } = useGetCommentsQuery(postId);
   const [createComment, { isLoading: isSubmitting }] = useCreateCommentMutation();
   const [commentText, setCommentText] = useState("");
@@ -14,6 +19,22 @@ const PostCommentSection = ({ postId, onClose }) => {
   const comments = commentsData?.comments || [];
 
   const handleSendComment = async () => {
+    if (!isAuthenticated) {
+      Swal.fire({
+        title: "Login Required",
+        text: "Please login to comment.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#22c55e",
+        cancelButtonColor: "#ef4444",
+        confirmButtonText: "Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate(ROUTES.LOGIN);
+        }
+      });
+      return;
+    }
     if (!commentText.trim()) return;
     try {
       await createComment({ postId, content: commentText.trim() }).unwrap();
@@ -99,17 +120,51 @@ const PostCommentSection = ({ postId, onClose }) => {
 
 const PostsList = memo(({ posts }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [openReplyIndex, setOpenReplyIndex] = useState(null);
   const currentUser = useSelector(selectUser);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const [toggleLikePost] = useToggleLikePostMutation();
 
   const toggleReplies = (index) => {
+    if (!isAuthenticated) {
+      Swal.fire({
+        title: "Login Required",
+        text: "Please login to see comments.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#22c55e",
+        cancelButtonColor: "#ef4444",
+        confirmButtonText: "Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate(ROUTES.LOGIN);
+        }
+      });
+      return;
+    }
     setOpenReplyIndex((currentIndex) =>
       currentIndex === index ? null : index,
     );
   };
 
   const handleLike = async (postId) => {
+    if (!isAuthenticated) {
+      Swal.fire({
+        title: "Login Required",
+        text: "Please login to like this post.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#22c55e",
+        cancelButtonColor: "#ef4444",
+        confirmButtonText: "Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate(ROUTES.LOGIN);
+        }
+      });
+      return;
+    }
     try {
       await toggleLikePost(postId).unwrap();
     } catch (err) {
