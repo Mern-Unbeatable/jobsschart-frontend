@@ -44,7 +44,7 @@ const PricingSection = memo(() => {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className="rounded-xl bg-white p-6 border border-[#00000033] flex flex-col justify-between"
+              className="rounded-xl bg-white p-6 border border-[#00000033] flex flex-col justify-start h-full"
             >
               <div>
                 {/* Plan Name & Credits Badge */}
@@ -76,9 +76,7 @@ const PricingSection = memo(() => {
                   {plan.description ||
                     (plan.minutes > 0 ? `${plan.minutes} minutes session` : "")}
                 </p>
-              </div>
 
-              <div>
                 {/* Button */}
                 <button
                   onClick={() => navigate(ROUTES.CREDIT)}
@@ -86,7 +84,9 @@ const PricingSection = memo(() => {
                 >
                   Buy Credits
                 </button>
+              </div>
 
+              <div>
                 {/* Features List */}
                 <ul className="space-y-4 border-gray-100">
                   {(plan.features || []).map((feature, idx) => (

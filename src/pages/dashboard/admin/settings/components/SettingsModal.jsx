@@ -30,7 +30,7 @@ const SettingsModal = ({
       >
         {isPriceModal ? (
           /* ── Price / Edit Price modal ── */
-          <div className="p-6 flex flex-col gap-4">
+          <div className="p-6 flex flex-col gap-4 max-h-[85vh]">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-gray-900">
                 {editingPlanId !== null ? "Edit Price" : "Add Price"}
@@ -45,142 +45,153 @@ const SettingsModal = ({
               </button>
             </div>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-base font-medium text-gray-700">
-                Name
-              </label>
-              <input
-                type="text"
-                placeholder="Name"
-                value={priceForm.name}
-                onChange={(e) =>
-                  setPriceForm((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-              {priceErrors.name && (
-                <p className="text-xs text-red-500">{priceErrors.name}</p>
-              )}
-            </div>
+            <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-base font-medium text-gray-700">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={priceForm.name}
+                  onChange={(e) =>
+                    setPriceForm((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+                {priceErrors.name && (
+                  <p className="text-xs text-red-500">{priceErrors.name}</p>
+                )}
+              </div>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-base font-medium text-gray-700">
-                Price (€)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={priceForm.price}
-                onChange={(e) =>
-                  setPriceForm((prev) => ({
-                    ...prev,
-                    price: e.target.value,
-                  }))
-                }
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-              {priceErrors.price && (
-                <p className="text-xs text-red-500">{priceErrors.price}</p>
-              )}
-            </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-base font-medium text-gray-700">
+                  Price (€)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={priceForm.price}
+                  onChange={(e) =>
+                    setPriceForm((prev) => ({
+                      ...prev,
+                      price: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+                {priceErrors.price && (
+                  <p className="text-xs text-red-500">{priceErrors.price}</p>
+                )}
+              </div>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-base font-medium text-gray-700">
-                Minutes
-              </label>
-              <input
-                type="number"
-                min="0"
-                placeholder="0"
-                value={priceForm.minutes}
-                onChange={(e) =>
-                  setPriceForm((prev) => ({
-                    ...prev,
-                    minutes: e.target.value,
-                  }))
-                }
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-              {priceErrors.minutes && (
-                <p className="text-xs text-red-500">{priceErrors.minutes}</p>
-              )}
-            </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-base font-medium text-gray-700">
+                  Minutes
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={priceForm.minutes}
+                  onChange={(e) =>
+                    setPriceForm((prev) => ({
+                      ...prev,
+                      minutes: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+                {priceErrors.minutes && (
+                  <p className="text-xs text-red-500">{priceErrors.minutes}</p>
+                )}
+              </div>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-base font-medium text-gray-700">
-                Credits
-              </label>
-              <input
-                type="number"
-                min="0"
-                placeholder="0"
-                value={priceForm.credits}
-                onChange={(e) =>
-                  setPriceForm((prev) => ({
-                    ...prev,
-                    credits: e.target.value,
-                  }))
-                }
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-              {priceErrors.credits && (
-                <p className="text-xs text-red-500">{priceErrors.credits}</p>
+              {editingPlanId !== null ? (
+                <div className="flex flex-col gap-1">
+                  <span className="text-base font-medium text-gray-700 font-semibold text-gray-600">Credits (Locked)</span>
+                  <div className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-500 bg-gray-100 select-none cursor-not-allowed">
+                    {priceForm.credits || '0'}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-1">
+                  <label className="text-base font-medium text-gray-700">
+                    Credits
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={priceForm.credits}
+                    onChange={(e) =>
+                      setPriceForm((prev) => ({
+                        ...prev,
+                        credits: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  />
+                  {priceErrors.credits && (
+                    <p className="text-xs text-red-500">{priceErrors.credits}</p>
+                  )}
+                </div>
               )}
-            </div>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-base font-medium text-gray-700">
-                Description
-              </label>
-              <input
-                type="text"
-                placeholder="Description"
-                value={priceForm.description}
-                onChange={(e) =>
-                  setPriceForm((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-              {priceErrors.description && (
-                <p className="text-xs text-red-500">
-                  {priceErrors.description}
-                </p>
-              )}
-            </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-base font-medium text-gray-700">
+                  Description
+                </label>
+                <input
+                  type="text"
+                  placeholder="Description"
+                  value={priceForm.description}
+                  onChange={(e) =>
+                    setPriceForm((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+                {priceErrors.description && (
+                  <p className="text-xs text-red-500">
+                    {priceErrors.description}
+                  </p>
+                )}
+              </div>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-base font-medium text-gray-700">
-                Features (One per line)
-              </label>
-              <textarea
-                placeholder="Write Features"
-                rows={4}
-                value={priceForm.featured}
-                onChange={(e) =>
-                  setPriceForm((prev) => ({
-                    ...prev,
-                    featured: e.target.value,
-                  }))
-                }
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
-              />
-              {priceErrors.featured && (
-                <p className="text-xs text-red-500">{priceErrors.featured}</p>
-              )}
+              <div className="flex flex-col gap-1">
+                <label className="text-base font-medium text-gray-700">
+                  Features (One per line)
+                </label>
+                <textarea
+                  placeholder="Write Features"
+                  rows={4}
+                  value={priceForm.featured}
+                  onChange={(e) =>
+                    setPriceForm((prev) => ({
+                      ...prev,
+                      featured: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-base text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+                />
+                {priceErrors.featured && (
+                  <p className="text-xs text-red-500">{priceErrors.featured}</p>
+                )}
+              </div>
             </div>
 
             <button
               type="button"
               onClick={handleSavePrice}
-              className="w-full py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-semibold rounded-lg transition-colors"
+              className="w-full py-2.5 bg-green-500/60 hover:brightness-95 text-white text-base font-semibold rounded-lg transition-colors shrink-0"
             >
               Save
             </button>

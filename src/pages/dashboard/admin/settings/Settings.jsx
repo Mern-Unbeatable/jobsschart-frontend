@@ -281,13 +281,15 @@ const Settings = () => {
       errors.minutes = 'Enter valid minutes';
     }
 
-    if (!priceForm.credits.trim()) {
-      errors.credits = 'Credits are required';
-    } else if (
-      isNaN(Number(priceForm.credits)) ||
-      Number(priceForm.credits) < 0
-    ) {
-      errors.credits = 'Enter valid credits';
+    if (editingPlanId === null) {
+      if (!priceForm.credits.trim()) {
+        errors.credits = 'Credits are required';
+      } else if (
+        isNaN(Number(priceForm.credits)) ||
+        Number(priceForm.credits) < 0
+      ) {
+        errors.credits = 'Enter valid credits';
+      }
     }
 
     if (!priceForm.featured.trim()) {
@@ -315,10 +317,13 @@ const Settings = () => {
       slug,
       price: Number(priceForm.price),
       minutes: Number(priceForm.minutes),
-      credits: Number(priceForm.credits),
       description: priceForm.description.trim(),
       features,
     };
+
+    if (editingPlanId === null) {
+      planData.credits = Number(priceForm.credits);
+    }
 
     try {
       if (editingPlanId !== null) {
