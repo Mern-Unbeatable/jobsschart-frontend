@@ -29,7 +29,7 @@ const CategoriesSidebar = memo(
         </div>
 
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-1/4 lg:sticky lg:top-28 bg-white border border-gray-200 rounded-lg p-4 h-60">
+        <div className="hidden lg:block w-1/4 lg:sticky lg:top-28 bg-white border border-gray-200 rounded-lg p-4 h-fit">
           <h2 className="text-lg  text-gray-800 mb-4 font-bold">
             {t("community.categories.title")}
           </h2>

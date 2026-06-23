@@ -170,7 +170,7 @@ const ConsultantDetail = memo(() => {
             </div>
             <button
               onClick={() => setShowBookSchedule(true)}
-              className="w-full bg-[#05BC27] hover:bg-[#049620] text-white py-4 rounded-lg font-bold text-base transition-all shadow-sm"
+              className="w-full bg-green-500/60 text-white py-4 rounded-lg font-bold text-base transition-all shadow-sm"
             >
               Book A Schedule
             </button>

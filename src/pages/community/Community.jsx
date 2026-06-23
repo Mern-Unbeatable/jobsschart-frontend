@@ -6,16 +6,35 @@ import CategoriesSidebar from "./sections/CategoriesSidebar";
 import TabFilter from "./sections/TabFilter";
 import PostsList from "./sections/PostsList";
 import ShareExperienceModal from "./sections/ShareExperienceModal";
+import { useGetPostsQuery } from "../../features/api/postApi";
 
 const CommunityContent = memo(() => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("meditation");
-  const [activeCategory, setActiveCategory] = useState("spiritual-development");
+  const [activeTab, setActiveTab] = useState("all");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const postsPerPage = 4;
+  const postsPerPage = 5;
+
+  const { data: postsData, isLoading } = useGetPostsQuery({
+    page: currentPage,
+    limit: postsPerPage,
+    category: activeCategory === "all" ? undefined : activeCategory,
+    subCategory: activeTab === "all" ? undefined : activeTab,
+  });
+
+  const handleCategoryChange = (cat) => {
+    setActiveCategory(cat);
+    setCurrentPage(1);
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
 
   const tabs = [
+    { value: "all", label: "All" },
     { value: "meditation", label: t("community.tabs.meditation") },
     { value: "mindfulness", label: t("community.tabs.mindfulness") },
     { value: "awakening", label: t("community.tabs.awakening") },
@@ -23,9 +42,14 @@ const CommunityContent = memo(() => {
 
   const categories = [
     {
+      value: "all",
+      label: "All",
+      isOpen: true,
+    },
+    {
       value: "spiritual-development",
       label: t("community.categories.spiritualDevelopment"),
-      isOpen: true,
+      isOpen: false,
     },
     {
       value: "meditation",
@@ -44,101 +68,11 @@ const CommunityContent = memo(() => {
     },
   ];
 
-  const allPosts = [
-    {
-      author: "Ralph Edwards",
-      title: t("community.posts.items.innerPeaceMindfulness.title"),
-      desc: t("community.posts.items.innerPeaceMindfulness.description"),
-      likes: 4,
-      replies: 4,
-    },
-    {
-      author: "Ralph Edwards",
-      title: t("community.posts.items.energyHealingAlignment.title"),
-      desc: t("community.posts.items.energyHealingAlignment.description"),
-      likes: 4,
-      replies: 4,
-    },
-    {
-      author: "Ralph Edwards",
-      title: t("community.posts.items.selfDiscoveryAwareness.title"),
-      desc: t("community.posts.items.selfDiscoveryAwareness.description"),
-      likes: 4,
-      replies: 4,
-    },
-    {
-      author: "Ralph Edwards",
-      title: t("community.posts.items.intuitionSpiritualGrowth.title"),
-      desc: t("community.posts.items.intuitionSpiritualGrowth.description"),
-      likes: 4,
-      replies: 4,
-    },
-    {
-      author: "Sarah Johnson",
-      title: t("community.posts.items.chakraBalancing.title"),
-      desc: t("community.posts.items.chakraBalancing.description"),
-      likes: 8,
-      replies: 6,
-    },
-    {
-      author: "Michael Chen",
-      title: t("community.posts.items.spiritualAwakeningJourney.title"),
-      desc: t("community.posts.items.spiritualAwakeningJourney.description"),
-      likes: 12,
-      replies: 9,
-    },
-    {
-      author: "Emma Williams",
-      title: t("community.posts.items.dailyMeditationPractices.title"),
-      desc: t("community.posts.items.dailyMeditationPractices.description"),
-      likes: 6,
-      replies: 5,
-    },
-    {
-      author: "David Kumar",
-      title: t("community.posts.items.energyWorkAndHealing.title"),
-      desc: t("community.posts.items.energyWorkAndHealing.description"),
-      likes: 10,
-      replies: 7,
-    },
-    {
-      author: "Lisa Anderson",
-      title: t("community.posts.items.mindfulLivingGuide.title"),
-      desc: t("community.posts.items.mindfulLivingGuide.description"),
-      likes: 7,
-      replies: 4,
-    },
-    {
-      author: "James Wilson",
-      title: t("community.posts.items.spiritualPracticesBeginners.title"),
-      desc: t("community.posts.items.spiritualPracticesBeginners.description"),
-      likes: 11,
-      replies: 8,
-    },
-    {
-      author: "Maria Garcia",
-      title: t("community.posts.items.connectingInnerWisdom.title"),
-      desc: t("community.posts.items.connectingInnerWisdom.description"),
-      likes: 5,
-      replies: 3,
-    },
-    {
-      author: "Robert Taylor",
-      title: t("community.posts.items.advancedMeditationTechniques.title"),
-      desc: t("community.posts.items.advancedMeditationTechniques.description"),
-      likes: 9,
-      replies: 6,
-    },
-  ];
-
-  // Calculate pagination
-  const totalPages = Math.ceil(allPosts.length / postsPerPage);
-  const startIndex = (currentPage - 1) * postsPerPage;
-  const endIndex = startIndex + postsPerPage;
-  const paginatedPosts = allPosts.slice(startIndex, endIndex);
+  const posts = postsData?.posts || [];
+  const totalPages = postsData?.meta?.totalPages || 1;
 
   return (
-    <div className="bg-[#FBFDFF] min-h-screen  ">
+    <div className="bg-[#FBFDFF] min-h-screen">
       {/* Top Header Section */}
       <div className="container mx-auto px-4 lg:px-6 pt-8 md:pt-12 pb-14 mb:pb-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start border-b border-gray-200 pb-8">
@@ -163,7 +97,7 @@ const CommunityContent = memo(() => {
           <CategoriesSidebar
             categories={categories}
             activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
+            onCategoryChange={handleCategoryChange}
           />
 
           {/* Right Content - Posts List */}
@@ -172,18 +106,40 @@ const CommunityContent = memo(() => {
             <TabFilter
               tabs={tabs}
               activeTab={activeTab}
-              onTabChange={setActiveTab}
+              onTabChange={handleTabChange}
             />
 
-            {/* Post Cards */}
-            <PostsList posts={paginatedPosts} />
+            {/* Post Cards / Loading State */}
+            {isLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((n) => (
+                  <div
+                    key={n}
+                    className="border bg-white border-gray-100 rounded-lg p-6 animate-pulse flex flex-col gap-4"
+                  >
+                    <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                    <div className="h-6 bg-gray-200 rounded w-2/3 mt-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  </div>
+                ))}
+              </div>
+            ) : posts.length > 0 ? (
+              <PostsList posts={posts} />
+            ) : (
+              <div className="bg-white border border-gray-100 rounded-lg p-10 text-center text-gray-500 font-medium">
+                No posts found in this community yet.
+              </div>
+            )}
 
             {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+            {!isLoading && totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </div>
         </div>
 

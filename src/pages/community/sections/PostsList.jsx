@@ -27,16 +27,16 @@ const PostsList = memo(({ posts }) => {
           className="border bg-white border-gray-100 rounded-lg p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow"
         >
           <span className="text-base text-gray-400 font-medium tracking-tight">
-            {post.author}
+            {post.user?.name || "Anonymous"}
           </span>
           <h3 className="text-2xl  text-[#1B1B1B] mt-2 mb-3">{post.title}</h3>
           <p className="text-gray-500 text-base leading-relaxed mb-6 border-b border-gray-100 pb-6">
-            {post.desc}
+            {post.content}
           </p>
           <div className="flex items-center gap-4 text-gray-400">
             <div className="flex items-center gap-1.5 cursor-pointer hover:text-gray-600">
               <ThumbsUp size={18} />
-              <span className="text-base font-medium">{post.likes}</span>
+              <span className="text-base font-medium">{post.likesCount || 0}</span>
             </div>
             <div className="w-px  h-3 bg-gray-200"></div>
             <button
@@ -46,7 +46,7 @@ const PostsList = memo(({ posts }) => {
             >
               <MessageSquare size={18} />
               <span className="text-base font-medium">
-                {t("community.posts.replyCount", { count: post.replies })}
+                {t("community.posts.replyCount", { count: post._count?.comments || 0 })}
               </span>
             </button>
           </div>
