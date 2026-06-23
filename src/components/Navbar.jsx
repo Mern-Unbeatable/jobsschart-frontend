@@ -120,7 +120,7 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
                   className="flex items-center gap-2 rounded-md bg-red-500/80 hover:bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all uppercase tracking-wide cursor-pointer"
                 >
                   <LogOut size={16} />
-                  <span>{t("common.signOut")}</span>
+                 
                 </button>
               </>
             ) : (
