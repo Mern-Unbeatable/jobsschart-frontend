@@ -20,7 +20,27 @@ export const postApi = baseApi.injectEndpoints({
       invalidatesTags: ['Posts'],
       transformResponse: (response) => response.data,
     }),
+    getComments: builder.query({
+      query: (postId) => ({
+        url: `/post/${postId}/comments`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, postId) => [{ type: 'PostComments', id: postId }],
+      transformResponse: (response) => response.data,
+    }),
+    createComment: builder.mutation({
+      query: ({ postId, content }) => ({
+        url: `/post/${postId}/comments`,
+        method: 'POST',
+        body: { content },
+      }),
+      invalidatesTags: (result, error, { postId }) => [
+        { type: 'PostComments', id: postId },
+        'Posts'
+      ],
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
-export const { useGetPostsQuery, useCreatePostMutation } = postApi;
+export const { useGetPostsQuery, useCreatePostMutation, useGetCommentsQuery, useCreateCommentMutation } = postApi;
