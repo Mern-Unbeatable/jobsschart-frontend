@@ -8,15 +8,21 @@ const dotenv = require('dotenv');
 module.exports = (env, argv) => {
   const isProd = argv.mode === 'production';
 
-  // ── Load env file ──────────────────────────────────────────
+  const defaultEnvPath = path.resolve(__dirname, '.env');
   const envPath = path.resolve(
     __dirname,
     argv.mode === 'production' ? '.env.production' : '.env.development'
   );
 
-  const rawEnv = fs.existsSync(envPath)
+  const defaultEnv = fs.existsSync(defaultEnvPath)
+    ? dotenv.parse(fs.readFileSync(defaultEnvPath))
+    : {};
+
+  const modeEnv = fs.existsSync(envPath)
     ? dotenv.parse(fs.readFileSync(envPath))
     : {};
+
+  const rawEnv = { ...defaultEnv, ...modeEnv };
 
   // ── Fallbacks (used when .env file is missing or incomplete) ─
   const fallbacks = {
