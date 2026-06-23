@@ -25,17 +25,17 @@ const HeroSection = memo(() => {
       />
 
       <div className="relative z-10 w-full container mx-auto px-4 lg:px-6  py-14 sm:py-20">
-        <div className=" max-w-2xl">
+        <div className=" max-w-5xl">
           {" "}
           {/* Limits width to keep text readable on left */}
-          <h1 className="font-crimson text-white font-medium text-3xl sm:text-4xl lg:text-6xl mb-4 sm:mb-6 leading-tight  max-w-xl">
+          <h1 className="font-crimson text-white font-medium text-2xl sm:text-4xl lg:text-5xl mb-4 sm:mb-6 leading-tight ">
             {t('hero.title')}
           </h1>
           <p className="text-white font-poppins! text-base sm:text-xl mb-6 sm:mb-8">
             {t('hero.subtitle')}
           </p>
           {/* Green Button matching image_6519a8.jpg */}
-          <button className="bg-green-500/90  cursor-pointer text-white px-6 py-3 rounded-sm font-medium text-sm sm:text-base transition-all duration-300 shadow-md active:scale-95">
+          <button className="bg-green-500 cursor-pointer text-white px-6 py-3 rounded-sm font-medium text-base transition-all duration-300 shadow-md active:scale-95">
             {t('hero.button')}
           </button>
         </div>
