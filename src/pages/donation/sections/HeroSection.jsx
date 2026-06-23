@@ -5,9 +5,9 @@ const HeroSection = memo(() => {
   const { t } = useTranslation();
   return (
     <div
-      className='relative w-full h-100 md:h-180 bg-cover bg-top flex items-center'
+      className='relative w-full h-100 md:h-180 2xl:h-220  bg-cover bg-top flex items-center'
       style={{
-        backgroundImage: 'url("/donate/donation2.jpg")',
+        backgroundImage: 'url("/donate/donation.png")',
       }}
     >
       {/* Dark Overlay - */}

@@ -17,7 +17,7 @@ const ConsultantsHero = memo(
 
     return (
       <div
-        className="relative w-full md:h-180 2xl:h-220 bg-cover bg-top flex items-center"
+        className="relative w-full h-120 md:h-180 2xl:h-220 bg-cover bg-top flex items-center"
         style={{
           backgroundImage:
             'url("/consoultant.png")',

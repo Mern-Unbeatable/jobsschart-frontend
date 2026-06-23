@@ -8,11 +8,11 @@ const HeroSection = memo(() => {
   return (
     <section
       aria-label="Car search hero"
-      className="relative w-full min-h-160 lg:min-h-200 flex items-center justify-center overflow-hidden"
+      className="relative w-full h-100 md:h-180 2xl:h-220 flex items-center justify-center overflow-hidden"
     >
       {/* Background image */}
       <img
-        src="/jbossHero.webp"
+        src="/home.png"
         alt=""
         aria-hidden="true"
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
