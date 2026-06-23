@@ -17,10 +17,10 @@ const ConsultantsHero = memo(
 
     return (
       <div
-        className="relative w-full h-150 bg-cover bg-center flex items-center"
+        className="relative w-full md:h-180 2xl:h-220 bg-cover bg-top flex items-center"
         style={{
           backgroundImage:
-            'url("https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600&h=900&fit=crop")',
+            'url("/consoultant.png")',
         }}
       >
         {/* Dark Overlay to make text readable */}
