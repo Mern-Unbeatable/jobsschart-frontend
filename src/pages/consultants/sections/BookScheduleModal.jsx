@@ -143,131 +143,139 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
 
   return (
     <div className='fixed inset-0 bg-black/60 flex items-center justify-center z-200 p-4 animate-modal-overlay'>
-      <div className='bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl animate-modal-panel relative'>
+      <div className='bg-white rounded-2xl p-6 md:p-8 w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-modal-panel relative'>
         {/* Close Button */}
         <button
           onClick={onClose}
-          className='absolute top-4 right-4 text-gray-500 hover:text-gray-700'
+          className='absolute top-6 right-6 text-gray-500 hover:text-gray-700 z-10 cursor-pointer'
         >
           <X size={24} />
         </button>
 
-        <h2 className='text-2xl font-bold text-gray-800 mb-8'>
-          Book A Schedule
-        </h2>
+        {/* Sticky Header */}
+        <div className='flex-none pb-4 mb-6 border-b border-gray-100 pr-10'>
+          <h2 className='text-2xl font-bold text-gray-800'>
+            Book A Schedule
+          </h2>
+        </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-          {/* Calendar Section */}
-          <div>
-            <h3 className='text-lg font-bold text-gray-800 mb-4'>
-              Available Date
-            </h3>
+        {/* Scrollable Content Body */}
+        <div className='flex-1 overflow-y-auto pr-1 min-h-0 py-2'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+            {/* Calendar Section */}
+            <div>
+              <h3 className='text-lg font-bold text-gray-800 mb-4'>
+                Available Date
+              </h3>
 
-            {/* Month Navigation */}
-            <div className='flex items-center justify-between mb-6'>
-              <button
-                onClick={() => {
-                  setCurrentMonth(
-                    new Date(
-                      currentMonth.getFullYear(),
-                      currentMonth.getMonth() - 1,
-                    ),
-                  );
-                  setSelectedDate(null);
-                  setSelectedTime(null);
-                  setSelectedSchedule(null);
-                }}
-                className='p-2 hover:bg-gray-100 rounded'
-              >
-                <ChevronLeft size={20} className='text-gray-600' />
-              </button>
-              <h4 className='text-lg font-semibold text-gray-800'>
-                {monthName}
-              </h4>
-              <button
-                onClick={() => {
-                  setCurrentMonth(
-                    new Date(
-                      currentMonth.getFullYear(),
-                      currentMonth.getMonth() + 1,
-                    ),
-                  );
-                  setSelectedDate(null);
-                  setSelectedTime(null);
-                  setSelectedSchedule(null);
-                }}
-                className='p-2 hover:bg-gray-100 rounded'
-              >
-                <ChevronRight size={20} className='text-gray-600' />
-              </button>
-            </div>
-
-            {/* Calendar Grid */}
-            <div className='bg-gray-50 p-4 rounded-lg'>
-              {/* Day Headers */}
-              <div className='grid grid-cols-7 gap-2 mb-2'>
-                {['SUN', 'MO', 'TU', 'WED', 'TH', 'FR', 'SA'].map((day) => (
-                  <div
-                    key={day}
-                    className='text-center text-xs font-bold text-gray-500 py-2'
-                  >
-                    {day}
-                  </div>
-                ))}
+              {/* Month Navigation */}
+              <div className='flex items-center justify-between mb-6'>
+                <button
+                  onClick={() => {
+                    setCurrentMonth(
+                      new Date(
+                        currentMonth.getFullYear(),
+                        currentMonth.getMonth() - 1,
+                      ),
+                    );
+                    setSelectedDate(null);
+                    setSelectedTime(null);
+                    setSelectedSchedule(null);
+                  }}
+                  className='p-2 hover:bg-gray-100 rounded cursor-pointer'
+                >
+                  <ChevronLeft size={20} className='text-gray-600' />
+                </button>
+                <h4 className='text-lg font-semibold text-gray-800'>
+                  {monthName}
+                </h4>
+                <button
+                  onClick={() => {
+                    setCurrentMonth(
+                      new Date(
+                        currentMonth.getFullYear(),
+                        currentMonth.getMonth() + 1,
+                      ),
+                    );
+                    setSelectedDate(null);
+                    setSelectedTime(null);
+                    setSelectedSchedule(null);
+                  }}
+                  className='p-2 hover:bg-gray-100 rounded cursor-pointer'
+                >
+                  <ChevronRight size={20} className='text-gray-600' />
+                </button>
               </div>
 
-              {/* Days Grid */}
-              <div className='grid grid-cols-7 gap-2'>{renderCalendar()}</div>
-            </div>
-          </div>
-
-          {/* Time Slots Section */}
-          <div>
-            <h3 className='text-lg font-bold text-gray-800 mb-4'>
-              Available Time
-            </h3>
-
-            {!selectedDate ? (
-              <div className="text-gray-400 text-sm font-medium text-center py-12 font-poppins">
-                Select a marked date from the calendar to view available times.
-              </div>
-            ) : availableSchedules.length === 0 ? (
-              <div className="text-gray-400 text-sm font-medium text-center py-12 font-poppins">
-                No available times for this date.
-              </div>
-            ) : (
-              <div className='space-y-2 max-h-64 overflow-y-auto pr-1'>
-                {availableSchedules.map((schedule) => {
-                  const timeLabel = formatTimeSlot(schedule.startTime, schedule.endTime);
-                  return (
-                    <button
-                      key={schedule.id}
-                      onClick={() => {
-                        setSelectedTime(timeLabel);
-                        setSelectedSchedule(schedule);
-                      }}
-                      className={`w-full px-4 py-3 rounded-lg font-medium text-center transition-all cursor-pointer ${
-                        selectedSchedule?.id === schedule.id
-                          ? 'bg-[#E9D5FF] text-gray-900 border-2 border-[#6E35AE]'
-                          : 'bg-purple-50/50 text-gray-800 border-2 border-purple-100 hover:border-purple-200'
-                      }`}
+              {/* Calendar Grid */}
+              <div className='bg-gray-50 p-4 rounded-lg'>
+                {/* Day Headers */}
+                <div className='grid grid-cols-7 gap-2 mb-2'>
+                  {['SUN', 'MO', 'TU', 'WED', 'TH', 'FR', 'SA'].map((day) => (
+                    <div
+                      key={day}
+                      className='text-center text-xs font-bold text-gray-500 py-2'
                     >
-                      {timeLabel}
-                    </button>
-                  );
-                })}
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Days Grid */}
+                <div className='grid grid-cols-7 gap-2'>{renderCalendar()}</div>
               </div>
-            )}
+            </div>
+
+            {/* Time Slots Section */}
+            <div>
+              <h3 className='text-lg font-bold text-gray-800 mb-4'>
+                Available Time
+              </h3>
+
+              {!selectedDate ? (
+                <div className="text-gray-400 text-sm font-medium text-center py-12 font-poppins">
+                  Select a marked date from the calendar to view available times.
+                </div>
+              ) : availableSchedules.length === 0 ? (
+                <div className="text-gray-400 text-sm font-medium text-center py-12 font-poppins">
+                  No available times for this date.
+                </div>
+              ) : (
+                <div className='space-y-2 max-h-64 overflow-y-auto pr-1'>
+                  {availableSchedules.map((schedule) => {
+                    const timeLabel = formatTimeSlot(schedule.startTime, schedule.endTime);
+                    return (
+                      <button
+                        key={schedule.id}
+                        onClick={() => {
+                          setSelectedTime(timeLabel);
+                          setSelectedSchedule(schedule);
+                        }}
+                        className={`w-full px-4 py-3 rounded-lg font-medium text-center transition-all cursor-pointer ${
+                          selectedSchedule?.id === schedule.id
+                            ? 'bg-[#E9D5FF] text-gray-900 border-2 border-[#6E35AE]'
+                            : 'bg-purple-50/50 text-gray-800 border-2 border-purple-100 hover:border-purple-200'
+                        }`}
+                      >
+                        {timeLabel}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Book Schedule Button */}
-        <button
-          onClick={handleBooking}
-          className='w-full bg-[#6E35AE] hover:bg-[#582791] text-white font-bold py-4 rounded-xl mt-8 text-lg transition-all shadow-md active:scale-98 cursor-pointer'
-        >
-          Book Schedule
-        </button>
+        {/* Sticky Footer */}
+        <div className='flex-none pt-4 mt-6 border-t border-gray-100'>
+          <button
+            onClick={handleBooking}
+            className='w-full bg-[#6E35AE] hover:bg-[#582791] text-white font-bold py-4 rounded-xl text-lg transition-all shadow-md active:scale-98 cursor-pointer'
+          >
+            Book Schedule
+          </button>
+        </div>
       </div>
     </div>
   );
