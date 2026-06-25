@@ -18,39 +18,45 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
     year: 'numeric',
   });
 
+  const getDayOfWeekName = (date) => {
+    const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+    return days[date.getDay()];
+  };
+
   // Helper to check if a day has available slots
   const hasAvailableSlots = (day) => {
-    if (!consultant?.schedules) return false;
-    return consultant.schedules.some((schedule) => {
-      const date = new Date(schedule.bookingDate);
-      return (
-        date.getDate() === day &&
-        date.getMonth() === currentMonth.getMonth() &&
-        date.getFullYear() === currentMonth.getFullYear() &&
-        schedule.status?.toUpperCase() === "AVAILABLE"
-      );
-    });
+    if (!consultant?.availabilitySlots) return false;
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    const dayName = getDayOfWeekName(date);
+    return consultant.availabilitySlots.some((slot) => slot.dayOfWeek?.toUpperCase() === dayName);
   };
 
   // Filter available schedules for the selected date
   const availableSchedules = React.useMemo(() => {
-    if (!selectedDate || !consultant?.schedules) return [];
+    if (!selectedDate || !consultant?.availabilitySlots) return [];
     
-    return consultant.schedules.filter((schedule) => {
-      const scheduleDate = new Date(schedule.bookingDate);
-      return (
-        scheduleDate.getDate() === selectedDate &&
-        scheduleDate.getMonth() === currentMonth.getMonth() &&
-        scheduleDate.getFullYear() === currentMonth.getFullYear() &&
-        schedule.status?.toUpperCase() === "AVAILABLE"
-      );
-    });
-  }, [selectedDate, currentMonth, consultant?.schedules]);
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), selectedDate);
+    const dayName = getDayOfWeekName(date);
+    
+    return consultant.availabilitySlots.filter(
+      (slot) => slot.dayOfWeek?.toUpperCase() === dayName
+    );
+  }, [selectedDate, currentMonth, consultant?.availabilitySlots]);
+
+  const formatTime = (timeStr) => {
+    try {
+      const [hours, minutes] = timeStr.split(":");
+      const date = new Date();
+      date.setHours(parseInt(hours, 10));
+      date.setMinutes(parseInt(minutes, 10));
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+      return timeStr;
+    }
+  };
 
   const formatTimeSlot = (startTime, endTime) => {
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-    return `${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    return `${formatTime(startTime)} - ${formatTime(endTime)}`;
   };
 
   const renderCalendar = () => {
