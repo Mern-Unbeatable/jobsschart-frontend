@@ -8,75 +8,102 @@ import {
   Video,
 } from "lucide-react";
 
-const ScheduleCard = ({ doctor, date, time, status = "upcoming" }) => {
+const ScheduleCard = ({ name, avatar, date, time, status = "upcoming" }) => {
   const { t } = useTranslation();
-  const isComplete = status === "complete";
-  const statusLabel = isComplete
-    ? t("dashboard.user.scheduleCard.statusComplete")
-    : t("dashboard.user.scheduleCard.statusUpcoming");
+  const isComplete = status?.toUpperCase() === "COMPLETED";
+  const isCancelled = status?.toUpperCase() === "CANCELLED";
+
+  let statusClass = "bg-purple-50 text-purple-700 border border-purple-100";
+  let statusLabel = status;
+
+  if (isComplete) {
+    statusClass = "bg-[#e6f9eb] text-[#3a9f4d] border border-[#b8ebc2]";
+    statusLabel = t("dashboard.user.scheduleCard.statusComplete") || "Complete";
+  } else if (isCancelled) {
+    statusClass = "bg-rose-50 text-rose-700 border border-rose-100";
+    statusLabel = "Cancelled";
+  } else {
+    statusClass = "bg-[#fcf7e7] text-amber-600 border border-amber-100";
+    statusLabel = t("dashboard.user.scheduleCard.statusUpcoming") || "Upcoming";
+  }
+
+  const initials = name
+    ? name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "C";
 
   return (
-    <article className="relative flex min-h-52 flex-col rounded-[10px] border border-gray-100 bg-[#f1ebf7] p-3.5">
+    <article className="relative flex min-h-52 flex-col rounded-[10px] border border-gray-100 bg-[#f8f3fd] p-4 shadow-xs">
       <span
-        className={`absolute right-3 top-3 rounded-full px-3 py-1 text-sm font-medium leading-none ${
-          isComplete
-            ? "bg-[#b8ebc2] text-[#3a9f4d]"
-            : "bg-[#fcf7e7] text-green-500/60"
-        }`}
+        className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold leading-none ${statusClass}`}
       >
         {statusLabel}
       </span>
 
-      <div className="flex size-8 items-center justify-center rounded-full bg-[#d2c0e6] text-sm font-semibold text-[#6e35ae]">
-        SJ
-      </div>
+      {avatar ? (
+        <img
+          src={avatar}
+          alt={name}
+          className="size-10 rounded-full object-cover border border-purple-100"
+        />
+      ) : (
+        <div className="flex size-10 items-center justify-center rounded-full bg-[#d2c0e6] text-sm font-semibold text-[#6e35ae]">
+          {initials}
+        </div>
+      )}
 
-      <h3 className="mt-3 text-lg font-semibold leading-[1.35] text-[#333333]">
-        {doctor}
+      <h3 className="mt-3 text-lg font-semibold leading-[1.35] text-[#333333] font-poppins">
+        {name}
       </h3>
 
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-base leading-5 text-[#333333]">
-        <span className="inline-flex items-center gap-1">
-          <CalendarDays size={14} aria-hidden="true" />
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-sm leading-5 text-[#666666] font-poppins">
+        <span className="inline-flex items-center gap-1.5">
+          <CalendarDays size={14} aria-hidden="true" className="text-purple-400" />
           {date}
         </span>
-        <span className="inline-flex items-center gap-1">
-          <Clock3 size={14} aria-hidden="true" />
+        <span className="inline-flex items-center gap-1.5">
+          <Clock3 size={14} aria-hidden="true" className="text-purple-400" />
           {time}
         </span>
       </div>
 
-      <div className="mt-auto pt-3">
+      <div className="mt-auto pt-4">
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
-            className="flex h-8 items-center justify-center rounded bg-[#d2c0e6] text-[#6e35ae] transition-colors hover:bg-[#c8b1df]"
+            className="flex h-9 items-center justify-center rounded-xl bg-[#d2c0e6]/50 text-[#6e35ae] transition-all hover:bg-[#d2c0e6] active:scale-95 cursor-pointer"
             aria-label={t("dashboard.user.scheduleCard.callDoctor")}
           >
             <Phone size={16} aria-hidden="true" />
           </button>
           <button
             type="button"
-            className="flex h-8 items-center justify-center rounded bg-[#d2c0e6] text-[#6e35ae] transition-colors hover:bg-[#c8b1df]"
+            className="flex h-9 items-center justify-center rounded-xl bg-[#d2c0e6]/50 text-[#6e35ae] transition-all hover:bg-[#d2c0e6] active:scale-95 cursor-pointer"
             aria-label={t("dashboard.user.scheduleCard.startVideoCall")}
           >
             <Video size={16} aria-hidden="true" />
           </button>
           <button
             type="button"
-            className="flex h-8 items-center justify-center rounded bg-[#d2c0e6] text-[#6e35ae] transition-colors hover:bg-[#c8b1df]"
+            className="flex h-9 items-center justify-center rounded-xl bg-[#d2c0e6]/50 text-[#6e35ae] transition-all hover:bg-[#d2c0e6] active:scale-95 cursor-pointer"
             aria-label={t("dashboard.user.scheduleCard.openChat")}
           >
             <MessageSquare size={16} aria-hidden="true" />
           </button>
         </div>
 
-        <button
-          type="button"
-          className="mt-2 rounded bg-[#b10000] px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#8d0000]"
-        >
-          {t("dashboard.user.scheduleCard.cancel")}
-        </button>
+        {!isComplete && !isCancelled && (
+          <button
+            type="button"
+            className="mt-2 w-full rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 py-2 text-sm font-semibold transition-all active:scale-95 cursor-pointer border border-rose-100"
+          >
+            {t("dashboard.user.scheduleCard.cancel")}
+          </button>
+        )}
       </div>
     </article>
   );
