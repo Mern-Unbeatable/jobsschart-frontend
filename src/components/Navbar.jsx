@@ -163,7 +163,7 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
         >
           <div
             id="mobile-menu"
-            className="absolute left-0 top-0 z-100 flex w-full flex-col border-t border-gray-100 bg-white shadow-2xl xl:hidden animate-in slide-in-from-top duration-200"
+            className="absolute left-0 top-0 z-100 flex w-full flex-col border-t border-gray-100 bg-[#E9D5FF] shadow-2xl xl:hidden animate-in slide-in-from-top duration-200"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="py-1">
@@ -186,11 +186,11 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
                   <Link
                     to={getDashboardRoute(userRole)}
                     onClick={closeMenu}
-                    className="w-full rounded-md bg-green-500/60 py-4 text-center text-lg font-bold text-white shadow-md uppercase tracking-wide"
+                    className="w-full rounded-md bg-[#6E35AE] py-4 text-center text-lg font-bold text-white shadow-md uppercase tracking-wide"
                   >
                     Dashboard
                   </Link>
-                  <button
+                  {/* <button
                     type="button"
                     onClick={() => {
                       closeMenu();
@@ -200,7 +200,7 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
                   >
                     <LogOut size={20} />
                     <span>{t("common.signOut")}</span>
-                  </button>
+                  </button> */}
                 </>
               ) : (
                 <>
