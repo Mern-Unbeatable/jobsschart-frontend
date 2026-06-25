@@ -106,17 +106,17 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
               <>
                 <Link
                   to={getDashboardRoute(userRole)}
-                  className="rounded-md bg-green-500/60 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all uppercase tracking-wide"
+                  className="rounded-md bg-[#6E35AE] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all uppercase tracking-wide"
                 >
                   Dashboard
                 </Link>
-                <button
+                {/* <button
                   type="button"
                   onClick={handleLogout}
                   className="flex items-center gap-2 rounded-md bg-red-500/80 hover:bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all uppercase tracking-wide cursor-pointer"
                 >
                   <LogOut size={16} />
-                </button>
+                </button> */}
               </>
             ) : (
               <>

@@ -11,12 +11,12 @@ const CommunitySection = memo(() => {
   ];
 
   const communityMembers = [
-    { id: 1, image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=200&h=200&fit=crop', rounded: 'rounded-xl' },
-    { id: 2, image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&h=200&fit=crop', rounded: 'rounded-full' },
-    { id: 3, image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&h=200&fit=crop', rounded: 'rounded-xl' },
-    { id: 4, image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&h=200&fit=crop', rounded: 'rounded-full' },
-    { id: 5, image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&h=200&fit=crop', rounded: 'rounded-xl' },
-    { id: 6, image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&h=200&fit=crop', rounded: 'rounded-full' },
+    { id: 1, image: '/member1.jpeg', rounded: 'rounded-xl' },
+    { id: 2, image: '/member2.jpeg', rounded: 'rounded-full' },
+    { id: 3, image: '/member3.jpeg', rounded: 'rounded-xl' },
+    { id: 4, image: '/member4.jpeg', rounded: 'rounded-full' },
+    { id: 5, image: '/member5.jpeg', rounded: 'rounded-xl' },
+    { id: 6, image: '/member6.jpeg', rounded: 'rounded-full' },
   ];
 
   return (
