@@ -20,34 +20,34 @@ const CommunitySection = memo(() => {
   ];
 
   return (
-    <section className='py-14 md:py-20 bg-[#FCF7E7]'>
+    <section className='py-14 md:py-20 bg-[#F8F3FD]'>
       <div className='container mx-auto px-4 lg:px-6 '>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center'>
           
           {/* Left Content */}
           <div className='flex flex-col items-start'>
             <div className='mb-2 mb:mb-8'>
-              <h2 className='text-2xl md:text-4xl font-bold mb-2  text-gray-900 leading-tight'>
+              <h2 className='text-2xl md:text-4xl font-bold mb-2 text-gray-900 leading-tight font-crimson'>
                 {t('home.communitySection.title')}
               </h2>
-              {/* Underline matching the image */}
-              <div className='w-12 h-0.5 bg-gray-500 mb-3 md:mb-6'></div>
+              {/* Underline matching the theme */}
+              <div className='w-12 h-1 bg-[#6E35AE] mb-4 md:mb-6 rounded-full'></div>
               
-              <p className='text-base text-gray-600 mb-4 md:mb-8 leading-relaxed max-w-lg'>
+              <p className='text-base text-gray-600 mb-6 md:mb-8 leading-relaxed max-w-lg font-poppins'>
                 {t('home.communitySection.description')}
               </p>
 
-              <button className='bg-green-500/60 text-white px-6 py-2.5 rounded-md text-sm font-semibold transition-all  active:scale-95'>
+              <button className='bg-[#6E35AE] hover:bg-[#582791] text-white px-8 py-3 rounded-full text-base font-semibold font-poppins transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 cursor-pointer'>
                 {t('home.communitySection.button')}
               </button>
             </div>
 
-            {/* Stats - Positioned at the bottom left like the image */}
-            <div className='grid grid-cols-3 gap-4 sm:gap-8 lg:gap-10 mt-6 lg:mt-8 pt-2 lg:pt-8'>
+            {/* Stats */}
+            <div className='grid grid-cols-3 gap-4 sm:gap-8 lg:gap-10 mt-6 lg:mt-8 pt-2 lg:pt-8 w-full border-t border-[#DFC2FF]'>
               {stats.map((stat) => (
                 <div key={stat.id} className='flex flex-col items-start'>
-                  <p className='text-2xl font-bold text-gray-900'>{stat.number}</p>
-                  <p className='text-sm sm:text-base text-gray-500 font-medium sm:uppercase sm:tracking-wider'>
+                  <p className='text-3xl font-bold text-[#6E35AE] font-crimson'>{stat.number}</p>
+                  <p className='text-sm sm:text-base text-gray-500 font-medium font-poppins sm:uppercase sm:tracking-wider'>
                     {t(stat.labelKey)}
                   </p>
                 </div>

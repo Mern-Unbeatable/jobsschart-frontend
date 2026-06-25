@@ -38,29 +38,29 @@ const PricingSection = memo(() => {
   }
 
   return (
-    <section className="py-14 md:py-20 bg-gray-50">
+    <section className="py-14 md:py-20 bg-linear-to-b from-[#F8F3FD] to-white">
       <div className="container mx-auto px-4 lg:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className="rounded-xl bg-white p-6 border border-[#00000033] flex flex-col justify-start h-full"
+              className="rounded-2xl bg-white p-8 border border-[#E9D5FF] hover:border-[#6E35AE] hover:shadow-xl transition-all duration-350 flex flex-col justify-between h-full"
             >
               <div>
                 {/* Plan Name & Credits Badge */}
-                <div className="flex justify-between items-start mb-2">
+                <div className="flex justify-between items-start mb-4">
                   <h3 className="text-2xl font-poppins font-bold text-gray-800">
                     {plan.name}
                   </h3>
                   {plan.credits !== undefined && (
-                    <span className="px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full border border-green-200">
+                    <span className="px-3 py-1 bg-[#F5EFFE] text-[#6E35AE] text-xs font-semibold rounded-full border border-[#E9D5FF]">
                       {plan.credits} Credits
                     </span>
                   )}
                 </div>
 
                 {/* Pricing Section */}
-                <div className="flex items-baseline mb-2">
+                <div className="flex items-baseline mb-3">
                   <span className="text-4xl font-bold text-gray-900">
                     €{plan.price}
                   </span>
@@ -72,7 +72,7 @@ const PricingSection = memo(() => {
                 </div>
 
                 {/* Secondary Pricing Text / Description */}
-                <p className="text-base text-gray-600 mb-4 font-poppins line-clamp-2 h-12">
+                <p className="text-base text-gray-600 mb-6 font-poppins line-clamp-2 h-12">
                   {plan.description ||
                     (plan.minutes > 0 ? `${plan.minutes} minutes session` : "")}
                 </p>
@@ -80,7 +80,7 @@ const PricingSection = memo(() => {
                 {/* Button */}
                 <button
                   onClick={() => navigate(ROUTES.CREDIT)}
-                  className="w-full bg-green-500/60 hover:bg-green-500/80 text-white py-3 rounded-md font-semibold mb-4 transition duration-200 shadow-sm font-poppins"
+                  className="w-full bg-[#E9D5FF] hover:bg-[#6E35AE] hover:text-white text-[#6E35AE] py-3 rounded-full font-bold mb-6 transition-all duration-300 shadow-xs hover:shadow-md active:scale-95 font-poppins cursor-pointer"
                 >
                   Buy Credits
                 </button>
@@ -88,7 +88,7 @@ const PricingSection = memo(() => {
 
               <div>
                 {/* Features List */}
-                <ul className="space-y-4 border-gray-100">
+                <ul className="space-y-4 pt-4 border-t border-[#F5EFFE]">
                   {(plan.features || []).map((feature, idx) => (
                     <li
                       key={idx}
@@ -96,7 +96,7 @@ const PricingSection = memo(() => {
                     >
                       <Check
                         size={18}
-                        className="text-[#10B981] shrink-0"
+                        className="text-[#6E35AE] shrink-0"
                         strokeWidth={3}
                       />
                       <span>{feature}</span>

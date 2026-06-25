@@ -25,14 +25,14 @@ const ServicesSection = memo(() => {
   const isDutch = i18n.resolvedLanguage === 'nl' || i18n.language === 'nl';
 
   return (
-    <section className='w-full py-14 md:py-20   bg-[#F1EBF7]'>
+    <section className='w-full py-14 md:py-20 bg-[#F8F3FD]'>
       <div className='container mx-auto px-4 lg:px-6'>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-12'>
           {SERVICES.map((service, index) => (
             <div key={index} className='flex flex-col items-start group'>
-              {/* Icon - Small and Rounded as per image */}
-              <div className='flex items-center justify-center w-8 h-8 bg-[#8F65D5] rounded-md mb-6'>
-                <service.icon size={16} className='text-white' />
+              {/* Icon - Styled with theme color */}
+              <div className='flex items-center justify-center w-12 h-12 bg-[#E9D5FF] rounded-xl mb-6 shadow-xs group-hover:scale-110 transition-transform duration-300'>
+                <service.icon size={22} className='text-[#6E35AE]' />
               </div>
 
               {/* Title - Serif style font */}
@@ -49,8 +49,8 @@ const ServicesSection = memo(() => {
                 {t(service.descriptionKey)}
               </p>
 
-              {/* Bottom Divider Line - Visible as per image */}
-              <div className='w-full h-px bg-gray-300 transition-colors group-hover:bg-purple-400'></div>
+              {/* Bottom Divider Line */}
+              <div className='w-full h-0.5 bg-[#E9D5FF] transition-all duration-300 group-hover:bg-[#6E35AE]'></div>
             </div>
           ))}
         </div>

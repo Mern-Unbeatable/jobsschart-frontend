@@ -1,78 +1,53 @@
 import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
 import ConsultantCard from "../../../components/ConsultantCard";
+import { useGetAllConsultantsQuery } from "../../../features/api/consultantApi";
 
 const ConsultantsSection = memo(() => {
   const { t } = useTranslation();
+  const { data: consultantsData, isLoading } = useGetAllConsultantsQuery({});
 
-  const consultants = [
-    {
-      id: 1,
-      name: "Elena Vance",
-      specialty: "Psychic & Medium",
-      rating: 4.9,
-      price: 2.5,
-      status: "Online",
-      image:
-        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&h=300&fit=crop",
-    },
-    {
-      id: 2,
-      name: "Marcus Thorne",
-      specialty: "Astrology Expert",
-      rating: 4.8,
-      price: 2.5,
-      status: "Offline",
-      image:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=400&h=300&fit=crop",
-    },
-    {
-      id: 3,
-      name: "Sarah Jenkins",
-      specialty: "Tarot Reader",
-      rating: 5.0,
-      price: 2.5,
-      status: "Busy",
-      image:
-        "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400&h=300&fit=crop",
-    },
-    {
-      id: 4,
-      name: "David Miller",
-      specialty: "Life Coach",
-      rating: 4.7,
-      price: 2.5,
-      status: "Online",
-      image:
-        "https://images.unsplash.com/photo-1519085185758-2ad980306e00?q=80&w=400&h=300&fit=crop",
-    },
-    {
-      id: 5,
-      name: "Elena Vance",
-      specialty: "Psychic & Medium",
-      rating: 5.0,
-      price: 2.5,
-      status: "Busy",
-      image:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&h=300&fit=crop",
-    },
-    {
-      id: 6,
-      name: "Elena Vance",
-      specialty: "Psychic & Medium",
-      rating: 4.9,
-      price: 2.5,
-      status: "Offline",
-      image:
-        "https://images.unsplash.com/photo-1554151228-14d9def656e4?q=80&w=400&h=300&fit=crop",
-    },
-  ];
+  const consultants = consultantsData?.consultants || [];
+  // Slice to show only the first 4 or 8 consultants on the home page
+  const featuredConsultants = consultants.slice(0, 4);
+
+  if (isLoading) {
+    return (
+      <section className="py-14 md:py-20 bg-linear-to-b from-white to-[#F8F3FD]">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="mb-8">
+            <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 font-crimson">
+              {t("home.consultantsSection.title")}
+            </h2>
+            <p className="text-base text-gray-500 font-poppins">
+              {t("home.consultantsSection.description")}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((n) => (
+              <div
+                key={n}
+                className="bg-[#F5F1FD] rounded-2xl p-4 h-96 animate-pulse flex flex-col justify-between"
+              >
+                <div className="w-full h-60 bg-gray-200 rounded-xl"></div>
+                <div className="space-y-3 mt-4">
+                  <div className="h-6 bg-gray-200 rounded w-2/3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-8 bg-gray-200 rounded w-full"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="py-14 md:py-20  bg-white">
+    <section className="py-14 md:py-20 bg-linear-to-b from-white to-[#F8F3FD]">
       <div className="container mx-auto px-4 lg:px-6">
-        <div className="mb-6">
-          <h2 className=" text-2xl md:text-4xl font-bold text-gray-900 mb-2 font-crimson">
+        <div className="mb-8">
+          <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 font-crimson">
             {t("home.consultantsSection.title")}
           </h2>
           <p className="text-base text-gray-500 font-poppins">
@@ -80,11 +55,7 @@ const ConsultantsSection = memo(() => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {consultants.map((consultant) => (
-            <ConsultantCard key={consultant.id} consultant={consultant} />
-          ))}
-        </div>
+        <ConsultantCard consultantsData={{ consultants: featuredConsultants }} />
       </div>
     </section>
   );

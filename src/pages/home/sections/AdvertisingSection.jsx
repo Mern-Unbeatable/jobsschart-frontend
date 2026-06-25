@@ -33,12 +33,11 @@ const AdvertisingSection = memo(() => {
     : "www.e-commerce.com";
 
   return (
-    <section className="py-14 md:py-20  px-4 bg-gray-100">
+    <section className="py-14 md:py-20 px-4 bg-linear-to-b from-white to-[#F8F3FD]">
       <div className="container mx-auto px-4 lg:px-6">
         {/* Background Image with Overlay */}
         <div
-          className="relative rounded-lg overflow-hidden shadow-lg"
-          style={{ border: "2px dotted #333" }}
+          className="relative rounded-2xl overflow-hidden shadow-lg border border-[#E9D5FF]/60"
         >
           {/* Background Image */}
           <img
@@ -48,16 +47,16 @@ const AdvertisingSection = memo(() => {
           />
 
           {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="absolute inset-0 bg-black/60"></div>
 
           {/* Content Overlay */}
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 sm:px-12 text-center">
             {campaign?.title && (
-              <h3 className="text-white text-xl sm:text-2xl lg:text-3xl font-bold mb-3 tracking-wide">
+              <h3 className="text-white text-xl sm:text-2xl lg:text-3xl font-bold font-crimson mb-3 tracking-wide">
                 {campaign.title}
               </h3>
             )}
-            <p className="text-white text-sm sm:text-base lg:text-lg mb-8 max-w-3xl leading-relaxed">
+            <p className="text-white text-sm sm:text-base lg:text-lg mb-8 max-w-3xl leading-relaxed font-poppins opacity-90">
               {description}
             </p>
 
@@ -66,7 +65,7 @@ const AdvertisingSection = memo(() => {
                 href={linkUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-yellow-500 hover:text-yellow-400 text-base sm:text-lg font-semibold transition-colors duration-300"
+                className="inline-flex items-center justify-center bg-white/15 hover:bg-white/25 text-[#E9D5FF] hover:text-white px-8 py-3 rounded-full text-base font-semibold font-poppins transition-all duration-300 border border-white/20 active:scale-95 backdrop-blur-xs"
               >
                 {displayLink}
               </a>

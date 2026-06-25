@@ -151,11 +151,10 @@
     "notFound": "Pagina niet gevonden",
     "notFoundMessage": "De pagina die u zoekt bestaat niet.",
     "backToHome": "Terug naar Home"
-  }
-  ,
+  },
   "hero": {
-    "title": "Loop je vast op je werk? Onzeker in je relatie? Of voel je dat er heling nodig is? Schakel direct een professionele consulent in voor een persoonlijk gesprek. Per telefoon, video of chat - afgerekend per minuut.",
-    "subtitle": "Geen wachttijden. Geen gedoe. Gewoon de begeleiding die je helpt vooruit te komen.",
+    "title": "Vragen over liefde, werk of je toekomst?",
+    "subtitle": "Praat met een vertrouwde spirituele gids.",
     "button": "Krijg direct advies"
   },
   "home": {
@@ -489,8 +488,7 @@
       "visibility": "Zichtbaarheid verbetering"
     },
     "button": "€{{amount}} nu doneren"
-  }
-  ,
+  },
   "community": {
     "page": {
       "title": "Community Forum",
@@ -592,8 +590,7 @@
         "awakening": "Ontwaken"
       }
     }
-  }
-  ,
+  },
   "blog": {
     "header": {
       "badge": "Wijsheid voor de moderne ziel",
@@ -628,8 +625,7 @@
     "card": {
       "readMore": "Lees meer"
     }
-  }
-  ,
+  },
   "footer": {
     "logoAlt": "Netwerkmediums logo",
     "copyright": "Copyright © 2026 – netwerkmediums.nl",

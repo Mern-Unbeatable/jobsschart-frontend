@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../../../config";
 
@@ -29,14 +29,13 @@ const HeroSection = memo(() => {
           {" "}
           {/* Limits width to keep text readable on left */}
           <h1 className="font-crimson text-white font-medium text-2xl sm:text-4xl lg:text-5xl mb-4 sm:mb-6 leading-tight ">
-            {t('hero.title')}
+            {t("hero.title")}
           </h1>
           <p className="text-white font-poppins! text-base sm:text-xl mb-6 sm:mb-8">
-            {t('hero.subtitle')}
+            {t("hero.subtitle")}
           </p>
-
-          <button className="bg-green-500 cursor-pointer text-white px-6 py-3 rounded-sm font-medium text-base transition-all duration-300 shadow-md active:scale-95">
-            {t('hero.button')}
+          <button className="bg-[#E9D5FF] cursor-pointer text-black px-6 py-3 rounded-sm font-medium text-base transition-all duration-300 shadow-md active:scale-95">
+            {t("hero.button")}
           </button>
         </div>
       </div>

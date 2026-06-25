@@ -51,11 +51,7 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const userRole = useSelector(selectUserRole);
 
-
-
-  const logoTo = isAuthenticated
-    ? getDashboardRoute(userRole)
-    : ROUTES.HOME;
+  const logoTo = isAuthenticated ? getDashboardRoute(userRole) : ROUTES.HOME;
   const closeMenu = () => setMenuOpen(false);
 
   const handleLogout = async () => {
@@ -77,16 +73,16 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
   };
 
   return (
-    <nav className="sticky top-0 z-100 border-b border-gray-100 bg-white shadow-sm">
+    <nav className="sticky top-0 z-100 border-b border-gray-100 bg-[#E9D5FF] shadow-sm">
       <div className="relative z-10 w-full container mx-auto px-4 lg:px-6 ">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex h-20 lg:h-30 items-center justify-between">
           <div className="shrink-0">
             <Link to={ROUTES.HOME} className="flex items-center gap-2">
               <img
                 src="/logo.png"
                 // src="/logo2.webp"
                 alt="Netwerkmediums Logo"
-                className="h-18 w-auto object-contain "
+                className="h-18 lg:h-28 w-auto object-contain "
               />
             </Link>
           </div>
@@ -120,7 +116,6 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
                   className="flex items-center gap-2 rounded-md bg-red-500/80 hover:bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all uppercase tracking-wide cursor-pointer"
                 >
                   <LogOut size={16} />
-                 
                 </button>
               </>
             ) : (
