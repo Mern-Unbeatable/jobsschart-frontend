@@ -65,84 +65,88 @@ const ConsultantCard = memo(({ consultantsData }) => {
             <div
               key={consultant.id}
               onClick={() => handleCardClick(consultant.id)}
-              className="bg-[#F5F1FD] rounded-2xl overflow-hidden shadow-sm p-4 cursor-pointer transition-transform hover:scale-105 duration-300"
+              className="bg-[#F5F1FD] rounded-2xl overflow-hidden shadow-sm p-4 cursor-pointer transition-all hover:scale-105 hover:shadow-md duration-300 flex flex-col justify-between h-full"
             >
-              <div className="relative rounded-xl overflow-hidden">
-                <img
-                  src={
-                    consultant.user?.avatar ||
-                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop"
-                  }
-                  alt={consultant.user?.name || "Consultant"}
-                  className="w-full h-60 object-cover"
-                  onError={(e) => {
-                    e.target.src =
-                      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop";
-                  }}
-                />
+              <div>
+                <div className="relative rounded-xl overflow-hidden">
+                  <img
+                    src={
+                      consultant.user?.avatar ||
+                      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop"
+                    }
+                    alt={consultant.user?.name || "Consultant"}
+                    className="w-full h-60 object-cover"
+                    onError={(e) => {
+                      e.target.src =
+                        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop";
+                    }}
+                  />
 
-                <div
-                  className={`absolute top-3 right-3 px-3 py-1 rounded-full text-[12px] font-medium flex items-center gap-1.5 ${getStatusStyle(displayStatus)}`}
-                >
-                  {displayStatus === "Online" && (
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
-                    </span>
-                  )}
-                  {displayStatus}
-                </div>
-              </div>
-
-              <div className="px-1 py-4">
-                <div className="flex justify-between items-center mb-1">
-                  <h3 className="text-2xl font-crimson font-medium text-gray-900">
-                    {consultant.user?.name || "Unknown"}
-                  </h3>
-                  <div className="flex items-center gap-1 text-green-500/60 font-bold text-lg font-crimson">
-                    <Star size={18} fill="currentColor" />
-                    <span>
-                      {parseFloat(
-                        consultant.rating || consultant.averageRating || 0,
-                      ).toFixed(1)}
-                    </span>
+                  <div
+                    className={`absolute top-3 right-3 px-3 py-1 rounded-full text-[12px] font-medium flex items-center gap-1.5 ${getStatusStyle(displayStatus)}`}
+                  >
+                    {displayStatus === "Online" && (
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                      </span>
+                    )}
+                    {displayStatus}
                   </div>
                 </div>
 
-                <p className="text-base text-gray-500 mb-4 font-poppins">
-                  {consultant.specialization?.length > 0
-                    ? consultant.specialization[0]
-                    : "Consultant"}
-                </p>
+                <div className="px-1 pt-4">
+                  <div className="flex justify-between items-center gap-2 mb-1 h-8">
+                    <h3 className="text-xl md:text-2xl font-crimson font-medium text-gray-900 truncate flex-1">
+                      {consultant.user?.name || "Unknown"}
+                    </h3>
+                    <div className="flex items-center gap-1 text-green-500/60 font-bold text-lg font-crimson shrink-0">
+                      <Star size={18} fill="currentColor" />
+                      <span>
+                        {parseFloat(
+                          consultant.rating || consultant.averageRating || 0,
+                        ).toFixed(1)}
+                      </span>
+                    </div>
+                  </div>
 
-                <div className="mb-6">
-                  <span className="text-2xl font-semibold text-gray-900">
-                    €{parseFloat(consultant.pricePerMinute || 2.5).toFixed(2)}
-                  </span>
-                  <span className="text-gray-800 text-2xl font-semibold ml-1 font-crimson">
-                    per minute
-                  </span>
+                  <p className="text-base text-gray-500 mb-4 font-poppins h-6 truncate">
+                    {consultant.specialization?.length > 0
+                      ? consultant.specialization[0]
+                      : "Consultant"}
+                  </p>
+
+                  <div className="mb-4">
+                    <span className="text-2xl font-semibold text-gray-900">
+                      €{parseFloat(consultant.pricePerMinute || 2.5).toFixed(2)}
+                    </span>
+                    <span className="text-gray-800 text-lg font-semibold ml-1 font-crimson">
+                      per minute
+                    </span>
+                  </div>
                 </div>
+              </div>
 
+              <div className="px-1 pb-1">
                 <div className="flex gap-3 pt-4 border-t border-[#DFC2FF]">
                   <button
                     type="button"
                     onClick={(e) => handleAudioCall(e, consultant)}
-                    className="flex-1 h-12 bg-[#D2C0E6] text-[#6E35AE] rounded-lg flex items-center justify-center hover:bg-[#D4C4E5] transition-colors"
+                    className="flex-1 h-12 bg-[#D2C0E6] text-[#6E35AE] rounded-lg flex items-center justify-center hover:bg-[#D4C4E5] transition-colors cursor-pointer"
                   >
                     <Phone size={20} className="stroke-[1.5]" />
                   </button>
                   <button
                     type="button"
                     onClick={(e) => handleVideoCall(e, consultant)}
-                    className="flex-1 h-12 bg-[#D2C0E6] text-[#6E35AE] rounded-lg flex items-center justify-center hover:bg-[#D4C4E5] transition-colors"
+                    className="flex-1 h-12 bg-[#D2C0E6] text-[#6E35AE] rounded-lg flex items-center justify-center hover:bg-[#D4C4E5] transition-colors cursor-pointer"
                   >
                     <Video size={20} className="stroke-[1.5]" />
                   </button>
                   <button
                     type="button"
                     onClick={(e) => handleChat(e, consultant.id)}
-                    className="flex-1 h-12 bg-[#D2C0E6] text-[#6E35AE] rounded-lg flex items-center justify-center hover:bg-[#D4C4E5] transition-colors"
+                    className="flex-1 h-12 bg-[#D2C0E6] text-[#6E35AE] rounded-lg flex items-center justify-center hover:bg-[#D4C4E5] transition-colors cursor-pointer"
                   >
                     <MessageSquare size={20} className="stroke-[1.5]" />
                   </button>
