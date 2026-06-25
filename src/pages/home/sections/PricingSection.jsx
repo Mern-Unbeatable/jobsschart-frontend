@@ -44,7 +44,7 @@ const PricingSection = memo(() => {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className="rounded-2xl bg-white p-8 border border-[#E9D5FF] hover:border-[#6E35AE] hover:shadow-xl transition-all duration-350 flex flex-col justify-between h-full"
+              className="rounded-2xl bg-white p-8 border border-[#E9D5FF] hover:border-[#6E35AE] hover:shadow-xl transition-all duration-350 flex flex-col justify-start h-full"
             >
               <div>
                 {/* Plan Name & Credits Badge */}
