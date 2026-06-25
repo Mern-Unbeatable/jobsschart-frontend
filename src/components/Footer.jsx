@@ -153,7 +153,7 @@ const Footer = () => {
       </footer>
 
       {/* Bottom Bar: Gold/Yellow Color */}
-      <div className="bg-[#E9D5FF] text-black py-4 px-4">
+      <div className="bg-[#E9D5FF] text-gray-600 py-4 px-4">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-base font-medium">
           <span>{t("footer.bottomBar.copyright")}</span>
           <div className="flex gap-6 items-center">
