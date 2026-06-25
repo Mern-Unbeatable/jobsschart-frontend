@@ -1,5 +1,7 @@
 import React, { memo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 import {
   Phone,
   Video,
@@ -18,6 +20,10 @@ import { useGetConsultantByIdQuery } from "../../features/api/consultantApi";
 import RealTimeChat from "./RealTimeChat";
 import { useConsultantStatus } from "../../hooks/usePresence";
 import { getStatusBadgeStyle, toDisplayStatus } from "../../utils/status";
+import {
+  selectIsAuthenticated,
+  selectUserRole,
+} from "../../features/slices/authSlice";
 
 const ConsultantDetail = memo(() => {
   const { id } = useParams();
@@ -25,6 +31,27 @@ const ConsultantDetail = memo(() => {
   const [showAudioCall, setShowAudioCall] = useState(false);
   const [showVideoCall, setShowVideoCall] = useState(false);
   const [showBookSchedule, setShowBookSchedule] = useState(false);
+
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const userRole = useSelector(selectUserRole);
+
+  const isRestrictedRole = isAuthenticated && (
+    userRole?.toUpperCase() === "CONSULTANT" || 
+    userRole?.toUpperCase() === "ADMIN"
+  );
+
+  const handleAction = (callback) => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to use this service.", { position: "top-center" });
+      navigate("/login");
+      return;
+    }
+    if (isRestrictedRole) {
+      toast.error("This action is only available for regular users.", { position: "top-center" });
+      return;
+    }
+    callback();
+  };
 
   const { data: consultantData, isLoading } = useGetConsultantByIdQuery(id);
 
@@ -164,28 +191,40 @@ const ConsultantDetail = memo(() => {
             {/* Action buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
               <button
-                onClick={() => setShowAudioCall(true)}
-                className="bg-green-500/60 text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all "
+                onClick={() => handleAction(() => setShowAudioCall(true))}
+                disabled={isRestrictedRole}
+                className={`bg-green-500/60 text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${
+                  isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-green-500/70 cursor-pointer"
+                }`}
               >
                 <Phone size={20} /> Call Now
               </button>
               <button
-                onClick={() => setShowVideoCall(true)}
-                className="bg-[#6E35AE] text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all hover:bg-[#5A2A8A]"
+                onClick={() => handleAction(() => setShowVideoCall(true))}
+                disabled={isRestrictedRole}
+                className={`bg-[#6E35AE] text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${
+                  isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-[#5A2A8A] cursor-pointer"
+                }`}
               >
                 <Video size={20} /> Video Call
               </button>
               <button
                 type="button"
-                onClick={handleChatNow}
-                className="bg-[#333333] text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all hover:bg-[#1a1a1a]"
+                onClick={() => handleAction(handleChatNow)}
+                disabled={isRestrictedRole}
+                className={`bg-[#333333] text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${
+                  isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-[#1a1a1a] cursor-pointer"
+                }`}
               >
                 <MessageSquare size={20} /> Chat Now
               </button>
             </div>
             <button
-              onClick={() => setShowBookSchedule(true)}
-              className="w-full bg-green-500/60 text-white py-4 rounded-lg font-bold text-base transition-all shadow-sm"
+              onClick={() => handleAction(() => setShowBookSchedule(true))}
+              disabled={isRestrictedRole}
+              className={`w-full bg-green-500/60 text-white py-4 rounded-lg font-bold text-base transition-all shadow-sm ${
+                isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-green-500/70 cursor-pointer"
+              }`}
             >
               Book A Schedule
             </button>
