@@ -22,7 +22,7 @@ const Footer = () => {
           <img
             src="/logo.png"
             alt={t("footer.logoAlt")}
-            className="h-20 w-auto object-contain "
+            className="h-18 lg:h-28 w-auto object-contain "
           />
           <div className="text-base leading-relaxed max-w-70">
             {t("footer.copyright")}

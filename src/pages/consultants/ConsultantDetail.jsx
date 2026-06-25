@@ -27,6 +27,21 @@ const ConsultantDetail = memo(() => {
   const [showBookSchedule, setShowBookSchedule] = useState(false);
 
   const { data: consultantData, isLoading } = useGetConsultantByIdQuery(id);
+
+  React.useEffect(() => {
+    if (consultantData) {
+      console.log("=== Consultant Detail API Fetch Info ===");
+      console.log(`API Hook: useGetConsultantByIdQuery(${id})`);
+      console.log("Raw Response Data:", consultantData);
+      console.log("Extracted Consultant Data:", 
+        consultantData?.data?.consultant ||
+        consultantData?.consultant ||
+        consultantData?.data
+      );
+      console.log("=========================================");
+    }
+  }, [consultantData, id]);
+
   const consultant =
     consultantData?.data?.consultant ||
     consultantData?.consultant ||

@@ -5,19 +5,8 @@ import toast from 'react-hot-toast';
 const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
-  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 4)); // May 2025
-
-  const timeSlots = [
-    '09:30 PM - 10:00 PM',
-    '10:30 PM - 11:00 PM',
-    '11:30 PM - 12:00 AM',
-    '01:00 AM - 1:30 AM',
-    '01:30 AM - 1:40 AM',
-    '01:40 AM - 2:00 AM',
-    '02:00 AM - 2:30 AM',
-    '02:00 AM - 2:30 AM',
-    '02:00 AM - 2:30 AM',
-  ];
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const getDaysInMonth = (date) =>
     new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -28,6 +17,41 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
     month: 'long',
     year: 'numeric',
   });
+
+  // Helper to check if a day has available slots
+  const hasAvailableSlots = (day) => {
+    if (!consultant?.schedules) return false;
+    return consultant.schedules.some((schedule) => {
+      const date = new Date(schedule.bookingDate);
+      return (
+        date.getDate() === day &&
+        date.getMonth() === currentMonth.getMonth() &&
+        date.getFullYear() === currentMonth.getFullYear() &&
+        schedule.status?.toUpperCase() === "AVAILABLE"
+      );
+    });
+  };
+
+  // Filter available schedules for the selected date
+  const availableSchedules = React.useMemo(() => {
+    if (!selectedDate || !consultant?.schedules) return [];
+    
+    return consultant.schedules.filter((schedule) => {
+      const scheduleDate = new Date(schedule.bookingDate);
+      return (
+        scheduleDate.getDate() === selectedDate &&
+        scheduleDate.getMonth() === currentMonth.getMonth() &&
+        scheduleDate.getFullYear() === currentMonth.getFullYear() &&
+        schedule.status?.toUpperCase() === "AVAILABLE"
+      );
+    });
+  }, [selectedDate, currentMonth, consultant?.schedules]);
+
+  const formatTimeSlot = (startTime, endTime) => {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    return `${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  };
 
   const renderCalendar = () => {
     const days = [];
@@ -50,17 +74,29 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
     // Add days of month
     for (let day = 1; day <= daysInMonth; day++) {
       const isSelected = selectedDate === day;
+      const isAvailable = hasAvailableSlots(day);
+      
       days.push(
         <button
           key={day}
-          onClick={() => setSelectedDate(day)}
-          className={`py-2 rounded-lg font-semibold transition-all ${
+          disabled={!isAvailable}
+          onClick={() => {
+            setSelectedDate(day);
+            setSelectedTime(null);
+            setSelectedSchedule(null);
+          }}
+          className={`py-2 rounded-lg font-semibold transition-all relative flex flex-col items-center justify-center ${
             isSelected
-              ? 'bg-yellow-400 text-gray-900'
-              : 'text-gray-700 hover:bg-gray-100'
+              ? 'bg-[#6E35AE] text-white font-bold'
+              : isAvailable
+              ? 'text-[#6E35AE] hover:bg-purple-50 cursor-pointer font-bold'
+              : 'text-gray-400 cursor-not-allowed opacity-40'
           }`}
         >
-          {day}
+          <span>{day}</span>
+          {isAvailable && !isSelected && (
+            <span className="absolute bottom-1 w-1 h-1 bg-[#6E35AE] rounded-full" />
+          )}
         </button>,
       );
     }
@@ -79,18 +115,19 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
   };
 
   const handleBooking = () => {
-    if (selectedDate && selectedTime) {
+    if (selectedDate && selectedTime && selectedSchedule) {
       toast.success(
-        `Booking confirmed for ${consultant.name} on May ${selectedDate}, 2025 at ${selectedTime}`,
+        `Booking confirmed for ${consultant?.name || consultant?.user?.name} on ${currentMonth.toLocaleString('default', { month: 'long' })} ${selectedDate}, ${currentMonth.getFullYear()} at ${selectedTime}`,
         { position: 'top-center' },
       );
       setTimeout(() => {
         onClose();
         setSelectedDate(null);
         setSelectedTime(null);
+        setSelectedSchedule(null);
       }, 1500);
     } else {
-      toast.error('Please select both a date and time', {
+      toast.error('Please select an available date and time slot', {
         position: 'top-center',
       });
     }
@@ -99,8 +136,8 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-modal-overlay'>
-      <div className='bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl animate-modal-panel'>
+    <div className='fixed inset-0 bg-black/60 flex items-center justify-center z-200 p-4 animate-modal-overlay'>
+      <div className='bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl animate-modal-panel relative'>
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -123,14 +160,17 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
             {/* Month Navigation */}
             <div className='flex items-center justify-between mb-6'>
               <button
-                onClick={() =>
+                onClick={() => {
                   setCurrentMonth(
                     new Date(
                       currentMonth.getFullYear(),
                       currentMonth.getMonth() - 1,
                     ),
-                  )
-                }
+                  );
+                  setSelectedDate(null);
+                  setSelectedTime(null);
+                  setSelectedSchedule(null);
+                }}
                 className='p-2 hover:bg-gray-100 rounded'
               >
                 <ChevronLeft size={20} className='text-gray-600' />
@@ -139,14 +179,17 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
                 {monthName}
               </h4>
               <button
-                onClick={() =>
+                onClick={() => {
                   setCurrentMonth(
                     new Date(
                       currentMonth.getFullYear(),
                       currentMonth.getMonth() + 1,
                     ),
-                  )
-                }
+                  );
+                  setSelectedDate(null);
+                  setSelectedTime(null);
+                  setSelectedSchedule(null);
+                }}
                 className='p-2 hover:bg-gray-100 rounded'
               >
                 <ChevronRight size={20} className='text-gray-600' />
@@ -175,31 +218,47 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
           {/* Time Slots Section */}
           <div>
             <h3 className='text-lg font-bold text-gray-800 mb-4'>
-              AvailableTime
+              Available Time
             </h3>
 
-            <div className='space-y-2 max-h-96 overflow-y-auto'>
-              {timeSlots.map((time, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedTime(time)}
-                  className={`w-full px-4 py-3 rounded-lg font-medium text-center transition-all ${
-                    selectedTime === time
-                      ? 'bg-yellow-300 text-gray-900 border-2 border-yellow-400'
-                      : 'bg-yellow-50 text-gray-800 border-2 border-yellow-200 hover:border-yellow-300'
-                  }`}
-                >
-                  {time}
-                </button>
-              ))}
-            </div>
+            {!selectedDate ? (
+              <div className="text-gray-400 text-sm font-medium text-center py-12 font-poppins">
+                Select a marked date from the calendar to view available times.
+              </div>
+            ) : availableSchedules.length === 0 ? (
+              <div className="text-gray-400 text-sm font-medium text-center py-12 font-poppins">
+                No available times for this date.
+              </div>
+            ) : (
+              <div className='space-y-2 max-h-64 overflow-y-auto pr-1'>
+                {availableSchedules.map((schedule) => {
+                  const timeLabel = formatTimeSlot(schedule.startTime, schedule.endTime);
+                  return (
+                    <button
+                      key={schedule.id}
+                      onClick={() => {
+                        setSelectedTime(timeLabel);
+                        setSelectedSchedule(schedule);
+                      }}
+                      className={`w-full px-4 py-3 rounded-lg font-medium text-center transition-all cursor-pointer ${
+                        selectedSchedule?.id === schedule.id
+                          ? 'bg-[#E9D5FF] text-gray-900 border-2 border-[#6E35AE]'
+                          : 'bg-purple-50/50 text-gray-800 border-2 border-purple-100 hover:border-purple-200'
+                      }`}
+                    >
+                      {timeLabel}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Book Schedule Button */}
         <button
           onClick={handleBooking}
-          className='w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg mt-8 text-lg transition-all'
+          className='w-full bg-[#6E35AE] hover:bg-[#582791] text-white font-bold py-4 rounded-xl mt-8 text-lg transition-all shadow-md active:scale-98 cursor-pointer'
         >
           Book Schedule
         </button>
