@@ -11,9 +11,19 @@ export const scheduleApi = baseApi.injectEndpoints({
       providesTags: ['Session'],
       transformResponse: (response) => response.data,
     }),
+    bookSchedule: builder.mutation({
+      query: (data) => ({
+        url: '/schedule/bookings',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Session'],
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
 export const {
   useGetMyBookingsQuery,
+  useBookScheduleMutation,
 } = scheduleApi;

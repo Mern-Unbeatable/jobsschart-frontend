@@ -1,12 +1,15 @@
 import React, { memo, useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useBookScheduleMutation } from '../../../features/api/scheduleApi';
 
 const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const [bookSchedule, { isLoading: isBooking }] = useBookScheduleMutation();
 
   const getDaysInMonth = (date) =>
     new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -21,6 +24,14 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
   const getDayOfWeekName = (date) => {
     const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
     return days[date.getDay()];
+  };
+
+  const getFormattedBookingDate = () => {
+    if (!selectedDate) return "";
+    const year = currentMonth.getFullYear();
+    const month = String(currentMonth.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   // Helper to check if a day has available slots
@@ -59,6 +70,14 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
     return `${formatTime(startTime)} - ${formatTime(endTime)}`;
   };
 
+  const isPastDate = (day) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateToCheck = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    dateToCheck.setHours(0, 0, 0, 0);
+    return dateToCheck < today;
+  };
+
   const renderCalendar = () => {
     const days = [];
     const daysInMonth = getDaysInMonth(currentMonth);
@@ -81,11 +100,13 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
     for (let day = 1; day <= daysInMonth; day++) {
       const isSelected = selectedDate === day;
       const isAvailable = hasAvailableSlots(day);
+      const isPast = isPastDate(day);
+      const isDisabled = !isAvailable || isPast;
       
       days.push(
         <button
           key={day}
-          disabled={!isAvailable}
+          disabled={isDisabled}
           onClick={() => {
             setSelectedDate(day);
             setSelectedTime(null);
@@ -94,13 +115,13 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
           className={`py-2 rounded-lg font-semibold transition-all relative flex flex-col items-center justify-center ${
             isSelected
               ? 'bg-[#6E35AE] text-white font-bold'
-              : isAvailable
+              : !isDisabled
               ? 'text-[#6E35AE] hover:bg-purple-50 cursor-pointer font-bold'
               : 'text-gray-400 cursor-not-allowed opacity-40'
           }`}
         >
           <span>{day}</span>
-          {isAvailable && !isSelected && (
+          {isAvailable && !isPast && !isSelected && (
             <span className="absolute bottom-1 w-1 h-1 bg-[#6E35AE] rounded-full" />
           )}
         </button>,
@@ -120,18 +141,34 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
     return days;
   };
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
     if (selectedDate && selectedTime && selectedSchedule) {
-      toast.success(
-        `Booking confirmed for ${consultant?.name || consultant?.user?.name} on ${currentMonth.toLocaleString('default', { month: 'long' })} ${selectedDate}, ${currentMonth.getFullYear()} at ${selectedTime}`,
-        { position: 'top-center' },
-      );
-      setTimeout(() => {
-        onClose();
-        setSelectedDate(null);
-        setSelectedTime(null);
-        setSelectedSchedule(null);
-      }, 1500);
+      try {
+        const payload = {
+          consultantId: consultant.consultantId || consultant.id,
+          bookingDate: getFormattedBookingDate(),
+          startTime: selectedSchedule.startTime,
+          endTime: selectedSchedule.endTime,
+        };
+
+        const response = await bookSchedule(payload).unwrap();
+        
+        toast.success(response.message || "Booking confirmed successfully!", {
+          position: "top-center",
+        });
+
+        setTimeout(() => {
+          onClose();
+          setSelectedDate(null);
+          setSelectedTime(null);
+          setSelectedSchedule(null);
+        }, 1500);
+      } catch (error) {
+        console.error("Booking error:", error);
+        toast.error(error?.data?.message || "Failed to book schedule. Please try again.", {
+          position: "top-center",
+        });
+      }
     } else {
       toast.error('Please select an available date and time slot', {
         position: 'top-center',
@@ -271,9 +308,12 @@ const BookScheduleModal = memo(({ isOpen, onClose, consultant }) => {
         <div className='flex-none pt-4 mt-6 border-t border-gray-100'>
           <button
             onClick={handleBooking}
-            className='w-full bg-[#6E35AE] hover:bg-[#582791] text-white font-bold py-4 rounded-xl text-lg transition-all shadow-md active:scale-98 cursor-pointer'
+            disabled={isBooking}
+            className={`w-full bg-[#6E35AE] hover:bg-[#582791] text-white font-bold py-4 rounded-xl text-lg transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center ${
+              isBooking ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            Book Schedule
+            {isBooking ? "Booking..." : "Book Schedule"}
           </button>
         </div>
       </div>
