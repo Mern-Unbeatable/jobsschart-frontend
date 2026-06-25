@@ -34,7 +34,7 @@ const HeroSection = memo(() => {
           <p className="text-white font-poppins! text-base sm:text-xl mb-6 sm:mb-8">
             {t('hero.subtitle')}
           </p>
-          {/* Green Button matching image_6519a8.jpg */}
+
           <button className="bg-green-500 cursor-pointer text-white px-6 py-3 rounded-sm font-medium text-base transition-all duration-300 shadow-md active:scale-95">
             {t('hero.button')}
           </button>
