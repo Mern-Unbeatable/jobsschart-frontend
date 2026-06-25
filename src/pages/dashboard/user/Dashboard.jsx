@@ -1,40 +1,39 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../../features/slices/authSlice";
 import { Wallet } from "lucide-react";
 import ScheduleCard from "./components/ScheduleCard";
-
-const SCHEDULE_ITEMS = [
-  {
-    id: 1,
-    doctor: "Dr. Sarah Johnson",
-    date: "4/27/2026",
-    time: "9:00 PM - 9:20 PM",
-  },
-  {
-    id: 2,
-    doctor: "Dr. Sarah Johnson",
-    date: "4/27/2026",
-    time: "9:00 PM - 9:20 PM",
-  },
-  {
-    id: 3,
-    doctor: "Dr. Sarah Johnson",
-    date: "4/27/2026",
-    time: "9:00 PM - 9:20 PM",
-  },
-  {
-    id: 4,
-    doctor: "Dr. Sarah Johnson",
-    date: "4/27/2026",
-    time: "9:00 PM - 9:20 PM",
-  },
-];
+import { useGetUpcomingBookingsQuery } from "../../../features/api/scheduleApi";
 
 const UserDashboard = () => {
   const { t } = useTranslation();
   const user = useSelector(selectUser);
+  const { data: bookingsData, isLoading, error } = useGetUpcomingBookingsQuery();
+
+  const upcomingBookings = bookingsData?.bookings || [];
+
+  const formatBookingDate = (dateStr) => {
+    try {
+      return new Date(dateStr).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
+  const formatBookingTime = (startTime, endTime) => {
+    try {
+      const start = new Date(startTime);
+      const end = new Date(endTime);
+      return `${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } catch (e) {
+      return "";
+    }
+  };
 
   return (
     <section className="space-y-8">
@@ -75,22 +74,46 @@ const UserDashboard = () => {
         </div>
       </div>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl md:text-3xl font-semibold text-[#050609]">
+      <section className="space-y-5">
+        <h2 className="text-2xl md:text-3xl font-semibold text-[#050609] font-poppins">
           {t("dashboard.user.upcomingSchedule")}
         </h2>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-          {SCHEDULE_ITEMS.map((item) => (
-            <ScheduleCard
-              key={item.id}
-              doctor={item.doctor}
-              date={item.date}
-              time={item.time}
-              status="Upcoming"
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="bg-[#f8f3fd] rounded-[10px] p-4 h-52 animate-pulse border border-purple-100 flex flex-col justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-full bg-gray-200"></div>
+                  <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="space-y-2 mt-4">
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <p className="text-rose-500 font-semibold font-poppins">Failed to load upcoming bookings.</p>
+        ) : upcomingBookings.length === 0 ? (
+          <div className="bg-[#f8f3fd] border border-dashed border-purple-200 text-gray-500 text-center py-12 rounded-xl font-poppins">
+            No upcoming bookings found.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            {upcomingBookings.map((item) => (
+              <ScheduleCard
+                key={item.id}
+                name={item.consultant?.user?.name || "Consultant"}
+                avatar={item.consultant?.user?.avatar}
+                date={formatBookingDate(item.bookingDate)}
+                time={formatBookingTime(item.startTime, item.endTime)}
+                status={item.status}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       <p className="sr-only">Signed in user: {user?.name || "User"}</p>

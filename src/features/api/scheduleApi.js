@@ -11,6 +11,15 @@ export const scheduleApi = baseApi.injectEndpoints({
       providesTags: ['Session'],
       transformResponse: (response) => response.data,
     }),
+    getUpcomingBookings: builder.query({
+      query: (params = {}) => ({
+        url: '/schedule/my-bookings/upcoming',
+        method: 'GET',
+        params,
+      }),
+      providesTags: ['Session'],
+      transformResponse: (response) => response.data,
+    }),
     bookSchedule: builder.mutation({
       query: (data) => ({
         url: '/schedule/bookings',
@@ -25,5 +34,6 @@ export const scheduleApi = baseApi.injectEndpoints({
 
 export const {
   useGetMyBookingsQuery,
+  useGetUpcomingBookingsQuery,
   useBookScheduleMutation,
 } = scheduleApi;
