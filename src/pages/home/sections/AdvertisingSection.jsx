@@ -65,7 +65,7 @@ const AdvertisingSection = memo(() => {
                 href={linkUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center bg-white/15 hover:bg-white/25 text-[#E9D5FF] hover:text-white px-8 py-3 rounded-full text-base font-semibold font-poppins transition-all duration-300 border border-white/20 active:scale-95 backdrop-blur-xs"
+                className="inline-flex items-center justify-center bg-white/15 hover:bg-white/30 text-white px-8 py-3 rounded-full text-base font-semibold font-poppins transition-all duration-300 border border-white/20 active:scale-95 backdrop-blur-xs"
               >
                 {displayLink}
               </a>
