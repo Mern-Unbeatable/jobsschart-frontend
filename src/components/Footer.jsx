@@ -60,6 +60,14 @@ const Footer = () => {
           <ul className="space-y-3 text-sm font-medium">
             <li>
               <Link
+                to={ROUTES.ABOUT}
+                className="hover:text-white transition-colors"
+              >
+                {t("footer.customerService.links.about")}
+              </Link>
+            </li>
+            <li>
+              <Link
                 to={ROUTES.TERMS}
                 className="hover:text-white transition-colors"
               >

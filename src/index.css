@@ -7,7 +7,39 @@
 @theme {
   --font-crimson: 'Crimson Pro', serif;
   --font-poppins: 'Poppins', sans-serif;
-  --color-btn-primary: #7BC47F;
+  --color-btn-primary: #E9D5FF;
+  --color-green-50: #FAF8FD;
+  --color-green-100: #F3E8FF;
+  --color-green-200: #E9D5FF;
+  --color-green-300: #D8B4FE;
+  --color-green-400: #C084FC;
+  --color-green-500: #E9D5FF;
+  --color-green-600: #6E35AE;
+  --color-green-700: #562590;
+  --color-green-800: #3B0764;
+  --color-green-900: #2E0854;
+  --color-green-950: #1C023A;
+}
+
+/* Global brand theme overrides for green classes */
+[class*="bg-green-500"] {
+  color: #6E35AE !important;
+}
+[class*="bg-green-500"]:hover {
+  background-color: #D8B4FE !important;
+  color: #562590 !important;
+}
+[class*="text-green-700"] {
+  color: #6E35AE !important;
+}
+[class*="text-green-600"] {
+  color: #6E35AE !important;
+}
+[class*="bg-green-50"] {
+  background-color: #F3E8FF !important;
+}
+[class*="bg-green-100"] {
+  background-color: #E9D5FF !important;
 }
 
 * {
@@ -35,7 +67,7 @@ body {
   --primary-text-heading-color: #0c0c0c;
   --secondary-text-color: #ffffff;
   --ternary-text-color: #525252;
-  --button-bg: #7bc47f;
+  --button-bg: #E9D5FF;
 }
 
 
