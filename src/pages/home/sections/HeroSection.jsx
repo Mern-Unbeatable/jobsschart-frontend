@@ -34,9 +34,12 @@ const HeroSection = memo(() => {
           <p className="text-white font-poppins! text-base sm:text-xl mb-6 sm:mb-8">
             {t("hero.subtitle")}
           </p>
-          <button className="bg-[#E9D5FF] cursor-pointer text-black px-6 py-3 rounded-sm font-medium text-base transition-all duration-300 shadow-md active:scale-95">
+          <Link
+            to={ROUTES.CONSULTANTS}
+            className="inline-block bg-[#E9D5FF] cursor-pointer text-black px-6 py-3 rounded-sm font-medium text-base transition-all duration-300 shadow-md active:scale-95"
+          >
             {t("hero.button")}
-          </button>
+          </Link>
         </div>
       </div>
     </section>

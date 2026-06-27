@@ -1,5 +1,7 @@
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../../../config';
 
 const CommunitySection = memo(() => {
   const { t } = useTranslation();
@@ -37,9 +39,12 @@ const CommunitySection = memo(() => {
                 {t('home.communitySection.description')}
               </p>
 
-              <button className='bg-[#6E35AE] hover:bg-[#582791] text-white px-8 py-3 rounded-full text-base font-semibold font-poppins transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 cursor-pointer'>
+              <Link
+                to={ROUTES.COMMUNITY}
+                className='inline-block bg-[#6E35AE] hover:bg-[#582791] text-white px-8 py-3 rounded-full text-base font-semibold font-poppins transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 cursor-pointer'
+              >
                 {t('home.communitySection.button')}
-              </button>
+              </Link>
             </div>
 
             {/* Stats */}

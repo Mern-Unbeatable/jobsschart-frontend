@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { ROUTES } from "../../../config";
 
 const ClosingCtaSection = memo(() => {
   const { t } = useTranslation();
@@ -27,7 +28,10 @@ const ClosingCtaSection = memo(() => {
 
         {/* Button Wrapper */}
         <div className="mt-6 flex justify-center">
-          <Link className="rounded bg-green-500/60 px-6 py-2.5 text-xs font-medium text-white transition-transform hover:-translate-y-0.5">
+          <Link
+            to={ROUTES.CONSULTANTS}
+            className="rounded bg-green-500/60 px-6 py-2.5 text-xs font-medium text-white transition-transform hover:-translate-y-0.5"
+          >
             {t(
               "entrepreneurshipPage.sections.closing.button",
               "Take the step today",
