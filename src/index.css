@@ -35,6 +35,9 @@
 [class*="text-green-600"] {
   color: #6E35AE !important;
 }
+[class*="text-green-500"] {
+  color: #000000 !important;
+}
 [class*="bg-green-50"] {
   background-color: #F3E8FF !important;
 }

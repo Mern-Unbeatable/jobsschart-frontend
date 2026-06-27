@@ -143,7 +143,7 @@ const Register = () => {
               className="w-full flex items-center p-5 border border-gray-200 rounded-2xl hover:border-green-500/60 transition-all group bg-white shadow-sm"
             >
               <div className="bg-[#FEF5E7] p-4 rounded-full mr-4 group-hover:bg-green-500/60 transition-colors">
-                <User className="text-green-500/60 group-hover:text-white" />
+                <User className="text-black group-hover:text-white" />
               </div>
               <div className="text-left">
                 <h3 className="font-bold text-gray-800">I'm a Customer</h3>
@@ -158,7 +158,7 @@ const Register = () => {
               className="w-full flex items-center p-5 border border-gray-200 rounded-2xl hover:border-green-500/60 transition-all group bg-white shadow-sm"
             >
               <div className="bg-[#FEF5E7] p-4 rounded-full mr-4 group-hover:bg-green-500/60 transition-colors">
-                <Briefcase className="text-green-500/60 group-hover:text-white" />
+                <Briefcase className="text-black group-hover:text-white" />
               </div>
               <div className="text-left">
                 <h3 className="font-bold text-gray-800">I'm a Consultant</h3>
