@@ -192,7 +192,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/forgot-password")}
-                  className="text-sm font-medium text-green-500/60 hover:text-[#DF900A] transition-colors"
+                  className="text-sm font-medium text-black transition-colors"
                 >
                   Forgot Password?
                 </button>
@@ -221,7 +221,7 @@ const Login = () => {
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="text-green-500/60 font-medium hover:text-[#DF900A] transition-colors"
+              className="text-black font-medium  transition-colors"
             >
               Register
             </Link>

@@ -172,7 +172,7 @@ const Register = () => {
               Already have an account?{" "}
               <Link
                 to={ROUTES.LOGIN}
-                className="text-green-500/60 font-bold ml-1"
+                className="text-black font-bold ml-1"
               >
                 Login
               </Link>
