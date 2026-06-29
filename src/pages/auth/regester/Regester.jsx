@@ -126,7 +126,7 @@ const Register = () => {
       </div>
       <div className="flex-1 flex items-center justify-center p-6 bg-white shadow-[-10px_0px_20px_rgba(0,0,0,0.05)] overflow-y-auto">
         {step === "select" ? (
-          <div className="w-full max-w-md space-y-6">
+          <div className="w-full max-w-2xl space-y-6">
             <div className="text-center mb-10">
               <div className="flex justify-center mb-3">
                 <div className="bg-[#FEF5E7] p-3 rounded-lg">
@@ -138,35 +138,37 @@ const Register = () => {
               </h2>
             </div>
 
-            <button
-              onClick={() => handleRoleSelect("customer")}
-              className="w-full flex items-center p-5 border border-gray-200 rounded-2xl hover:border-green-500/60 transition-all group bg-white shadow-sm"
-            >
-              <div className="bg-[#FEF5E7] p-4 rounded-full mr-4 group-hover:bg-green-500/60 transition-colors">
-                <User className="text-black group-hover:text-white" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-bold text-gray-800">I'm a Customer</h3>
-                <p className="text-gray-500 text-xs text-nowrap">
-                  Find and connect with Consultant
-                </p>
-              </div>
-            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <button
+                onClick={() => handleRoleSelect("customer")}
+                className="w-full flex items-center p-5 border border-gray-200 rounded-2xl hover:border-green-500/60 transition-all group bg-white shadow-sm"
+              >
+                <div className="bg-[#FEF5E7] p-4 rounded-full mr-4 group-hover:bg-green-500/60 transition-colors shrink-0">
+                  <User className="text-black group-hover:text-white" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-bold text-gray-800">I'm a Customer</h3>
+                  <p className="text-gray-500 text-xs text-wrap">
+                    Find and connect with Consultant
+                  </p>
+                </div>
+              </button>
 
-            <button
-              onClick={() => handleRoleSelect("consultant")}
-              className="w-full flex items-center p-5 border border-gray-200 rounded-2xl hover:border-green-500/60 transition-all group bg-white shadow-sm"
-            >
-              <div className="bg-[#FEF5E7] p-4 rounded-full mr-4 group-hover:bg-green-500/60 transition-colors">
-                <Briefcase className="text-black group-hover:text-white" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-bold text-gray-800">I'm a Consultant</h3>
-                <p className="text-gray-500 text-xs text-nowrap">
-                  Grow your Skill and reach more customers
-                </p>
-              </div>
-            </button>
+              <button
+                onClick={() => handleRoleSelect("consultant")}
+                className="w-full flex items-center p-5 border border-gray-200 rounded-2xl hover:border-green-500/60 transition-all group bg-white shadow-sm"
+              >
+                <div className="bg-[#FEF5E7] p-4 rounded-full mr-4 group-hover:bg-green-500/60 transition-colors shrink-0">
+                  <Briefcase className="text-black group-hover:text-white" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-bold text-gray-800">I'm a Consultant</h3>
+                  <p className="text-gray-500 text-xs text-wrap">
+                    Grow your Skill and reach more customers
+                  </p>
+                </div>
+              </button>
+            </div>
 
             <p className="text-center text-base text-gray-500 mt-4">
               Already have an account?{" "}
