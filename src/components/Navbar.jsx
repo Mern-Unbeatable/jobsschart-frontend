@@ -149,14 +149,12 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
             <div
               ref={dropdownRef}
               className="relative"
-              onMouseEnter={() => setDropdownOpen(true)}
-              onMouseLeave={() => setDropdownOpen(false)}
             >
               <button
                 type="button"
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 className={`group relative inline-flex items-center gap-1 px-2 py-1 text-base font-medium transition-all duration-300 ease-out hover:-translate-y-0.5 active:translate-y-0 cursor-pointer after:absolute after:left-0 after:-bottom-0.5 after:h-0.5 after:w-full after:origin-left after:rounded-full after:transition-transform after:duration-300 after:content-[''] ${
-                  isEntrepreneurshipActive || dropdownOpen
+                  isEntrepreneurshipActive
                     ? "text-purple-700 after:scale-x-100 after:bg-purple-700"
                     : "text-gray-600 hover:text-purple-600 after:scale-x-0 after:bg-purple-300 hover:after:scale-x-100"
                 }`}
