@@ -204,12 +204,12 @@
       },
       "topics": {
         "all": "Topics",
-        "strategy": "Strategy",
-        "development": "Development",
-        "design": "Design",
-        "marketing": "Marketing",
-        "operations": "Operations",
-        "leadership": "Leadership"
+        "twinFlames": "Twin Flames & Soulmates",
+        "workCareer": "Work & Career",
+        "business": "Business",
+        "lawOfAttraction": "Law of Attraction",
+        "personalDevelopment": "Personal Development",
+        "futureQuestions": "Future-Related Questions"
       }
     }
   },

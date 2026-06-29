@@ -204,12 +204,12 @@
       },
       "topics": {
         "all": "Onderwerpen",
-        "strategy": "Strategie",
-        "development": "Ontwikkeling",
-        "design": "Ontwerp",
-        "marketing": "Marketing",
-        "operations": "Operaties",
-        "leadership": "Leiderschap"
+        "twinFlames": "Tweelingzielen & Zielsverwanten",
+        "workCareer": "Werk & Carrière",
+        "business": "Business",
+        "lawOfAttraction": "Wet van Aantrekkingskracht",
+        "personalDevelopment": "Persoonlijke Ontwikkeling",
+        "futureQuestions": "Toekomstgerelateerde Vragen"
       }
     }
   },

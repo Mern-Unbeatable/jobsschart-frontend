@@ -26,12 +26,12 @@ const Consultants = () => {
 
   const topicsOptions = [
     { value: 'all', label: t('consultantsHero.filters.topics.all') },
-    { value: 'strategy', label: t('consultantsHero.filters.topics.strategy') },
-    { value: 'development', label: t('consultantsHero.filters.topics.development') },
-    { value: 'design', label: t('consultantsHero.filters.topics.design') },
-    { value: 'marketing', label: t('consultantsHero.filters.topics.marketing') },
-    { value: 'operations', label: t('consultantsHero.filters.topics.operations') },
-    { value: 'leadership', label: t('consultantsHero.filters.topics.leadership') },
+    { value: 'twinFlames', label: t('consultantsHero.filters.topics.twinFlames') },
+    { value: 'workCareer', label: t('consultantsHero.filters.topics.workCareer') },
+    { value: 'business', label: t('consultantsHero.filters.topics.business') },
+    { value: 'lawOfAttraction', label: t('consultantsHero.filters.topics.lawOfAttraction') },
+    { value: 'personalDevelopment', label: t('consultantsHero.filters.topics.personalDevelopment') },
+    { value: 'futureQuestions', label: t('consultantsHero.filters.topics.futureQuestions') },
   ]
 
   // Process consultants data
