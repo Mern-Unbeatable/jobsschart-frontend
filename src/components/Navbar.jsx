@@ -217,7 +217,7 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
               <>
                 <Link
                   to={ROUTES.REGISTER}
-                  className="rounded-md bg-[#E9D5FF] px-5 py-2.5 text-sm font-semibold text-[#6E35AE] shadow-sm transition-all hover:bg-[#d8b4fe]"
+                  className="rounded-md bg-white border border-gray-200 px-5 py-2.5 text-sm font-semibold text-[#6E35AE] shadow-sm transition-all hover:bg-gray-50"
                 >
                   {t("common.becomeConsultant")}
                 </Link>
@@ -339,7 +339,7 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
                   <Link
                     to={ROUTES.REGISTER}
                     onClick={closeMenu}
-                    className="w-full rounded-md bg-[#E9D5FF] py-4 text-center text-lg font-bold text-[#6E35AE] shadow-md hover:bg-[#d8b4fe] transition-all"
+                    className="w-full rounded-md bg-white border border-gray-200 py-4 text-center text-lg font-bold text-[#6E35AE] shadow-md hover:bg-gray-50 transition-all"
                   >
                     {t("common.becomeConsultant")}
                   </Link>

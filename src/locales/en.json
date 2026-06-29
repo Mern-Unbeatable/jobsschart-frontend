@@ -265,28 +265,29 @@
     "button": "Donate Now"
   },
   "donation": {
+    "grow": {
+      "title": "Help Our Community Grow",
+      "p1": "Your donation helps us continue expanding our community and improving the platform for all members.",
+      "p2": "In addition, we aim to support people who are less fortunate and create a positive impact throughout the spiritual communities of the Netherlands and Belgium.",
+      "p3": "Our mission is to inspire, educate, and support individuals on their personal and spiritual journeys, helping more people awaken to their highest potential.",
+      "p4": "We strongly believe in the principle of giving and receiving, as taught by Deepak Chopra. By giving from a place of abundance and connection, we create opportunities for growth and transformation for everyone."
+    },
     "impact": {
-      "title": "Your Donation Makes an Impact",
-      "cards": {
-        "feedFamily": {
-          "title": "Feed a Family",
-          "description": "Provide meals to families in need."
-        },
-        "supportEducation": {
-          "title": "Support Education",
-          "description": "Help children access quality education."
-        },
-        "medicalSupport": {
-          "title": "Medical Support",
-          "description": "Ensure basic healthcare for communities."
-        }
+      "title": "The Impact of Your Donation",
+      "subtitle": "Your contribution helps us:",
+      "list": {
+        "grow": "Grow and strengthen our community",
+        "support": "Support more people on their spiritual journeys",
+        "awareness": "Increase awareness and consciousness throughout the Netherlands and Belgium",
+        "assist": "Assist those who are less fortunate",
+        "improve": "Continuously improve and expand the platform"
       }
     },
-    "supportNetwork": {
-      "title": "Support Network",
-      "subtitle": "Based on the Law of Giving and Receiving",
-      "quote": "\"What you give will return to you in another form.\"",
-      "attribution": "Inspired by the Deepak Chopra Principle"
+    "benefit": {
+      "eyebrow": "Additional Benefit for Donors",
+      "title": "Promote Your Business",
+      "p1": "As a token of appreciation for supporting our mission, donors will receive the opportunity to advertise their business, brand, or logo within our community free of charge for one full year.",
+      "p2": "This allows us to support both the growth of our platform and the visibility of entrepreneurs and businesses within our network."
     }
   },
   "donationForm": {

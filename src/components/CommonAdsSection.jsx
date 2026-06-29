@@ -58,34 +58,34 @@ const CommonAdsSection = memo(
         : "";
 
       const content = (
-        <div className={`w-full h-44 md:h-56 lg:h-72 relative rounded-xl overflow-hidden shadow-md border border-gray-200 group hover:shadow-lg transition-all duration-300 ${!campaign.image ? 'bg-green-500/60' : ''}`}>
+        <div className={`w-full h-44 md:h-56 lg:h-72 relative rounded-xl overflow-hidden shadow-md border border-gray-200 ${!campaign.image ? 'bg-[#E9D5FF]' : ''}`}>
           {/* Background Image */}
           {campaign.image && (
             <>
               <img
                 src={campaign.image}
                 alt={campaign.title || 'Advertisement'}
-                className='w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500'
+                className='w-full h-full object-cover'
               />
               {/* Dark Overlay */}
-              <div className='absolute inset-0 bg-black/50 transition-opacity duration-300 group-hover:bg-black/60'></div>
+              <div className='absolute inset-0 bg-black/50'></div>
             </>
           )}
 
           {/* Centered Content Overlay */}
-          <div className='absolute inset-0 flex flex-col items-center justify-center p-4 md:p-6 text-center text-white z-10'>
+          <div className={`absolute inset-0 flex flex-col items-center justify-center p-4 md:p-6 text-center z-10 ${campaign.image ? 'text-white' : 'text-[#6E35AE]'}`}>
             {campaign.title && (
-              <h4 className='text-white text-base md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 tracking-wide line-clamp-1 drop-shadow-md'>
+              <h4 className={`text-base md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 tracking-wide line-clamp-1 ${campaign.image ? 'text-white drop-shadow-md' : 'text-[#6E35AE]'}`}>
                 {campaign.title}
               </h4>
             )}
             {description && (
-              <p className='text-white text-xs md:text-sm lg:text-base mb-2 md:mb-4 max-w-2xl leading-relaxed line-clamp-2 drop-shadow-sm'>
+              <p className={`text-xs md:text-sm lg:text-base mb-2 md:mb-4 max-w-2xl leading-relaxed line-clamp-2 ${campaign.image ? 'text-white drop-shadow-sm' : 'text-[#6E35AE]/90'}`}>
                 {description}
               </p>
             )}
             {displayLink && (
-              <span className='text-yellow-500 group-hover:text-yellow-400 text-xs md:text-sm font-semibold transition-colors duration-300 drop-shadow-sm'>
+              <span className={`text-xs md:text-sm font-semibold ${campaign.image ? 'text-yellow-500 drop-shadow-sm' : 'text-[#6E35AE]/80'}`}>
                 {displayLink}
               </span>
             )}
