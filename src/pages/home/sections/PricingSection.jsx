@@ -3,10 +3,14 @@ import { Check } from "lucide-react";
 import { useGetAllPackagesQuery } from "../../../features/api/packageApi";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../../config";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "../../../features/slices/authSlice";
+import Swal from "sweetalert2";
 
 const PricingSection = memo(() => {
   const { data: packagesData, isLoading } = useGetAllPackagesQuery();
   const navigate = useNavigate();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const plans = packagesData?.packages || [];
 
@@ -79,7 +83,25 @@ const PricingSection = memo(() => {
 
                 {/* Button */}
                 <button
-                  onClick={() => navigate(ROUTES.CREDIT)}
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      Swal.fire({
+                        title: "Login Required",
+                        text: "For buy credit you have to login first",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Login",
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          navigate(ROUTES.LOGIN);
+                        }
+                      });
+                      return;
+                    }
+                    navigate(ROUTES.CREDIT);
+                  }}
                   className="w-full bg-[#E9D5FF] hover:bg-[#6E35AE] hover:text-white text-[#6E35AE] py-3 rounded-full font-bold mb-6 transition-all duration-300 shadow-xs hover:shadow-md active:scale-95 font-poppins cursor-pointer"
                 >
                   Buy Credits

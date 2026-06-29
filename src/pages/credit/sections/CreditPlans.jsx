@@ -4,16 +4,40 @@ import { useGetAllPackagesQuery } from "../../../features/api/packageApi";
 import { useCreateCheckoutMutation } from "../../../features/api/paymentApi";
 import toast from "react-hot-toast";
 import CreditPlanCard from "./CreditPlanCard";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "../../../features/slices/authSlice";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../../config";
 
 const CreditPlans = memo(() => {
   const { t } = useTranslation();
   const { data: packagesData, isLoading } = useGetAllPackagesQuery();
   const [createCheckout, { isLoading: isCheckingOut }] = useCreateCheckoutMutation();
   const [activePackageId, setActivePackageId] = useState(null);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const navigate = useNavigate();
 
   const creditPlans = packagesData?.packages || [];
 
   const handleBuyCredits = async (packageId) => {
+    if (!isAuthenticated) {
+      Swal.fire({
+        title: "Login Required",
+        text: "For buy credit you have to login first",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate(ROUTES.LOGIN);
+        }
+      });
+      return;
+    }
+
     setActivePackageId(packageId);
     try {
       const payload = {
