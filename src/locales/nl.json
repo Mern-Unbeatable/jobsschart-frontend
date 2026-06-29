@@ -161,23 +161,24 @@
     "services": {
       "telephone": {
         "title": "Telefonisch advies",
-        "description": "Maak verbinding via een hoogwaardige telefoongesprek voor een persoonlijke ervaring."
+        "description": "Spreek direct met een van onze spirituele consultants."
       },
       "video": {
         "title": "Video advies",
-        "description": "Gezicht-tot-gezicht sessies voor een diepere verbinding en visuele begeleiding."
+        "description": "Plan een persoonlijk video-consult met een van onze spirituele consultants."
       },
       "chat": {
         "title": "Chat advies",
-        "description": "Handig tekstgebaseerd advies voor snelle antwoorden en privacy."
-      }
+        "description": "Start een live chatgesprek met een van onze spirituele consultants."
+      },
+      "clickHere": "Klik hier"
     },
     "consultantsSection": {
       "title": "Beschikbare adviseurs",
       "description": "Onze experts staan klaar om u te helpen. Kies een consultant en start uw sessie direct."
     },
     "communitySection": {
-      "title": "Sluit u aan bij de gemeenschap",
+      "title": "Word vandaag nog gratis lid van onze spirituele gemeenschap.",
       "description": "Stel vragen, deel ervaringen en kom in contact met anderen die een vergelijkbare reis maken. Onze community is een veilige plek voor groei en begrip.",
       "button": "Ga naar de gemeenschap",
       "stats": {
@@ -189,17 +190,17 @@
   },
   "consultantsHero": {
     "title": "Vind de perfecte expert voor uw volgende grote project.",
-    "description": "Kom in contact met topconsultants in medische, juridische, technische en creatieve sectoren. Realtime beschikbaarheid en direct boeken.",
+    "description": "Kies een van onze spirituele coaches die u kunnen helpen en begeleiden bij uw levensvragen en persoonlijke groeireis.",
     "searchPlaceholder": "Zoeken...",
     "filters": {
       "expertise": {
         "all": "Alle expertise",
-        "medical": "Medisch",
-        "legal": "Juridisch",
-        "technology": "Technologie",
-        "creative": "Creatief",
-        "finance": "Financiën",
-        "businessStrategy": "Bedrijfsstrategie"
+        "clairvoyance": "Helderziendheid",
+        "claircognizance": "Helderwetendheid",
+        "tarotReading": "Tarot legging",
+        "spiritualCoaching": "Spirituele coaching",
+        "healing": "Healing",
+        "communicationWithLovedOnes": "Contact met overleden dierbaren"
       },
       "topics": {
         "all": "Onderwerpen",

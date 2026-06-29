@@ -16,12 +16,12 @@ const Consultants = () => {
 
   const expertiseOptions = [
     { value: 'all', label: t('consultantsHero.filters.expertise.all') },
-    { value: 'medical', label: t('consultantsHero.filters.expertise.medical') },
-    { value: 'legal', label: t('consultantsHero.filters.expertise.legal') },
-    { value: 'technology', label: t('consultantsHero.filters.expertise.technology') },
-    { value: 'creative', label: t('consultantsHero.filters.expertise.creative') },
-    { value: 'finance', label: t('consultantsHero.filters.expertise.finance') },
-    { value: 'businessStrategy', label: t('consultantsHero.filters.expertise.businessStrategy') },
+    { value: 'clairvoyance', label: t('consultantsHero.filters.expertise.clairvoyance') },
+    { value: 'claircognizance', label: t('consultantsHero.filters.expertise.claircognizance') },
+    { value: 'tarotReading', label: t('consultantsHero.filters.expertise.tarotReading') },
+    { value: 'spiritualCoaching', label: t('consultantsHero.filters.expertise.spiritualCoaching') },
+    { value: 'healing', label: t('consultantsHero.filters.expertise.healing') },
+    { value: 'communicationWithLovedOnes', label: t('consultantsHero.filters.expertise.communicationWithLovedOnes') },
   ]
 
   const topicsOptions = [
