@@ -1,23 +1,21 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const SUPPORTED_LANGUAGES = {
-  en: { code: 'en', name: 'English',  },
-  nl: { code: 'nl', name: 'Nederlands',  },
+  en: { code: "en", name: "English", flag: "🇬🇧" },
+  nl: { code: "nl", name: "Nederlands", flag: "🇳🇱" },
 };
 
 const loadLanguageState = () => {
   try {
-    const savedLang = localStorage.getItem('language');
-    return savedLang && SUPPORTED_LANGUAGES[savedLang]
-      ? savedLang
-      : 'en';
+    const savedLang = localStorage.getItem("language");
+    return savedLang && SUPPORTED_LANGUAGES[savedLang] ? savedLang : "nl";
   } catch {
-    return 'en';
+    return "nl";
   }
 };
 
 const languageSlice = createSlice({
-  name: 'language',
+  name: "language",
   initialState: {
     current: loadLanguageState(),
     supported: SUPPORTED_LANGUAGES,

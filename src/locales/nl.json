@@ -161,23 +161,24 @@
     "services": {
       "telephone": {
         "title": "Telefonisch advies",
-        "description": "Maak verbinding via een hoogwaardige telefoongesprek voor een persoonlijke ervaring."
+        "description": "Spreek direct met een van onze spirituele consultants."
       },
       "video": {
         "title": "Video advies",
-        "description": "Gezicht-tot-gezicht sessies voor een diepere verbinding en visuele begeleiding."
+        "description": "Plan een persoonlijk video-consult met een van onze spirituele consultants."
       },
       "chat": {
         "title": "Chat advies",
-        "description": "Handig tekstgebaseerd advies voor snelle antwoorden en privacy."
-      }
+        "description": "Start een live chatgesprek met een van onze spirituele consultants."
+      },
+      "clickHere": "Klik hier"
     },
     "consultantsSection": {
       "title": "Beschikbare adviseurs",
       "description": "Onze experts staan klaar om u te helpen. Kies een consultant en start uw sessie direct."
     },
     "communitySection": {
-      "title": "Sluit u aan bij de gemeenschap",
+      "title": "Word vandaag nog gratis lid van onze spirituele gemeenschap.",
       "description": "Stel vragen, deel ervaringen en kom in contact met anderen die een vergelijkbare reis maken. Onze community is een veilige plek voor groei en begrip.",
       "button": "Ga naar de gemeenschap",
       "stats": {
@@ -189,26 +190,26 @@
   },
   "consultantsHero": {
     "title": "Vind de perfecte expert voor uw volgende grote project.",
-    "description": "Kom in contact met topconsultants in medische, juridische, technische en creatieve sectoren. Realtime beschikbaarheid en direct boeken.",
+    "description": "Kies een van onze spirituele coaches die u kunnen helpen en begeleiden bij uw levensvragen en persoonlijke groeireis.",
     "searchPlaceholder": "Zoeken...",
     "filters": {
       "expertise": {
         "all": "Alle expertise",
-        "medical": "Medisch",
-        "legal": "Juridisch",
-        "technology": "Technologie",
-        "creative": "Creatief",
-        "finance": "Financiën",
-        "businessStrategy": "Bedrijfsstrategie"
+        "clairvoyance": "Helderziendheid",
+        "claircognizance": "Helderwetendheid",
+        "tarotReading": "Tarot legging",
+        "spiritualCoaching": "Spirituele coaching",
+        "healing": "Healing",
+        "communicationWithLovedOnes": "Contact met overleden dierbaren"
       },
       "topics": {
         "all": "Onderwerpen",
-        "strategy": "Strategie",
-        "development": "Ontwikkeling",
-        "design": "Ontwerp",
-        "marketing": "Marketing",
-        "operations": "Operaties",
-        "leadership": "Leiderschap"
+        "twinFlames": "Tweelingzielen & Zielsverwanten",
+        "workCareer": "Werk & Carrière",
+        "business": "Business",
+        "lawOfAttraction": "Wet van Aantrekkingskracht",
+        "personalDevelopment": "Persoonlijke Ontwikkeling",
+        "futureQuestions": "Toekomstgerelateerde Vragen"
       }
     }
   },
@@ -400,28 +401,29 @@
     "button": "Nu doneren"
   },
   "donation": {
+    "grow": {
+      "title": "Help onze gemeenschap groeien",
+      "p1": "Uw donatie helpt ons om onze gemeenschap te blijven uitbreiden en het platform voor alle leden te verbeteren.",
+      "p2": "Daarnaast willen we mensen ondersteunen die minder bedeeld zijn en een positieve impact creëren binnen de spirituele gemeenschappen in Nederland en België.",
+      "p3": "Onze missie is om individuen te inspireren, te onderwijzen en te ondersteunen op hun persoonlijke en spirituele reis, en zo meer mensen te helpen ontwaken naar hun hoogste potentieel.",
+      "p4": "Wij geloven sterk in het principe van geven en ontvangen, zoals onderwezen door Deepak Chopra. Door te geven vanuit overvloed en verbinding, creëren we kansen voor groei en transformatie voor iedereen."
+    },
     "impact": {
-      "title": "Uw donatie heeft impact",
-      "cards": {
-        "feedFamily": {
-          "title": "Voed een gezin",
-          "description": "Bied maaltijden aan gezinnen in nood."
-        },
-        "supportEducation": {
-          "title": "Onderwijs ondersteunen",
-          "description": "Help kinderen toegang te krijgen tot kwalitatief onderwijs."
-        },
-        "medicalSupport": {
-          "title": "Medische ondersteuning",
-          "description": "Zorg voor basisgezondheidszorg voor gemeenschappen."
-        }
+      "title": "De impact van uw donatie",
+      "subtitle": "Uw bijdrage helpt ons bij het:",
+      "list": {
+        "grow": "Groeien en versterken van onze gemeenschap",
+        "support": "Ondersteunen van meer mensen op hun spirituele reis",
+        "awareness": "Vergroten van het bewustzijn in heel Nederland en België",
+        "assist": "Helpen van degenen die minder bedeeld zijn",
+        "improve": "Continu verbeteren en uitbreiden van het platform"
       }
     },
-    "supportNetwork": {
-      "title": "Support Netwerkmediums",
-      "subtitle": "Gebaseerd op de Wet van Geven en Ontvangen",
-      "quote": "\"Wat je geeft zal in een andere vorm naar je terugkeren.\"",
-      "attribution": "Geïnspireerd door het Deepak Chopra-principe"
+    "benefit": {
+      "eyebrow": "Extra voordeel voor donateurs",
+      "title": "Promoot uw bedrijf",
+      "p1": "Als blijk van waardering voor het ondersteunen van onze missie, krijgen donateurs de mogelijkheid om hun bedrijf, merk of logo een jaar lang gratis te promoten binnen onze gemeenschap.",
+      "p2": "Dit stelt ons in staat om zowel de groei van ons platform als de zichtbaarheid van ondernemers en bedrijven in ons netwerk te ondersteunen."
     }
   },
   "donationForm": {

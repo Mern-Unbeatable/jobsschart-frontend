@@ -16,22 +16,22 @@ const Consultants = () => {
 
   const expertiseOptions = [
     { value: 'all', label: t('consultantsHero.filters.expertise.all') },
-    { value: 'medical', label: t('consultantsHero.filters.expertise.medical') },
-    { value: 'legal', label: t('consultantsHero.filters.expertise.legal') },
-    { value: 'technology', label: t('consultantsHero.filters.expertise.technology') },
-    { value: 'creative', label: t('consultantsHero.filters.expertise.creative') },
-    { value: 'finance', label: t('consultantsHero.filters.expertise.finance') },
-    { value: 'businessStrategy', label: t('consultantsHero.filters.expertise.businessStrategy') },
+    { value: 'clairvoyance', label: t('consultantsHero.filters.expertise.clairvoyance') },
+    { value: 'claircognizance', label: t('consultantsHero.filters.expertise.claircognizance') },
+    { value: 'tarotReading', label: t('consultantsHero.filters.expertise.tarotReading') },
+    { value: 'spiritualCoaching', label: t('consultantsHero.filters.expertise.spiritualCoaching') },
+    { value: 'healing', label: t('consultantsHero.filters.expertise.healing') },
+    { value: 'communicationWithLovedOnes', label: t('consultantsHero.filters.expertise.communicationWithLovedOnes') },
   ]
 
   const topicsOptions = [
     { value: 'all', label: t('consultantsHero.filters.topics.all') },
-    { value: 'strategy', label: t('consultantsHero.filters.topics.strategy') },
-    { value: 'development', label: t('consultantsHero.filters.topics.development') },
-    { value: 'design', label: t('consultantsHero.filters.topics.design') },
-    { value: 'marketing', label: t('consultantsHero.filters.topics.marketing') },
-    { value: 'operations', label: t('consultantsHero.filters.topics.operations') },
-    { value: 'leadership', label: t('consultantsHero.filters.topics.leadership') },
+    { value: 'twinFlames', label: t('consultantsHero.filters.topics.twinFlames') },
+    { value: 'workCareer', label: t('consultantsHero.filters.topics.workCareer') },
+    { value: 'business', label: t('consultantsHero.filters.topics.business') },
+    { value: 'lawOfAttraction', label: t('consultantsHero.filters.topics.lawOfAttraction') },
+    { value: 'personalDevelopment', label: t('consultantsHero.filters.topics.personalDevelopment') },
+    { value: 'futureQuestions', label: t('consultantsHero.filters.topics.futureQuestions') },
   ]
 
   // Process consultants data

@@ -161,23 +161,24 @@
     "services": {
       "telephone": {
         "title": "Telephone Consultation",
-        "description": "Connect via high-quality voice call for a personal experience."
+        "description": "Speak directly with one of our spiritual consultants."
       },
       "video": {
         "title": "Video Consultation",
-        "description": "Face-to-face sessions for a deeper connection and visual guidance."
+        "description": "Schedule a personal video consultation with one of our spiritual consultants."
       },
       "chat": {
         "title": "Chat Consultation",
-        "description": "Convenient text-based consultation for quick answers and privacy."
-      }
+        "description": "Start a live chat conversation with one of our spiritual consultants."
+      },
+      "clickHere": "Click here"
     },
     "consultantsSection": {
       "title": "Available Consultants",
       "description": "Our experts are ready to help you. Choose a consultant and start your session immediately."
     },
     "communitySection": {
-      "title": "Join the Community",
+      "title": "Join our spiritual community today for free.",
       "description": "Ask questions, share experiences, and connect with others who are on a similar journey. Our community is a safe space for growth and understanding.",
       "button": "Go to Community",
       "stats": {
@@ -189,26 +190,26 @@
   },
   "consultantsHero": {
     "title": "Find the perfect expert for your next big project.",
-    "description": "Connect with top-tier consultants across medical, legal, tech, and creative industries. Real-time availability and instant booking.",
+    "description": "Choose one of our spiritual coaches who can help guide you through your life questions and personal growth journey.",
     "searchPlaceholder": "Search...",
     "filters": {
       "expertise": {
         "all": "All expertise",
-        "medical": "Medical",
-        "legal": "Legal",
-        "technology": "Technology",
-        "creative": "Creative",
-        "finance": "Finance",
-        "businessStrategy": "Business Strategy"
+        "clairvoyance": "Clairvoyance",
+        "claircognizance": "Claircognizance",
+        "tarotReading": "Tarot Reading",
+        "spiritualCoaching": "Spiritual Coaching",
+        "healing": "Healing",
+        "communicationWithLovedOnes": "Communication with Loved Ones in Spirit"
       },
       "topics": {
         "all": "Topics",
-        "strategy": "Strategy",
-        "development": "Development",
-        "design": "Design",
-        "marketing": "Marketing",
-        "operations": "Operations",
-        "leadership": "Leadership"
+        "twinFlames": "Twin Flames & Soulmates",
+        "workCareer": "Work & Career",
+        "business": "Business",
+        "lawOfAttraction": "Law of Attraction",
+        "personalDevelopment": "Personal Development",
+        "futureQuestions": "Future-Related Questions"
       }
     }
   },
@@ -264,28 +265,29 @@
     "button": "Donate Now"
   },
   "donation": {
+    "grow": {
+      "title": "Help Our Community Grow",
+      "p1": "Your donation helps us continue expanding our community and improving the platform for all members.",
+      "p2": "In addition, we aim to support people who are less fortunate and create a positive impact throughout the spiritual communities of the Netherlands and Belgium.",
+      "p3": "Our mission is to inspire, educate, and support individuals on their personal and spiritual journeys, helping more people awaken to their highest potential.",
+      "p4": "We strongly believe in the principle of giving and receiving, as taught by Deepak Chopra. By giving from a place of abundance and connection, we create opportunities for growth and transformation for everyone."
+    },
     "impact": {
-      "title": "Your Donation Makes an Impact",
-      "cards": {
-        "feedFamily": {
-          "title": "Feed a Family",
-          "description": "Provide meals to families in need."
-        },
-        "supportEducation": {
-          "title": "Support Education",
-          "description": "Help children access quality education."
-        },
-        "medicalSupport": {
-          "title": "Medical Support",
-          "description": "Ensure basic healthcare for communities."
-        }
+      "title": "The Impact of Your Donation",
+      "subtitle": "Your contribution helps us:",
+      "list": {
+        "grow": "Grow and strengthen our community",
+        "support": "Support more people on their spiritual journeys",
+        "awareness": "Increase awareness and consciousness throughout the Netherlands and Belgium",
+        "assist": "Assist those who are less fortunate",
+        "improve": "Continuously improve and expand the platform"
       }
     },
-    "supportNetwork": {
-      "title": "Support Network",
-      "subtitle": "Based on the Law of Giving and Receiving",
-      "quote": "\"What you give will return to you in another form.\"",
-      "attribution": "Inspired by the Deepak Chopra Principle"
+    "benefit": {
+      "eyebrow": "Additional Benefit for Donors",
+      "title": "Promote Your Business",
+      "p1": "As a token of appreciation for supporting our mission, donors will receive the opportunity to advertise their business, brand, or logo within our community free of charge for one full year.",
+      "p2": "This allows us to support both the growth of our platform and the visibility of entrepreneurs and businesses within our network."
     }
   },
   "donationForm": {

@@ -1,17 +1,17 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
 
 // Import translation files
-import enTranslations from '../locales/en.json';
-import nlTranslations from '../locales/nl.json';
+import enTranslations from "../locales/en.json";
+import nlTranslations from "../locales/nl.json";
 
-// Get initial language from localStorage or default to 'en'
+// Get initial language from localStorage or default to 'nl'
 const getInitialLanguage = () => {
   try {
-    return localStorage.getItem('language') || 'en';
+    return localStorage.getItem("language") || "nl";
   } catch {
-    return 'en';
+    return "nl";
   }
 };
 
@@ -30,9 +30,9 @@ i18n
   .init({
     resources,
     lng: getInitialLanguage(), // Set initial language from localStorage
-    fallbackLng: 'en', // Fallback language if translation is missing
-    
-    debug: process.env.NODE_ENV === 'development',
+    fallbackLng: "nl", // Fallback language if translation is missing
+
+    debug: process.env.NODE_ENV === "development",
 
     interpolation: {
       escapeValue: false, // React already escapes values
@@ -40,9 +40,9 @@ i18n
 
     detection: {
       // Order of language detection methods
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-      lookupLocalStorage: 'language',
+      order: ["localStorage"],
+      caches: ["localStorage"],
+      lookupLocalStorage: "language",
     },
 
     react: {
@@ -51,11 +51,11 @@ i18n
   });
 
 // Sync i18n language changes to localStorage
-i18n.on('languageChanged', (lng) => {
+i18n.on("languageChanged", (lng) => {
   try {
-    localStorage.setItem('language', lng);
+    localStorage.setItem("language", lng);
   } catch (error) {
-    console.error('Failed to save language to localStorage:', error);
+    console.error("Failed to save language to localStorage:", error);
   }
 });
 
