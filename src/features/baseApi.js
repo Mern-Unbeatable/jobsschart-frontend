@@ -4,7 +4,7 @@ import { tagList } from './tagList';
 
 const BASE_URL =
   process.env.REACT_APP_API_BASE_URL ||
-  'http://api.illorac.nl/api/v1';
+  'https://api.illorac.nl/api/v1';
 
 
 const baseQuery = fetchBaseQuery({
