@@ -30,7 +30,7 @@ class SocketService {
         }
 
         const SOCKET_URL =
-            process.env.REACT_APP_SOCKET_URL || 'https://jobsschart-api.maktechgroup.tech';
+            process.env.REACT_APP_SOCKET_URL || 'http://api.illorac.nl';
 
         this.socket = io(SOCKET_URL, {
             auth: { token },

@@ -30,10 +30,10 @@ module.exports = (env, argv) => {
     REACT_APP_VERSION: rawEnv.REACT_APP_VERSION || '1.0.0',
     REACT_APP_API_BASE_URL:
       rawEnv.REACT_APP_API_BASE_URL ||
-      'https://jobsschart-api.maktechgroup.tech/api/v1',
+      'http://api.illorac.nl/api/v1',
     REACT_APP_SOCKET_URL:
       rawEnv.REACT_APP_SOCKET_URL ||
-      'https://jobsschart-api.maktechgroup.tech',
+      'http://api.illorac.nl',
     REACT_APP_API_TIMEOUT: rawEnv.REACT_APP_API_TIMEOUT || '10000',
     REACT_APP_API_RETRY_ATTEMPTS:
       rawEnv.REACT_APP_API_RETRY_ATTEMPTS || '3',
@@ -201,7 +201,7 @@ module.exports = (env, argv) => {
       },
       proxy: {
         '/api': {
-          target: 'https://jobsschart-api.maktechgroup.tech',
+          target: 'http://api.illorac.nl',
           changeOrigin: true,
           secure: false,
           pathRewrite: {
