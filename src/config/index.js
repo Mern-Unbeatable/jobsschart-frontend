@@ -122,8 +122,8 @@ export const getDashboardRoute = (role) => {
 export const API_CONFIG = {
   BASE_URL:
     process.env.REACT_APP_API_BASE_URL ||
-    'https://jobsschart-api.maktechgroup.tech/api/v1',
-      VITALS_ENDPOINT: getEnv('REACT_APP_VITALS_ENDPOINT', ''),
+    'https://api.illorac.nl/api/v1',
+  VITALS_ENDPOINT: getEnv('REACT_APP_VITALS_ENDPOINT', ''),
   TIMEOUT: parseInt(process.env.REACT_APP_API_TIMEOUT, 10) || 10000,
   RETRY_ATTEMPTS: parseInt(process.env.REACT_APP_API_RETRY_ATTEMPTS, 10) || 3,
   RETRY_DELAY: parseInt(process.env.REACT_APP_API_RETRY_DELAY, 10) || 1000,
