@@ -17,7 +17,7 @@ const ShowcaseSection = memo(() => {
   return (
     <section className="mx-auto container px-4 pt-14 lg:pt-20 lg:px-6 ">
       {/* Outer Gray Card Container */}
-      <div className="rounded-lg bg-[#EEEEEE] px-6 py-12 sm:px-12 sm:py-16">
+      <div className="rounded-lg bg-[#F5F1FD] px-6 py-12 sm:px-12 sm:py-16">
         {/* Centered Top Heading Section */}
         <div className="mb-12 text-center">
           <h2 className="font-serif text-3xl font-medium text-gray-900 sm:text-4xl">
@@ -35,7 +35,7 @@ const ShowcaseSection = memo(() => {
         <div className="mx-auto max-w-5xl">
           <div className="grid gap-6 md:grid-cols-2 lg:gap-8 lg:items-stretch">
             {/* Left Column: Soft Cream Price Card */}
-            <div className="flex flex-col items-center justify-center rounded-lg bg-[#FEF5E7] p-6 text-center ">
+            <div className="flex flex-col items-center justify-center rounded-lg bg-[#E9D5FF]/60 p-6 text-center ">
               <p className="text-base text-slate-500 line-through ">
                 {t("coaching.regularPrice", "Regular: €229,–")}
               </p>
@@ -72,7 +72,7 @@ const ShowcaseSection = memo(() => {
               <div className="mt-8">
                 <Link
                   to={ROUTES.CONSULTANTS}
-                  className="inline-block rounded bg-green-500/60 px-5 py-2.5 text-sm font-medium text-white transition-transform hover:-translate-y-0.5"
+                  className="inline-block rounded bg-[#6E35AE] px-5 py-2.5 text-sm font-medium text-white transition-transform hover:-translate-y-0.5"
                 >
                   {t("coaching.btn", "Book now")}
                 </Link>

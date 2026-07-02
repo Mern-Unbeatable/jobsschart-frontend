@@ -9,7 +9,7 @@ const ShieldCheckIcon = () => (
     height="20"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="#22C55E" // Tailwind green-500
+    stroke="#6E35AE" // Brand purple
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -34,7 +34,7 @@ const BusinessPlanSection = memo(() => {
 
   return (
     // The background color matches the light cream/off-white in the image
-    <section className="bg-[#FEF5E7] ">
+    <section className="bg-[#F5F1FD] ">
       <div className="container  mx-auto px-4 lg:px-6 py-14 lg:py-20">
         <div className="grid gap-2 lg:grid-cols-2 lg:items-start lg:gap-2">
           {/* Left Column: Typography and List */}
@@ -67,7 +67,7 @@ const BusinessPlanSection = memo(() => {
           </div>
 
           {/* Right Column: Investment Card */}
-          <div className="rounded-lg bg-[#FCE1B3] p-4 sm:p-6">
+          <div className="rounded-lg bg-[#E9D5FF]/60 p-4 sm:p-6">
             <h3 className=" text-3xl font-medium text-gray-900">
               {t("businessPlan.investment.title", "Investment & Growth")}
             </h3>

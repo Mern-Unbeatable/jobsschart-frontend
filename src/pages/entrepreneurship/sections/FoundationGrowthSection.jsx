@@ -19,7 +19,7 @@ const FocusStrategySection = memo(() => {
 
         {/* Right Side: Text Content */}
         <div className="">
-          <p className="mb-3 text-base font-medium uppercase  text-[#F59E0B] ">
+          <p className="mb-3 text-base font-medium uppercase  text-[#6E35AE] ">
             {t("focusStrategy.eyebrow", "FOCUS AND STRATEGY")}
           </p>
 

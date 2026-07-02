@@ -23,6 +23,7 @@ const NAV_BEFORE_LINKS = [
 const NAV_AFTER_LINKS = [{ to: ROUTES.FAQ, labelKey: "common.faq" }];
 
 const ENTREPRENEURSHIP_LINKS = [
+  { to: ROUTES.ENTREPRENEURSHIP, labelKey: "common.entrepreneurship" },
   { to: ROUTES.WEBSHOP, labelKey: "common.webshop" },
   { to: ROUTES.BLOG, labelKey: "common.blog" },
 ];
@@ -70,9 +71,11 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
   const userRole = useSelector(selectUserRole);
 
   const location = useLocation();
-  const isEntrepreneurshipActive = [ROUTES.WEBSHOP, ROUTES.BLOG].includes(
-    location.pathname,
-  );
+  const isEntrepreneurshipActive = [
+    ROUTES.WEBSHOP,
+    ROUTES.BLOG,
+    ROUTES.ENTREPRENEURSHIP,
+  ].includes(location.pathname);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(

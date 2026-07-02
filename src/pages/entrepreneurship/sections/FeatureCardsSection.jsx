@@ -91,7 +91,7 @@ const FeatureCardsSection = memo(() => {
             className="flex flex-col rounded-xl border border-gray-100 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.04)] transition-shadow hover:shadow-md"
           >
             {/* Orange Icon Container */}
-            <div className="mb-5 flex h-8 w-8 items-center justify-center rounded bg-[#F59E0B] text-white">
+            <div className="mb-5 flex h-8 w-8 items-center justify-center rounded bg-[#E9D5FF] text-[#6E35AE]">
               {card.icon}
             </div>
             
