@@ -51,7 +51,7 @@ const PricingSection = memo(() => {
               className="rounded-2xl bg-white p-8 border border-[#E9D5FF] hover:border-[#6E35AE] hover:shadow-xl transition-all duration-350 flex flex-col justify-start h-full"
             >
               <div>
-                {/* Plan Name & Credits Badge */}
+               
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-2xl font-poppins font-bold text-gray-800">
                     {plan.name}
