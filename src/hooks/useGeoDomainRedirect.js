@@ -38,8 +38,7 @@ function useGeoDomainRedirect() {
                 const data = await res.json();
                 if (!isMounted || !data?.targetDomain) return;
 
-                // /geo-routing is served from API host, so backend hostEligible may be false.
-                // We use targetDomain as the source of truth and compare with the current browser host.
+
                 const targetHost = String(data.targetDomain).toLowerCase().replace(/^www\./, '');
                 if (currentHost === targetHost) return;
 
@@ -49,7 +48,7 @@ function useGeoDomainRedirect() {
 
                 window.location.replace(nextUrl);
             } catch {
-                // Fail silently to avoid blocking app render.
+
             }
         };
 
