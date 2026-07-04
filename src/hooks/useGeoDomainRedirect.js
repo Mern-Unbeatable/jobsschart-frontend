@@ -11,8 +11,23 @@ function useGeoDomainRedirect() {
 
                 if (!eligibleHosts.includes(host)) return;
 
-                const apiBase = process.env.REACT_APP_API_BASE_URL || 'https://api.illorac.nl';
-                const res = await fetch(`${apiBase}/geo-routing`, {
+                const currentHost = host.replace(/^www\./, '');
+                const viteApiBase =
+                    typeof import.meta !== 'undefined' && import.meta.env
+                        ? import.meta.env.VITE_API_BASE_URL
+                        : undefined;
+                const configuredApiBase =
+                    viteApiBase || process.env.REACT_APP_API_BASE_URL || 'https://api.illorac.nl';
+
+                let geoRoutingUrl = 'https://api.illorac.nl/geo-routing';
+                try {
+                    geoRoutingUrl = `${new URL(configuredApiBase).origin}/geo-routing`;
+                } catch {
+                    const fallbackBase = String(configuredApiBase).replace(/\/+$/, '');
+                    geoRoutingUrl = `${fallbackBase}/geo-routing`;
+                }
+
+                const res = await fetch(geoRoutingUrl, {
                     method: 'GET',
                     credentials: 'include',
                     headers: { Accept: 'application/json' },
@@ -21,11 +36,11 @@ function useGeoDomainRedirect() {
                 if (!res.ok || !isMounted) return;
 
                 const data = await res.json();
-                if (!isMounted || !data?.shouldRedirect || !data?.targetDomain) return;
+                if (!isMounted || !data?.targetDomain) return;
 
-                const currentHost = host.replace(/^www\./, '');
+                // /geo-routing is served from API host, so backend hostEligible may be false.
+                // We use targetDomain as the source of truth and compare with the current browser host.
                 const targetHost = String(data.targetDomain).toLowerCase().replace(/^www\./, '');
-
                 if (currentHost === targetHost) return;
 
                 const nextUrl =
