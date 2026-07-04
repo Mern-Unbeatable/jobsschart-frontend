@@ -8,7 +8,11 @@ import { TOAST_CONFIG } from './config';
 import store from './features/store';
 import GlobalCallHandler from './components/GlobalCallHandler';
 import { IncomingCallNotification } from './components/IncomingCallNotification';
+import useGeoDomainRedirect from './hooks/useGeoDomainRedirect';
+
 function App() {
+  useGeoDomainRedirect();
+
   return (
     <Provider store={store}>
       <ErrorBoundary>
