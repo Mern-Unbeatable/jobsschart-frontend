@@ -22,10 +22,9 @@ export const userApi = baseApi.injectEndpoints({
             url: '/users/me',
             method: 'PATCH',
             body: data,
-            // Don't set Content-Type - let browser set it for FormData
           };
         }
-        // Handle regular JSON data
+
         return {
           url: '/users/me',
           method: 'PATCH',
@@ -63,8 +62,6 @@ export const userApi = baseApi.injectEndpoints({
       providesTags: ['CreditHistory'],
       transformResponse: (response) => response.data,
     }),
-
-    // ========== ADMIN ONLY ROUTES ==========
 
     getAllUsers: builder.query({
       query: ({ page = 1, limit = 10, search, role, status, sortBy, sortOrder } = {}) => ({

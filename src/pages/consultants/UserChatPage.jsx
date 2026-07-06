@@ -30,9 +30,6 @@ const UserChatPage = memo(() => {
 
 
 
-
-  // Add this useEffect in UserChatPage to ensure RealTimeChat gets the consultant ID correctly
-
   useEffect(() => {
     if (consultantData && consultantId) {
       const consultant = consultantData?.consultant || consultantData?.data?.consultant || consultantData;
@@ -190,7 +187,6 @@ const UserChatPage = memo(() => {
         </div>
       </div>
 
-      {/* ── Ads Section ──────────────────────────────────────────────── */}
       <div className='pb-12'>
         <CommonAdsSection
           containerClassName='container mx-auto px-4 lg:px-6'

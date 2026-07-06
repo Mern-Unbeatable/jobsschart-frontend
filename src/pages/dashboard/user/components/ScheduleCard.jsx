@@ -8,7 +8,18 @@ import {
   Video,
 } from "lucide-react";
 
-const ScheduleCard = ({ name, avatar, date, time, status = "upcoming" }) => {
+const ScheduleCard = ({
+  name,
+  avatar,
+  date,
+  time,
+  status = "upcoming",
+  consultantId,
+  onViewConsultant,
+  onAudioCall,
+  onVideoCall,
+  onChat,
+}) => {
   const { t } = useTranslation();
   const isComplete = status?.toUpperCase() === "COMPLETED";
   const isCancelled = status?.toUpperCase() === "CANCELLED";
@@ -29,15 +40,23 @@ const ScheduleCard = ({ name, avatar, date, time, status = "upcoming" }) => {
 
   const initials = name
     ? name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "C";
 
+  const handleAction = (event, action) => {
+    event.stopPropagation();
+    action?.();
+  };
+
   return (
-    <article className="relative flex min-h-52 flex-col rounded-[10px] border border-gray-100 bg-[#f8f3fd] p-4 shadow-xs">
+    <article
+      className="relative flex min-h-52 flex-col rounded-[10px] border border-gray-100 bg-[#f8f3fd] p-4 shadow-xs cursor-pointer"
+      onClick={() => onViewConsultant?.(consultantId)}
+    >
       <span
         className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold leading-none ${statusClass}`}
       >
@@ -75,6 +94,7 @@ const ScheduleCard = ({ name, avatar, date, time, status = "upcoming" }) => {
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
+            onClick={(event) => handleAction(event, onAudioCall)}
             className="flex h-9 items-center justify-center rounded-xl bg-[#d2c0e6]/50 text-[#6e35ae] transition-all hover:bg-[#d2c0e6] active:scale-95 cursor-pointer"
             aria-label={t("dashboard.user.scheduleCard.callDoctor")}
           >
@@ -82,6 +102,7 @@ const ScheduleCard = ({ name, avatar, date, time, status = "upcoming" }) => {
           </button>
           <button
             type="button"
+            onClick={(event) => handleAction(event, onVideoCall)}
             className="flex h-9 items-center justify-center rounded-xl bg-[#d2c0e6]/50 text-[#6e35ae] transition-all hover:bg-[#d2c0e6] active:scale-95 cursor-pointer"
             aria-label={t("dashboard.user.scheduleCard.startVideoCall")}
           >
@@ -89,6 +110,7 @@ const ScheduleCard = ({ name, avatar, date, time, status = "upcoming" }) => {
           </button>
           <button
             type="button"
+            onClick={(event) => handleAction(event, onChat)}
             className="flex h-9 items-center justify-center rounded-xl bg-[#d2c0e6]/50 text-[#6e35ae] transition-all hover:bg-[#d2c0e6] active:scale-95 cursor-pointer"
             aria-label={t("dashboard.user.scheduleCard.openChat")}
           >

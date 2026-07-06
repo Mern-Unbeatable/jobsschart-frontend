@@ -36,7 +36,7 @@ const ConsultantDetail = memo(() => {
   const userRole = useSelector(selectUserRole);
 
   const isRestrictedRole = isAuthenticated && (
-    userRole?.toUpperCase() === "CONSULTANT" || 
+    userRole?.toUpperCase() === "CONSULTANT" ||
     userRole?.toUpperCase() === "ADMIN"
   );
 
@@ -54,20 +54,6 @@ const ConsultantDetail = memo(() => {
   };
 
   const { data: consultantData, isLoading } = useGetConsultantByIdQuery(id);
-
-  React.useEffect(() => {
-    if (consultantData) {
-      console.log("=== Consultant Detail API Fetch Info ===");
-      console.log(`API Hook: useGetConsultantByIdQuery(${id})`);
-      console.log("Raw Response Data:", consultantData);
-      console.log("Extracted Consultant Data:", 
-        consultantData?.data?.consultant ||
-        consultantData?.consultant ||
-        consultantData?.data
-      );
-      console.log("=========================================");
-    }
-  }, [consultantData, id]);
 
   const consultant =
     consultantData?.data?.consultant ||
@@ -193,18 +179,16 @@ const ConsultantDetail = memo(() => {
               <button
                 onClick={() => handleAction(() => setShowAudioCall(true))}
                 disabled={isRestrictedRole}
-                className={`bg-green-500/60 text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${
-                  isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-green-500/70 cursor-pointer"
-                }`}
+                className={`bg-green-500/60 text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-green-500/70 cursor-pointer"
+                  }`}
               >
                 <Phone size={20} /> Call Now
               </button>
               <button
                 onClick={() => handleAction(() => setShowVideoCall(true))}
                 disabled={isRestrictedRole}
-                className={`bg-[#6E35AE] text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${
-                  isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-[#5A2A8A] cursor-pointer"
-                }`}
+                className={`bg-[#6E35AE] text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-[#5A2A8A] cursor-pointer"
+                  }`}
               >
                 <Video size={20} /> Video Call
               </button>
@@ -212,9 +196,8 @@ const ConsultantDetail = memo(() => {
                 type="button"
                 onClick={() => handleAction(handleChatNow)}
                 disabled={isRestrictedRole}
-                className={`bg-[#333333] text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${
-                  isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-[#1a1a1a] cursor-pointer"
-                }`}
+                className={`bg-[#333333] text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-[#1a1a1a] cursor-pointer"
+                  }`}
               >
                 <MessageSquare size={20} /> Chat Now
               </button>
@@ -222,9 +205,8 @@ const ConsultantDetail = memo(() => {
             <button
               onClick={() => handleAction(() => setShowBookSchedule(true))}
               disabled={isRestrictedRole}
-              className={`w-full bg-green-500/60 text-white py-4 rounded-lg font-bold text-base transition-all shadow-sm ${
-                isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-green-500/70 cursor-pointer"
-              }`}
+              className={`w-full bg-green-500/60 text-white py-4 rounded-lg font-bold text-base transition-all shadow-sm ${isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-green-500/70 cursor-pointer"
+                }`}
             >
               Book A Schedule
             </button>

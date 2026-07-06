@@ -29,7 +29,7 @@ const Sidebar = ({
       path: ROUTES.USER_BOOKED_SCHEDULE,
       icon: CalendarDays,
     },
-    { name: t('dashboard.user.sidebar.chat'), path: ROUTES.USER_CHAT, icon: MessageCircle },
+    // { name: t('dashboard.user.sidebar.chat'), path: ROUTES.USER_CHAT, icon: MessageCircle },
     { name: t('dashboard.user.sidebar.orders'), path: ROUTES.USER_ORDERS, icon: Package },
     { name: t('dashboard.user.sidebar.profile'), path: ROUTES.USER_PROFILE, icon: User },
   ];

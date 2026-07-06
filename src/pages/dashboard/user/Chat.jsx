@@ -1,7 +1,8 @@
 import React, { memo, useEffect } from 'react';
 import RealTimeChat from '../../consultants/RealTimeChat';
+import UserChatPage from '../../consultants/UserChatPage';
 
-const UserChatPage = memo(() => {
+const UserDashboardChat = memo(() => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
@@ -11,12 +12,12 @@ const UserChatPage = memo(() => {
       <div className='container mx-auto px-4 lg:px-6 py-6'>
         <h1 className='text-2xl font-bold text-gray-900 mb-6'>Messages</h1>
         <div style={{ height: 'calc(100vh - 180px)' }}>
-          <RealTimeChat className='h-full' showSidebar={true} />
+          <UserChatPage />
         </div>
       </div>
     </div>
   );
 });
 
-UserChatPage.displayName = 'UserChatPage';
-export default UserChatPage;
+UserDashboardChat.displayName = 'UserDashboardChat';
+export default UserDashboardChat;

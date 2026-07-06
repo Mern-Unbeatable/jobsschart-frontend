@@ -10,7 +10,7 @@ const UserDashboard = () => {
   const { t } = useTranslation();
   const user = useSelector(selectUser);
   const { data: bookingsData, isLoading, error } = useGetUpcomingBookingsQuery();
-
+  console.log('user check', user)
   const upcomingBookings = bookingsData?.bookings || [];
 
   const formatBookingDate = (dateStr) => {
@@ -58,7 +58,7 @@ const UserDashboard = () => {
               {t("dashboard.user.walletBalance.availableMinutes")}
             </p>
             <p className="mt-2 text-3xl font-semibold text-[#050609]">
-              {t("dashboard.user.walletBalance.minutesValue")}
+              {user?.wallet?.creditBalance || 0}
             </p>
             <p className="mt-2 text-sm font-medium text-[#8e33ea]">
               {t("dashboard.user.walletBalance.flatRate")}
