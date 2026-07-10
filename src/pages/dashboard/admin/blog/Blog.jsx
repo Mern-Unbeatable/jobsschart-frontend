@@ -13,6 +13,7 @@ import BlogCard from "./components/BlogCard";
 import BlogModal from "./components/BlogModal";
 import {
   useGetBlogsQuery,
+  useGetDraftBlogsQuery,
   useGetAllBlogCategoriesQuery,
   useCreateBlogMutation,
   useUpdateBlogMutation,
@@ -32,7 +33,18 @@ const EMPTY_FORM = {
 const MODAL_CLOSE_ANIMATION_MS = 280;
 
 const Blog = () => {
-  const { data: blogsData, isLoading: isBlogsLoading } = useGetBlogsQuery();
+  const [activeTab, setActiveTab] = useState("PUBLISHED"); // "PUBLISHED" or "DRAFT"
+
+  const { data: publishedBlogsData, isLoading: isPublishedLoading } = useGetBlogsQuery(undefined, {
+    skip: activeTab !== "PUBLISHED",
+  });
+  const { data: draftBlogsData, isLoading: isDraftsLoading } = useGetDraftBlogsQuery(undefined, {
+    skip: activeTab !== "DRAFT",
+  });
+
+  const blogsData = activeTab === "PUBLISHED" ? publishedBlogsData : draftBlogsData;
+  const isBlogsLoading = activeTab === "PUBLISHED" ? isPublishedLoading : isDraftsLoading;
+
   const { data: categoriesData } = useGetAllBlogCategoriesQuery();
   const [createBlog] = useCreateBlogMutation();
   const [updateBlog] = useUpdateBlogMutation();
@@ -283,6 +295,38 @@ const Blog = () => {
       <BlogHeader onAddClick={handleOpenCreate} />
 
     
+      {/* Tab Switcher */}
+      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 bg-white border border-[#E8E8E8] rounded-lg px-2 py-2 w-full sm:w-fit">
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("PUBLISHED");
+            setActiveCategory("All");
+          }}
+          className={`flex-1 sm:flex-none px-5 py-1.5 rounded-md text-base font-medium transition-colors ${
+            activeTab === "PUBLISHED"
+              ? "bg-green-500/60 text-white"
+              : "text-[#545454] hover:bg-gray-100"
+          }`}
+        >
+          Published
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("DRAFT");
+            setActiveCategory("All");
+          }}
+          className={`flex-1 sm:flex-none px-5 py-1.5 rounded-md text-base font-medium transition-colors ${
+            activeTab === "DRAFT"
+              ? "bg-green-500/60 text-white"
+              : "text-[#545454] hover:bg-gray-100"
+          }`}
+        >
+          Drafts
+        </button>
+      </div>
+
       {/* Category Filters */}
       <CategoryFilters
         categories={filterCategoriesList}
