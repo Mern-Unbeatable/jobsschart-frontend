@@ -49,7 +49,7 @@ export const IncomingCallNotification = () => {
                 setIncomingCall(callData);
                 audioRef.current?.play().catch(() => { });
 
-                if (Notification.permission === 'granted') {
+                if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
                     new Notification('📞 Incoming Call', {
                         body: `${callData.callerName} is calling (${callData.callType})`,
                         icon: '/logo.webp',
@@ -95,7 +95,7 @@ export const IncomingCallNotification = () => {
             }
         }, 3000);
 
-        if (Notification.permission === 'default') {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
             Notification.requestPermission();
         }
 

@@ -15,6 +15,7 @@ const UserChatPage = memo(() => {
 
   const [conversationReady, setConversationReady] = useState(false);
   const [otherUserInfo, setOtherUserInfo] = useState(null);
+  const [avatarError, setAvatarError] = useState(false);
 
   const {
     data: consultantData,
@@ -23,6 +24,10 @@ const UserChatPage = memo(() => {
   } = useGetConsultantByIdQuery(consultantId, {
     skip: !consultantId
   });
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [consultantId]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
@@ -119,15 +124,12 @@ const UserChatPage = memo(() => {
           <div className='bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow'>
             <div className='relative'>
               <div className='w-14 h-14 rounded-full bg-gradient-to-br from-[#6E35AE] to-[#D1C4E9] flex items-center justify-center overflow-hidden'>
-                {consultantAvatar ? (
+                {consultantAvatar && !avatarError ? (
                   <img
                     src={consultantAvatar}
                     alt={consultantName}
                     className='w-full h-full object-cover'
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.parentElement.innerHTML = consultantName.charAt(0).toUpperCase();
-                    }}
+                    onError={() => setAvatarError(true)}
                   />
                 ) : (
                   <span className='text-white text-xl font-bold'>
