@@ -30,7 +30,7 @@ const OrderCard = memo(({ order, onCancel }) => {
           <button
             type="button"
             onClick={() => onCancel && onCancel(order.id)}
-            className="inline-flex w-full items-center justify-center rounded bg-green-500/60 px-6 py-2.5 text-base font-medium text-white transition-colors hover:bg-[#cc9800] sm:w-auto cursor-pointer"
+            className="inline-flex w-full items-center justify-center rounded bg-green-500/60 px-6 py-2.5 text-base font-medium text-white transition-colors hover:bg-[#6E35AE] sm:w-auto cursor-pointer"
           >
             {t("dashboard.user.orders.cancelButton")}
           </button>

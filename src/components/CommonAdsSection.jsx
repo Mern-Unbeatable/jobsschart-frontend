@@ -85,7 +85,7 @@ const CommonAdsSection = memo(
               </p>
             )}
             {displayLink && (
-              <span className={`text-xs md:text-sm font-semibold ${campaign.image ? 'text-yellow-500 drop-shadow-sm' : 'text-[#6E35AE]/80'}`}>
+              <span className={`text-xs md:text-sm font-semibold ${campaign.image ? 'text-purple-300 drop-shadow-sm' : 'text-[#6E35AE]/80'}`}>
                 {displayLink}
               </span>
             )}

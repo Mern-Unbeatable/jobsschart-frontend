@@ -14,7 +14,7 @@ const Pagination = memo(({ page, totalResults, pageSize, totalPages, onPageChang
           type='button'
           onClick={() => onPageChange(Math.max(1, page - 1))}
           disabled={page === 1}
-          className='px-5 py-1.5 rounded-lg border border-green-500/60 text-base text-green-500/60 bg-white hover:bg-[#FCF7E7] disabled:opacity-40 disabled:cursor-not-allowed transition-colors'
+          className='px-5 py-1.5 rounded-lg border border-green-500/60 text-base text-green-500/60 bg-white hover:bg-[#F5F1FD] disabled:opacity-40 disabled:cursor-not-allowed transition-colors'
         >
           Previous
         </button>
@@ -22,7 +22,7 @@ const Pagination = memo(({ page, totalResults, pageSize, totalPages, onPageChang
           type='button'
           onClick={() => onPageChange(Math.min(totalPages, page + 1))}
           disabled={page >= totalPages}
-          className='px-5 py-1.5 rounded-lg border border-green-500/60 text-base text-green-500/60 bg-white hover:bg-[#FCF7E7] disabled:opacity-40 disabled:cursor-not-allowed transition-colors'
+          className='px-5 py-1.5 rounded-lg border border-green-500/60 text-base text-green-500/60 bg-white hover:bg-[#F5F1FD] disabled:opacity-40 disabled:cursor-not-allowed transition-colors'
         >
           Next
         </button>

@@ -1,8 +1,8 @@
 {
   "common": {
-    "home": "Thuis",
+    "home": "Home",
     "entrepreneurship": "Ondernemerschap",
-    "consultants": "Adviseurs",
+    "consultants": "Consultants",
     "credit": "Credit",
     "webshop": "Webwinkel",
     "donation": "Donatie",
@@ -11,7 +11,7 @@
     "faq": "FAQ",
     "about": "Over",
     "services": "Diensten",
-    "becomeConsultant": "Word een adviseur",
+    "becomeConsultant": "Word consultant",
     "signIn": "Meld u aan",
     "signOut": "Uitloggen",
     "welcome": "Welkom",
@@ -174,7 +174,7 @@
       "clickHere": "Klik hier"
     },
     "consultantsSection": {
-      "title": "Beschikbare adviseurs",
+      "title": "Beschikbare consultants",
       "description": "Onze experts staan klaar om u te helpen. Kies een consultant en start uw sessie direct."
     },
     "communitySection": {

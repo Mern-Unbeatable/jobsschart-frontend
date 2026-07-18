@@ -96,7 +96,7 @@ const ConsultantForm = ({
                 onClick={() =>
                   fileInputRef.current && fileInputRef.current.click()
                 }
-                className="relative border-2 border-dashed border-gray-200 bg-[#FEF5E7] mt-1 rounded-xl h-40 flex items-center justify-center text-gray-400 cursor-pointer hover:bg-orange-50 transition-colors overflow-hidden"
+                className="relative border-2 border-dashed border-gray-200 bg-[#F5F1FD] mt-1 rounded-xl h-40 flex items-center justify-center text-gray-400 cursor-pointer hover:bg-[#E9D5FF] transition-colors overflow-hidden"
               >
                 {formData && formData.imagePreview ? (
                   <img

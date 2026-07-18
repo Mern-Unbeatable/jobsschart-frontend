@@ -93,9 +93,9 @@ const ProductDetail = memo(() => {
                     {gallery.map((img, idx) => (
                       <div
                         key={idx}
-                        className={`aspect-square rounded-lg overflow-hidden border-2 cursor-pointer hover:border-[#D9A108] transition-all ${
+                        className={`aspect-square rounded-lg overflow-hidden border-2 cursor-pointer hover:border-green-600 transition-all ${
                           selectedImage === idx
-                            ? "border-[#D9A108]"
+                            ? "border-green-600"
                             : "border-gray-200"
                         }`}
                         onClick={() => setSelectedImage(idx)}

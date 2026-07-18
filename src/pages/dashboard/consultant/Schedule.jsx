@@ -288,7 +288,7 @@ const ConsultantSchedule = () => {
                             <button
                               type="button"
                               onClick={() => setModalDateKey(dateKey)}
-                              className="text-left text-sm text-green-500/60 underline transition-colors duration-200 hover:text-[#ce9c0a]"
+                              className="text-left text-sm text-green-500/60 underline transition-colors duration-200 hover:text-green-700"
                             >
                               See More
                             </button>

@@ -191,7 +191,7 @@ const ConversationItem = memo(({ conversation, isActive, onClick }) => {
     <button
       type="button"
       onClick={handleClick}
-      className={`w-full flex gap-3 items-start px-4 py-5 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 ${
+      className={`w-full flex gap-3 items-start px-4 py-5 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-purple-500 ${
         isActive ? "bg-white" : "bg-gray-200 hover:bg-gray-300"
       }`}
       aria-pressed={isActive}
@@ -410,7 +410,7 @@ const ChatPanel = memo(
             <button
               type="button"
               onClick={handleBackToSidebar}
-              className={`${showConversations ? "lg:hidden" : "hidden"} text-gray-900 hover:text-orange-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded`}
+              className={`${showConversations ? "lg:hidden" : "hidden"} text-gray-900 hover:text-purple-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded`}
               aria-label="Back to conversations"
             >
               <ArrowLeft size={22} />
@@ -481,14 +481,14 @@ const ChatPanel = memo(
                 onKeyDown={handleKeyDown}
                 placeholder="Text message from MTN"
                 aria-label="Type a message"
-                className="flex-1 h-12 bg-white rounded-full px-5 text-sm text-slate-800 placeholder-gray-400 tracking-[0.5px] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.14)] focus:outline-none focus:ring-2 focus:ring-orange-400 transition-shadow"
+                className="flex-1 h-12 bg-white rounded-full px-5 text-sm text-slate-800 placeholder-gray-400 tracking-[0.5px] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.14)] focus:outline-none focus:ring-2 focus:ring-purple-400 transition-shadow"
               />
               <button
                 type="button"
                 onClick={handleSend}
                 disabled={!inputValue.trim()}
                 aria-label="Send message"
-                className="shrink-0 flex flex-col items-center justify-center h-12 w-12 bg-white rounded-full shadow-[0px_2px_8px_0px_rgba(0,0,0,0.14)] text-gray-400 hover:text-orange-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+                className="shrink-0 flex flex-col items-center justify-center h-12 w-12 bg-white rounded-full shadow-[0px_2px_8px_0px_rgba(0,0,0,0.14)] text-gray-400 hover:text-purple-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
               >
                 <Send size={16} aria-hidden="true" />
                 <span className="text-sm font-semibold tracking-[0.5px] leading-none mt-0.5 select-none">

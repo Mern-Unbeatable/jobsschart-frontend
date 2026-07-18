@@ -145,7 +145,7 @@ export default function WithdrawModal({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-xl border border-green-500/60 px-9 py-3 text-base font-medium text-[#24272d] transition-all duration-200 ease-in-out hover:bg-[#fcf7e7] disabled:opacity-50"
+              className="rounded-xl border border-green-500/60 px-9 py-3 text-base font-medium text-[#24272d] transition-all duration-200 ease-in-out hover:bg-[#F5F1FD] disabled:opacity-50"
             >
               Cancel
             </button>

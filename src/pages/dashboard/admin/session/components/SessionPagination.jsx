@@ -20,7 +20,7 @@ export default function SessionPagination({
           aria-label="Previous page"
           onClick={onPrev}
           disabled={currentPage === 1}
-          className="px-5 py-1.5 rounded-lg border border-green-500/60 text-base text-green-500/60 bg-white hover:bg-[#FCF7E7] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="px-5 py-1.5 rounded-lg border border-green-500/60 text-base text-green-500/60 bg-white hover:bg-[#F5F1FD] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           Previous
         </button>
@@ -29,7 +29,7 @@ export default function SessionPagination({
           aria-label="Next page"
           onClick={onNext}
           disabled={currentPage === totalPages}
-          className="px-5 py-1.5 rounded-lg border border-green-500/60 text-base text-green-500/60 bg-white hover:bg-[#FCF7E7] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="px-5 py-1.5 rounded-lg border border-green-500/60 text-base text-green-500/60 bg-white hover:bg-[#F5F1FD] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           Next
         </button>

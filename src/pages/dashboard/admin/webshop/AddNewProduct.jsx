@@ -524,7 +524,7 @@ const AdminAddNewProduct = () => {
             onMouseLeave={() =>
               gsap.to(saveBtnRef.current, { scale: 1, duration: 0.12 })
             }
-            className="bg-green-500/60 text-white px-6 py-2.5 rounded text-base font-normal hover:bg-[#c99809] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-green-500/60 text-white px-6 py-2.5 rounded text-base font-normal hover:bg-[#6E35AE] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? "Saving..." : mode === "edit" ? "Update" : "Save"}
           </button>

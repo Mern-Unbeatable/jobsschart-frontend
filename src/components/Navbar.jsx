@@ -18,6 +18,7 @@ const NAV_BEFORE_LINKS = [
   { to: ROUTES.CREDIT, labelKey: "common.credit" },
   { to: ROUTES.DONATION, labelKey: "common.donation" },
   { to: ROUTES.COMMUNITY, labelKey: "common.community" },
+  { to: ROUTES.BLOG, labelKey: "common.blog" },
 ];
 
 const NAV_AFTER_LINKS = [{ to: ROUTES.FAQ, labelKey: "common.faq" }];
@@ -25,7 +26,6 @@ const NAV_AFTER_LINKS = [{ to: ROUTES.FAQ, labelKey: "common.faq" }];
 const ENTREPRENEURSHIP_LINKS = [
   { to: ROUTES.ENTREPRENEURSHIP, labelKey: "common.entrepreneurship" },
   { to: ROUTES.WEBSHOP, labelKey: "common.webshop" },
-  { to: ROUTES.BLOG, labelKey: "common.blog" },
 ];
 
 const navLinkClass = ({ isActive }) =>
@@ -73,7 +73,6 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
   const location = useLocation();
   const isEntrepreneurshipActive = [
     ROUTES.WEBSHOP,
-    ROUTES.BLOG,
     ROUTES.ENTREPRENEURSHIP,
   ].includes(location.pathname);
 

@@ -234,7 +234,7 @@ const SessionsTable = memo(({
               type="button"
               onClick={onPrev}
               disabled={currentPage <= 1}
-              className="rounded-xl border border-green-500/60 px-4 py-2 text-sm capitalize text-green-500/60 transition-colors duration-150 hover:bg-[#fcf7e7] disabled:opacity-50 disabled:cursor-not-allowed sm:text-base"
+              className="rounded-xl border border-green-500/60 px-4 py-2 text-sm capitalize text-green-500/60 transition-colors duration-150 hover:bg-[#F5F1FD] disabled:opacity-50 disabled:cursor-not-allowed sm:text-base"
             >
               Previous
             </button>
@@ -242,7 +242,7 @@ const SessionsTable = memo(({
               type="button"
               onClick={onNext}
               disabled={currentPage >= totalPages}
-              className="rounded-xl border border-green-500/60 px-4 py-2 text-sm capitalize text-green-500/60 transition-colors duration-150 hover:bg-[#fcf7e7] disabled:opacity-50 disabled:cursor-not-allowed sm:text-base"
+              className="rounded-xl border border-green-500/60 px-4 py-2 text-sm capitalize text-green-500/60 transition-colors duration-150 hover:bg-[#F5F1FD] disabled:opacity-50 disabled:cursor-not-allowed sm:text-base"
             >
               Next
             </button>

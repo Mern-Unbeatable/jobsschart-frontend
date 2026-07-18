@@ -221,7 +221,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   }
                   className={`flex-1 py-6 rounded-lg border-2 flex flex-col items-center gap-2 transition-all ${
                     formData.donorType === "individual"
-                      ? "border-green-500/60 bg-[#FFFBEB]/50"
+                      ? "border-green-500/60 bg-[#F5F1FD]"
                       : "border-gray-100 bg-white"
                   }`}
                 >
@@ -244,7 +244,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   }
                   className={`flex-1 py-6 rounded-lg border-2 flex flex-col items-center gap-2 transition-all ${
                     formData.donorType === "business"
-                      ? "border-green-500/60 bg-[#FCF7E7]"
+                      ? "border-green-500/60 bg-[#F5F1FD]"
                       : "border-gray-100 bg-white"
                   }`}
                 >

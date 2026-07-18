@@ -197,7 +197,7 @@ const AdminOrders = () => {
         </p>
         <button
           onClick={() => window.location.reload()}
-          className="px-5 py-2 bg-green-500/60 text-white rounded-lg hover:bg-[#c99508] transition-colors"
+          className="px-5 py-2 bg-green-500/60 text-white rounded-lg hover:bg-[#6E35AE] transition-colors"
         >
           Try Again
         </button>

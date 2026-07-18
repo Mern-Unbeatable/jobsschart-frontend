@@ -12,7 +12,7 @@ function PagBtn({ children, onClick, disabled }) {
         if (!disabled) gsap.to(ref.current, { scale: 1.05, duration: 0.12 });
       }}
       onMouseLeave={() => gsap.to(ref.current, { scale: 1, duration: 0.12 })}
-      className="px-5 py-1.5 rounded-lg border border-green-500/60 text-sm font-medium text-green-500/60 bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FCF7E7] transition-colors"
+      className="px-5 py-1.5 rounded-lg border border-green-500/60 text-sm font-medium text-green-500/60 bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#F5F1FD] transition-colors"
     >
       {children}
     </button>

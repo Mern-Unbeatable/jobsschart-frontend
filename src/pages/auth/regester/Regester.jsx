@@ -143,7 +143,7 @@ const Register = () => {
                 onClick={() => handleRoleSelect("customer")}
                 className="w-full flex items-center p-5 border border-gray-200 rounded-2xl hover:border-green-500/60 transition-all group bg-white shadow-sm"
               >
-                <div className="bg-[#FEF5E7] p-4 rounded-full mr-4 group-hover:bg-green-500/60 transition-colors shrink-0">
+                <div className="bg-[#F5F1FD] p-4 rounded-full mr-4 group-hover:bg-green-600 transition-colors shrink-0">
                   <User className="text-black group-hover:text-white" />
                 </div>
                 <div className="text-left">
@@ -158,7 +158,7 @@ const Register = () => {
                 onClick={() => handleRoleSelect("consultant")}
                 className="w-full flex items-center p-5 border border-gray-200 rounded-2xl hover:border-green-500/60 transition-all group bg-white shadow-sm"
               >
-                <div className="bg-[#FEF5E7] p-4 rounded-full mr-4 group-hover:bg-green-500/60 transition-colors shrink-0">
+                <div className="bg-[#F5F1FD] p-4 rounded-full mr-4 group-hover:bg-green-600 transition-colors shrink-0">
                   <Briefcase className="text-black group-hover:text-white" />
                 </div>
                 <div className="text-left">

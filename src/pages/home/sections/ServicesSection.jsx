@@ -52,7 +52,7 @@ const ServicesSection = memo(() => {
                 </p>
 
                 {/* Click here link/button with different color */}
-                <span className='text-sm font-poppins font-semibold text-[#B45309] group-hover:text-[#D97706] transition-colors duration-200 mb-6 inline-block'>
+                <span className='text-sm font-poppins font-semibold text-green-600 group-hover:text-green-700 transition-colors duration-200 mb-6 inline-block'>
                   {t('home.services.clickHere')} &gt;&gt;
                 </span>
               </div>

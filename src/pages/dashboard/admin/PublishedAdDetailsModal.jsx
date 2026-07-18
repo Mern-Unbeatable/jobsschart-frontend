@@ -250,7 +250,7 @@ export default function PublishedAdDetailsModal({
                           className={`w-full text-left px-3 py-2 text-sm transition-colors ${
                             option === selectedAdsPage
                               ? "bg-green-500/60 text-white"
-                              : "text-[#333] hover:bg-[#FCF7E7]"
+                              : "text-[#333] hover:bg-[#F5F1FD]"
                           }`}
                         >
                           {option}

@@ -67,7 +67,7 @@ const UserDashboard = () => {
 
           <button
             type="button"
-            className="inline-flex w-full items-center justify-center rounded bg-green-500/60 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-[#cf9a00]"
+            className="inline-flex w-full items-center justify-center rounded bg-green-500/60 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-[#6E35AE]"
           >
             {t("dashboard.user.buyCreditsButton")}
           </button>

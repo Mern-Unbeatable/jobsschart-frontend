@@ -140,7 +140,7 @@ const ShareExperienceModal = memo(({ isOpen, onClose }) => {
                   className={`px-4 py-2 rounded-lg text-sm transition-all ${
                     formData.category === cat.value
                       ? "bg-green-500/60 text-white "
-                      : "bg-[#FCF7E7] text-[#1C1C1C] hover:bg-[#FCF7E7]"
+                      : "bg-[#F5F1FD] text-[#1C1C1C] hover:bg-[#E9D5FF]"
                   }`}
                 >
                   {cat.label}
@@ -165,7 +165,7 @@ const ShareExperienceModal = memo(({ isOpen, onClose }) => {
                   className={`px-4 py-2 rounded-lg text-sm transition-all ${
                     formData.subcategory === sub.value
                       ? "bg-green-500/60 text-white "
-                      : "bg-[#FCF7E7] text-[#1C1C1C] hover:bg-[#FCF7E7]"
+                      : "bg-[#F5F1FD] text-[#1C1C1C] hover:bg-[#E9D5FF]"
                   }`}
                 >
                   {sub.label}
