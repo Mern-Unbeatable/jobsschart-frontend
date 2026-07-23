@@ -14,6 +14,7 @@ import {
   Settings,
   UserCircle,
   HelpCircle,
+  Calendar,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { name: 'Session', path: ROUTES.ADMIN_SESSION, icon: RefreshCw },
   { name: 'Payout', path: ROUTES.ADMIN_PAYOUT, icon: Euro },
   { name: 'Blog', path: ROUTES.ADMIN_BLOG, icon: FileText },
+  { name: 'Activities', path: ROUTES.ADMIN_ACTIVITIES, icon: Calendar },
   { name: 'FAQ', path: ROUTES.ADMIN_FAQ, icon: HelpCircle },
   { name: 'Setting', path: ROUTES.ADMIN_SETTINGS, icon: Settings },
   { name: 'Profile', path: ROUTES.ADMIN_PROFILE, icon: UserCircle },

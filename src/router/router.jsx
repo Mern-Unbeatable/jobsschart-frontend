@@ -99,6 +99,7 @@ const AdminSettings = lazy(
 );
 const AdminProfile = lazy(() => import("../pages/dashboard/admin/Profile"));
 const AdminFaq = lazy(() => import("../pages/dashboard/admin/faq/Faq"));
+const AdminActivities = lazy(() => import("../pages/dashboard/admin/activities/AdminActivities"));
 
 // User pages
 const UserDashboard = lazy(() => import("../pages/dashboard/user/Dashboard"));
@@ -353,6 +354,10 @@ const router = createBrowserRouter(
         <Route
           path={seg(ROUTES.ADMIN_FAQ, ROUTES.ADMIN)}
           element={<AdminFaq />}
+        />
+        <Route
+          path={seg(ROUTES.ADMIN_ACTIVITIES, ROUTES.ADMIN)}
+          element={<AdminActivities />}
         />
       </Route>
 

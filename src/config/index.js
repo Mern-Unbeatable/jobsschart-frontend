@@ -73,6 +73,7 @@ export const ROUTES = {
   ADMIN_SETTINGS: '/admin/settings',
   ADMIN_PROFILE: '/admin/profile',
   ADMIN_FAQ: '/admin/faq',
+  ADMIN_ACTIVITIES: '/admin/activities',
 
   USER_DASHBOARD: '/user/dashboard',
   USER_BOOKED_SCHEDULE: '/user/booked-schedule',

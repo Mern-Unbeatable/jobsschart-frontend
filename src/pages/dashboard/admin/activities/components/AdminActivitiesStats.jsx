@@ -1,0 +1,42 @@
+import React, { memo } from "react";
+import { Calendar, Sparkles, DollarSign } from "lucide-react";
+
+const AdminActivitiesStats = memo(({ totalEvents, totalWorkshops, paidActivities }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-reveal>
+      <div className="bg-white p-6 rounded-xl border border-purple-100/50 shadow-sm flex items-center justify-between">
+        <div>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Events</p>
+          <h3 className="text-3xl font-extrabold text-gray-900 mt-1">{totalEvents}</h3>
+        </div>
+        <div className="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
+          <Calendar size={24} />
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl border border-purple-100/50 shadow-sm flex items-center justify-between">
+        <div>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Workshops</p>
+          <h3 className="text-3xl font-extrabold text-gray-900 mt-1">{totalWorkshops}</h3>
+        </div>
+        <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600">
+          <Sparkles size={24} />
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl border border-purple-100/50 shadow-sm flex items-center justify-between">
+        <div>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Paid Sessions</p>
+          <h3 className="text-3xl font-extrabold text-gray-900 mt-1">{paidActivities}</h3>
+        </div>
+        <div className="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center text-green-600">
+          <DollarSign size={24} />
+        </div>
+      </div>
+    </div>
+  );
+});
+
+AdminActivitiesStats.displayName = "AdminActivitiesStats";
+
+export default AdminActivitiesStats;
