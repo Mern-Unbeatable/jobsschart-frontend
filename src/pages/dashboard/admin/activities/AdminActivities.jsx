@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import toast from "react-hot-toast";
 
+import Swal from "sweetalert2";
+
 import AdminActivitiesHeader from "./components/AdminActivitiesHeader";
 import AdminActivitiesStats from "./components/AdminActivitiesStats";
 import AdminActivitiesFilter from "./components/AdminActivitiesFilter";
@@ -125,10 +127,21 @@ const AdminActivities = () => {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this activity?")) {
-      setActivities(prev => prev.filter(item => item.id !== id));
-      toast.success("Activity deleted successfully");
-    }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#6E35AE",
+      cancelButtonColor: "#EF4444",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setActivities(prev => prev.filter(item => item.id !== id));
+        toast.success("Activity deleted successfully");
+      }
+    });
   };
 
   const handleSave = (payload) => {
