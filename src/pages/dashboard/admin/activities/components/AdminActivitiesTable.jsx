@@ -31,24 +31,24 @@ const AdminActivitiesTable = memo(({ activities, onEditClick, onDeleteClick }) =
                   </td>
                   <td className="p-4">
                     <div>
-                      <div className="font-semibold text-gray-800 text-sm">{item.host}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">{item.hostTitleEn}</div>
+                      <div className="font-semibold text-gray-800 text-base">{item.host}</div>
+                      <div className="text-sm text-gray-400 mt-0.5">{item.hostTitleEn}</div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="text-xs text-gray-700 font-semibold">{item.date}</div>
-                    <div className="text-xs text-gray-400 mt-0.5">{item.time}</div>
+                    <div className="text-sm text-gray-700 font-semibold">{item.date}</div>
+                    <div className="text-sm text-gray-400 mt-0.5">{item.time}</div>
                   </td>
                   <td className="p-4">
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                    <span className={`px-2.5 py-1 rounded-full text-sm font-medium uppercase tracking-wider ${
                       item.type === "event" ? "bg-purple-100 text-[#6E35AE]" : "bg-orange-100 text-orange-600"
                     }`}>
                       {item.type}
                     </span>
                   </td>
-                  <td className="p-4 text-sm font-bold text-gray-900">
+                  <td className="p-4 text-sm font-medium text-gray-900">
                     <div>{item.price}</div>
-                    <div className="text-xs text-gray-400 font-medium mt-0.5">{item.priceNl}</div>
+                    <div className="text-sm text-gray-400 font-medium mt-0.5">{item.priceNl}</div>
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-2">
