@@ -33,13 +33,13 @@ const INITIAL_ACTIVITIES = [
   {
     id: 2,
     type: "workshop",
-    titleEn: "Holistic Branding for Conscious Businesses",
-    titleNl: "Holistische Branding voor Bewuste Bedrijven",
-    descriptionEn: "Learn how to translate your spiritual values into a powerful and authentic brand identity that attracts aligned clients.",
-    descriptionNl: "Leer hoe u uw spirituele waarden vertaalt naar een krachtige en authentieke merkidentiteit die passende klanten aantrekt.",
-    host: "Marcus de Groot",
-    hostTitleEn: "Creative Director & Brand Strategist",
-    hostTitleNl: "Creatief Directeur & Merkstrateeg",
+    titleEn: "Chakra Balancing & Sound Healing Masterclass",
+    titleNl: "Chakra Balanceren & Sound Healing Masterclass",
+    descriptionEn: "An immersive virtual masterclass to harmonize your energy centers using crystal singing bowls and breathwork.",
+    descriptionNl: "Een meeslepende virtuele masterclass om je energiecentra te harmoniseren met behulp van kristallen klankschalen en ademwerk.",
+    host: "Amara Vance",
+    hostTitleEn: "Sound Therapist & Energy Healer",
+    hostTitleNl: "Geluidstherapeut & Energetisch Genezer",
     date: "2026-08-15",
     time: "14:00 - 17:00",
     price: "€49.00",
@@ -48,8 +48,8 @@ const INITIAL_ACTIVITIES = [
     locationNl: "Google Meet (Interactief)",
     durationEn: "3 Hours",
     durationNl: "3 Uur",
-    tags: ["Business", "Branding"],
-    image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80"
+    tags: ["Chakra", "Sound Healing"],
+    image: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 3,
@@ -70,18 +70,18 @@ const INITIAL_ACTIVITIES = [
     durationEn: "90 Mins",
     durationNl: "90 Min",
     tags: ["Tarot", "Q&A"],
-    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80"
+    image: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 4,
     type: "workshop",
-    titleEn: "SEO Mastery for Soulful Entrepreneurs",
-    titleNl: "SEO-meesterschap voor Bezield Ondernemen",
-    descriptionEn: "Demystify search engine optimization and build an organic traffic strategy that aligns with your message and values.",
-    descriptionNl: "Demystificeer zoekmachineoptimalisatie en bouw een organische verkeersstrategie die aansluit bij uw boodschap en waarden.",
-    host: "Johan Bakhuizen",
-    hostTitleEn: "Search & Visibility Specialist",
-    hostTitleNl: "Zoek- & Zichtbaarheidsspecialist",
+    titleEn: "Astrology & Natal Chart Reading for Beginners",
+    titleNl: "Astrologie & Geboortehoroscoop Lezen voor Beginners",
+    descriptionEn: "Unlock the secrets of the stars and learn to interpret your birth chart's houses, signs, and planetary placements.",
+    descriptionNl: "Ontgrendel de geheimen van de sterren en leer de huizen, tekens en planetaire posities van uw geboortehoroscoop te interpreteren.",
+    host: "Alistair Crowley",
+    hostTitleEn: "Master Astrologer & Author",
+    hostTitleNl: "Meester Astroloog & Auteur",
     date: "2026-08-28",
     time: "10:00 - 13:00",
     price: "€65.00",
@@ -90,8 +90,8 @@ const INITIAL_ACTIVITIES = [
     locationNl: "Interactieve Workshop Hub",
     durationEn: "3 Hours",
     durationNl: "3 Uur",
-    tags: ["SEO", "Marketing"],
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80"
+    tags: ["Astrology", "Zodiac"],
+    image: "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?auto=format&fit=crop&w=800&q=80"
   }
 ];
 
