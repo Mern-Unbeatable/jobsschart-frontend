@@ -7,7 +7,7 @@ const AdminActivitiesFilter = memo(({ filterType, setFilterType, searchQuery, se
       <div className="flex bg-purple-50 p-1 rounded-lg border border-purple-100 w-full md:w-auto">
         <button
           onClick={() => setFilterType("all")}
-          className={`px-4 py-2 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer ${
+          className={`px-4 py-2 rounded-md text-sm font-bold transition-all duration-200 cursor-pointer ${
             filterType === "all" ? "bg-white text-[#6E35AE] shadow-sm" : "text-gray-500 hover:text-[#6E35AE]"
           }`}
         >
@@ -15,7 +15,7 @@ const AdminActivitiesFilter = memo(({ filterType, setFilterType, searchQuery, se
         </button>
         <button
           onClick={() => setFilterType("event")}
-          className={`px-4 py-2 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer ${
+          className={`px-4 py-2 rounded-md text-sm font-bold transition-all duration-200 cursor-pointer ${
             filterType === "event" ? "bg-white text-[#6E35AE] shadow-sm" : "text-gray-500 hover:text-[#6E35AE]"
           }`}
         >
@@ -23,7 +23,7 @@ const AdminActivitiesFilter = memo(({ filterType, setFilterType, searchQuery, se
         </button>
         <button
           onClick={() => setFilterType("workshop")}
-          className={`px-4 py-2 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer ${
+          className={`px-4 py-2 rounded-md text-sm font-bold transition-all duration-200 cursor-pointer ${
             filterType === "workshop" ? "bg-white text-[#6E35AE] shadow-sm" : "text-gray-500 hover:text-[#6E35AE]"
           }`}
         >

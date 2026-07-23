@@ -8,12 +8,12 @@ const AdminActivitiesTable = memo(({ activities, onEditClick, onDeleteClick }) =
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-purple-50/50 border-b border-purple-100">
-              <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Title</th>
-              <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Host</th>
-              <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Date &amp; Time</th>
-              <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Price (EN/NL)</th>
-              <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+              <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Title</th>
+              <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Host</th>
+              <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Date &amp; Time</th>
+              <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Type</th>
+              <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Price (EN/NL)</th>
+              <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-purple-50">

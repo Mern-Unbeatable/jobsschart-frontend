@@ -25,7 +25,7 @@ const ActivityCard = memo(({ activity, onOpenDetails, onRegister }) => {
           <span className={`absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider text-white shadow-sm ${
             activity.type === "event" 
               ? "bg-[#6E35AE]" 
-              : "bg-gradient-to-r from-amber-500 to-orange-500"
+              : "bg-green-500/60"
           }`}>
             {activity.type === "event" ? t("activities.events") : t("activities.workshops")}
           </span>
