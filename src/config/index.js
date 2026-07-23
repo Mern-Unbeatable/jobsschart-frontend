@@ -41,6 +41,7 @@ export const ROUTES = {
   BLOG: '/blog',
   FAQ: '/faq',
   BLOG_DETAIL: '/blog/:blogId',
+  ACTIVITIES: '/activities',
 
   LOGIN: '/login',
   REGISTER: '/register',

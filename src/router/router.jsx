@@ -52,6 +52,7 @@ const TermsConditions = lazy(() => import("../pages/termsConditions/TermsConditi
 const PrivacyPolicy = lazy(() => import("../pages/privacyPolicy/PrivacyPolicy"));
 const CookiePolicy = lazy(() => import("../pages/cookiePolicy/CookiePolicy"));
 const Contact = lazy(() => import("../pages/Contact"));
+const Activities = lazy(() => import("../pages/Activities"));
 
 // Admin pages
 const Dashboard = lazy(() => import("../pages/dashboard/admin/dashboard/Dashboard"));
@@ -231,6 +232,7 @@ const router = createBrowserRouter(
         <Route path={ROUTES.CONTACT} element={<Contact />} />
         <Route path={ROUTES.SERVICES} element={<Services />} />
         <Route path={ROUTES.COMMUNITY} element={<Community />} />
+        <Route path={ROUTES.ACTIVITIES} element={<Activities />} />
       </Route>
 
       {/* Auth routes */}

@@ -11,6 +11,7 @@
     "faq": "FAQ",
     "about": "About",
     "services": "Services",
+    "activities": "Activities",
     "becomeConsultant": "Become a Consultant",
     "signIn": "Sign IN",
     "signOut": "Sign Out",
@@ -659,5 +660,29 @@
         "button": "Book now"
       }
     }
+  },
+  "activities": {
+    "title": "Activities & Gathering Hub",
+    "subtitle": "Join our live events, immersive workshops, and group sessions designed to expand your consciousness and professional reach.",
+    "events": "Events & Gatherings",
+    "workshops": "Interactive Workshops",
+    "searchPlaceholder": "Search by title, host or keyword...",
+    "all": "All",
+    "viewDetails": "View Details",
+    "registerNow": "Register Now",
+    "close": "Close",
+    "host": "Host",
+    "date": "Date",
+    "time": "Time",
+    "price": "Price",
+    "location": "Location",
+    "type": "Type",
+    "duration": "Duration",
+    "registrationModalTitle": "Secure Your Spot",
+    "successMessage": "Successfully registered! Check your email for joining instructions.",
+    "namePlaceholder": "Enter your name",
+    "emailPlaceholder": "Enter your email",
+    "confirmRegistration": "Confirm Registration",
+    "free": "Free"
   }
 }

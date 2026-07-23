@@ -11,6 +11,7 @@
     "faq": "FAQ",
     "about": "Over",
     "services": "Diensten",
+    "activities": "Activiteiten",
     "becomeConsultant": "Word consultant",
     "signIn": "Meld u aan",
     "signOut": "Uitloggen",
@@ -665,5 +666,29 @@
         "cookies": "Cookies"
       }
     }
+  },
+  "activities": {
+    "title": "Activiteiten & Evenementen Hub",
+    "subtitle": "Doe mee met onze live evenementen, meeslepende workshops en groepssessies die zijn ontworpen om uw bewustzijn en professionele bereik te vergroten.",
+    "events": "Evenementen & Bijeenkomsten",
+    "workshops": "Interactieve Workshops",
+    "searchPlaceholder": "Zoek op titel, gastheer of trefwoord...",
+    "all": "Alle",
+    "viewDetails": "Details Bekijken",
+    "registerNow": "Nu Registreren",
+    "close": "Sluiten",
+    "host": "Gastheer",
+    "date": "Datum",
+    "time": "Tijd",
+    "price": "Prijs",
+    "location": "Locatie",
+    "type": "Type",
+    "duration": "Duur",
+    "registrationModalTitle": "Beveilig Je Plek",
+    "successMessage": "Succesvol geregistreerd! Controleer je e-mail voor deelname-instructies.",
+    "namePlaceholder": "Vul je naam in",
+    "emailPlaceholder": "Vul je e-mailadres in",
+    "confirmRegistration": "Registratie Bevestigen",
+    "free": "Gratis"
   }
 }

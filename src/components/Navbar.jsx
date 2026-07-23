@@ -18,6 +18,7 @@ const NAV_BEFORE_LINKS = [
   { to: ROUTES.CREDIT, labelKey: "common.credit" },
   { to: ROUTES.DONATION, labelKey: "common.donation" },
   { to: ROUTES.COMMUNITY, labelKey: "common.community" },
+  { to: ROUTES.ACTIVITIES, labelKey: "common.activities" },
   { to: ROUTES.BLOG, labelKey: "common.blog" },
 ];
 
