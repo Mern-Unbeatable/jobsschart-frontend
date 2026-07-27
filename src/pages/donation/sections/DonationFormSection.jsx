@@ -1,4 +1,4 @@
-import React, { memo, useRef } from "react";
+import React, { memo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   User,
@@ -13,11 +13,14 @@ import {
 import { useCreateCheckoutMutation } from "../../../features/api/paymentApi";
 import toast from "react-hot-toast";
 
+const MIN_DONATION_AMOUNT = 100;
+
 const DonationFormSection = memo(({ formData, setFormData }) => {
   const { t } = useTranslation();
   const fileInputRef = useRef(null);
   const [createCheckout, { isLoading: isCheckingOut }] =
     useCreateCheckoutMutation();
+  const [amountError, setAmountError] = useState("");
 
   const isBusiness = formData.donorType === "business";
 
@@ -32,6 +35,23 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
     }
   };
 
+  const getAmountError = (value) => {
+    if (!value) {
+      return t(
+        "donationForm.fields.amount.requiredError",
+        "Please enter a donation amount.",
+      );
+    }
+    const amountValue = Number(value);
+    if (Number.isNaN(amountValue) || amountValue < MIN_DONATION_AMOUNT) {
+      return t(
+        "donationForm.fields.amount.minError",
+        "Minimum donation amount is €100.00.",
+      );
+    }
+    return "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (
@@ -40,9 +60,22 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
       !formData.phone ||
       !formData.amount
     ) {
-      toast.error("Please fill in all required fields.");
+      toast.error(
+        t(
+          "donationForm.fields.requiredError",
+          "Please fill in all required fields.",
+        ),
+      );
       return;
     }
+
+    const amountValidationError = getAmountError(formData.amount);
+    if (amountValidationError) {
+      setAmountError(amountValidationError);
+      toast.error(amountValidationError);
+      return;
+    }
+    setAmountError("");
 
     try {
       const data = new FormData();
@@ -123,7 +156,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
         </div>
 
         <div className="p-4 lg:p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} noValidate className="space-y-6">
             {/* Standard Inputs */}
             <div className="grid grid-cols-1 gap-6">
               <div>
@@ -180,13 +213,37 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   </label>
                   <input
                     type="number"
+                    step="0.01"
                     placeholder={t("donationForm.fields.amount.placeholder")}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-green-500/60"
+                    className={`w-full px-4 py-3 border rounded-md text-sm focus:outline-none ${
+                      amountError
+                        ? "border-red-400 focus:border-red-500"
+                        : "border-gray-200 focus:border-green-500/60"
+                    }`}
                     value={formData.amount}
-                    onChange={(e) =>
-                      setFormData({ ...formData, amount: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const nextAmount = e.target.value;
+                      setFormData({ ...formData, amount: nextAmount });
+                      if (amountError) {
+                        setAmountError(getAmountError(nextAmount));
+                      }
+                    }}
+                    onBlur={() => {
+                      if (formData.amount) {
+                        setAmountError(getAmountError(formData.amount));
+                      }
+                    }}
                   />
+                  {amountError ? (
+                    <p className="mt-1.5 text-xs text-red-500">{amountError}</p>
+                  ) : (
+                    <p className="mt-1.5 text-xs text-gray-500">
+                      {t(
+                        "donationForm.fields.amount.hint",
+                        "Minimum donation: €100.00",
+                      )}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-base text-gray-600 mb-2">
@@ -208,7 +265,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
               </div>
             </div>
 
-            {/* Donor Type Selection */}
+            {/* Donator Type Selection */}
             <div className="pt-4">
               <label className="block text-lg text-gray-600 mb-4">
                 {t("donationForm.donorType.label")}

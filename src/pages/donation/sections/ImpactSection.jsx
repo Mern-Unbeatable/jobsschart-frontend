@@ -48,7 +48,7 @@ const ImpactSection = memo(() => {
           </ul>
         </div>
 
-        {/* Section 17: Additional Benefit for Donors */}
+        {/* Section 17: Additional Benefit for Donators */}
         <div className="bg-[#E9D5FF] rounded-2xl p-8 md:p-12 border border-purple-200 text-[#6E35AE] flex flex-col md:flex-row items-center gap-8">
           <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-sm animate-pulse">
             <Megaphone size={32} className="text-[#6E35AE]" />

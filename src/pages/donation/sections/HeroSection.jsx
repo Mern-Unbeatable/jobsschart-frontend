@@ -7,7 +7,7 @@ const HeroSection = memo(() => {
     <div
       className='relative w-full h-100 md:h-180 2xl:h-220  bg-cover bg-top flex items-center'
       style={{
-        backgroundImage: 'url("/donate/donation.png")',
+        backgroundImage: 'url("/donate/donatie.jpg")',
       }}
     >
       {/* Dark Overlay - */}

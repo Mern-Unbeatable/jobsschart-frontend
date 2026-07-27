@@ -10,12 +10,12 @@ const HeroSection = memo(() => {
       aria-label="Car search hero"
       className="relative w-full h-100 md:h-180 2xl:h-220 flex items-center justify-center overflow-hidden"
     >
-      {/* Background image */}
+      {/* Background image — object-center keeps the circular board + tarot cards in view */}
       <img
-        src="/home.png"
+        src="/newHero.jpg"
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
         loading="eager"
       />
       {/* Light overlay — keeps text readable while image stays vivid */}

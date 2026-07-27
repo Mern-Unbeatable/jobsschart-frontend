@@ -14,7 +14,7 @@ export default function AdsHeader({ onPublishClick }) {
           Adds Management
         </h1>
         <p className="text-sm sm:text-base text-[#464646] leading-6">
-          Donor Advertisement Management Dashboard
+          Donator Advertisement Management Dashboard
         </p>
       </div>
       <button

@@ -421,9 +421,9 @@
       }
     },
     "benefit": {
-      "eyebrow": "Extra voordeel voor donateurs",
+      "eyebrow": "Extra voordeel voor donatoren",
       "title": "Promoot uw bedrijf",
-      "p1": "Als blijk van waardering voor het ondersteunen van onze missie, krijgen donateurs de mogelijkheid om hun bedrijf, merk of logo een jaar lang gratis te promoten binnen onze gemeenschap.",
+      "p1": "Als blijk van waardering voor het ondersteunen van onze missie, krijgen donatoren de mogelijkheid om hun bedrijf, merk of logo een jaar lang gratis te promoten binnen onze gemeenschap.",
       "p2": "Dit stelt ons in staat om zowel de groei van ons platform als de zichtbaarheid van ondernemers en bedrijven in ons netwerk te ondersteunen."
     }
   },
@@ -453,8 +453,12 @@
       },
       "amount": {
         "label": "Bedrag (€)",
-        "placeholder": "bijv. 250"
+        "placeholder": "bijv. 100.00",
+        "hint": "Minimumdonatie: €100.00",
+        "minError": "Het minimumdonatiebedrag is €100.00.",
+        "requiredError": "Voer een donatiebedrag in."
       },
+      "requiredError": "Vul alle verplichte velden in.",
       "businessName": {
         "label": "Bedrijfsnaam *",
         "placeholder": "Uw bedrijfsnaam"
@@ -477,16 +481,16 @@
       }
     },
     "donorType": {
-      "label": "Donateur type",
-      "individual": "Individuele donor",
-      "business": "Zakelijke donor"
+      "label": "Donator type",
+      "individual": "Individuele donator",
+      "business": "Zakelijke donator"
     },
     "businessType": {
       "local": "Lokaal bedrijf",
       "online": "Online bedrijf"
     },
     "benefits": {
-      "title": "Voordelen zakelijke donor",
+      "title": "Voordelen zakelijke donator",
       "adPlacement": "Website advertentieplaatsing",
       "visibility": "Zichtbaarheid verbetering"
     },

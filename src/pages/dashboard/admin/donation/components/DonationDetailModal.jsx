@@ -81,9 +81,9 @@ function DonationDetailModal({ donorId, onClose }) {
               <p className="text-sm font-medium text-[#4A5565]">Phone</p>
               <p className="text-base text-[#0A0A0A]">{donor.phone || "—"}</p>
             </div>
-            {/* Donor Type */}
+            {/* Donator Type */}
             <div className="flex flex-col gap-1.5">
-              <p className="text-sm font-medium text-[#4A5565]">Donor Type</p>
+              <p className="text-sm font-medium text-[#4A5565]">Donator Type</p>
               <span
                 style={{ background: "#030213" }}
                 className="inline-flex items-center text-white text-xs font-medium px-2.25 py-0.75 rounded-lg w-fit"

@@ -285,9 +285,9 @@
       }
     },
     "benefit": {
-      "eyebrow": "Additional Benefit for Donors",
+      "eyebrow": "Additional Benefit for Donators",
       "title": "Promote Your Business",
-      "p1": "As a token of appreciation for supporting our mission, donors will receive the opportunity to advertise their business, brand, or logo within our community free of charge for one full year.",
+      "p1": "As a token of appreciation for supporting our mission, donators will receive the opportunity to advertise their business, brand, or logo within our community free of charge for one full year.",
       "p2": "This allows us to support both the growth of our platform and the visibility of entrepreneurs and businesses within our network."
     }
   },
@@ -317,8 +317,12 @@
       },
       "amount": {
         "label": "Amount (€)",
-        "placeholder": "e.g. 250"
+        "placeholder": "e.g. 100.00",
+        "hint": "Minimum donation: €100.00",
+        "minError": "Minimum donation amount is €100.00.",
+        "requiredError": "Please enter a donation amount."
       },
+      "requiredError": "Please fill in all required fields.",
       "businessName": {
         "label": "Business Name *",
         "placeholder": "Your Business Name"
@@ -341,16 +345,16 @@
       }
     },
     "donorType": {
-      "label": "Donor Type",
-      "individual": "Individual Donor",
-      "business": "Business Donor"
+      "label": "Donator Type",
+      "individual": "Individual Donator",
+      "business": "Business Donator"
     },
     "businessType": {
       "local": "Local Business",
       "online": "Online Business"
     },
     "benefits": {
-      "title": "Business Donor Benefits",
+      "title": "Business Donator Benefits",
       "adPlacement": "Website ad placement",
       "visibility": "Visibility boost"
     },
