@@ -4,6 +4,8 @@ import PayoutSummary from "./components/PayoutSummary";
 import PaymentHistoryTable from "./components/PaymentHistoryTable";
 import WithdrawModal from "./components/WithdrawModal";
 import { useGetPayoutBalanceQuery, useGetMyPayoutsQuery, useRequestPayoutMutation } from "../../../../features/api/payoutApi";
+import { useGetMyConsultantProfileQuery } from "../../../../features/api/consultantApi";
+import { getApiErrorMessage, validateIban } from "../../../../utils/apiErrorUtils";
 
 const MODAL_CLOSE_ANIMATION_MS = 280;
 const PAGE_SIZE = 10;
@@ -16,6 +18,8 @@ const ConsultantPayout = memo(() => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data: balanceData, isLoading: isBalanceLoading } = useGetPayoutBalanceQuery();
+  const { data: profileData } = useGetMyConsultantProfileQuery();
+  const profile = profileData?.profile || profileData;
 
   const { data: payoutsData, isLoading: isPayoutsLoading } = useGetMyPayoutsQuery({
     page: currentPage,
@@ -64,11 +68,11 @@ const ConsultantPayout = memo(() => {
       return;
     }
 
-    const availableBalance = balanceData?.availableBalance ?? 0;
+    const withdrawableBalance = balanceData?.withdrawableBalance ?? 0;
     const minimumPayout = balanceData?.minimumPayout ?? 10;
 
-    if (amountVal > availableBalance) {
-      toast.error(`Requested amount exceeds available balance of €${availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`);
+    if (amountVal > withdrawableBalance) {
+      toast.error(`Requested amount exceeds withdrawable balance of €${withdrawableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`);
       return;
     }
 
@@ -82,13 +86,14 @@ const ConsultantPayout = memo(() => {
       return;
     }
 
-    if (!formData.routingNumber) {
-      toast.error("Please enter the routing number.");
+    if (!formData.routingNumber?.trim()) {
+      toast.error("Please enter your IBAN (bank account number).");
       return;
     }
 
-    if (!formData.accountNumber) {
-      toast.error("Please enter the account number.");
+    const ibanError = validateIban(formData.routingNumber);
+    if (ibanError) {
+      toast.error(ibanError, { duration: 6000 });
       return;
     }
 
@@ -97,13 +102,14 @@ const ConsultantPayout = memo(() => {
       await requestPayout({
         amount: amountVal,
         organisationName: formData.businessName,
-        routingNumber: formData.routingNumber,
-        accountNumber: formData.accountNumber,
+        routingNumber: formData.routingNumber.replace(/\s/g, '').toUpperCase(),
+        accountNumber: formData.accountNumber?.replace(/\s/g, '') || '',
       }).unwrap();
       toast.success("Withdrawal request submitted successfully.", { id: toastId });
       handleCloseModal();
     } catch (error) {
-      toast.error(error?.message || error?.data?.message || "Failed to submit withdrawal request.", { id: toastId });
+      const message = getApiErrorMessage(error, "Failed to submit withdrawal request.");
+      toast.error(message, { id: toastId, duration: 7000 });
     }
   }, [balanceData, requestPayout, handleCloseModal]);
 
@@ -170,6 +176,8 @@ const ConsultantPayout = memo(() => {
         onClose={handleCloseModal}
         onSubmit={handleSubmitWithdrawal}
         isSubmitting={isSubmitting}
+        defaultIban={profile?.businessBankAccount || ""}
+        defaultBusinessName={profile?.user?.name || ""}
       />
     </>
   );

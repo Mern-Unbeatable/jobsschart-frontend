@@ -16,6 +16,7 @@ import {
     useDeclineSessionMutation,
 } from '../../features/api/chatApi';
 import toast from 'react-hot-toast';
+import { showBalanceWarning } from '../../utils/balanceWarningUtils';
 import axios from 'axios';
 import MessageBubble from '../../components/chat/MessageBubble';
 import ConversationItem from '../../components/chat/ConversationItem';
@@ -300,11 +301,7 @@ const RealTimeChat = memo(({
 
         socketService.on('balance_warning', LISTENER_KEY, (data) => {
             if (data.conversationId === activeConvRef.current?.id) {
-                if (data.type === 'critical') {
-                    toast.error(`⚠️ Less than 1 minute remaining! (€${parseFloat(data.remainingBalance || 0).toFixed(2)})`, { duration: 8000 });
-                } else {
-                    toast(`⚠️ Only ${data.remainingMinutes} min remaining`, { icon: '', duration: 5000 });
-                }
+                showBalanceWarning(data);
             }
         });
 
@@ -762,6 +759,7 @@ const RealTimeChat = memo(({
                                     startedAt={sessionStartedAt}
                                     totalCost={sessionTotalCost}
                                     walletBalance={currentBalance}
+                                    onBalanceUpdate={setCurrentBalance}
                                     onEnd={handleEndSession}
                                     isEnding={isEndingSession}
                                 />

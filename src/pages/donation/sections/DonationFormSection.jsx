@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useCreateCheckoutMutation } from "../../../features/api/paymentApi";
 import toast from "react-hot-toast";
+import PaymentMethodSelector from "../../../components/payment/PaymentMethodSelector";
 
 const MIN_DONATION_AMOUNT = 100;
 
@@ -21,6 +22,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
   const [createCheckout, { isLoading: isCheckingOut }] =
     useCreateCheckoutMutation();
   const [amountError, setAmountError] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
 
   const isBusiness = formData.donorType === "business";
 
@@ -104,6 +106,10 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
         if (formData.image) {
           data.append("donationData[image]", formData.image);
         }
+      }
+
+      if (paymentMethod) {
+        data.append("paymentMethod", paymentMethod);
       }
 
       const result = await createCheckout(data).unwrap();
@@ -500,6 +506,12 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                 </div>
               </div>
             </div>
+
+            <PaymentMethodSelector
+              value={paymentMethod}
+              onChange={setPaymentMethod}
+              className="mt-6"
+            />
 
             <div className="pt-4">
               <button

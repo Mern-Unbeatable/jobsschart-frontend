@@ -1,7 +1,8 @@
 import React, { memo, useState, useEffect } from 'react';
 import { Phone, Video, MessageSquare, Clock, Euro, PhoneOff } from 'lucide-react';
+import InCallCreditTopUp from '../credit/InCallCreditTopUp';
 
-const BillingBanner = memo(({ sessionType, startedAt, totalCost, walletBalance, onEnd, frozenElapsed }) => {
+const BillingBanner = memo(({ sessionType, startedAt, totalCost, walletBalance, onEnd, frozenElapsed, onBalanceUpdate }) => {
     const [elapsed, setElapsed] = useState(0);
     const [displayCost, setDisplayCost] = useState(parseFloat(totalCost || 0));
 
@@ -52,12 +53,15 @@ const BillingBanner = memo(({ sessionType, startedAt, totalCost, walletBalance, 
                     Balance: <strong className='text-gray-800'>€{parseFloat(walletBalance || 0).toFixed(2)}</strong>
                 </span>
             </div>
-            <button
-                onClick={onEnd}
-                className='flex items-center gap-1 px-3 py-1 rounded-full bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition-colors shrink-0'
-            >
-                <PhoneOff size={12} /> End Session
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+                <InCallCreditTopUp onBalanceUpdate={onBalanceUpdate} />
+                <button
+                    onClick={onEnd}
+                    className='flex items-center gap-1 px-3 py-1 rounded-full bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition-colors'
+                >
+                    <PhoneOff size={12} /> End Session
+                </button>
+            </div>
         </div>
     );
 });

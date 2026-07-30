@@ -188,6 +188,22 @@ export const consultantApi = baseApi.injectEndpoints({
             transformResponse: (response) => response.data,
         }),
 
+        getPendingVerifications: builder.query({
+            query: () => '/consultants/admin/verifications',
+            providesTags: ['Consultant'],
+            transformResponse: (response) => response?.data?.consultants || [],
+        }),
+
+        reviewVerification: builder.mutation({
+            query: ({ id, ...body }) => ({
+                url: `/consultants/${id}/verification-review`,
+                method: 'PATCH',
+                body,
+            }),
+            invalidatesTags: ['Consultant', 'MyConsultantProfile'],
+            transformResponse: (response) => response.data,
+        }),
+
         updateScheduleStatus: builder.mutation({
             query: ({ scheduleId, ...data }) => ({
                 url: `/consultants/me/schedules/${scheduleId}`,
@@ -251,6 +267,8 @@ export const {
     useDeleteAvailabilitySlotMutation,
     useGetMonthlyInvoicesQuery,
     useUpdateVerificationInfoMutation,
+    useGetPendingVerificationsQuery,
+    useReviewVerificationMutation,
     useUpdateScheduleStatusMutation,
 
     // Reviews (public but requires auth)

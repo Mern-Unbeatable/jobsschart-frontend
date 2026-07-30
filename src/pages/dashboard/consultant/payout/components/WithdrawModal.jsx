@@ -7,6 +7,8 @@ export default function WithdrawModal({
   onClose,
   onSubmit,
   isSubmitting = false,
+  defaultIban = "",
+  defaultBusinessName = "",
 }) {
   const [amount, setAmount] = useState("");
   const [businessName, setBusinessName] = useState("");
@@ -16,11 +18,11 @@ export default function WithdrawModal({
   useEffect(() => {
     if (isOpen) {
       setAmount("");
-      setBusinessName("");
-      setRoutingNumber("");
+      setBusinessName(defaultBusinessName || "");
+      setRoutingNumber(defaultIban || "");
       setAccountNumber("");
     }
-  }, [isOpen]);
+  }, [isOpen, defaultIban, defaultBusinessName]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

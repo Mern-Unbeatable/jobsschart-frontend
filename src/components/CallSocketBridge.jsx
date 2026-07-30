@@ -23,6 +23,8 @@ export function CallSocketBridge() {
             call_accepted: (data) => forward('call_accepted', data),
             call_rejected: (data) => forward('call_rejected', data),
             incoming_call: (data) => forward('incoming_call', data),
+            call_balance_warning: (data) => forward('call_balance_warning', data),
+            call_billing_tick: (data) => forward('call_billing_tick', data),
         };
 
         Object.entries(handlers).forEach(([event, handler]) => {

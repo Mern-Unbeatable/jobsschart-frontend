@@ -12,6 +12,7 @@ import {
 import { gsap } from "gsap";
 import StatusBadge from "./StatusBadge";
 import InfoCard from "./InfoCard";
+import AdminVerificationPanel from "./AdminVerificationPanel";
 
 function ConsultantDetail({ consultant: c, onBack }) {
   const wrapRef = useRef(null);
@@ -147,6 +148,10 @@ function ConsultantDetail({ consultant: c, onBack }) {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="detail-card">
+        <AdminVerificationPanel consultant={c} />
       </div>
     </div>
   );

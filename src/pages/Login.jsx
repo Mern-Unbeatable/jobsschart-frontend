@@ -9,6 +9,7 @@ import {
 import { ROUTES, getDashboardRoute } from "../config";
 import { Eye, EyeOff, ArrowLeft, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { getApiErrorMessage, getApiFieldErrors } from "../utils/apiErrorUtils";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -86,19 +87,14 @@ const Login = () => {
     } catch (error) {
       console.error("Login error:", error);
 
-      let errorMessage = "Login failed. Please try again.";
-
-      if (error?.data?.message) {
-        errorMessage = error.data.message;
-      } else if (error?.message) {
-        errorMessage = error.message;
-      } else if (error?.status === 401) {
-        errorMessage = "Invalid email or password.";
-      } else if (error?.status === 403) {
-        errorMessage = "Your account is locked or not verified.";
+      const fieldErrors = getApiFieldErrors(error);
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
+        toast.error(Object.values(fieldErrors)[0]);
+        return;
       }
 
-      toast.error(errorMessage);
+      toast.error(getApiErrorMessage(error, "Login failed. Please try again."));
     }
   };
 

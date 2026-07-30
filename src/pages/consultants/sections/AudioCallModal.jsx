@@ -13,6 +13,8 @@ import {
 import toast from 'react-hot-toast';
 import { twilioVideoService } from '../../../services/twilioVideoService';
 import { freezeCallUI, matchesCallId } from '../../../utils/callEndUtils';
+import { showBalanceWarning } from '../../../utils/balanceWarningUtils';
+import InCallCreditTopUp from '../../../components/credit/InCallCreditTopUp';
 
 const LISTENER_KEY = 'audio-call-modal';
 
@@ -21,6 +23,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [currentBilling, setCurrentBilling] = useState(0);
+  const [walletBalance, setWalletBalance] = useState(0);
   const [callState, setCallState] = useState(null);
   const [actualStartTime, setActualStartTime] = useState(null);
 
@@ -44,6 +47,10 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
   });
 
   const hasInitiatedRef = useRef(false);
+
+  useEffect(() => {
+    setWalletBalance(parseFloat(user?.wallet?.creditBalance || 0));
+  }, [user?.wallet?.creditBalance]);
 
   // Sync call duration from server
   useEffect(() => {
@@ -106,6 +113,9 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
 
     const handleCallEnded = (data) => {
       if (!matchesCallId(data, callStateRef.current?.callId)) return;
+      if (data?.reason === 'insufficient_balance') {
+        toast.error('Call ended — your credit balance was exhausted.');
+      }
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -124,8 +134,24 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
 
     const onCallEnding = (e) => handleCallEnding(e.detail);
     const onCallEnded = (e) => handleCallEnded(e.detail);
+    const onBalanceWarning = (e) => {
+      if (!matchesCallId(e.detail, callStateRef.current?.callId)) return;
+      if (callStateRef.current?.isIncoming) return;
+      showBalanceWarning(e.detail);
+    };
+    const onBillingTick = (e) => {
+      if (!matchesCallId(e.detail, callStateRef.current?.callId)) return;
+      if (e.detail?.balanceAfter != null) {
+        setWalletBalance(parseFloat(e.detail.balanceAfter));
+      }
+      if (e.detail?.amountCharged != null) {
+        setCurrentBilling((prev) => Number((prev + e.detail.amountCharged).toFixed(2)));
+      }
+    };
     window.addEventListener('rtcall:call_ending', onCallEnding);
     window.addEventListener('rtcall:call_ended', onCallEnded);
+    window.addEventListener('rtcall:call_balance_warning', onBalanceWarning);
+    window.addEventListener('rtcall:call_billing_tick', onBillingTick);
 
     socketService.on('call_accepted', LISTENER_KEY, async (data) => {
       if (isClosingRef.current || isConnectedRef.current) return;
@@ -190,6 +216,8 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
     return () => {
       window.removeEventListener('rtcall:call_ending', onCallEnding);
       window.removeEventListener('rtcall:call_ended', onCallEnded);
+      window.removeEventListener('rtcall:call_balance_warning', onBalanceWarning);
+      window.removeEventListener('rtcall:call_billing_tick', onBillingTick);
       socketService.off('call_accepted', LISTENER_KEY);
       socketService.off('call_rejected', LISTENER_KEY);
     };
@@ -386,10 +414,21 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
             {formatTime(seconds)}
           </div>
 
-          <div className="bg-white/10 px-6 py-3 rounded-xl mb-8 text-center">
+          <div className="bg-white/10 px-6 py-3 rounded-xl mb-4 text-center w-full max-w-xs">
             <p className="text-xs text-gray-400 mb-1 uppercase">Current Billing</p>
             <p className="text-white font-bold text-xl">€{currentBilling.toFixed(2)}</p>
+            {!callState?.isIncoming && callState?.status === 'active' && (
+              <p className="text-xs text-gray-400 mt-2">
+                Balance: <span className="text-white font-semibold">€{walletBalance.toFixed(2)}</span>
+              </p>
+            )}
           </div>
+
+          {!callState?.isIncoming && callState?.status === 'active' && (
+            <div className="mb-6">
+              <InCallCreditTopUp compact onBalanceUpdate={setWalletBalance} />
+            </div>
+          )}
 
           <div className="flex items-center gap-4">
             <button

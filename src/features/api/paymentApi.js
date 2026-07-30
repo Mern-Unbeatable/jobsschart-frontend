@@ -1,6 +1,7 @@
 import { baseApi } from '../baseApi';
 
 export const paymentApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     // ========== PROTECTED ROUTES (Requires authentication) ==========
     createCheckout: builder.mutation({
@@ -35,6 +36,15 @@ export const paymentApi = baseApi.injectEndpoints({
       transformResponse: (response) => response.data,
     }),
 
+    getPaymentMethods: builder.query({
+      query: ({ amount = 10 } = {}) => ({
+        url: '/payments/methods',
+        method: 'GET',
+        params: { amount },
+      }),
+      transformResponse: (response) => response.data,
+    }),
+
     // ========== ADMIN ROUTES ==========
     getAllPayments: builder.query({
       query: ({ page = 1, limit = 10, status, startDate, endDate } = {}) => ({
@@ -54,4 +64,5 @@ export const {
   useLazyVerifyPaymentQuery,
   useGetPaymentHistoryQuery,
   useGetAllPaymentsQuery,
+  useGetPaymentMethodsQuery,
 } = paymentApi;

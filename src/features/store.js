@@ -4,6 +4,10 @@ import authReducer, { setCredentials } from './slices/authSlice';
 import languageReducer from './slices/languageSlice';
 import themeReducer from './slices/themeSlice';
 import { baseApi } from './baseApi';
+import './api/paymentApi';
+import './api/callApi';
+import './api/chatApi';
+import './api/packageApi';
 
 export const store = configureStore({
   reducer: {

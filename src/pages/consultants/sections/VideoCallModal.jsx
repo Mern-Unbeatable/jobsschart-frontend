@@ -16,6 +16,8 @@ import {
 import { twilioVideoService } from '../../../services/twilioVideoService';
 import toast from 'react-hot-toast';
 import { freezeCallUI, matchesCallId } from '../../../utils/callEndUtils';
+import { showBalanceWarning } from '../../../utils/balanceWarningUtils';
+import InCallCreditTopUp from '../../../components/credit/InCallCreditTopUp';
 
 const LISTENER_KEY = 'video-call-modal';
 
@@ -25,6 +27,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [currentBilling, setCurrentBilling] = useState(0);
+  const [walletBalance, setWalletBalance] = useState(0);
   const [callState, setCallState] = useState(null);
   const [actualStartTime, setActualStartTime] = useState(null);
   const [isVideoConnected, setIsVideoConnected] = useState(false);
@@ -48,6 +51,10 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   const actualStartTimeRef = useRef(null);
   callStateRef.current = callState;
   actualStartTimeRef.current = actualStartTime;
+
+  useEffect(() => {
+    setWalletBalance(parseFloat(user?.wallet?.creditBalance || 0));
+  }, [user?.wallet?.creditBalance]);
 
   const { data: callData } = useGetCallByIdQuery(callState?.callId, {
     skip: !callState?.callId || showFeedback,
@@ -215,6 +222,9 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
     const handleCallEnded = (data) => {
       if (!matchesCallId(data, callStateRef.current?.callId)) return;
+      if (data?.reason === 'insufficient_balance') {
+        toast.error('Call ended — your credit balance was exhausted.');
+      }
       if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
       twilioVideoService.disconnect();
       setIsVideoConnected(false);
@@ -230,9 +240,25 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
     const onCallEnding = (e) => handleCallEnding(e.detail);
     const onCallEnded = (e) => handleCallEnded(e.detail);
+    const onBalanceWarning = (e) => {
+      if (!matchesCallId(e.detail, callStateRef.current?.callId)) return;
+      if (callStateRef.current?.isIncoming) return;
+      showBalanceWarning(e.detail);
+    };
+    const onBillingTick = (e) => {
+      if (!matchesCallId(e.detail, callStateRef.current?.callId)) return;
+      if (e.detail?.balanceAfter != null) {
+        setWalletBalance(parseFloat(e.detail.balanceAfter));
+      }
+      if (e.detail?.amountCharged != null) {
+        setCurrentBilling((prev) => Number((prev + e.detail.amountCharged).toFixed(2)));
+      }
+    };
 
     window.addEventListener('rtcall:call_ending', onCallEnding);
     window.addEventListener('rtcall:call_ended', onCallEnded);
+    window.addEventListener('rtcall:call_balance_warning', onBalanceWarning);
+    window.addEventListener('rtcall:call_billing_tick', onBillingTick);
 
     socketService.on('call_accepted', LISTENER_KEY, handleCallAccepted);
     socketService.on('call_rejected', LISTENER_KEY, handleCallRejected);
@@ -240,6 +266,8 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     return () => {
       window.removeEventListener('rtcall:call_ending', onCallEnding);
       window.removeEventListener('rtcall:call_ended', onCallEnded);
+      window.removeEventListener('rtcall:call_balance_warning', onBalanceWarning);
+      window.removeEventListener('rtcall:call_billing_tick', onBillingTick);
       socketService.off('call_accepted', LISTENER_KEY);
       socketService.off('call_rejected', LISTENER_KEY);
       isAcceptedRef.current = false;
@@ -481,7 +509,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         )}
 
         {/* Top Info Bar */}
-        <div className="absolute top-4 left-4 z-20">
+        <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
           <div className="bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 border border-white/10">
             <div className={`w-2 h-2 rounded-full ${callState?.status === 'active' ? 'bg-green-400 animate-pulse' : 'bg-yellow-400 animate-pulse'}`} />
             <p className="text-xs font-bold text-white tracking-wide">
@@ -493,6 +521,14 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
               }
             </p>
           </div>
+          {callState?.status === 'active' && !callState?.isIncoming && (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-white/80 bg-black/30 px-2 py-0.5 rounded-full">
+                Bal: €{walletBalance.toFixed(2)}
+              </span>
+              <InCallCreditTopUp compact onBalanceUpdate={setWalletBalance} />
+            </div>
+          )}
         </div>
 
         {/* Bottom Controls */}

@@ -29,17 +29,17 @@ const SummaryCard = memo(
 SummaryCard.displayName = "SummaryCard";
 
 export default function PayoutSummary({ onWithdrawClick, balanceData }) {
-  const available = balanceData?.availableBalance ?? 0;
+  const withdrawable = balanceData?.withdrawableBalance ?? 0;
   const pending = balanceData?.pendingPayoutAmount ?? 0;
   const total = balanceData?.totalEarned ?? 0;
 
   const summaryItems = [
     {
-      id: "available",
-      title: "Available Balance",
-      amount: `€${available.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      id: "withdrawable",
+      title: "Available to Withdraw",
+      amount: `€${withdrawable.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: Euro,
-      showWithdraw: false,
+      showWithdraw: true,
     },
     {
       id: "pending",
