@@ -18,6 +18,7 @@ import toast from 'react-hot-toast';
 import { freezeCallUI, matchesCallId } from '../../../utils/callEndUtils';
 import { showBalanceWarning } from '../../../utils/balanceWarningUtils';
 import InCallCreditTopUp from '../../../components/credit/InCallCreditTopUp';
+import { unlockBrowserAudio } from '../../../utils/notificationSound';
 
 const LISTENER_KEY = 'video-call-modal';
 
@@ -172,6 +173,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     const handleCallAccepted = async (data) => {
       if (isClosingRef.current || isAcceptedRef.current) return;
       isAcceptedRef.current = true;
+      unlockBrowserAudio();
 
       const startTime = data.actualStartTime ? new Date(data.actualStartTime).getTime() : Date.now();
       setActualStartTime(startTime);

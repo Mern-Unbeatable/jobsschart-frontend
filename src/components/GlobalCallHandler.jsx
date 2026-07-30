@@ -1,6 +1,5 @@
-// src/components/GlobalCallHandler.jsx
 import React, { useState, useEffect } from 'react';
-import CallRoom from './CallRoom'; // adjust path as needed
+import CallRoom from './CallRoom';
 
 const GlobalCallHandler = () => {
     const [activeCallData, setActiveCallData] = useState(null);
@@ -14,22 +13,15 @@ const GlobalCallHandler = () => {
         };
 
         window.addEventListener('open-call-window', handleOpenCallWindow);
-
-        return () => {
-            window.removeEventListener('open-call-window', handleOpenCallWindow);
-        };
+        return () => window.removeEventListener('open-call-window', handleOpenCallWindow);
     }, []);
-
-    const handleClose = () => {
-        setActiveCallData(null);
-    };
 
     if (!activeCallData) return null;
 
     return (
         <CallRoom
             callData={activeCallData}
-            onClose={handleClose}
+            onClose={() => setActiveCallData(null)}
         />
     );
 };

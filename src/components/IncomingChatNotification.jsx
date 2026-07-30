@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { MessageSquare, Check, X, Volume2, VolumeX } from 'lucide-react';
 import { socketService } from '../services/socketService';
 import { useAcceptSessionMutation, useDeclineSessionMutation } from '../features/api/chatApi';
+import {
+    playNotificationRingtone,
+    stopNotificationRingtone,
+} from '../utils/notificationSound';
 import toast from 'react-hot-toast';
 
 const LISTENER_KEY = 'incoming-chat-notification';
@@ -10,49 +14,20 @@ const LISTENER_KEY = 'incoming-chat-notification';
 export const IncomingChatNotification = () => {
     const [incomingChat, setIncomingChat] = useState(null);
     const [isMuted, setIsMuted] = useState(false);
-    const audioRef = useRef(null);
     const { user, token, isAuthenticated } = useSelector(state => state.auth);
     const [acceptSession, { isLoading: isAccepting }] = useAcceptSessionMutation();
     const [declineSession, { isLoading: isDeclining }] = useDeclineSessionMutation();
 
     const isConsultant = user?.role === 'CONSULTANT' || user?.role === 'ADMIN';
-
-    useEffect(() => {
-        audioRef.current = new Audio('/ringtone.mp3');
-        audioRef.current.loop = true;
-        return () => { audioRef.current?.pause(); };
-    }, []);
-
     const incomingChatRef = useRef(null);
     incomingChatRef.current = incomingChat;
-
-    const stopSound = useCallback(() => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-        }
-    }, []);
 
     useEffect(() => {
         if (!isAuthenticated || !user?.id || !token || !isConsultant) return;
 
         const handleIncoming = (data) => {
             setIncomingChat(data);
-            if (audioRef.current) {
-                audioRef.current.play().catch(() => {
-                    try {
-                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.frequency.value = 880;
-                        gain.gain.value = 0.15;
-                        osc.start();
-                        setTimeout(() => osc.stop(), 200);
-                    } catch { /* ignore */ }
-                });
-            }
+            playNotificationRingtone();
 
             if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
                 new Notification('💬 New Chat Request', {
@@ -69,19 +44,18 @@ export const IncomingChatNotification = () => {
         });
         socketService.on('chat_request_declined', LISTENER_KEY, () => {
             setIncomingChat(null);
-            audioRef.current?.pause();
-            audioRef.current.currentTime = 0;
+            stopNotificationRingtone();
         });
         socketService.on('session_started', LISTENER_KEY, (data) => {
             if (incomingChatRef.current?.conversationId === data.conversationId) {
                 setIncomingChat(null);
-                stopSound();
+                stopNotificationRingtone();
             }
         });
         socketService.on('chat_request_accepted', LISTENER_KEY, (data) => {
             if (incomingChatRef.current?.conversationId === data.conversationId) {
                 setIncomingChat(null);
-                stopSound();
+                stopNotificationRingtone();
             }
         });
 
@@ -95,12 +69,13 @@ export const IncomingChatNotification = () => {
             socketService.off('chat_request_declined', LISTENER_KEY);
             socketService.off('session_started', LISTENER_KEY);
             socketService.off('chat_request_accepted', LISTENER_KEY);
+            stopNotificationRingtone();
         };
-    }, [isAuthenticated, user?.id, token, isConsultant, stopSound]);
+    }, [isAuthenticated, user?.id, token, isConsultant]);
 
     const handleAccept = async () => {
         if (!incomingChat?.conversationId) return;
-        stopSound();
+        stopNotificationRingtone();
         try {
             await acceptSession(incomingChat.conversationId).unwrap();
             setIncomingChat(null);
@@ -112,7 +87,7 @@ export const IncomingChatNotification = () => {
 
     const handleDecline = async () => {
         if (!incomingChat?.conversationId) return;
-        stopSound();
+        stopNotificationRingtone();
         try {
             await declineSession(incomingChat.conversationId).unwrap();
             toast('Chat request declined');
@@ -161,8 +136,11 @@ export const IncomingChatNotification = () => {
                             <X size={18} />
                             Decline
                         </button>
-                        <button onClick={() => { audioRef.current.volume = isMuted ? 1 : 0; setIsMuted(!isMuted); }}
-                            className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center">
+                        <button
+                            type="button"
+                            onClick={() => setIsMuted(!isMuted)}
+                            className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center"
+                        >
                             {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
                         </button>
                     </div>

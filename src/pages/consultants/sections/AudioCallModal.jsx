@@ -15,6 +15,7 @@ import { twilioVideoService } from '../../../services/twilioVideoService';
 import { freezeCallUI, matchesCallId } from '../../../utils/callEndUtils';
 import { showBalanceWarning } from '../../../utils/balanceWarningUtils';
 import InCallCreditTopUp from '../../../components/credit/InCallCreditTopUp';
+import { unlockBrowserAudio } from '../../../utils/notificationSound';
 
 const LISTENER_KEY = 'audio-call-modal';
 
@@ -172,12 +173,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
       toast.success('Call accepted! Connecting audio...');
 
       // 🔥 ADD THIS
-      const unlockAudio = () => {
-        const audio = new Audio();
-        audio.muted = true;
-        audio.play().catch(() => { });
-      };
-      unlockAudio();
+      unlockBrowserAudio();
 
       //  Connect to Twilio audio room
       const roomName = data.roomName || callStateRef.current?.roomName;

@@ -5,35 +5,18 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { Menu, User } from "lucide-react";
 import Sidebar from "./consultantSidebar/Sidebar";
 import ScrollToTop from "../../ScrollToTop";
-import { IncomingCallNotification } from "../../IncomingCallNotification";
-import CallRoom from "../../CallRoom";
 import { ROUTES } from "../../../config";
 import { selectUser } from "../../../features/slices/authSlice";
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
-  const [activeCall, setActiveCall] = useState(null);
   const location = useLocation();
   const user = useSelector(selectUser);
   const isChatPage = location.pathname === ROUTES.CONSULTANT_CHAT;
   const userName = user?.name || "Consultant";
   const userRole = user?.role || "Consultant";
 
-  // Listen for open-call-window event
-  useEffect(() => {
-    const handleOpenCall = (event) => {
-      setActiveCall(event.detail);
-    };
-
-    window.addEventListener("open-call-window", handleOpenCall);
-
-    return () => {
-      window.removeEventListener("open-call-window", handleOpenCall);
-    };
-  }, []);
-
-  // Handle ESC key
   useEffect(() => {
     const handleKey = (e) => {
       if (e.key === "Escape") setSidebarOpen(false);
@@ -42,7 +25,6 @@ const Layout = () => {
     return () => document.removeEventListener("keydown", handleKey);
   }, []);
 
-  // Handle resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) setSidebarOpen(false);
@@ -51,7 +33,6 @@ const Layout = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Body overflow
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
     return () => {
@@ -63,15 +44,6 @@ const Layout = () => {
     <div className="fixed inset-0 flex overflow-hidden bg-gray-50">
       <ScrollToTop />
 
-      {/* Incoming Call Notification */}
-      <IncomingCallNotification />
-
-      {/* Active Call Room - Only render when activeCall exists */}
-      {activeCall && (
-        <CallRoom callData={activeCall} onClose={() => setActiveCall(null)} />
-      )}
-
-      {/* Overlay */}
       <div
         className={`fixed inset-0 z-20 bg-black/40 backdrop-blur-sm lg:hidden transition-opacity duration-300 ${
           sidebarOpen
@@ -82,7 +54,6 @@ const Layout = () => {
         aria-hidden="true"
       />
 
-      {/* Sidebar */}
       <aside
         id="sidebar"
         aria-label="Sidebar navigation"
@@ -102,7 +73,6 @@ const Layout = () => {
         />
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="hidden lg:flex h-22 shrink-0 items-center justify-between border-b border-gray-100 bg-white px-8 shadow-sm">
           <div className="h-10 w-10" aria-hidden="true" />

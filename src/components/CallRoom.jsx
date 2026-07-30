@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PhoneOff, Mic, MicOff, Video, VideoOff, Volume2 } from 'lucide-react';
 import { twilioVideoService } from '../services/twilioVideoService';
-import { useJoinCallMutation, useEndCallMutation, useGetCallByIdQuery } from '../features/api/callApi';
+import { useJoinCallMutation, useEndCallMutation } from '../features/api/callApi';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { freezeCallUI, matchesCallId } from '../utils/callEndUtils';
+import { unlockBrowserAudio } from '../utils/notificationSound';
 
 const CallRoom = ({ callData, onClose }) => {
     const [seconds, setSeconds] = useState(0);
@@ -30,13 +31,18 @@ const CallRoom = ({ callData, onClose }) => {
     const [joinCall] = useJoinCallMutation();
     const [endCall] = useEndCallMutation();
 
+    const isVideoCall = callData?.callType === 'VIDEO';
+
     const formatTime = (totalSeconds) => {
         const mins = Math.floor(totalSeconds / 60);
         const secs = totalSeconds % 60;
         return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     };
 
-    // Instant call end sync via CallSocketBridge window events
+    useEffect(() => {
+        unlockBrowserAudio();
+    }, []);
+
     useEffect(() => {
         if (!user?.id || !token) return;
 
@@ -79,9 +85,27 @@ const CallRoom = ({ callData, onClose }) => {
         };
     }, [user?.id, token, callData?.callId, callStatus, onClose]);
 
-    // Connect to Twilio room
     useEffect(() => {
-        if (!callData?.callId || !callData?.token || isConnectingRef.current) return;
+        if (!callData?.callId) return;
+
+        let cancelled = false;
+
+        const waitForRef = (ref, maxMs = 8000) => new Promise((resolve, reject) => {
+            const start = Date.now();
+            const check = () => {
+                if (cancelled) return;
+                if (ref.current) {
+                    resolve(ref.current);
+                    return;
+                }
+                if (Date.now() - start > maxMs) {
+                    reject(new Error('Media element not ready'));
+                    return;
+                }
+                requestAnimationFrame(check);
+            };
+            check();
+        });
 
         const connectToCall = async () => {
             if (isConnectingRef.current) return;
@@ -91,91 +115,73 @@ const CallRoom = ({ callData, onClose }) => {
                 setCallId(callData.callId);
                 setCallStatus('connecting');
                 setConnectionError(false);
+                unlockBrowserAudio();
 
-                // Get fresh token via joinCall API
                 let tokenToUse = callData.token;
                 let roomName = callData.roomName;
                 let startTime = null;
 
-                try {
-                    const result = await joinCall(callData.callId).unwrap();
-                    tokenToUse = result?.token || result?.data?.token || callData.token;
-                    roomName = result?.call?.roomName || result?.data?.call?.roomName || callData.roomName;
-                    startTime = result?.call?.startTime || result?.data?.call?.startTime;
-                } catch (joinErr) {
-                    console.warn('joinCall failed, using original token:', joinErr);
-                }
+                const result = await joinCall(callData.callId).unwrap();
+                tokenToUse = result?.token || result?.data?.token || callData.token;
+                roomName = result?.call?.roomName || result?.data?.call?.roomName || callData.roomName;
+                startTime = result?.call?.startTime || result?.data?.call?.startTime;
+
+                if (cancelled) return;
 
                 if (startTime) {
-                    const start = new Date(startTime).getTime();
-                    setActualStartTime(start);
+                    setActualStartTime(new Date(startTime).getTime());
                 } else {
                     setActualStartTime(Date.now());
                 }
 
-                setCallStatus('active');
-
-                const isVideoCall = callData.callType === 'VIDEO';
-
-                const waitForRefs = (maxMs = 5000) => new Promise((resolve, reject) => {
-                    const start = Date.now();
-                    const check = () => {
-                        if (localVideoRef.current && remoteVideoRef.current) {
-                            resolve({ local: localVideoRef.current, remote: remoteVideoRef.current });
-                            return;
-                        }
-                        if (Date.now() - start > maxMs) {
-                            reject(new Error('Video elements not ready'));
-                            return;
-                        }
-                        requestAnimationFrame(check);
-                    };
-                    check();
-                });
-
                 if (isVideoCall) {
+                    setCallStatus('active');
+                    const remoteEl = await waitForRef(remoteVideoRef);
+                    const localEl = await waitForRef(localVideoRef).catch(() => null);
+
+                    if (cancelled) return;
+
                     try {
-                        const { local, remote } = await waitForRefs(5000);
-                        await twilioVideoService.connectVideo(tokenToUse, roomName, local, remote);
+                        await twilioVideoService.connectVideo(
+                            tokenToUse,
+                            roomName,
+                            localEl,
+                            remoteEl,
+                        );
                         toast.success('Video call connected');
                     } catch (videoError) {
                         console.warn('Video failed, falling back to audio:', videoError);
                         setConnectionError(true);
-                        toast.error('Camera not available. Audio only mode.');
-                        // Fallback to audio
-                        try {
-                            await twilioVideoService.connectAudio(tokenToUse, roomName);
-                        } catch (audioErr) {
-                            console.error('Audio fallback also failed:', audioErr);
-                            setConnectionError(true);
-                        }
+                        await twilioVideoService.connectAudio(tokenToUse, roomName);
+                        toast('Connected with audio only', { icon: '📞' });
                     }
                 } else {
-                    try {
-                        await twilioVideoService.connectAudio(tokenToUse, roomName);
-                        toast.success('Audio call connected');
-                    } catch (audioError) {
-                        console.error('Audio connection failed:', audioError);
-                        setConnectionError(true);
-                        toast.error('Microphone not found');
-                    }
+                    await twilioVideoService.connectAudio(tokenToUse, roomName);
+                    if (cancelled) return;
+                    setCallStatus('active');
+                    toast.success('Audio call connected');
                 }
-
             } catch (error) {
                 console.error('Failed to connect to call:', error);
-                toast.error('Failed to connect to call');
-                setTimeout(() => onClose(), 2000);
+                if (!cancelled) {
+                    toast.error(error?.data?.message || 'Failed to connect to call');
+                    setTimeout(() => onClose(), 2000);
+                }
+            } finally {
+                isConnectingRef.current = false;
             }
         };
 
         connectToCall();
 
         return () => {
+            cancelled = true;
+            isConnectingRef.current = false;
             if (timerRef.current) clearInterval(timerRef.current);
+            twilioVideoService.disconnect();
         };
-    }, [callData]);
+    }, [callData?.callId, callData?.token, callData?.roomName, isVideoCall, joinCall, onClose]);
 
-    // Timer
     useEffect(() => {
         if (callStatus === 'active' && actualStartTime) {
             if (timerRef.current) clearInterval(timerRef.current);
@@ -234,8 +240,6 @@ const CallRoom = ({ callData, onClose }) => {
         }
     };
 
-    const isVideoCall = callData?.callType === 'VIDEO';
-
     if (isVideoCall) {
         return (
             <div className="fixed inset-0 bg-black z-[10000]">
@@ -248,15 +252,15 @@ const CallRoom = ({ callData, onClose }) => {
                             </div>
                         )}
                         {connectionError && callStatus === 'active' && (
-                            <div className="text-center">
+                            <div className="text-center pointer-events-none">
                                 <VideoOff size={48} className="text-white/50 mx-auto mb-4" />
-                                <p className="text-white">Camera/Microphone not available</p>
-                                <p className="text-white/60 text-sm">Continuing with audio only</p>
+                                <p className="text-white">Camera not available</p>
+                                <p className="text-white/60 text-sm">Audio only mode</p>
                             </div>
                         )}
                     </div>
 
-                    <div className="absolute bottom-4 right-4 w-48 h-36 rounded-lg overflow-hidden shadow-lg border-2 border-white bg-gray-800">
+                    <div className="absolute bottom-4 right-4 w-48 h-36 rounded-lg overflow-hidden shadow-lg border-2 border-white bg-gray-800 z-20">
                         <div ref={localVideoRef} className="w-full h-full" />
                         {isVideoOff && (
                             <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
@@ -265,25 +269,28 @@ const CallRoom = ({ callData, onClose }) => {
                         )}
                     </div>
 
-                    <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg">
+                    <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg z-20">
                         <p className="text-white font-semibold">{callData?.callerName || 'Unknown'}</p>
                         <p className="text-white/70 text-sm">{formatTime(seconds)} · €{currentBilling.toFixed(2)}</p>
                     </div>
 
-                    <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4">
+                    <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 z-20">
                         <button
+                            type="button"
                             onClick={() => setIsMuted(!isMuted)}
                             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isMuted ? 'bg-red-500' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
                         >
                             {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
                         </button>
                         <button
+                            type="button"
                             onClick={() => setIsVideoOff(!isVideoOff)}
                             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isVideoOff ? 'bg-red-500' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
                         >
                             {isVideoOff ? <VideoOff size={20} /> : <Video size={20} />}
                         </button>
                         <button
+                            type="button"
                             onClick={handleEndCall}
                             className="w-14 h-14 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center shadow-lg"
                         >
@@ -295,7 +302,6 @@ const CallRoom = ({ callData, onClose }) => {
         );
     }
 
-    // ── Audio Call UI ──
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="bg-[#2D2D2D] w-full max-w-md rounded-2xl p-8 flex flex-col items-center">
@@ -319,18 +325,20 @@ const CallRoom = ({ callData, onClose }) => {
 
                 <div className="flex items-center gap-6">
                     <button
+                        type="button"
                         onClick={() => setIsMuted(!isMuted)}
                         className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${isMuted ? 'bg-red-500' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
                     >
                         {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
                     </button>
                     <button
+                        type="button"
                         onClick={handleEndCall}
                         className="w-16 h-16 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center shadow-lg"
                     >
                         <PhoneOff size={28} />
                     </button>
-                    <button className="w-14 h-14 rounded-full bg-gray-700 text-gray-300 flex items-center justify-center">
+                    <button type="button" className="w-14 h-14 rounded-full bg-gray-700 text-gray-300 flex items-center justify-center">
                         <Volume2 size={24} />
                     </button>
                 </div>

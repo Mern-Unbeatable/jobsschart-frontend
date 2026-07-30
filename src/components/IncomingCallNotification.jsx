@@ -3,6 +3,11 @@ import { useSelector } from 'react-redux';
 import { Phone, PhoneOff, User, Volume2, VolumeX } from 'lucide-react';
 import { socketService } from '../services/socketService';
 import { useAcceptCallMutation, useRejectCallMutation } from '../features/api/callApi';
+import {
+    playNotificationRingtone,
+    stopNotificationRingtone,
+    unlockBrowserAudio,
+} from '../utils/notificationSound';
 import toast from 'react-hot-toast';
 
 const LISTENER_KEY = 'incoming-call-notification';
@@ -10,68 +15,48 @@ const LISTENER_KEY = 'incoming-call-notification';
 export const IncomingCallNotification = () => {
     const [incomingCall, setIncomingCall] = useState(null);
     const [isMuted, setIsMuted] = useState(false);
-    const [socketStatus, setSocketStatus] = useState('disconnected');
-    const [registered, setRegistered] = useState(false);
-    const audioRef = useRef(null);
     const reconnectTimerRef = useRef(null);
     const { user, token, isAuthenticated } = useSelector(state => state.auth);
     const [acceptCall, { isLoading: isAccepting }] = useAcceptCallMutation();
     const [rejectCall, { isLoading: isRejecting }] = useRejectCallMutation();
 
-    useEffect(() => {
-        audioRef.current = new Audio('/ringtone.mp3');
-        audioRef.current.loop = true;
-        return () => {
-            audioRef.current?.pause();
-        };
+    const isConsultant = user?.role === 'CONSULTANT' || user?.role === 'ADMIN';
+
+    const dismissIncoming = useCallback(() => {
+        setIncomingCall(null);
+        stopNotificationRingtone();
     }, []);
 
     useEffect(() => {
-        if (!isAuthenticated || !user?.id || !token) {
-            setSocketStatus('disconnected');
-            setRegistered(false);
-            return;
-        }
+        if (!isAuthenticated || !user?.id || !token || !isConsultant) return;
 
-        const dismissIncoming = () => {
-            setIncomingCall(null);
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
-            }
+        const setupSocket = () => {
+            socketService.connect(user.id, token);
+
+            socketService.on('incoming_call', LISTENER_KEY, (callData) => {
+                setIncomingCall(callData);
+                playNotificationRingtone();
+
+                if (typeof Notification !== 'undefined') {
+                    if (Notification.permission === 'granted') {
+                        new Notification('Incoming Call', {
+                            body: `${callData.callerName} is calling (${callData.callType})`,
+                            icon: '/logo.webp',
+                            requireInteraction: true,
+                            tag: `call-${callData.callId}`,
+                        });
+                    } else if (Notification.permission === 'default') {
+                        Notification.requestPermission();
+                    }
+                }
+            });
+
+            socketService.on('call_rejected', LISTENER_KEY, dismissIncoming);
         };
 
         const onCallEnding = () => dismissIncoming();
         const onCallEnded = () => dismissIncoming();
         const onCallRejectedEvt = () => dismissIncoming();
-
-        const setupSocket = () => {
-            socketService.connect(user.id, token);
-
-            socketService.on('registered', LISTENER_KEY, (data) => {
-                setRegistered(true);
-                setSocketStatus('connected');
-                if (reconnectTimerRef.current) {
-                    clearTimeout(reconnectTimerRef.current);
-                    reconnectTimerRef.current = null;
-                }
-            });
-
-            socketService.on('incoming_call', LISTENER_KEY, (callData) => {
-                setIncomingCall(callData);
-                audioRef.current?.play().catch(() => { });
-
-                if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-                    new Notification('📞 Incoming Call', {
-                        body: `${callData.callerName} is calling (${callData.callType})`,
-                        icon: '/logo.webp',
-                        requireInteraction: true,
-                    });
-                }
-            });
-
-            socketService.on('call_rejected', LISTENER_KEY, onCallRejectedEvt);
-        };
 
         window.addEventListener('rtcall:call_ending', onCallEnding);
         window.addEventListener('rtcall:call_ended', onCallEnded);
@@ -79,15 +64,8 @@ export const IncomingCallNotification = () => {
 
         setupSocket();
 
-        // Poll connection status and auto-reconnect if disconnected
         const interval = setInterval(() => {
-            const connected = socketService.isConnected();
-            const reg = socketService.isRegistered();
-            setSocketStatus(connected ? 'connected' : 'disconnected');
-            setRegistered(reg);
-
-            // Auto-reconnect if disconnected
-            if (!connected && !reconnectTimerRef.current) {
+            if (!socketService.isConnected() && !reconnectTimerRef.current) {
                 reconnectTimerRef.current = setTimeout(() => {
                     reconnectTimerRef.current = null;
                     if (isAuthenticated && user?.id && token) {
@@ -107,33 +85,33 @@ export const IncomingCallNotification = () => {
             window.removeEventListener('rtcall:call_ending', onCallEnding);
             window.removeEventListener('rtcall:call_ended', onCallEnded);
             window.removeEventListener('rtcall:call_rejected', onCallRejectedEvt);
-            socketService.off('registered', LISTENER_KEY);
             socketService.off('incoming_call', LISTENER_KEY);
             socketService.off('call_rejected', LISTENER_KEY);
+            stopNotificationRingtone();
         };
-    }, [isAuthenticated, user?.id, token]);
-
-    const stopRingtone = useCallback(() => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-        }
-    }, []);
+    }, [isAuthenticated, user?.id, token, isConsultant, dismissIncoming]);
 
     const handleAccept = async () => {
         if (!incomingCall) return;
-        stopRingtone();
+        unlockBrowserAudio();
+        stopNotificationRingtone();
+
         try {
-            await acceptCall(incomingCall.callId).unwrap();
+            const result = await acceptCall(incomingCall.callId).unwrap();
+            const freshToken = result?.consultantToken || result?.token;
+            const roomName = result?.call?.roomName || incomingCall.roomName;
+            const callType = result?.call?.callType || incomingCall.callType;
+
             window.dispatchEvent(new CustomEvent('open-call-window', {
                 detail: {
                     callId: incomingCall.callId,
-                    roomName: incomingCall.roomName,
-                    token: incomingCall.token,
-                    callType: incomingCall.callType,
+                    roomName,
+                    token: freshToken,
+                    callType,
                     callerName: incomingCall.callerName,
-                }
+                },
             }));
+
             setIncomingCall(null);
             toast.success('Call connected!');
         } catch (err) {
@@ -143,7 +121,7 @@ export const IncomingCallNotification = () => {
 
     const handleReject = async () => {
         if (!incomingCall) return;
-        stopRingtone();
+        stopNotificationRingtone();
         try {
             await rejectCall(incomingCall.callId).unwrap();
             toast('Call rejected');
@@ -155,61 +133,77 @@ export const IncomingCallNotification = () => {
     };
 
     const toggleMute = () => {
-        if (audioRef.current) {
-            audioRef.current.volume = isMuted ? 1 : 0;
-            setIsMuted(!isMuted);
-        }
+        setIsMuted((prev) => {
+            const next = !prev;
+            const audio = document.querySelector('#notification-ringtone-preview');
+            if (audio) audio.volume = next ? 0 : 1;
+            return next;
+        });
     };
 
+    if (!isConsultant || !incomingCall) return null;
+
     return (
-        <>
-
-
-            {incomingCall && (
-                <div className="fixed top-4 right-4 z-[9999]">
-                    <div className="bg-white rounded-2xl shadow-2xl w-96 overflow-hidden border-l-4 border-green-500">
-                        <div className="bg-gradient-to-r from-green-50 to-white p-4">
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="font-bold text-lg text-gray-800">📞 Incoming Call</h3>
-                                <div className="flex gap-1">
-                                    {[0, 150, 300].map(d => (
-                                        <div key={d} className="w-2 h-2 bg-green-500 rounded-full animate-pulse"
-                                            style={{ animationDelay: `${d}ms` }} />
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                                    {incomingCall.callerName?.charAt(0)?.toUpperCase() || <User size={32} />}
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-gray-900 text-lg">{incomingCall.callerName}</p>
-                                    <p className="text-sm text-gray-500">{incomingCall.callerEmail}</p>
-                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full mt-1 inline-block">
-                                        {incomingCall.callType} Call
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="flex gap-3">
-                                <button onClick={handleAccept} disabled={isAccepting}
-                                    className="flex-1 bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all">
-                                    <Phone size={18} />
-                                    {isAccepting ? 'Connecting...' : 'Accept'}
-                                </button>
-                                <button onClick={handleReject} disabled={isRejecting}
-                                    className="flex-1 bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all">
-                                    <PhoneOff size={18} />
-                                    Reject
-                                </button>
-                                <button onClick={toggleMute}
-                                    className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center transition-all">
-                                    {isMuted ? <VolumeX size={18} className="text-gray-600" /> : <Volume2 size={18} className="text-gray-600" />}
-                                </button>
-                            </div>
+        <div className="fixed top-4 right-4 z-[9999]">
+            <div className="bg-white rounded-2xl shadow-2xl w-96 overflow-hidden border-l-4 border-green-500">
+                <div className="bg-gradient-to-r from-green-50 to-white p-4">
+                    <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-bold text-lg text-gray-800">Incoming Call</h3>
+                        <div className="flex gap-1">
+                            {[0, 150, 300].map((d) => (
+                                <div
+                                    key={d}
+                                    className="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+                                    style={{ animationDelay: `${d}ms` }}
+                                />
+                            ))}
                         </div>
                     </div>
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                            {incomingCall.callerName?.charAt(0)?.toUpperCase() || <User size={32} />}
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-900 text-lg">{incomingCall.callerName}</p>
+                            <p className="text-sm text-gray-500">{incomingCall.callerEmail}</p>
+                            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full mt-1 inline-block">
+                                {incomingCall.callType} Call
+                            </span>
+                        </div>
+                    </div>
+                    <div className="flex gap-3">
+                        <button
+                            type="button"
+                            onClick={handleAccept}
+                            disabled={isAccepting}
+                            className="flex-1 bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
+                        >
+                            <Phone size={18} />
+                            {isAccepting ? 'Connecting...' : 'Accept'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleReject}
+                            disabled={isRejecting}
+                            className="flex-1 bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
+                        >
+                            <PhoneOff size={18} />
+                            Reject
+                        </button>
+                        <button
+                            type="button"
+                            onClick={toggleMute}
+                            className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center transition-all"
+                        >
+                            {isMuted ? (
+                                <VolumeX size={18} className="text-gray-600" />
+                            ) : (
+                                <Volume2 size={18} className="text-gray-600" />
+                            )}
+                        </button>
+                    </div>
                 </div>
-            )}
-        </>
+            </div>
+        </div>
     );
 };

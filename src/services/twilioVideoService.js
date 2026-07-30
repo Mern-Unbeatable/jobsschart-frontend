@@ -164,9 +164,12 @@ class TwilioVideoService {
             automaticSubscription: true,
             dominantSpeaker: false,
             networkQuality: { local: 1, remote: 1 },
+            maxAudioBitrate: 16000,
         });
 
         console.log('✅ Connected to video room:', this.room.name);
+
+        if (remoteVideoRef) remoteVideoRef.innerHTML = '';
 
         // Attach local video to PiP
         localTracks.forEach(track => {
@@ -212,6 +215,7 @@ class TwilioVideoService {
             automaticSubscription: true,
             dominantSpeaker: false,
             networkQuality: { local: 1, remote: 1 },
+            maxAudioBitrate: 16000,
         });
 
         console.log('✅ Connected to audio room:', this.room.name);
