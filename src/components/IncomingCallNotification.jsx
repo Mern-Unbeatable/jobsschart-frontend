@@ -33,6 +33,18 @@ export const IncomingCallNotification = () => {
             return;
         }
 
+        const dismissIncoming = () => {
+            setIncomingCall(null);
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
+        };
+
+        const onCallEnding = () => dismissIncoming();
+        const onCallEnded = () => dismissIncoming();
+        const onCallRejectedEvt = () => dismissIncoming();
+
         const setupSocket = () => {
             socketService.connect(user.id, token);
 
@@ -58,22 +70,12 @@ export const IncomingCallNotification = () => {
                 }
             });
 
-            socketService.on('call_ended', LISTENER_KEY, () => {
-                setIncomingCall(null);
-                if (audioRef.current) {
-                    audioRef.current.pause();
-                    audioRef.current.currentTime = 0;
-                }
-            });
-
-            socketService.on('call_rejected', LISTENER_KEY, () => {
-                setIncomingCall(null);
-                if (audioRef.current) {
-                    audioRef.current.pause();
-                    audioRef.current.currentTime = 0;
-                }
-            });
+            socketService.on('call_rejected', LISTENER_KEY, onCallRejectedEvt);
         };
+
+        window.addEventListener('rtcall:call_ending', onCallEnding);
+        window.addEventListener('rtcall:call_ended', onCallEnded);
+        window.addEventListener('rtcall:call_rejected', onCallRejectedEvt);
 
         setupSocket();
 
@@ -102,9 +104,11 @@ export const IncomingCallNotification = () => {
         return () => {
             clearInterval(interval);
             if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+            window.removeEventListener('rtcall:call_ending', onCallEnding);
+            window.removeEventListener('rtcall:call_ended', onCallEnded);
+            window.removeEventListener('rtcall:call_rejected', onCallRejectedEvt);
             socketService.off('registered', LISTENER_KEY);
             socketService.off('incoming_call', LISTENER_KEY);
-            socketService.off('call_ended', LISTENER_KEY);
             socketService.off('call_rejected', LISTENER_KEY);
         };
     }, [isAuthenticated, user?.id, token]);

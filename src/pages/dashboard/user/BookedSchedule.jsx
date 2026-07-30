@@ -2,7 +2,8 @@ import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import ScheduleCard from "./components/ScheduleCard";
-import { useGetMyBookingsQuery } from "../../../features/api/scheduleApi";
+import { useGetMyBookingsQuery, useCancelBookingMutation } from "../../../features/api/scheduleApi";
+import toast from "react-hot-toast";
 import AudioCallModal from "../../consultants/sections/AudioCallModal";
 import VideoCallModal from "../../consultants/sections/VideoCallModal";
 
@@ -10,6 +11,7 @@ const UserBookedSchedule = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: bookingsData, isLoading, error } = useGetMyBookingsQuery();
+  const [cancelBooking] = useCancelBookingMutation();
   const [showAudio, setShowAudio] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [selectedConsultant, setSelectedConsultant] = useState(null);
@@ -92,6 +94,16 @@ const UserBookedSchedule = () => {
     setShowVideo(true);
   };
 
+  const handleCancel = async (bookingId) => {
+    if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
+    try {
+      await cancelBooking(bookingId).unwrap();
+      toast.success("Appointment cancelled. You will receive a confirmation email.");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to cancel appointment");
+    }
+  };
+
   const handleChat = (booking) => {
     const consultantId = getConsultantRouteId(booking);
     if (!consultantId) return;
@@ -144,6 +156,8 @@ const UserBookedSchedule = () => {
                   onAudioCall={() => handleAudioCall(item)}
                   onVideoCall={() => handleVideoCall(item)}
                   onChat={() => handleChat(item)}
+                  onCancel={() => handleCancel(item.id)}
+                  showCancel={item.status?.toUpperCase() !== "COMPLETED" && item.status?.toUpperCase() !== "CANCELLED"}
                 />
               ))}
             </div>
@@ -174,6 +188,7 @@ const UserBookedSchedule = () => {
                   onAudioCall={() => handleAudioCall(item)}
                   onVideoCall={() => handleVideoCall(item)}
                   onChat={() => handleChat(item)}
+                  showCancel={false}
                 />
               ))}
             </div>

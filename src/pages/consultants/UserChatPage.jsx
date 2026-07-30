@@ -1,10 +1,12 @@
 
 import React, { memo, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Phone, Video, MessageSquare } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { ArrowLeft, MessageSquare } from 'lucide-react';
 import CommonAdsSection from '../../components/CommonAdsSection';
 
 import { useGetConsultantByIdQuery } from '../../features/api/consultantApi';
+import { selectIsAuthenticated } from '../../features/slices/authSlice';
 import toast from 'react-hot-toast';
 import RealTimeChat from './RealTimeChat';
 
@@ -12,6 +14,7 @@ const UserChatPage = memo(() => {
 
   const { id: consultantId } = useParams();
   const navigate = useNavigate();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [conversationReady, setConversationReady] = useState(false);
   const [otherUserInfo, setOtherUserInfo] = useState(null);
@@ -33,38 +36,51 @@ const UserChatPage = memo(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
 
-
-
   useEffect(() => {
     if (consultantData && consultantId) {
       const consultant = consultantData?.consultant || consultantData?.data?.consultant || consultantData;
 
       if (consultant) {
+        const consultantUserId = consultant.userId || consultant.user?.id;
+        if (!consultantUserId) {
+          setConversationReady(false);
+          return;
+        }
+
         const consultantUser = consultant.user || {
-          id: consultant.userId || consultantId,
+          id: consultantUserId,
           name: consultant.name,
           avatar: consultant.avatar,
           role: 'CONSULTANT'
         };
 
-        setOtherUserInfo(consultantUser);
+        setOtherUserInfo({ ...consultantUser, id: consultantUserId });
         setConversationReady(true);
-
-        // Log for debugging
-        console.log('Consultant user info loaded:', consultantUser);
       }
     }
   }, [consultantData, consultantId]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast.error('Please log in to start a chat.', { position: 'top-center' });
+      navigate('/login', { state: { from: `/consultants/${consultantId}/chat` } });
+    }
+  }, [isAuthenticated, consultantId, navigate]);
+
   // Handle loading state
-  if (consultantLoading) {
-    return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#6E35AE] mx-auto mb-4' />
-          <p className='text-gray-500'>Loading consultant information...</p>
-        </div>
-      </div>
-    );
+  // if (consultantLoading) {
+  //   return (
+  //     <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+  //       <div className='text-center'>
+  //         <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#6E35AE] mx-auto mb-4' />
+  //         <p className='text-gray-500'>Loading consultant information...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   // Handle error state

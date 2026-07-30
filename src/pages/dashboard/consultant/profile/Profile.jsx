@@ -3,12 +3,14 @@ import { toast } from "react-hot-toast";
 import ProfileAvatar from "./components/ProfileAvatar";
 import AccountInfoForm from "./components/AccountInfoForm";
 import AvailabilitySlots from "./components/AvailabilitySlots";
+import VerificationSection from "./components/VerificationSection";
 import ChangePasswordForm from "./components/ChangePasswordForm";
 import {
   useGetMyConsultantProfileQuery,
   useUpdateMyConsultantProfileMutation,
   useGetMyAvailabilitySlotsQuery,
   useAddAvailabilitySlotsMutation,
+  useUpdateAvailabilitySlotMutation,
   useDeleteAvailabilitySlotMutation,
 } from "../../../../features/api/consultantApi";
 import { useChangePasswordMutation } from "../../../../features/api/authApi";
@@ -40,6 +42,7 @@ const ConsultantProfile = memo(() => {
 
   const [updateMyConsultantProfile] = useUpdateMyConsultantProfileMutation();
   const [addAvailabilitySlots] = useAddAvailabilitySlotsMutation();
+  const [updateAvailabilitySlot] = useUpdateAvailabilitySlotMutation();
   const [deleteAvailabilitySlot] = useDeleteAvailabilitySlotMutation();
   const [changePassword] = useChangePasswordMutation();
   const [updateProfile] = useUpdateProfileMutation();
@@ -64,7 +67,13 @@ const ConsultantProfile = memo(() => {
   // Initialize slots state from API response
   useEffect(() => {
     if (slotsData?.slots) {
-      setSlots(slotsData.slots);
+      setSlots(slotsData.slots.map(s => ({
+        id: s.id,
+        day: s.dayLabel || s.dayOfWeek || s.day || 'Monday',
+        from: s.startTime || s.from || '09:00',
+        to: s.endTime || s.to || '21:00',
+        dayOfWeek: s.dayOfWeek,
+      })));
     } else if (Array.isArray(slotsData)) {
       setSlots(slotsData);
     }
@@ -111,11 +120,28 @@ const ConsultantProfile = memo(() => {
     }
   }, [deleteAvailabilitySlot]);
 
-  const handleSlotChange = useCallback((id, field, value) => {
+  const handleSlotChange = useCallback(async (id, field, value) => {
     setSlots((prev) =>
       prev.map((slot) => (slot.id === id ? { ...slot, [field]: value } : slot)),
     );
-  }, []);
+
+    const dayMap = {
+      Sunday: 'SUNDAY', Monday: 'MONDAY', Tuesday: 'TUESDAY',
+      Wednesday: 'WEDNESDAY', Thursday: 'THURSDAY', Friday: 'FRIDAY', Saturday: 'SATURDAY',
+    };
+
+    try {
+      const payload = {};
+      if (field === 'day') payload.dayOfWeek = dayMap[value] || value.toUpperCase();
+      if (field === 'from') payload.startTime = value;
+      if (field === 'to') payload.endTime = value;
+      if (Object.keys(payload).length > 0) {
+        await updateAvailabilitySlot({ slotId: id, ...payload }).unwrap();
+      }
+    } catch {
+      // Silent fail on debounced edits — user can retry
+    }
+  }, [updateAvailabilitySlot]);
 
   const handleAvatarChange = useCallback(async (file) => {
     const loadingToast = toast.loading("Uploading image...");
@@ -234,6 +260,10 @@ const ConsultantProfile = memo(() => {
             onChange={handleSlotChange}
           />
         </div>
+      </div>
+
+      <div className="rounded-[20px] border border-gray-100 bg-white px-6 py-8 lg:px-10 lg:py-12">
+        <VerificationSection profile={profileData?.profile} />
       </div>
 
       <div className="rounded-[20px] border border-gray-100 bg-white px-6 py-8 lg:px-10 lg:py-12">

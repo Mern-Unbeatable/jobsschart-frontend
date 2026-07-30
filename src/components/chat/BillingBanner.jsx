@@ -1,20 +1,24 @@
 import React, { memo, useState, useEffect } from 'react';
 import { Phone, Video, MessageSquare, Clock, Euro, PhoneOff } from 'lucide-react';
 
-const BillingBanner = memo(({ sessionType, startedAt, totalCost, walletBalance, onEnd }) => {
+const BillingBanner = memo(({ sessionType, startedAt, totalCost, walletBalance, onEnd, frozenElapsed }) => {
     const [elapsed, setElapsed] = useState(0);
     const [displayCost, setDisplayCost] = useState(parseFloat(totalCost || 0));
 
     useEffect(() => {
-        if (!startedAt) return;
+        if (frozenElapsed != null) {
+            setElapsed(frozenElapsed);
+            return undefined;
+        }
+        if (!startedAt) return undefined;
         const updateElapsed = () => {
-            const diffSeconds = Math.floor((new Date() - new Date(startedAt)) / 1000);
+            const diffSeconds = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000);
             setElapsed(diffSeconds);
         };
         updateElapsed();
         const interval = setInterval(updateElapsed, 1000);
         return () => clearInterval(interval);
-    }, [startedAt]);
+    }, [startedAt, frozenElapsed]);
 
     useEffect(() => {
         setDisplayCost(parseFloat(totalCost || 0));

@@ -1,6 +1,7 @@
 import React, { memo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import {
   Phone,
@@ -28,6 +29,7 @@ import {
 const ConsultantDetail = memo(() => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
   const [showAudioCall, setShowAudioCall] = useState(false);
   const [showVideoCall, setShowVideoCall] = useState(false);
   const [showBookSchedule, setShowBookSchedule] = useState(false);
@@ -86,8 +88,9 @@ const ConsultantDetail = memo(() => {
 
   const consultantForModal = {
     ...consultant,
-    userId: consultant.id,
+    userId: consultantUserId,
     consultantId: consultant.id,
+    user: consultant.user || { id: consultantUserId, name: consultant.name },
     name: consultant.name || consultant.user?.name,
     image: consultant.avatar || consultant.user?.avatar || consultant.image,
     pricePerMinute: parseFloat(consultant.pricePerMinute || 2.5),
@@ -97,12 +100,12 @@ const ConsultantDetail = memo(() => {
   const reviews = consultant.reviews || [];
 
   const handleChatNow = () => {
-    const userId = consultantForModal.userId;
-    if (!userId) {
-      console.error("Consultant userId not found");
+    const recordId = consultantForModal.consultantId || consultant.id;
+    if (!recordId) {
+      console.error("Consultant id not found");
       return;
     }
-    navigate(`/consultants/${userId}/chat`);
+    navigate(`/consultants/${recordId}/chat`);
   };
 
   return (
@@ -130,7 +133,7 @@ const ConsultantDetail = memo(() => {
                 <div
                   className={`flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded-full w-fit mb-2 ${getStatusBadgeStyle(displayStatus)}`}
                 >
-                  {displayStatus === "Available Now" && (
+                  {displayStatus === "Online" && (
                     <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                   )}
                   {displayStatus}
@@ -149,7 +152,9 @@ const ConsultantDetail = memo(() => {
               About Me
             </h2>
             <p className="text-gray-600 leading-relaxed mb-8 text-base md:text-lg">
-              {consultant.bio || "Professional consultant ready to help you."}
+              {(i18n.language?.startsWith('nl') && consultant.bioNl)
+                ? consultant.bioNl
+                : (consultant.bio || "Professional consultant ready to help you.")}
             </p>
 
             <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">

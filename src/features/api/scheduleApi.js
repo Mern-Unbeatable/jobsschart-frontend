@@ -29,6 +29,14 @@ export const scheduleApi = baseApi.injectEndpoints({
       invalidatesTags: ['Session'],
       transformResponse: (response) => response.data,
     }),
+    cancelBooking: builder.mutation({
+      query: (bookingId) => ({
+        url: `/schedule/bookings/${bookingId}/cancel`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: ['Session'],
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
@@ -36,4 +44,5 @@ export const {
   useGetMyBookingsQuery,
   useGetUpcomingBookingsQuery,
   useBookScheduleMutation,
+  useCancelBookingMutation,
 } = scheduleApi;

@@ -3,6 +3,15 @@ import { baseApi } from "../baseApi";
 
 export const callApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
+        clearStuckCalls: builder.mutation({
+            query: () => ({
+                url: '/calls/clear-stuck',
+                method: 'POST',
+            }),
+            invalidatesTags: ['Call', 'PendingCalls', 'CallHistory'],
+            transformResponse: (response) => response?.data || response,
+        }),
+
         initiateCall: builder.mutation({
             query: (data) => {
                 return {
@@ -16,12 +25,13 @@ export const callApi = baseApi.injectEndpoints({
                 return response?.data || response;
             },
             transformErrorResponse: (error) => {
-                console.error('📞 Call initiation error FULL:', error);
-                return {
-                    message: error?.data?.message || 'Failed to initiate call',
-                    status: error?.status,
-                    data: error?.data
-                };
+                const data = error?.data;
+                const message =
+                    data?.message
+                    || (typeof data === 'string' ? data : null)
+                    || error?.error
+                    || 'Failed to initiate call';
+                return { message, status: error?.status, data };
             },
         }),
 
@@ -131,6 +141,7 @@ export const callApi = baseApi.injectEndpoints({
 
 export const {
     useInitiateCallMutation,
+    useClearStuckCallsMutation,
     useAcceptCallMutation,
     useRejectCallMutation,
     useJoinCallMutation,

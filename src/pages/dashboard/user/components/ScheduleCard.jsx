@@ -19,6 +19,8 @@ const ScheduleCard = ({
   onAudioCall,
   onVideoCall,
   onChat,
+  onCancel,
+  showCancel = true,
 }) => {
   const { t } = useTranslation();
   const isComplete = status?.toUpperCase() === "COMPLETED";
@@ -118,9 +120,10 @@ const ScheduleCard = ({
           </button>
         </div>
 
-        {!isComplete && !isCancelled && (
+        {!isComplete && !isCancelled && showCancel && (
           <button
             type="button"
+            onClick={(event) => handleAction(event, onCancel)}
             className="mt-2 w-full rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 py-2 text-sm font-semibold transition-all active:scale-95 cursor-pointer border border-rose-100"
           >
             {t("dashboard.user.scheduleCard.cancel")}

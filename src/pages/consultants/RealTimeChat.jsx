@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import {
     Send, Paperclip, ArrowLeft, Search, Phone, Video,
@@ -12,6 +12,8 @@ import {
     useGetOrCreateConversationMutation,
     useStartSessionMutation,
     useEndSessionMutation,
+    useAcceptSessionMutation,
+    useDeclineSessionMutation,
 } from '../../features/api/chatApi';
 import toast from 'react-hot-toast';
 import axios from 'axios';
@@ -54,8 +56,10 @@ const RealTimeChat = memo(({
     const [isEndingSession, setIsEndingSession] = useState(false);
     const [sessionSummary, setSessionSummary] = useState(null);
     const [isStartingSession, setIsStartingSession] = useState(false);
+    const [frozenElapsedSeconds, setFrozenElapsedSeconds] = useState(null);
 
     const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
     const inputRef = useRef(null);
     const fileInputRef = useRef(null);
     const typingTimerRef = useRef(null);
@@ -65,52 +69,64 @@ const RealTimeChat = memo(({
     const sessionStatusRef = useRef(null);
     sessionStatusRef.current = sessionStatus;
 
+    const isEndingSessionRef = useRef(false);
+    isEndingSessionRef.current = isEndingSession;
+
     const sessionTypeRef = useRef(null);
     sessionTypeRef.current = sessionType;
 
-    const { data: conversations = [], refetch: refetchConversations } = useGetConversationsQuery();
+    const sessionStartedAtRef = useRef(null);
+    sessionStartedAtRef.current = sessionStartedAt;
+
+    const { data: conversations = [], refetch: refetchConversations } = useGetConversationsQuery(undefined, {
+        skip: !token,
+    });
     const [sendMessage] = useSendMessageMutation();
     const [markAsRead] = useMarkAsReadMutation();
     const [getOrCreateConversation] = useGetOrCreateConversationMutation();
     const [startSessionMutation] = useStartSessionMutation();
     const [endSessionMutation] = useEndSessionMutation();
+    const [acceptSessionMutation, { isLoading: isAccepting }] = useAcceptSessionMutation();
+    const [declineSessionMutation, { isLoading: isDeclining }] = useDeclineSessionMutation();
 
 
     const isSessionActive = sessionStatus === 'ACTIVE';
-    const canSend = !!inputValue.trim() && !isUploading && !isStartingSession && !isEndingSession;
+    const isSessionPending = sessionStatus === 'PENDING';
+    // Users can send to start a session (IDLE/ENDED) or while waiting (PENDING); consultants only when ACTIVE
+    const canSend = !!inputValue.trim() && !isUploading && !isStartingSession && !isEndingSession
+        && sessionStatus !== 'ENDING'
+        && (
+            (isConsultant && isSessionActive) ||
+            (!isConsultant && (isSessionActive || isSessionPending || !sessionStatus || sessionStatus === 'IDLE' || sessionStatus === 'ENDED'))
+        );
 
-    // ── Socket connect + register ─────────────────────────────────
+    const openingConvRef = useRef(false);
+
+    // ── Join all conversation rooms when list updates ─────────────
     useEffect(() => {
-        if (!user?.id || !token) return;
-        socketService.connect(user.id, token);
-
-        const doRegister = () => socketService.emit('register', user.id);
-        doRegister();
-
-        const socket = socketService.socket || socketService._socket;
-        if (socket) {
-            socket.on('connect', doRegister);
-            socket.on('reconnect', doRegister);
-            return () => {
-                socket.off('connect', doRegister);
-                socket.off('reconnect', doRegister);
-            };
-        }
-    }, [user?.id, token]);
+        if (!user?.id || !conversations?.length) return;
+        conversations.forEach((c) => socketService.joinConversation(c.id));
+    }, [user?.id, conversations]);
 
     // ── Auto-open conversation from prop ──────────────────────────
     useEffect(() => {
-        if (!initialOtherUserId || !user?.id) return;
+        if (!initialOtherUserId || !user?.id || openingConvRef.current) return;
+        openingConvRef.current = true;
+
         getOrCreateConversation(initialOtherUserId)
             .unwrap()
             .then(conv => {
                 if (!conv?.id) return;
                 setActiveConv(conv);
                 setShowMobileSidebar(false);
+                socketService.joinConversation(conv.id);
                 if (onConversationChange) onConversationChange(conv.id);
                 refetchConversations();
             })
-            .catch(() => toast.error('Could not open conversation.'));
+            .catch(() => toast.error('Could not open conversation.'))
+            .finally(() => {
+                openingConvRef.current = false;
+            });
     }, [initialOtherUserId, user?.id]);
 
     // ── Load messages when active conversation changes ────────────
@@ -120,7 +136,8 @@ const RealTimeChat = memo(({
         setMessages([]);
 
         const isActive = activeConv.sessionStatus === 'ACTIVE';
-        setSessionStatus(isActive ? 'ACTIVE' : null);
+        const isPending = activeConv.sessionStatus === 'PENDING';
+        setSessionStatus(isActive ? 'ACTIVE' : isPending ? 'PENDING' : null);
         setSessionType(activeConv.sessionType || null);
         setSessionTotalCost(parseFloat(activeConv.totalCost || 0));
         setSessionStartedAt(activeConv.startedAt || null);
@@ -137,7 +154,7 @@ const RealTimeChat = memo(({
             .catch(() => setIsLoadingMessages(false));
 
         markAsRead(activeConv.id);
-        socketService.emit('join_conversation', { conversationId: activeConv.id });
+        socketService.joinConversation(activeConv.id);
     }, [activeConv?.id, token, markAsRead]);
 
     // ── Sync wallet balance from Redux ────────────────────────────
@@ -145,49 +162,121 @@ const RealTimeChat = memo(({
         setCurrentBalance(parseFloat(walletBalance));
     }, [walletBalance]);
 
-    // ── Socket event listeners ────────────────────────────────────
+    // ── Realtime updates (via ChatSocketBridge window events + direct socket for billing/typing)
     useEffect(() => {
         if (!user?.id) return;
 
-        socketService.on('new_message', LISTENER_KEY, (data) => {
-            if (data.conversationId === activeConvRef.current?.id) {
-                setMessages(prev => {
-                    if (prev.some(m => m.id === data.message.id)) return prev;
-                    if (
-                        data.message.senderId === user.id &&
-                        prev.some(m => m.id.startsWith('temp-') && m.senderId === user.id)
-                    ) {
-                        return prev.map(m =>
-                            m.id.startsWith('temp-') && m.senderId === user.id ? data.message : m
-                        );
-                    }
-                    return [...prev, data.message];
-                });
-                markAsRead(data.conversationId);
+        const appendMessage = (data) => {
+            const convId = data.conversationId;
+            if (convId !== activeConvRef.current?.id) {
+                refetchConversations();
+                return;
             }
+            setMessages(prev => {
+                if (prev.some(m => m.id === data.message.id)) return prev;
+                if (
+                    data.message.senderId === user.id &&
+                    prev.some(m => m.id.startsWith('temp-') && m.senderId === user.id)
+                ) {
+                    return prev.map(m =>
+                        m.id.startsWith('temp-') && m.senderId === user.id ? data.message : m
+                    );
+                }
+                return [...prev, data.message];
+            });
+            markAsRead(convId);
             refetchConversations();
-        });
+        };
 
-        socketService.on('new_file', LISTENER_KEY, (data) => {
+        const onNewMessage = (e) => appendMessage(e.detail);
+        const onNewFile = (e) => appendMessage(e.detail);
+
+        const onChatPending = (e) => {
+            const data = e.detail;
             if (data.conversationId === activeConvRef.current?.id) {
-                setMessages(prev => {
-                    if (prev.some(m => m.id === data.message.id)) return prev;
-                    if (data.message.senderId === user.id) {
-                        const tempIdx = prev.findIndex(
-                            m => m.id.startsWith('temp-') && m.senderId === data.message.senderId && m.fileUrl === data.message.fileUrl
-                        );
-                        if (tempIdx !== -1) {
-                            const next = [...prev];
-                            next[tempIdx] = data.message;
-                            return next;
-                        }
-                        return prev;
-                    }
-                    return [...prev, data.message];
+                setSessionStatus('PENDING');
+                setSessionType(data.sessionType);
+                setIsStartingSession(false);
+            }
+            refetchConversations();
+        };
+
+        const onChatDeclined = (e) => {
+            const data = e.detail;
+            if (data.conversationId === activeConvRef.current?.id) {
+                setSessionStatus(null);
+                setSessionType(null);
+                setSessionStartedAt(null);
+                setIsStartingSession(false);
+                refetchConversations();
+            }
+        };
+
+        const onSessionStarted = (e) => {
+            const data = e.detail;
+            if (sessionStatusRef.current === 'ENDING' || sessionStatusRef.current === 'ENDED') return;
+            if (data.conversationId !== activeConvRef.current?.id) {
+                refetchConversations();
+                return;
+            }
+            setSessionStatus('ACTIVE');
+            setSessionType(data.sessionType);
+            setSessionStartedAt(data.startedAt);
+            setSessionTotalCost(0);
+            setFrozenElapsedSeconds(null);
+            setIsStartingSession(false);
+            setActiveConv((prev) => prev ? { ...prev, sessionStatus: 'ACTIVE', startedAt: data.startedAt } : prev);
+            refetchConversations();
+        };
+
+        const onSessionEnding = (e) => {
+            const data = e.detail;
+            if (data.conversationId !== activeConvRef.current?.id) return;
+            if (sessionStatusRef.current === 'ENDED') return;
+
+            const frozen = data.durationSeconds != null
+                ? data.durationSeconds
+                : (data.endedAt && sessionStartedAtRef.current)
+                    ? Math.max(0, Math.floor((new Date(data.endedAt).getTime() - new Date(sessionStartedAtRef.current).getTime()) / 1000))
+                    : null;
+
+            setSessionStatus('ENDING');
+            if (frozen != null) setFrozenElapsedSeconds(frozen);
+        };
+
+        const onSessionEnded = (e) => {
+            const data = e.detail;
+            if (data.conversationId !== activeConvRef.current?.id) return;
+            const wasAlreadyEnded = sessionStatusRef.current === 'ENDED';
+            setSessionStatus('ENDED');
+            setSessionStartedAt(null);
+            setIsEndingSession(false);
+            setIsStartingSession(false);
+            if (data.durationSeconds != null) setFrozenElapsedSeconds(data.durationSeconds);
+            if (data.totalCost != null) setSessionTotalCost(parseFloat(data.totalCost));
+            setActiveConv((prev) => prev ? { ...prev, sessionStatus: 'ENDED', startedAt: null } : prev);
+            const totalMin = Number(data.totalMinutes || 0).toFixed(2);
+            const totalCost = Number(data.totalCost || 0).toFixed(2);
+            if (!wasAlreadyEnded && !isEndingSessionRef.current) {
+                toast.success(`Session ended · ${totalMin} min · €${totalCost}`, { duration: 4000 });
+            }
+            if (!isConsultant && !wasAlreadyEnded) {
+                setSessionSummary({
+                    sessionType: data.sessionType || sessionTypeRef.current,
+                    totalMinutes: totalMin,
+                    totalCost: totalCost,
                 });
             }
             refetchConversations();
-        });
+        };
+
+        window.addEventListener('rtchat:new_message', onNewMessage);
+        window.addEventListener('rtchat:new_file', onNewFile);
+        window.addEventListener('rtchat:chat_request_pending', onChatPending);
+        window.addEventListener('rtchat:chat_request_declined', onChatDeclined);
+        window.addEventListener('rtchat:session_started', onSessionStarted);
+        window.addEventListener('rtchat:session_ending', onSessionEnding);
+        window.addEventListener('rtchat:session_ended', onSessionEnded);
 
         socketService.on('user_typing', LISTENER_KEY, (data) => {
             if (data.conversationId === activeConvRef.current?.id && data.userId !== user.id) {
@@ -201,25 +290,8 @@ const RealTimeChat = memo(({
             }
         });
 
-        socketService.on('session_started', LISTENER_KEY, (data) => {
-            if (data.conversationId === activeConvRef.current?.id) {
-                // ✅ Don't override if we're in ENDING state
-                if (sessionStatusRef.current === 'ENDING' || sessionStatusRef.current === 'ENDED') return;
-
-                setSessionStatus('ACTIVE');
-                setSessionType(data.sessionType);
-                setSessionStartedAt(data.startedAt);
-                setSessionTotalCost(0);
-                setIsStartingSession(false);
-                refetchConversations();
-                toast.success(`${data.sessionType} session started · €${PRICE_PER_MINUTE}/min`, { duration: 3000 });
-            }
-        });
-
         socketService.on('billing_tick', LISTENER_KEY, (data) => {
-            // ✅ Don't update cost if we're ending — prevents cost jumping after click
             if (sessionStatusRef.current === 'ENDING' || sessionStatusRef.current === 'ENDED') return;
-
             if (data.conversationId === activeConvRef.current?.id) {
                 setSessionTotalCost(prev => data.amountCharged ? prev + data.amountCharged : prev + PRICE_PER_MINUTE);
                 if (data.balanceAfter !== undefined) setCurrentBalance(data.balanceAfter);
@@ -236,49 +308,27 @@ const RealTimeChat = memo(({
             }
         });
 
-        // ✅ Socket session_ended is a safety net — REST API response is the primary handler
-        socketService.on('session_ended', LISTENER_KEY, (data) => {
-            if (data.conversationId === activeConvRef.current?.id) {
-                // ✅ If we already handled it via REST API, just refetch
-                if (sessionStatusRef.current === 'ENDED') {
-                    refetchConversations();
-                    return;
-                }
-
-                // Otherwise handle it here (e.g. other user ended the session)
-                setSessionStatus('ENDED');
-                setIsEndingSession(false);
-                setIsStartingSession(false);
-
-                const totalMin = Number(data.totalMinutes || 0).toFixed(2);
-                const totalCost = Number(data.totalCost || 0).toFixed(2);
-
-                if (data.reason === 'insufficient_balance') {
-                    toast.error('⚠️ Session ended: Insufficient balance', { duration: 6000 });
-                } else {
-                    toast.success(`Session ended · ${totalMin} min · €${totalCost}`, { duration: 4000 });
-                }
-
-                if (!isConsultant) {
-                    setSessionSummary({
-                        sessionType: data.sessionType || sessionTypeRef.current,
-                        totalMinutes: totalMin,
-                        totalCost: totalCost,
-                    });
-                }
-                refetchConversations();
-            }
-        });
-
         return () => {
-            ['new_message', 'new_file', 'user_typing', 'messages_read', 'session_started', 'billing_tick', 'balance_warning', 'session_ended']
+            window.removeEventListener('rtchat:new_message', onNewMessage);
+            window.removeEventListener('rtchat:new_file', onNewFile);
+            window.removeEventListener('rtchat:chat_request_pending', onChatPending);
+            window.removeEventListener('rtchat:chat_request_declined', onChatDeclined);
+            window.removeEventListener('rtchat:session_started', onSessionStarted);
+            window.removeEventListener('rtchat:session_ending', onSessionEnding);
+            window.removeEventListener('rtchat:session_ended', onSessionEnded);
+            ['user_typing', 'messages_read', 'billing_tick', 'balance_warning']
                 .forEach(e => socketService.off(e, LISTENER_KEY));
         };
-    }, [user?.id, isConsultant]);
+    }, [user?.id, isConsultant, markAsRead, refetchConversations]);
 
-    // ── Auto-scroll ───────────────────────────────────────────────
+    // ── Auto-scroll (within messages container only — prevents page jump) ──
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        const container = messagesContainerRef.current;
+        if (!container) return;
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+        if (isNearBottom) {
+            container.scrollTop = container.scrollHeight;
+        }
     }, [messages, typingUsers]);
 
     // ── Handlers ──────────────────────────────────────────────────
@@ -288,7 +338,10 @@ const RealTimeChat = memo(({
         setShowMobileSidebar(false);
         setMessages([]);
         setTypingUsers({});
-        setSessionStatus(null);
+        const status = conv?.sessionStatus;
+        setSessionStatus(status === 'ACTIVE' ? 'ACTIVE' : status === 'PENDING' ? 'PENDING' : status === 'ENDED' ? 'ENDED' : null);
+        setSessionType(conv?.sessionType || null);
+        setSessionStartedAt(conv?.startedAt || null);
         setSessionSummary(null);
         setIsStartingSession(false);
         setIsEndingSession(false);
@@ -302,7 +355,9 @@ const RealTimeChat = memo(({
         // Consultants need active session
         if (isConsultant) {
             if (sessionStatusRef.current !== 'ACTIVE') {
-                toast.error('No active session. Wait for the client to start one.');
+                toast.error(sessionStatusRef.current === 'PENDING'
+                    ? 'Please accept the chat request first.'
+                    : 'No active session. Wait for the client to start one.');
                 return;
             }
             setInputValue('');
@@ -327,8 +382,8 @@ const RealTimeChat = memo(({
             return;
         }
 
-        // User: auto-start session if not active
-        if (!isSessionActive) {
+        // User: request session if not active/pending
+        if (!isSessionActive && sessionStatusRef.current !== 'PENDING') {
             if (currentBalance < PRICE_PER_MINUTE) {
                 toast.error(`Insufficient balance. Minimum €${PRICE_PER_MINUTE} required.`);
                 return;
@@ -341,19 +396,16 @@ const RealTimeChat = memo(({
                     sessionType: 'CHAT',
                 }).unwrap();
 
-                setSessionStatus('ACTIVE');
+                setSessionStatus('PENDING');
                 setSessionType('CHAT');
-                setSessionTotalCost(0);
-                setSessionStartedAt(new Date().toISOString());
+                toast('Chat request sent — waiting for consultant to accept', { duration: 4000 });
             } catch (err) {
                 setIsStartingSession(false);
-                toast.error(err?.data?.message || 'Failed to start session.');
+                toast.error(err?.data?.message || 'Failed to send chat request.');
                 return;
             }
             setIsStartingSession(false);
         }
-
-        // Send the message
         setInputValue('');
         socketService.emit('typing_stop', { conversationId: activeConvRef.current.id });
 
@@ -404,18 +456,47 @@ const RealTimeChat = memo(({
         finally { setIsUploading(false); if (fileInputRef.current) fileInputRef.current.value = ''; }
     }, [token, user, refetchConversations, isSessionActive]);
 
+    const handleAcceptSession = useCallback(async () => {
+        if (!activeConvRef.current?.id || isAccepting) return;
+        try {
+            const session = await acceptSessionMutation(activeConvRef.current.id).unwrap();
+            setSessionStatus('ACTIVE');
+            setSessionType(session?.sessionType || 'CHAT');
+            setSessionStartedAt(session?.startedAt || new Date().toISOString());
+            setSessionTotalCost(0);
+            refetchConversations();
+            toast.success('Chat accepted — session started');
+        } catch (err) {
+            toast.error(err?.data?.message || 'Failed to accept chat request');
+        }
+    }, [acceptSessionMutation, isAccepting, refetchConversations]);
+
+    const handleDeclineSession = useCallback(async () => {
+        if (!activeConvRef.current?.id || isDeclining) return;
+        try {
+            await declineSessionMutation(activeConvRef.current.id).unwrap();
+            setSessionStatus(null);
+            setSessionType(null);
+            setSessionStartedAt(null);
+            refetchConversations();
+            toast('Chat request declined');
+        } catch (err) {
+            toast.error(err?.data?.message || 'Failed to decline chat request');
+        }
+    }, [declineSessionMutation, isDeclining, refetchConversations]);
+
     const handleStartSession = useCallback(async (type) => {
         if (!activeConvRef.current?.id) return;
         setShowStartModal(false);
         setIsStartingSession(true);
         try {
             await startSessionMutation({ conversationId: activeConvRef.current.id, sessionType: type }).unwrap();
-            setSessionStatus('ACTIVE');
+            setSessionStatus('PENDING');
             setSessionType(type);
-            setSessionTotalCost(0);
-            setSessionStartedAt(new Date().toISOString());
+            toast('Chat request sent — waiting for consultant to accept', { duration: 4000 });
         } catch (err) {
-            toast.error(err?.data?.message || 'Failed to start session');
+            toast.error(err?.data?.message || 'Failed to send chat request');
+        } finally {
             setIsStartingSession(false);
         }
     }, [startSessionMutation]);
@@ -424,19 +505,20 @@ const RealTimeChat = memo(({
     const handleEndSession = useCallback(async () => {
         if (!activeConvRef.current?.id || isEndingSession) return;
 
-        // ✅ STEP 1: Immediately freeze the UI
-        // Setting 'ENDING' makes isSessionActive = false → BillingBanner unmounts → timer STOPS
+        const endTs = Date.now();
+        const frozen = sessionStartedAtRef.current
+            ? Math.max(0, Math.floor((endTs - new Date(sessionStartedAtRef.current).getTime()) / 1000))
+            : 0;
+
         setIsEndingSession(true);
         setSessionStatus('ENDING');
+        setFrozenElapsedSeconds(frozen);
 
-        // ✅ STEP 2: Show instant toast
         toast.loading('Ending session...', { id: 'end-session' });
 
         try {
-            // ✅ STEP 3: Call REST API
             const result = await endSessionMutation(activeConvRef.current.id).unwrap();
 
-            // ✅ STEP 4: Success — show final toast + summary
             toast.dismiss('end-session');
 
             const totalMin = Number(result?.totalMinutes || 0).toFixed(2);
@@ -444,11 +526,16 @@ const RealTimeChat = memo(({
 
             toast.success(`Session ended · ${totalMin} min · €${totalCost}`, { duration: 4000 });
 
-            // ✅ STEP 5: Set final state
             setSessionStatus('ENDED');
+            setSessionStartedAt(null);
             setIsEndingSession(false);
+            if (result?.durationSeconds != null) {
+                setFrozenElapsedSeconds(result.durationSeconds);
+            }
+            if (result?.totalCost != null) {
+                setSessionTotalCost(parseFloat(result.totalCost));
+            }
 
-            // ✅ STEP 6: Show summary modal for users
             if (!isConsultant) {
                 setSessionSummary({
                     sessionType: result?.sessionType || sessionTypeRef.current || 'CHAT',
@@ -460,11 +547,28 @@ const RealTimeChat = memo(({
             refetchConversations();
 
         } catch (err) {
-            // ✅ On error — revert to ACTIVE so user can try again
             toast.dismiss('end-session');
+            const status = err?.status || err?.originalStatus;
+            const apiMsg =
+                err?.data?.message
+                || (typeof err?.data === 'string' ? err.data : null)
+                || err?.error
+                || err?.message;
+
+            // Session may already be ended on server despite client error
+            if (status === 404 || String(apiMsg || '').toLowerCase().includes('not found')) {
+                setSessionStatus('ENDED');
+                setSessionStartedAt(null);
+                setIsEndingSession(false);
+                refetchConversations();
+                toast.success('Session ended');
+                return;
+            }
+
             setIsEndingSession(false);
+            setFrozenElapsedSeconds(null);
             setSessionStatus('ACTIVE');
-            toast.error(err?.data?.message || 'Failed to end session. Please try again.');
+            toast.error(apiMsg || 'Failed to end session. Please try again.');
         }
     }, [endSessionMutation, isConsultant, isEndingSession]);
 
@@ -484,20 +588,43 @@ const RealTimeChat = memo(({
     }, [handleSend]);
 
     const isTyping = Object.values(typingUsers).some(Boolean);
-    const filteredConversations = conversations.filter(c =>
+
+    // One conversation per other user (safety net if duplicates exist in cache)
+    const uniqueConversations = useMemo(() => {
+        const byOtherUser = new Map();
+        for (const conv of conversations) {
+            const key = conv.otherUser?.id || conv.id;
+            const existing = byOtherUser.get(key);
+            if (!existing || new Date(conv.updatedAt) > new Date(existing.updatedAt)) {
+                byOtherUser.set(key, conv);
+            }
+        }
+        return Array.from(byOtherUser.values()).sort(
+            (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        );
+    }, [conversations]);
+
+    const filteredConversations = uniqueConversations.filter(c =>
         c.otherUser?.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const inputPlaceholder = () => {
-        if (isStartingSession) return 'Starting session…';
+        if (isStartingSession) return 'Sending chat request…';
         if (isEndingSession) return 'Ending session…';
-        if (isConsultant && !isSessionActive) return 'Waiting for client to start a session…';
+        if (isConsultant && isSessionPending) return 'Accept the chat request to start replying…';
+        if (isConsultant && !isSessionActive) return 'Waiting for a chat request…';
+        if (!isConsultant && isSessionPending) return 'Waiting for consultant to accept…';
         if (isSessionActive) return 'Type a message…';
-        return 'Type a message and hit send to start a session…';
+        return 'Type a message to request a chat session…';
     };
 
     // ── Format elapsed time for the "Ending" banner ───────────────
     const formatElapsedTime = () => {
+        if (frozenElapsedSeconds != null) {
+            const mins = Math.floor(frozenElapsedSeconds / 60);
+            const secs = frozenElapsedSeconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
         if (!sessionStartedAt) return '';
         const seconds = Math.floor((Date.now() - new Date(sessionStartedAt).getTime()) / 1000);
         const mins = Math.floor(seconds / 60);
@@ -574,11 +701,46 @@ const RealTimeChat = memo(({
                                 )}
                             </div>
 
+                            {/* Pending request banner + consultant actions */}
+                            {isSessionPending && (
+                                <div className='px-4 py-3 bg-amber-50 border-b border-amber-200 shrink-0'>
+                                    {isConsultant ? (
+                                        <div className='flex flex-col sm:flex-row items-center justify-between gap-3'>
+                                            <p className='text-sm text-amber-800 font-medium text-center sm:text-left'>
+                                                New chat request from {activeConv.otherUser?.name || 'customer'}
+                                            </p>
+                                            <div className='flex gap-2 w-full sm:w-auto'>
+                                                <button
+                                                    type='button'
+                                                    onClick={handleAcceptSession}
+                                                    disabled={isAccepting || isDeclining}
+                                                    className='flex-1 sm:flex-none px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white text-sm font-semibold rounded-lg'
+                                                >
+                                                    {isAccepting ? 'Accepting…' : 'Accept Chat'}
+                                                </button>
+                                                <button
+                                                    type='button'
+                                                    onClick={handleDeclineSession}
+                                                    disabled={isAccepting || isDeclining}
+                                                    className='flex-1 sm:flex-none px-4 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white text-sm font-semibold rounded-lg'
+                                                >
+                                                    {isDeclining ? 'Declining…' : 'Decline'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className='text-xs text-amber-700 text-center'>
+                                            Waiting for consultant to accept your chat request…
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
                             {/* Info banner — users before session starts */}
-                            {!isSessionActive && !isConsultant && sessionStatus !== 'ENDING' && (
-                                <div className='px-4 py-2 bg-amber-50 border-b border-amber-200 text-center'>
+                            {!isSessionActive && !isSessionPending && !isConsultant && sessionStatus !== 'ENDING' && (
+                                <div className='px-4 py-2 bg-amber-50 border-b border-amber-200 text-center shrink-0'>
                                     <p className='text-xs text-amber-700'>
-                                        Send a message to auto-start a <strong>CHAT</strong> session (€{PRICE_PER_MINUTE}/min)
+                                        Send a message to request a <strong>CHAT</strong> session (€{PRICE_PER_MINUTE}/min). Billing starts after the consultant accepts.
                                     </p>
                                 </div>
                             )}
@@ -606,7 +768,7 @@ const RealTimeChat = memo(({
                             )}
 
                             {/* Messages */}
-                            <div className='flex-1 overflow-y-auto px-4 py-4 bg-gray-50'>
+                            <div ref={messagesContainerRef} className='flex-1 overflow-y-auto px-4 py-4 bg-gray-50' style={{ overflowAnchor: 'none' }}>
                                 {isLoadingMessages ? (
                                     <div className='flex justify-center py-8'>
                                         <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-[#6E35AE]' />
@@ -722,6 +884,9 @@ const RealTimeChat = memo(({
             {sessionSummary && (
                 <SessionSummaryModal
                     summary={sessionSummary}
+                    consultantRecordId={activeConv?.consultantRecordId || activeConv?.otherUser?.consultantRecordId}
+                    consultantUserId={activeConv?.otherUser?.id}
+                    consultantId={activeConv?.consultantRecordId || activeConv?.otherUser?.consultantRecordId}
                     onClose={() => setSessionSummary(null)}
                 />
             )}

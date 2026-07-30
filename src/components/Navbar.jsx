@@ -130,8 +130,9 @@ const Navbar = memo(({ menuOpen, setMenuOpen }) => {
             <Link to={ROUTES.HOME} className="flex items-center gap-2">
               <img
                 src="/logo2.webp"
-                alt="Netwerkmediums Logo"
+                alt="Illorac Logo"
                 className="h-12 sm:h-14 2xl:h-16 w-auto object-contain"
+                style={{ filter: 'saturate(1.3) contrast(1.1) hue-rotate(-8deg)' }}
               />
             </Link>
           </div>

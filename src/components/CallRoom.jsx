@@ -4,7 +4,7 @@ import { twilioVideoService } from '../services/twilioVideoService';
 import { useJoinCallMutation, useEndCallMutation, useGetCallByIdQuery } from '../features/api/callApi';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
-import socketService from '../services/socketService';
+import { freezeCallUI, matchesCallId } from '../utils/callEndUtils';
 
 const CallRoom = ({ callData, onClose }) => {
     const [seconds, setSeconds] = useState(0);
@@ -20,6 +20,11 @@ const CallRoom = ({ callData, onClose }) => {
     const remoteVideoRef = useRef(null);
     const timerRef = useRef(null);
     const isConnectingRef = useRef(false);
+    const isEndingRef = useRef(false);
+    const callIdRef = useRef(null);
+    const actualStartTimeRef = useRef(null);
+    callIdRef.current = callId;
+    actualStartTimeRef.current = actualStartTime;
     const { user, token } = useSelector(state => state.auth);
 
     const [joinCall] = useJoinCallMutation();
@@ -31,28 +36,48 @@ const CallRoom = ({ callData, onClose }) => {
         return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     };
 
-    // Socket listener for call_ended
+    // Instant call end sync via CallSocketBridge window events
     useEffect(() => {
-        if (!user?.id || !token || !callId) return;
+        if (!user?.id || !token) return;
 
-        socketService.connect(user.id, token);
+        const handleCallEnding = (data) => {
+            const id = callIdRef.current || callData?.callId;
+            if (!matchesCallId(data, id)) return;
+            if (callStatus === 'ending') return;
+            freezeCallUI({
+                timerRef,
+                twilioVideoService,
+                setSeconds,
+                setCurrentBilling,
+                setCallStatus,
+                actualStartTime: actualStartTimeRef.current,
+                durationSeconds: data.durationSeconds,
+            });
+        };
 
         const handleCallEnded = (data) => {
+            const id = callIdRef.current || callData?.callId;
+            if (!matchesCallId(data, id)) return;
             if (timerRef.current) {
                 clearInterval(timerRef.current);
                 timerRef.current = null;
             }
             twilioVideoService.disconnect();
+            if (data?.durationSeconds != null) setSeconds(data.durationSeconds);
             toast.success('Call ended');
             setTimeout(() => onClose(), 500);
         };
 
-        socketService.on('call_ended', `call-room-${callId}`, handleCallEnded);
+        const onCallEnding = (e) => handleCallEnding(e.detail);
+        const onCallEnded = (e) => handleCallEnded(e.detail);
+        window.addEventListener('rtcall:call_ending', onCallEnding);
+        window.addEventListener('rtcall:call_ended', onCallEnded);
 
         return () => {
-            socketService.off('call_ended', `call-room-${callId}`);
+            window.removeEventListener('rtcall:call_ending', onCallEnding);
+            window.removeEventListener('rtcall:call_ended', onCallEnded);
         };
-    }, [user?.id, token, callId, onClose]);
+    }, [user?.id, token, callData?.callId, callStatus, onClose]);
 
     // Connect to Twilio room
     useEffect(() => {
@@ -92,14 +117,26 @@ const CallRoom = ({ callData, onClose }) => {
 
                 const isVideoCall = callData.callType === 'VIDEO';
 
+                const waitForRefs = (maxMs = 5000) => new Promise((resolve, reject) => {
+                    const start = Date.now();
+                    const check = () => {
+                        if (localVideoRef.current && remoteVideoRef.current) {
+                            resolve({ local: localVideoRef.current, remote: remoteVideoRef.current });
+                            return;
+                        }
+                        if (Date.now() - start > maxMs) {
+                            reject(new Error('Video elements not ready'));
+                            return;
+                        }
+                        requestAnimationFrame(check);
+                    };
+                    check();
+                });
+
                 if (isVideoCall) {
                     try {
-                        await twilioVideoService.connectVideo(
-                            tokenToUse,
-                            roomName,
-                            localVideoRef.current,
-                            remoteVideoRef.current
-                        );
+                        const { local, remote } = await waitForRefs(5000);
+                        await twilioVideoService.connectVideo(tokenToUse, roomName, local, remote);
                         toast.success('Video call connected');
                     } catch (videoError) {
                         console.warn('Video failed, falling back to audio:', videoError);
@@ -144,11 +181,10 @@ const CallRoom = ({ callData, onClose }) => {
             if (timerRef.current) clearInterval(timerRef.current);
 
             timerRef.current = setInterval(() => {
-                const now = Date.now();
-                const diffSeconds = Math.floor((now - actualStartTime) / 1000);
+                const start = actualStartTimeRef.current;
+                if (!start) return;
+                const diffSeconds = Math.floor((Date.now() - start) / 1000);
                 setSeconds(diffSeconds);
-
-                // Calculate billing
                 const pricePerSecond = 2.5 / 60;
                 setCurrentBilling(Number((diffSeconds * pricePerSecond).toFixed(2)));
             }, 1000);
@@ -173,14 +209,22 @@ const CallRoom = ({ callData, onClose }) => {
     }, [isVideoOff]);
 
     const handleEndCall = async () => {
+        if (isEndingRef.current) return;
+        isEndingRef.current = true;
+
+        freezeCallUI({
+            timerRef,
+            twilioVideoService,
+            setSeconds,
+            setCurrentBilling,
+            setCallStatus,
+            actualStartTime: actualStartTimeRef.current,
+        });
+
         try {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-            }
-            twilioVideoService.disconnect();
-            if (callData?.callId) {
-                await endCall(callData.callId).unwrap();
+            const id = callIdRef.current || callData?.callId;
+            if (id) {
+                await endCall(id).unwrap();
             }
             toast.success('Call ended');
             onClose();
@@ -261,7 +305,7 @@ const CallRoom = ({ callData, onClose }) => {
 
                 <h2 className="text-white font-bold text-2xl mb-1">{callData?.callerName || 'Unknown'}</h2>
                 <p className="text-green-400 text-sm mb-6">
-                    {callStatus === 'active' ? '● Audio call in progress' : 'Connecting...'}
+                    {callStatus === 'ending' ? '● Ending call...' : callStatus === 'active' ? '● Audio call in progress' : 'Connecting...'}
                 </p>
 
                 <div className="text-5xl font-bold text-white mb-4 font-mono">

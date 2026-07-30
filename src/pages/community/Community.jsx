@@ -111,12 +111,20 @@ const CommunityContent = memo(() => {
               {t("community.page.description")}
             </p>
           </div>
+          <div className="flex flex-wrap gap-3 self-start">
           <button
             onClick={handleShareExperience}
-            className="self-start bg-green-500/60 text-white px-5 py-2 rounded-lg text-base transition-all"
+            className="bg-green-500/60 text-white px-5 py-2 rounded-lg text-base transition-all"
           >
             {t("community.page.shareExperience")}
           </button>
+          <a
+            href="/services"
+            className="border border-[#6E35AE] text-[#6E35AE] px-5 py-2 rounded-lg text-base transition-all hover:bg-[#F5F1FD]"
+          >
+            View Services
+          </a>
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-12 mt-10">

@@ -11,9 +11,11 @@ import {
   useGetCallByIdQuery,
   useCancelCallMutation,
   useAcceptCallMutation,
+  useClearStuckCallsMutation,
 } from '../../../features/api/callApi';
 import { twilioVideoService } from '../../../services/twilioVideoService';
 import toast from 'react-hot-toast';
+import { freezeCallUI, matchesCallId } from '../../../utils/callEndUtils';
 
 const LISTENER_KEY = 'video-call-modal';
 
@@ -29,6 +31,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
   const { user, token } = useSelector(state => state.auth);
   const [initiateCall, { isLoading: isInitiating }] = useInitiateCallMutation();
+  const [clearStuckCalls] = useClearStuckCallsMutation();
   const [endCall, { isLoading: isEnding }] = useEndCallMutation();
   const [cancelCall] = useCancelCallMutation();
   const [acceptCall] = useAcceptCallMutation();
@@ -42,7 +45,9 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   const hasInitiatedRef = useRef(false);
   // Store pending connection params so we can retry once refs are ready
   const pendingVideoConnectRef = useRef(null);
+  const actualStartTimeRef = useRef(null);
   callStateRef.current = callState;
+  actualStartTimeRef.current = actualStartTime;
 
   const { data: callData } = useGetCallByIdQuery(callState?.callId, {
     skip: !callState?.callId || showFeedback,
@@ -66,7 +71,9 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => {
         if (!isClosingRef.current && callStateRef.current?.status === 'active') {
-          const diffSeconds = Math.floor((Date.now() - actualStartTime) / 1000);
+          const start = actualStartTimeRef.current;
+          if (!start) return;
+          const diffSeconds = Math.floor((Date.now() - start) / 1000);
           setSeconds(diffSeconds);
           const pricePerSecond = (consultant?.pricePerMinute || 2.5) / 60;
           setCurrentBilling(Number((diffSeconds * pricePerSecond).toFixed(2)));
@@ -190,30 +197,54 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       setTimeout(() => { if (!isClosingRef.current) closeAll(); }, 500);
     };
 
+    const handleCallEnding = (data) => {
+      if (!matchesCallId(data, callStateRef.current?.callId)) return;
+      if (callStateRef.current?.status === 'ending') return;
+      freezeCallUI({
+        timerRef,
+        twilioVideoService,
+        setSeconds,
+        setCurrentBilling,
+        setCallState,
+        actualStartTime: actualStartTimeRef.current,
+        pricePerMinute: consultant?.pricePerMinute,
+        durationSeconds: data.durationSeconds,
+      });
+      setIsVideoConnected(false);
+    };
+
     const handleCallEnded = (data) => {
-      if (isClosingRef.current) return;
+      if (!matchesCallId(data, callStateRef.current?.callId)) return;
       if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
       twilioVideoService.disconnect();
-      const finalSeconds = data?.durationSeconds || seconds;
+      setIsVideoConnected(false);
+      const finalSeconds = data?.durationSeconds ?? seconds;
       setSeconds(finalSeconds);
       if (finalSeconds > 0) {
         setShowFeedback(true);
-      } else {
-        setTimeout(() => { if (!isClosingRef.current) closeAll(); }, 500);
+        isClosingRef.current = false;
+      } else if (!isClosingRef.current) {
+        setTimeout(() => closeAll(), 500);
       }
     };
 
+    const onCallEnding = (e) => handleCallEnding(e.detail);
+    const onCallEnded = (e) => handleCallEnded(e.detail);
+
+    window.addEventListener('rtcall:call_ending', onCallEnding);
+    window.addEventListener('rtcall:call_ended', onCallEnded);
+
     socketService.on('call_accepted', LISTENER_KEY, handleCallAccepted);
     socketService.on('call_rejected', LISTENER_KEY, handleCallRejected);
-    socketService.on('call_ended', LISTENER_KEY, handleCallEnded);
 
     return () => {
+      window.removeEventListener('rtcall:call_ending', onCallEnding);
+      window.removeEventListener('rtcall:call_ended', onCallEnded);
       socketService.off('call_accepted', LISTENER_KEY);
       socketService.off('call_rejected', LISTENER_KEY);
-      socketService.off('call_ended', LISTENER_KEY);
       isAcceptedRef.current = false;
     };
-  }, [isOpen, user?.id, token]);
+  }, [isOpen, user?.id, token, consultant?.pricePerMinute]);
 
   // Initiate call (caller side)
   useEffect(() => {
@@ -223,8 +254,15 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
     const startCall = async () => {
       try {
-        const consultantUserId = consultant.user?.id || consultant.id;
-        if (!consultantUserId) { toast.error('Consultant ID not found'); closeAll(); return; }
+        const consultantUserId = consultant?.userId || consultant?.user?.id;
+        if (!consultantUserId) {
+          toast.error('Consultant user ID not found');
+          closeAll();
+          return;
+        }
+
+        // Clear orphaned PENDING calls from previous failed attempts
+        await clearStuckCalls().unwrap().catch(() => {});
 
         const response = await initiateCall({
           consultantId: consultantUserId,
@@ -246,7 +284,8 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       } catch (err) {
         console.error('❌ initiateCall error:', err);
         hasInitiatedRef.current = false;
-        toast.error(err?.data?.message || 'Failed to start video call');
+        const msg = err?.data?.message || err?.message || 'Failed to start video call';
+        toast.error(msg);
         closeAll();
       }
     };
@@ -258,17 +297,26 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     if (isClosingRef.current) return;
     isClosingRef.current = true;
 
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-    twilioVideoService.disconnect();
+    const wasPending = callStateRef.current?.status === 'pending';
+    const frozen = freezeCallUI({
+      timerRef,
+      twilioVideoService,
+      setSeconds,
+      setCurrentBilling,
+      setCallState,
+      actualStartTime: actualStartTimeRef.current,
+      pricePerMinute: consultant?.pricePerMinute,
+    });
+    setIsVideoConnected(false);
 
     try {
       if (callStateRef.current?.callId) {
-        if (callStateRef.current.status === 'pending') {
+        if (wasPending) {
           await cancelCall(callStateRef.current.callId).unwrap();
           closeAll();
         } else {
           const result = await endCall(callStateRef.current.callId).unwrap();
-          const finalDuration = result?.data?.durationSeconds || result?.durationSeconds || seconds;
+          const finalDuration = result?.durationSeconds || result?.data?.durationSeconds || frozen;
           setSeconds(finalDuration);
           if (finalDuration > 0) {
             setShowFeedback(true);
@@ -282,7 +330,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       }
     } catch (err) {
       console.error('End call error:', err);
-      if (seconds > 0) { setShowFeedback(true); isClosingRef.current = false; }
+      if (frozen > 0) { setShowFeedback(true); isClosingRef.current = false; }
       else { closeAll(); }
     }
   };

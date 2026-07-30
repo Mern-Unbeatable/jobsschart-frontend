@@ -8,6 +8,10 @@ import { TOAST_CONFIG } from './config';
 import store from './features/store';
 import GlobalCallHandler from './components/GlobalCallHandler';
 import { IncomingCallNotification } from './components/IncomingCallNotification';
+import { IncomingChatNotification } from './components/IncomingChatNotification';
+import { SocketManager } from './components/SocketManager';
+import { ChatSocketBridge } from './components/ChatSocketBridge';
+import { CallSocketBridge } from './components/CallSocketBridge';
 import useGeoDomainRedirect from './hooks/useGeoDomainRedirect';
 
 function App() {
@@ -18,7 +22,11 @@ function App() {
       <ErrorBoundary>
         <RouterProvider router={router} />
         <GlobalCallHandler />
+        <SocketManager />
+        <ChatSocketBridge />
+        <CallSocketBridge />
         <IncomingCallNotification />
+        <IncomingChatNotification />
         <Toaster
           position={TOAST_CONFIG.POSITION}
           toastOptions={{ duration: TOAST_CONFIG.DURATION }}

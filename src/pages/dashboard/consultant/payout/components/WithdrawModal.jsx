@@ -109,14 +109,14 @@ export default function WithdrawModal({
               htmlFor="withdraw-routing-number"
               className="block text-base text-black"
             >
-              Routing number
+              IBAN (International Bank Account Number)
             </label>
             <input
               id="withdraw-routing-number"
               type="text"
               value={routingNumber}
               onChange={(event) => setRoutingNumber(event.target.value)}
-              placeholder="Enter routing number"
+              placeholder="e.g. NL00 BANK 0123 4567 89"
               className="h-11.75 w-full rounded-lg border border-[#cdcdcd] px-4 text-base text-black placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-green-500/60"
               disabled={isSubmitting}
             />
@@ -127,14 +127,14 @@ export default function WithdrawModal({
               htmlFor="withdraw-account-number"
               className="block text-base text-black"
             >
-              Account Number
+              Business Bank Account (optional BIC/SWIFT)
             </label>
             <input
               id="withdraw-account-number"
               type="text"
               value={accountNumber}
               onChange={(event) => setAccountNumber(event.target.value)}
-              placeholder="Enter your account number"
+              placeholder="e.g. ABNANL2A"
               className="h-11.75 w-full rounded-lg border border-[#cdcdcd] px-4 text-base font-medium text-black placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-green-500/60"
               disabled={isSubmitting}
             />

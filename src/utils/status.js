@@ -1,7 +1,7 @@
 export const toDisplayStatus = (raw = "") => {
   switch (raw?.toUpperCase()) {
     case "ONLINE":
-      return "Available Now";
+      return "Online";
     case "BUSY":
       return "Busy";
     default:
@@ -11,12 +11,12 @@ export const toDisplayStatus = (raw = "") => {
 
 export const getStatusBadgeStyle = (display) => {
   switch (display) {
-    case "Available Now":
-      return "bg-green-500/90";
+    case "Online":
+      return "bg-green-500/90 text-white";
     case "Busy":
-      return "bg-yellow-500/90";
+      return "bg-yellow-500/90 text-white";
     default:
-      return "bg-gray-400/80";
+      return "bg-red-500/90 text-white";
   }
 };
 
@@ -25,8 +25,8 @@ export const getStatusStyle = (display) => {
     case "Online":
       return "bg-[#05BC27] text-white";
     case "Busy":
-      return "bg-green-500/60 text-white";
+      return "bg-yellow-500/90 text-white";
     default:
-      return "bg-gray-100 text-gray-500";
+      return "bg-red-500 text-white";
   }
 };

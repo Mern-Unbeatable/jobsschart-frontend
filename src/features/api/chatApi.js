@@ -64,6 +64,32 @@ export const chatApi = baseApi.injectEndpoints({
             transformResponse: (r) => r?.data?.session || r?.session,
         }),
 
+        acceptSession: builder.mutation({
+            query: (conversationId) => ({
+                url: `/chat/conversations/${conversationId}/session/accept`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['ChatConversation'],
+            transformResponse: (r) => r?.data?.session || r?.session,
+        }),
+
+        declineSession: builder.mutation({
+            query: (conversationId) => ({
+                url: `/chat/conversations/${conversationId}/session/decline`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['ChatConversation'],
+            transformResponse: (r) => r?.data?.session || r?.session,
+        }),
+
+        emailTranscript: builder.mutation({
+            query: (conversationId) => ({
+                url: `/chat/conversations/${conversationId}/transcript/email`,
+                method: 'POST',
+            }),
+            transformResponse: (r) => r?.data || r,
+        }),
+
 
 endSession: builder.mutation({
     query: (conversationId) => ({
@@ -95,6 +121,9 @@ export const {
     useMarkAsReadMutation,
     useGetUnreadCountQuery,
     useStartSessionMutation,
+    useAcceptSessionMutation,
+    useDeclineSessionMutation,
     useEndSessionMutation,
+    useEmailTranscriptMutation,
     useGetSessionStatusQuery,
 } = chatApi;

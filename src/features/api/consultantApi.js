@@ -121,19 +121,43 @@ export const consultantApi = baseApi.injectEndpoints({
 
         getMyAvailabilitySlots: builder.query({
             query: (params = {}) => ({
-                url: '/consultants/me/slots',
+                url: '/availability/my-slots',
                 method: 'GET',
                 params,
             }),
             providesTags: ['AvailabilitySlots'],
-            transformResponse: (response) => response.data,
+            transformResponse: (response) => {
+                const data = response?.data || response;
+                return { slots: data?.weeklySlots || data?.slots || [] };
+            },
         }),
 
         addAvailabilitySlots: builder.mutation({
-            query: (data) => ({
-                url: '/consultants/me/slots',
-                method: 'POST',
-                body: data,
+            query: (data) => {
+                const slots = data.slots || [{
+                    dayOfWeek: (data.day || 'SUNDAY').toUpperCase(),
+                    startTime: data.from || data.startTime || '09:00',
+                    endTime: data.to || data.endTime || '21:00',
+                }];
+                return {
+                    url: '/availability/slots/bulk',
+                    method: 'POST',
+                    body: { slots },
+                };
+            },
+            invalidatesTags: ['AvailabilitySlots', 'Availability'],
+            transformResponse: (response) => response.data,
+        }),
+
+        updateAvailabilitySlot: builder.mutation({
+            query: ({ slotId, ...data }) => ({
+                url: `/availability/slots/${slotId}`,
+                method: 'PATCH',
+                body: {
+                    dayOfWeek: data.dayOfWeek || (data.day ? data.day.toUpperCase() : undefined),
+                    startTime: data.from || data.startTime,
+                    endTime: data.to || data.endTime,
+                },
             }),
             invalidatesTags: ['AvailabilitySlots', 'Availability'],
             transformResponse: (response) => response.data,
@@ -141,10 +165,26 @@ export const consultantApi = baseApi.injectEndpoints({
 
         deleteAvailabilitySlot: builder.mutation({
             query: (slotId) => ({
-                url: `/consultants/me/slots/${slotId}`,
+                url: `/availability/slots/${slotId}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['AvailabilitySlots', 'Availability'],
+            transformResponse: (response) => response.data,
+        }),
+
+        getMonthlyInvoices: builder.query({
+            query: () => '/consultants/me/invoices',
+            providesTags: ['Invoices'],
+            transformResponse: (response) => response?.data?.invoices || [],
+        }),
+
+        updateVerificationInfo: builder.mutation({
+            query: (data) => ({
+                url: '/consultants/me/verification',
+                method: 'PATCH',
+                body: data,
+            }),
+            invalidatesTags: ['MyConsultantProfile'],
             transformResponse: (response) => response.data,
         }),
 
@@ -207,7 +247,10 @@ export const {
     // Availability slots (protected)
     useGetMyAvailabilitySlotsQuery,
     useAddAvailabilitySlotsMutation,
+    useUpdateAvailabilitySlotMutation,
     useDeleteAvailabilitySlotMutation,
+    useGetMonthlyInvoicesQuery,
+    useUpdateVerificationInfoMutation,
     useUpdateScheduleStatusMutation,
 
     // Reviews (public but requires auth)

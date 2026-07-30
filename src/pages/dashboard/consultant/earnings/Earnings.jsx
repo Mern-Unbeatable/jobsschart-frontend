@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import EarningsStats from './components/EarningsStats';
 import EarningsChart from './components/EarningsChart';
+import InvoicesSection from './components/InvoicesSection';
 import { useGetMyEarningsDashboardQuery } from '../../../../features/api/consultantApi';
 
 const ConsultantEarnings = memo(() => {
@@ -32,6 +33,9 @@ const ConsultantEarnings = memo(() => {
 
       {/* Earnings Over Time chart */}
       <EarningsChart chartData={chartData} />
+
+      {/* Monthly invoices */}
+      <InvoicesSection />
     </div>
   );
 });

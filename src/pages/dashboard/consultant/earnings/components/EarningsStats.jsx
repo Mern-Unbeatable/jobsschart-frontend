@@ -20,18 +20,16 @@ StatCard.displayName = 'StatCard';
 const EarningsStats = memo(({ dashboardData }) => {
   const today = dashboardData?.todayIncome ?? 0;
   const revenue = dashboardData?.totalRevenue ?? 0;
-  const withdraw = dashboardData?.withdrawableAmount ?? 0;
-  const balance = dashboardData?.availableBalance ?? 0;
+  const balance = dashboardData?.availableBalance ?? dashboardData?.withdrawableAmount ?? 0;
 
   const cards = [
     { id: 'today', label: "Today's Income", value: `€${today.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     { id: 'revenue', label: 'Total Revenue', value: `€${revenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
-    { id: 'withdraw', label: 'Withdraw', value: `€${withdraw.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     { id: 'balance', label: 'Available Balance', value: `€${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
   ];
 
   return (
-    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
+    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3'>
       {cards.map((card) => (
         <StatCard key={card.id} label={card.label} value={card.value} />
       ))}

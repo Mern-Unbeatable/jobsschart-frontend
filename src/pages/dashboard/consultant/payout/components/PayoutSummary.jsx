@@ -39,11 +39,11 @@ export default function PayoutSummary({ onWithdrawClick, balanceData }) {
       title: "Available Balance",
       amount: `€${available.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: Euro,
-      showWithdraw: true,
+      showWithdraw: false,
     },
     {
       id: "pending",
-      title: "Pending Amount",
+      title: "Pending Payout (processing)",
       amount: `€${pending.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: ArrowUpRight,
       showWithdraw: false,

@@ -161,6 +161,9 @@ class TwilioVideoService {
         this.room = await connectTwilioVideo(token, {
             name: roomName,
             tracks: localTracks,
+            automaticSubscription: true,
+            dominantSpeaker: false,
+            networkQuality: { local: 1, remote: 1 },
         });
 
         console.log('✅ Connected to video room:', this.room.name);
@@ -206,6 +209,9 @@ class TwilioVideoService {
         this.room = await connectTwilioVideo(token, {
             name: roomName,
             tracks: localTracks,
+            automaticSubscription: true,
+            dominantSpeaker: false,
+            networkQuality: { local: 1, remote: 1 },
         });
 
         console.log('✅ Connected to audio room:', this.room.name);

@@ -88,7 +88,7 @@ function DonationDetailModal({ donorId, onClose }) {
                 style={{ background: "#030213" }}
                 className="inline-flex items-center text-white text-xs font-medium px-2.25 py-0.75 rounded-lg w-fit"
               >
-                {donor.donorType === "INDIVIDUAL" ? "Individual" : "Business"}
+                {donor.donorType === "INDIVIDUAL" ? "Individual Donator" : "Business Donator"}
               </span>
             </div>
             {/* Business Name */}

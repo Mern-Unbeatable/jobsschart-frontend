@@ -200,6 +200,12 @@ module.exports = (env, argv) => {
           'GET, POST, PUT, PATCH, DELETE, OPTIONS',
       },
       proxy: {
+        '/socket.io': {
+          target: 'http://localhost:5000',
+          changeOrigin: true,
+          ws: true,
+          secure: false,
+        },
         '/api': {
           target: 'https://api.illorac.nl',
           changeOrigin: true,
