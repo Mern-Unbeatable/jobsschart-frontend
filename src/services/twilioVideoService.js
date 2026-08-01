@@ -13,6 +13,7 @@ class TwilioVideoService {
         this._participantListeners = new Map();
         this._remoteAudioElements = new Set();
         this._remoteVideoElements = new Set();
+        this._routeObserver = null;
     }
 
     _getAudioContainer() {
@@ -51,21 +52,38 @@ class TwilioVideoService {
         if (this._audioContainer) {
             this._audioContainer.innerHTML = '';
         }
+        this._teardownAudioRouteObserver();
         this._remoteAudioElements.clear();
         this._remoteVideoElements.clear();
+    }
+
+    _teardownAudioRouteObserver() {
+        if (this._routeObserver) {
+            this._routeObserver.disconnect();
+            this._routeObserver = null;
+        }
+    }
+
+    _setupAudioRouteObserver() {
+        const container = this._getAudioContainer();
+        this._teardownAudioRouteObserver();
+        this._routeObserver = new MutationObserver(() => {
+            this._applySpeakerToRemoteAudio();
+        });
+        this._routeObserver.observe(container, { childList: true, subtree: true });
     }
 
     _getRemoteElements() {
         return [...this._remoteAudioElements, ...this._remoteVideoElements];
     }
 
-    async _applySpeakerToRemoteAudio() {
-        return applyAudioOutputRoute(this.isSpeakerOn, this._getRemoteElements());
+    async _applySpeakerToRemoteAudio(forceRefresh = false) {
+        return applyAudioOutputRoute(this.isSpeakerOn, this._getRemoteElements(), { forceRefresh });
     }
 
     async setSpeakerOn(enabled) {
         this.isSpeakerOn = Boolean(enabled);
-        const routeInfo = await this._applySpeakerToRemoteAudio();
+        const routeInfo = await this._applySpeakerToRemoteAudio(true);
         return { on: this.isSpeakerOn, ...routeInfo };
     }
 
@@ -107,12 +125,13 @@ class TwilioVideoService {
             el.volume = 1;
             audioContainer.appendChild(el);
             this._remoteAudioElements.add(el);
+            this._setupAudioRouteObserver();
 
             const tryPlay = () => {
                 const p = el.play();
                 if (p) {
-                    p.then(() => this._applySpeakerToRemoteAudio()).catch(() => {
-                        setTimeout(() => el.play().then(() => this._applySpeakerToRemoteAudio()).catch(() => {}), 500);
+                    p.then(() => this._applySpeakerToRemoteAudio(true)).catch(() => {
+                        setTimeout(() => el.play().then(() => this._applySpeakerToRemoteAudio(true)).catch(() => {}), 500);
                     });
                 }
             };
@@ -136,7 +155,7 @@ class TwilioVideoService {
             el.volume = 1;
             this._remoteVideoElements.add(el);
             remoteVideoRef.appendChild(el);
-            this._applySpeakerToRemoteAudio();
+            this._applySpeakerToRemoteAudio(true);
         }
     }
 
@@ -166,7 +185,11 @@ class TwilioVideoService {
         listeners.push({ target: participant, event: 'trackPublished', fn: onTrackPublished });
 
         const onUnsubscribed = (track) => {
-            track.detach().forEach(el => el.remove());
+            track.detach().forEach((el) => {
+                this._remoteAudioElements.delete(el);
+                this._remoteVideoElements.delete(el);
+                el.remove();
+            });
         };
         participant.on('trackUnsubscribed', onUnsubscribed);
         listeners.push({ target: participant, event: 'trackUnsubscribed', fn: onUnsubscribed });
@@ -220,7 +243,7 @@ class TwilioVideoService {
 
         this.room.on('disconnected', () => { this.cleanup(); });
 
-        await this._applySpeakerToRemoteAudio();
+        await this._applySpeakerToRemoteAudio(true);
         return this.room;
     }
 
@@ -267,7 +290,7 @@ class TwilioVideoService {
             setTimeout(() => onConnect?.(), 200);
         }
 
-        await this._applySpeakerToRemoteAudio();
+        await this._applySpeakerToRemoteAudio(true);
         return this.room;
     }
 
@@ -320,6 +343,8 @@ class TwilioVideoService {
         if (this._audioContainer) {
             this._audioContainer.innerHTML = '';
         }
+
+        this._teardownAudioRouteObserver();
 
         this.isMuted = false;
         this.isVideoOff = false;
