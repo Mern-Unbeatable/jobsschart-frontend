@@ -1,5 +1,5 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
-import { PhoneOff, Mic, Volume2, MicOff } from 'lucide-react';
+import { PhoneOff, Mic, Volume2, VolumeX, MicOff } from 'lucide-react';
 import CallFeedbackModal from './CallFeedbackModal';
 import { socketService } from '../../../services/socketService';
 import { useSelector } from 'react-redux';
@@ -16,13 +16,16 @@ import { freezeCallUI, matchesCallId, parseServerStartTimeMs } from '../../../ut
 import { showBalanceWarning } from '../../../utils/balanceWarningUtils';
 import InCallCreditTopUp from '../../../components/credit/InCallCreditTopUp';
 import { unlockBrowserAudio } from '../../../utils/notificationSound';
+import { useResponsiveCallLayout } from '../../../hooks/useResponsiveCallLayout';
 
 const LISTENER_KEY = 'audio-call-modal';
 
 const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
   const [seconds, setSeconds] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+  const [isSpeakerOn, setIsSpeakerOn] = useState(true);
   const [showFeedback, setShowFeedback] = useState(false);
+  const callLayout = useResponsiveCallLayout();
   const [currentBilling, setCurrentBilling] = useState(0);
   const [sessionTotalCost, setSessionTotalCost] = useState(null);
   const [walletBalance, setWalletBalance] = useState(0);
@@ -196,6 +199,8 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
         try {
           isConnectedRef.current = true;
           await twilioVideoService.connectAudio(tokenToUse, roomName);
+          setIsSpeakerOn(true);
+          await twilioVideoService.setSpeakerOn(true);
           console.log(' User audio connected successfully');
         } catch (err) {
           console.error(' Audio connect error:', err);
@@ -403,34 +408,34 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
 
   if (isInitiating) {
     return (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
-        <div className="bg-[#2D2D2D] w-full max-w-md rounded-2xl p-8 flex flex-col items-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-400 mb-4" />
-          <p className="text-white text-lg">Connecting to {consultant?.name}...</p>
+      <div className="fixed inset-0 z-[9999] flex h-[100dvh] w-screen items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+        <div className="flex w-full max-w-md flex-col items-center rounded-2xl bg-[#2D2D2D] p-6 sm:p-8">
+          <div className="mb-4 h-10 w-10 animate-spin rounded-full border-b-2 border-yellow-400" />
+          <p className="text-center text-base text-white sm:text-lg">Connecting to {consultant?.name}...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+    <div className="fixed inset-0 z-[9999] flex h-[100dvh] w-screen items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
       {!showFeedback ? (
-        <div className="bg-[#2D2D2D] w-full max-w-md rounded-2xl p-6 flex flex-col items-center">
-          <div className="w-20 h-20 rounded-full bg-[#D1C4E9] flex items-center justify-center mb-4 text-[#5E35B1] text-3xl font-bold">
+        <div className="flex w-full max-w-md max-h-[92dvh] flex-col items-center overflow-y-auto rounded-2xl bg-[#2D2D2D] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:p-6">
+          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#D1C4E9] text-3xl font-bold text-[#5E35B1] sm:h-24 sm:w-24">
             {consultant?.name?.charAt(0) || 'C'}
           </div>
 
-          <h2 className="text-white font-bold text-xl mb-1">{consultant?.name}</h2>
+          <h2 className="mb-1 text-center text-lg font-bold text-white sm:text-xl">{consultant?.name}</h2>
 
-          <p className={`text-sm font-semibold mb-6 uppercase tracking-wider ${callState?.status === 'active' ? 'text-green-400' : 'text-yellow-400'}`}>
+          <p className={`mb-4 text-sm font-semibold uppercase tracking-wider sm:mb-6 ${callState?.status === 'active' ? 'text-green-400' : 'text-yellow-400'}`}>
             {callState?.status === 'active' ? '● In Progress' : '● Waiting for answer...'}
           </p>
 
-          <div className="text-5xl font-bold text-white mb-8 font-mono">
+          <div className="mb-6 text-4xl font-bold font-mono text-white sm:mb-8 sm:text-5xl">
             {formatTime(seconds)}
           </div>
 
-          <div className="bg-white/10 px-6 py-3 rounded-xl mb-4 text-center w-full max-w-xs">
+          <div className="mb-4 w-full max-w-xs rounded-xl bg-white/10 px-4 py-3 text-center sm:px-6">
             <p className="text-xs text-gray-400 mb-1 uppercase">Current Billing</p>
             <p className="text-white font-bold text-xl">€{currentBilling.toFixed(2)}</p>
             {!callState?.isIncoming && callState?.status === 'active' && (
@@ -446,26 +451,41 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
             </div>
           )}
 
-          <div className="flex items-center gap-4">
+          <div className={`flex items-center ${callLayout.controlGapClass}`}>
             <button
+              type="button"
               onClick={() => {
                 const newMuted = !isMuted;
                 setIsMuted(newMuted);
                 newMuted ? twilioVideoService.mute() : twilioVideoService.unmute();
               }}
-              className={`w-12 h-12 rounded-full flex items-center justify-center ${isMuted ? 'bg-red-500' : 'bg-white/10'} text-white`}
+              className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full ${isMuted ? 'bg-red-500' : 'bg-white/10'} text-white`}
             >
               {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
             </button>
             <button
+              type="button"
               onClick={handleEndCall}
               disabled={isEnding}
-              className="w-14 h-14 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-full flex items-center justify-center"
+              className={`${callLayout.endCallBtnClass} flex items-center justify-center rounded-full bg-red-600 text-white active:bg-red-700 disabled:opacity-50`}
             >
               <PhoneOff size={22} />
             </button>
-            <button className="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center">
-              <Volume2 size={20} />
+            <button
+              type="button"
+              onClick={async () => {
+                unlockBrowserAudio();
+                const next = await twilioVideoService.toggleSpeaker();
+                setIsSpeakerOn(next);
+                toast(next ? 'Sound on' : 'Sound off — you will not hear the other person', {
+                  duration: 2000,
+                  position: 'top-center',
+                });
+              }}
+              className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full ${isSpeakerOn ? 'bg-white/10' : 'bg-[#6E35AE]'} text-white`}
+              aria-label={isSpeakerOn ? 'Mute incoming sound' : 'Unmute incoming sound'}
+            >
+              {isSpeakerOn ? <Volume2 size={20} /> : <VolumeX size={20} />}
             </button>
           </div>
         </div>

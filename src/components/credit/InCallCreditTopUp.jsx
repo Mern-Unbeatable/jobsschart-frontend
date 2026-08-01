@@ -1,7 +1,7 @@
 import React, { memo, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, X, ExternalLink, CreditCard } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useGetAllPackagesQuery } from '../../features/api/packageApi';
 import { useCreateCheckoutMutation } from '../../features/api/paymentApi';
@@ -12,16 +12,19 @@ import { updateUser } from '../../features/slices/authSlice';
  * Credit purchase during active chat/call sessions.
  * Opens a portal modal above call UI (z-index > call modal) so it is never clipped.
  */
-const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate }) => {
+const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate, showForUserOnly = true }) => {
     const [open, setOpen] = useState(false);
     const [buyingId, setBuyingId] = useState(null);
     const dispatch = useDispatch();
+    const userRole = useSelector((state) => state.auth?.user?.role);
+    const isConsultant = userRole === 'CONSULTANT' || userRole === 'ADMIN';
+    const hidden = showForUserOnly && isConsultant;
 
-    const { data: packagesData, isLoading } = useGetAllPackagesQuery(undefined, { skip: !open });
+    const { data: packagesData, isLoading } = useGetAllPackagesQuery(undefined, { skip: !open || hidden });
     const [createCheckout] = useCreateCheckoutMutation();
     const { data: meData } = useGetMeQuery(undefined, {
-        skip: !open,
-        pollingInterval: open ? 5000 : 0,
+        skip: !open || hidden,
+        pollingInterval: open && !hidden ? 5000 : 0,
     });
 
     const packages = packagesData?.packages || [];
@@ -64,7 +67,7 @@ const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate }) => {
 
     const modal = open ? createPortal(
         <div
-            className="fixed inset-0 z-[10050] flex items-center justify-center p-4"
+            className="fixed inset-0 z-[10050] flex h-[100dvh] items-center justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
             role="dialog"
             aria-modal="true"
             aria-label="Add credits"
@@ -76,7 +79,7 @@ const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate }) => {
                 onClick={() => setOpen(false)}
             />
             <div
-                className="relative z-[10051] w-full max-w-md max-h-[85vh] flex flex-col rounded-2xl bg-white shadow-2xl border border-gray-200 overflow-hidden"
+                className="relative z-[10051] flex max-h-[85dvh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
@@ -150,6 +153,8 @@ const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate }) => {
         document.body
     ) : null;
 
+    if (hidden) return null;
+
     return (
         <>
             <button
@@ -157,8 +162,8 @@ const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate }) => {
                 onClick={() => setOpen(true)}
                 className={
                     compact
-                        ? 'flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#6E35AE] hover:bg-[#5E35B1] text-white text-xs font-semibold transition-colors'
-                        : 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#6E35AE] hover:bg-[#5E35B1] text-white text-xs font-semibold transition-colors'
+                        ? 'inline-flex h-8 items-center gap-1 rounded-full bg-[#6E35AE] px-2 text-[10px] font-semibold text-white transition-colors active:bg-[#5E35B1] sm:h-9 sm:px-2.5 sm:text-xs'
+                        : 'inline-flex items-center gap-1.5 rounded-full bg-[#6E35AE] px-3 py-1 text-xs font-semibold text-white transition-colors active:bg-[#5E35B1]'
                 }
             >
                 <Plus size={12} /> Add Credits

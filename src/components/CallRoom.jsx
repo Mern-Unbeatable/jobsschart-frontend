@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PhoneOff, Mic, MicOff, Video, VideoOff, Volume2 } from 'lucide-react';
+import { PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, VolumeX } from 'lucide-react';
 import { twilioVideoService } from '../services/twilioVideoService';
 import { useJoinCallMutation, useEndCallMutation } from '../features/api/callApi';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { freezeCallUI, matchesCallId, parseServerStartTimeMs } from '../utils/callEndUtils';
 import { unlockBrowserAudio } from '../utils/notificationSound';
+import { shouldShowNotification } from '../utils/notificationDedupe';
 import { isVideoCallType, parseTwilioToken, resolveTwilioRoom } from '../utils/twilioTokenUtils';
 import { acquireTwilioCallLock, releaseTwilioCallLock } from '../utils/twilioConnectionLock';
+import DraggableCallPiP from './call/DraggableCallPiP';
+import { useResponsiveCallLayout } from '../hooks/useResponsiveCallLayout';
 
 const CallRoom = ({ callData, onClose }) => {
     const [seconds, setSeconds] = useState(0);
@@ -19,9 +22,11 @@ const CallRoom = ({ callData, onClose }) => {
     const [connectError, setConnectError] = useState(null);
     const [connectAttempt, setConnectAttempt] = useState(0);
     const [currentBilling, setCurrentBilling] = useState(0);
+    const [isSpeakerOn, setIsSpeakerOn] = useState(true);
 
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
+    const videoContainerRef = useRef(null);
     const timerRef = useRef(null);
     const isConnectingRef = useRef(false);
     const hasConnectedRef = useRef(false);
@@ -42,6 +47,7 @@ const CallRoom = ({ callData, onClose }) => {
 
     const isVideoCall = isVideoCallType(callData?.callType);
     const callId = callData?.callId;
+    const callLayout = useResponsiveCallLayout();
 
     const formatTime = (totalSeconds) => {
         const mins = Math.floor(totalSeconds / 60);
@@ -83,7 +89,9 @@ const CallRoom = ({ callData, onClose }) => {
             hasConnectedRef.current = false;
             if (data?.durationSeconds != null) setSeconds(data.durationSeconds);
             if (data?.totalCost != null) setCurrentBilling(parseFloat(data.totalCost));
-            toast.success('Call ended');
+            if (shouldShowNotification(`call-ended:${callIdRef.current}`, 5000)) {
+                toast.success('Call ended');
+            }
             setTimeout(() => onCloseRef.current(), 500);
         };
 
@@ -168,6 +176,8 @@ const CallRoom = ({ callData, onClose }) => {
                     try {
                         await twilioVideoService.connectVideo(tokenToUse, roomName, localEl, remoteEl);
                         hasConnectedRef.current = true;
+                        setIsSpeakerOn(true);
+                        await twilioVideoService.setSpeakerOn(true);
                         toast.success('Video call connected');
                     } catch (videoError) {
                         console.warn('Video failed, falling back to audio:', videoError);
@@ -175,6 +185,8 @@ const CallRoom = ({ callData, onClose }) => {
                         if (cancelled) return;
                         await twilioVideoService.connectAudio(tokenToUse, roomName);
                         hasConnectedRef.current = true;
+                        setIsSpeakerOn(true);
+                        await twilioVideoService.setSpeakerOn(true);
                         toast('Connected with audio only', { icon: '📞' });
                     }
                 } else {
@@ -182,6 +194,8 @@ const CallRoom = ({ callData, onClose }) => {
                     await twilioVideoService.connectAudio(tokenToUse, roomName);
                     if (cancelled) return;
                     hasConnectedRef.current = true;
+                    setIsSpeakerOn(true);
+                    await twilioVideoService.setSpeakerOn(true);
                     setCallStatus('active');
                     toast.success('Audio call connected');
                 }
@@ -289,7 +303,9 @@ const CallRoom = ({ callData, onClose }) => {
                 if (result?.durationSeconds != null) setSeconds(result.durationSeconds);
                 if (result?.totalCost != null) setCurrentBilling(parseFloat(result.totalCost));
             }
-            toast.success('Call ended');
+            if (shouldShowNotification(`call-ended:${callIdRef.current}`, 5000)) {
+                toast.success('Call ended');
+            }
             onCloseRef.current();
         } catch (error) {
             console.error('Failed to end call:', error);
@@ -297,11 +313,21 @@ const CallRoom = ({ callData, onClose }) => {
         }
     };
 
+    const handleToggleSpeaker = async () => {
+        unlockBrowserAudio();
+        const next = await twilioVideoService.toggleSpeaker();
+        setIsSpeakerOn(next);
+        toast(next ? 'Sound on' : 'Sound off — you will not hear the other person', {
+            duration: 2000,
+            position: 'top-center',
+        });
+    };
+
     if (isVideoCall) {
         return (
-            <div className="fixed inset-0 bg-black z-[10000]">
-                <div className="relative h-full">
-                    <div ref={remoteVideoRef} className="w-full h-full bg-gray-900 flex items-center justify-center">
+            <div className="fixed inset-0 z-[10000] h-[100dvh] w-screen bg-black">
+                <div ref={videoContainerRef} className="relative h-full w-full">
+                    <div ref={remoteVideoRef} className="flex h-full w-full items-center justify-center bg-gray-900">
                         {callStatus === 'connecting' && (
                             <div className="text-center">
                                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-400 mx-auto mb-4" />
@@ -337,42 +363,62 @@ const CallRoom = ({ callData, onClose }) => {
                         )}
                     </div>
 
-                    <div className="absolute bottom-4 right-4 w-48 h-36 rounded-lg overflow-hidden shadow-lg border-2 border-white bg-gray-800 z-20">
-                        <div ref={localVideoRef} className="w-full h-full" />
-                        {isVideoOff && (
-                            <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
-                                <VideoOff size={24} className="text-white/60" />
-                            </div>
-                        )}
+                    <DraggableCallPiP
+                        containerRef={videoContainerRef}
+                        videoRef={localVideoRef}
+                        width={callLayout.pipWidth}
+                        height={callLayout.pipHeight}
+                        margin={callLayout.pipMargin}
+                        bottomInset={callLayout.bottomControlInset}
+                        topInset={callLayout.topInset}
+                        defaultCorner={callLayout.pipDefaultCorner}
+                        className={callLayout.pipShellClass}
+                        overlay={
+                            isVideoOff ? (
+                                <div className="absolute inset-0 flex items-center justify-center bg-gray-800 pointer-events-none">
+                                    <VideoOff size={24} className="text-white/60" />
+                                </div>
+                            ) : null
+                        }
+                    />
+
+                    <div className="absolute left-[max(0.75rem,env(safe-area-inset-left))] top-[max(0.75rem,env(safe-area-inset-top))] z-20 max-w-[calc(100%-1.5rem)] rounded-lg bg-black/50 px-3 py-2 backdrop-blur-sm sm:px-4">
+                        <p className="truncate text-sm font-semibold text-white sm:text-base">{callData?.callerName || 'Unknown'}</p>
+                        <p className="text-xs text-white/70 sm:text-sm">{formatTime(seconds)} · €{currentBilling.toFixed(2)}</p>
                     </div>
 
-                    <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg z-20">
-                        <p className="text-white font-semibold">{callData?.callerName || 'Unknown'}</p>
-                        <p className="text-white/70 text-sm">{formatTime(seconds)} · €{currentBilling.toFixed(2)}</p>
-                    </div>
-
-                    <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 z-20">
+                    <div className="absolute bottom-0 left-0 right-0 z-20 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 px-2">
+                        <div className={`flex items-center justify-center ${callLayout.controlGapClass}`}>
                         <button
                             type="button"
                             onClick={() => setIsMuted(!isMuted)}
-                            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isMuted ? 'bg-red-500' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
+                            className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full transition-all ${isMuted ? 'bg-red-500' : 'bg-gray-700 active:bg-gray-600'} text-white`}
                         >
                             {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
                         </button>
                         <button
                             type="button"
                             onClick={() => setIsVideoOff(!isVideoOff)}
-                            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isVideoOff ? 'bg-red-500' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
+                            className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full transition-all ${isVideoOff ? 'bg-red-500' : 'bg-gray-700 active:bg-gray-600'} text-white`}
                         >
                             {isVideoOff ? <VideoOff size={20} /> : <Video size={20} />}
                         </button>
                         <button
                             type="button"
+                            onClick={handleToggleSpeaker}
+                            className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full transition-all ${isSpeakerOn ? 'bg-gray-700 active:bg-gray-600' : 'bg-[#6E35AE]'} text-white`}
+                            aria-label={isSpeakerOn ? 'Mute incoming sound' : 'Unmute incoming sound'}
+                        >
+                            {isSpeakerOn ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                        </button>
+                        <button
+                            type="button"
                             onClick={handleEndCall}
-                            className="w-14 h-14 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center shadow-lg"
+                            className={`${callLayout.endCallBtnClass} flex items-center justify-center rounded-full bg-red-600 text-white shadow-lg active:bg-red-700`}
                         >
                             <PhoneOff size={24} />
                         </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -380,8 +426,8 @@ const CallRoom = ({ callData, onClose }) => {
     }
 
     return (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
-            <div className="bg-[#2D2D2D] w-full max-w-md rounded-2xl p-8 flex flex-col items-center">
+        <div className="fixed inset-0 z-[10000] flex h-[100dvh] w-screen items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+            <div className="flex w-full max-w-md max-h-[92dvh] flex-col items-center overflow-y-auto rounded-2xl bg-[#2D2D2D] p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:p-8">
                 <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-4xl font-bold mb-4">
                     {callData?.callerName?.charAt(0) || 'C'}
                 </div>
@@ -406,16 +452,16 @@ const CallRoom = ({ callData, onClose }) => {
                     </div>
                 )}
 
-                <div className="text-5xl font-bold text-white mb-4 font-mono">
+                <div className="mb-4 text-4xl font-bold font-mono text-white sm:text-5xl">
                     {formatTime(seconds)}
                 </div>
 
-                <div className="bg-white/10 px-6 py-3 rounded-xl mb-8 text-center">
+                <div className="mb-6 w-full max-w-xs rounded-xl bg-white/10 px-4 py-3 text-center sm:mb-8 sm:px-6">
                     <p className="text-xs text-gray-400 mb-1 uppercase">Current Billing</p>
                     <p className="text-white font-bold text-xl">€{currentBilling.toFixed(2)}</p>
                 </div>
 
-                <div className="flex items-center gap-6">
+                <div className={`flex flex-wrap items-center justify-center ${callLayout.controlGapClass}`}>
                     {callStatus === 'failed' && (
                         <button
                             type="button"
@@ -428,19 +474,24 @@ const CallRoom = ({ callData, onClose }) => {
                     <button
                         type="button"
                         onClick={() => setIsMuted(!isMuted)}
-                        className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${isMuted ? 'bg-red-500' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
+                        className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full transition-all ${isMuted ? 'bg-red-500' : 'bg-gray-700 active:bg-gray-600'} text-white`}
                     >
                         {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
                     </button>
                     <button
                         type="button"
                         onClick={handleEndCall}
-                        className="w-16 h-16 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center shadow-lg"
+                        className={`${callLayout.endCallBtnClass} flex items-center justify-center rounded-full bg-red-600 text-white shadow-lg active:bg-red-700`}
                     >
                         <PhoneOff size={28} />
                     </button>
-                    <button type="button" className="w-14 h-14 rounded-full bg-gray-700 text-gray-300 flex items-center justify-center">
-                        <Volume2 size={24} />
+                    <button
+                        type="button"
+                        onClick={handleToggleSpeaker}
+                        className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full transition-all ${isSpeakerOn ? 'bg-gray-700 active:bg-gray-600' : 'bg-[#6E35AE]'} text-white`}
+                        aria-label={isSpeakerOn ? 'Mute incoming sound' : 'Unmute incoming sound'}
+                    >
+                        {isSpeakerOn ? <Volume2 size={24} /> : <VolumeX size={24} />}
                     </button>
                 </div>
             </div>

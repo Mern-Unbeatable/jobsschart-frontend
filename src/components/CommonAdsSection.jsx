@@ -10,7 +10,7 @@ const CommonAdsSection = memo(
     const { data, isLoading } = useGetActiveCampaignsQuery();
 
     const activeCampaigns = data?.campaigns || [];
-    
+
     // 1. Try to find a campaign with the requested placement
     let campaign = activeCampaigns.find(
       (c) =>

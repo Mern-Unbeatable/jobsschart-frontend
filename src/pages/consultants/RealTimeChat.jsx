@@ -17,6 +17,8 @@ import {
 } from '../../features/api/chatApi';
 import toast from 'react-hot-toast';
 import { showBalanceWarning } from '../../utils/balanceWarningUtils';
+import { shouldShowNotification } from '../../utils/notificationDedupe';
+import { responsiveToastOptions } from '../../utils/responsiveToast';
 import { formatSessionDuration, formatSessionEndMessage } from '../../utils/formatSessionDuration';
 import axios from 'axios';
 import MessageBubble from '../../components/chat/MessageBubble';
@@ -95,6 +97,8 @@ const RealTimeChat = memo(({
 
     const isEndingSessionRef = useRef(false);
     isEndingSessionRef.current = isEndingSession;
+
+    const skipSessionEndToastRef = useRef(false);
 
     const sessionTypeRef = useRef(null);
     sessionTypeRef.current = sessionType;
@@ -298,9 +302,15 @@ const RealTimeChat = memo(({
             const durationSeconds = data.durationSeconds != null
                 ? data.durationSeconds
                 : frozenElapsedSeconds;
-            if (!wasAlreadyEnded && !isEndingSessionRef.current) {
-                toast.success(formatSessionEndMessage({ durationSeconds, totalCost }), { duration: 4000 });
+            if (!wasAlreadyEnded && !isEndingSessionRef.current && !skipSessionEndToastRef.current) {
+                if (shouldShowNotification(`session-ended:${data.conversationId}`, 5000)) {
+                    toast.success(
+                        formatSessionEndMessage({ durationSeconds, totalCost }),
+                        responsiveToastOptions({ duration: 4000 }),
+                    );
+                }
             }
+            skipSessionEndToastRef.current = false;
             if (!isConsultant && !wasAlreadyEnded) {
                 setSessionSummary({
                     sessionType: data.sessionType || sessionTypeRef.current,
@@ -454,7 +464,7 @@ const RealTimeChat = memo(({
 
                 setSessionStatus('PENDING');
                 setSessionType('CHAT');
-                toast('Chat request sent — waiting for consultant to accept', { duration: 4000 });
+                toast('Chat request sent — waiting for consultant to accept', responsiveToastOptions({ duration: 4000 }));
             } catch (err) {
                 setIsStartingSession(false);
                 toast.error(err?.data?.message || 'Failed to send chat request.');
@@ -523,7 +533,9 @@ const RealTimeChat = memo(({
             setSessionStartedAt(session?.startedAt || new Date().toISOString());
             setSessionTotalCost(0);
             refetchConversations();
-            toast.success('Chat accepted — session started');
+            if (shouldShowNotification(`session-accepted:${activeConvRef.current.id}`, 5000)) {
+                toast.success('Chat accepted — session started', responsiveToastOptions());
+            }
         } catch (err) {
             toast.error(err?.data?.message || 'Failed to accept chat request');
         }
@@ -537,7 +549,9 @@ const RealTimeChat = memo(({
             setSessionType(null);
             setSessionStartedAt(null);
             refetchConversations();
-            toast('Chat request declined');
+            if (shouldShowNotification(`session-declined:${activeConvRef.current.id}`, 5000)) {
+                toast('Chat request declined', responsiveToastOptions());
+            }
         } catch (err) {
             toast.error(err?.data?.message || 'Failed to decline chat request');
         }
@@ -551,7 +565,7 @@ const RealTimeChat = memo(({
             await startSessionMutation({ conversationId: activeConvRef.current.id, sessionType: type }).unwrap();
             setSessionStatus('PENDING');
             setSessionType(type);
-            toast('Chat request sent — waiting for consultant to accept', { duration: 4000 });
+            toast('Chat request sent — waiting for consultant to accept', responsiveToastOptions({ duration: 4000 }));
         } catch (err) {
             toast.error(err?.data?.message || 'Failed to send chat request');
         } finally {
@@ -584,7 +598,12 @@ const RealTimeChat = memo(({
                 ? result.durationSeconds
                 : frozen;
 
-            toast.success(formatSessionEndMessage({ durationSeconds, totalCost }), { duration: 4000 });
+            skipSessionEndToastRef.current = true;
+
+            toast.success(
+                formatSessionEndMessage({ durationSeconds, totalCost }),
+                responsiveToastOptions({ duration: 4000 }),
+            );
 
             setSessionStatus('ENDED');
             setSessionStartedAt(null);
@@ -691,11 +710,11 @@ const RealTimeChat = memo(({
 
     return (
         <>
-            <div className={`flex h-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ${className}`}>
+            <div className={`flex h-full min-h-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ${className}`}>
 
                 {/* Sidebar */}
                 {showSidebar && (
-                    <aside className={`${showMobileSidebar ? 'flex' : 'hidden'} lg:flex flex-col w-full lg:w-80 shrink-0 border-r border-gray-100`}>
+                    <aside className={`${showMobileSidebar ? 'flex' : 'hidden'} lg:flex h-full min-h-0 w-full shrink-0 flex-col border-r border-gray-100 lg:w-80`}>
                         <div className='px-4 py-4 border-b border-gray-100'>
                             <h2 className='text-lg font-bold text-gray-900 mb-3'>Messages</h2>
                             <div className='relative'>
@@ -718,7 +737,7 @@ const RealTimeChat = memo(({
                 )}
 
                 {/* Chat Window */}
-                <section className={`${showSidebar ? (!showMobileSidebar ? 'flex' : 'hidden') : 'flex'} lg:flex flex-col flex-1 min-w-0`}>
+                <section className={`${showSidebar ? (!showMobileSidebar ? 'flex' : 'hidden') : 'flex'} lg:flex h-full min-h-0 flex-1 flex-col`}>
                     {!activeConv ? (
                         <div className='flex-1 flex flex-col items-center justify-center text-gray-400 gap-3'>
                             <div className='w-16 h-16 rounded-full bg-[#F5F1FD] flex items-center justify-center'>
@@ -731,7 +750,7 @@ const RealTimeChat = memo(({
                     ) : (
                         <>
                             {/* Header */}
-                            <div className='flex items-center gap-3 px-4 py-3 border-b border-gray-100 bg-white shrink-0'>
+                            <div className='flex shrink-0 items-center gap-2 border-b border-gray-100 bg-white px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3'>
                                 {showSidebar && (
                                     <button onClick={() => setShowMobileSidebar(true)} className='lg:hidden text-gray-500'>
                                         <ArrowLeft size={20} />
@@ -823,11 +842,12 @@ const RealTimeChat = memo(({
                                     onEnd={handleEndSession}
                                     frozenElapsed={frozenElapsedSeconds}
                                     isEnding={isEndingSession}
+                                    isConsultant={isConsultant}
                                 />
                             )}
 
                             {/* Messages */}
-                            <div ref={messagesContainerRef} className='flex-1 overflow-y-auto px-4 py-4 bg-gray-50' style={{ overflowAnchor: 'none' }}>
+                            <div ref={messagesContainerRef} className='min-h-0 flex-1 overflow-y-auto bg-gray-50 px-3 py-3 sm:px-4 sm:py-4' style={{ overflowAnchor: 'none' }}>
                                 {isLoadingMessages ? (
                                     <div className='flex justify-center py-8'>
                                         <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-[#6E35AE]' />
@@ -863,7 +883,7 @@ const RealTimeChat = memo(({
                             </div>
 
                             {/* Input Bar */}
-                            <div className='px-4 py-3 border-t border-gray-100 bg-white shrink-0'>
+                            <div className='shrink-0 border-t border-gray-100 bg-white px-3 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:px-4 sm:py-3'>
                                 {isUploading && (
                                     <div className='flex items-center gap-2 mb-2 text-xs text-[#6E35AE]'>
                                         <div className='animate-spin rounded-full h-3 w-3 border-b border-[#6E35AE]' />

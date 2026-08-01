@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useSelector } from 'react-redux';
 import { CalendarX, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { responsiveToastOptions } from '../utils/responsiveToast';
 import { socketService } from '../services/socketService';
 
 const LISTENER_KEY = 'booking-cancelled-alert';
@@ -37,11 +38,11 @@ export function BookingCancelledAlert() {
           ? 'Your appointment has been cancelled by the consultant.'
           : 'A client has cancelled their appointment.');
 
-      toast.error(message, {
+      toast.error(message, responsiveToastOptions({
         duration: 8000,
         position: 'top-center',
         icon: '📅',
-      });
+      }));
 
       if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
         new Notification(data?.title || 'Appointment Cancelled', {
@@ -67,9 +68,9 @@ export function BookingCancelledAlert() {
   const cancelledByConsultant = alert.cancelledBy === 'consultant';
 
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 px-4">
+    <div className="fixed inset-0 z-[70] flex h-[100dvh] items-center justify-center bg-black/60 px-4 py-[max(1rem,env(safe-area-inset-top))]">
       <div
-        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+        className="w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-2xl bg-white p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl"
         role="alertdialog"
         aria-labelledby="booking-cancelled-title"
         aria-describedby="booking-cancelled-desc"
@@ -78,21 +79,21 @@ export function BookingCancelledAlert() {
           <CalendarX size={28} className="text-rose-500" aria-hidden="true" />
         </div>
 
-        <h3 id="booking-cancelled-title" className="mb-2 text-center text-lg font-bold text-gray-900">
+        <h3 id="booking-cancelled-title" className="mb-2 text-center text-base font-bold text-gray-900 sm:text-lg">
           {alert.title || 'Appointment Cancelled'}
         </h3>
 
-        <p id="booking-cancelled-desc" className="mb-4 text-center text-sm leading-relaxed text-gray-600">
+        <p id="booking-cancelled-desc" className="mb-4 text-center text-xs leading-relaxed text-gray-600 sm:text-sm">
           {alert.message}
         </p>
 
         {cancelledByConsultant && refundAmount > 0 ? (
-          <p className="mb-4 rounded-xl bg-green-50 px-4 py-3 text-center text-sm text-green-700">
+          <p className="mb-4 rounded-xl bg-green-50 px-3 py-2.5 text-center text-xs text-green-700 sm:px-4 sm:py-3 sm:text-sm">
             A refund of <strong>€{refundAmount.toFixed(2)}</strong> has been credited to your wallet.
           </p>
         ) : null}
 
-        <p className="mb-6 text-center text-xs text-gray-400">
+        <p className="mb-6 text-center text-[11px] text-gray-400 sm:text-xs">
           {cancelledByConsultant
             ? 'A confirmation email has been sent to your inbox.'
             : 'The client has been notified by email.'}

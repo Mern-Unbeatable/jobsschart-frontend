@@ -12,6 +12,15 @@ import {
 } from '../utils/notificationSound';
 import toast from 'react-hot-toast';
 import { matchesCallId } from '../utils/callEndUtils';
+import { shouldShowNotification } from '../utils/notificationDedupe';
+import { responsiveToastOptions } from '../utils/responsiveToast';
+import NotificationShell, {
+    NotificationHeader,
+    NotificationBody,
+    NotificationActions,
+    NotificationActionButton,
+    NotificationIconButton,
+} from './notifications/NotificationShell';
 
 const LISTENER_KEY = 'incoming-call-notification';
 
@@ -124,9 +133,11 @@ export const IncomingCallNotification = () => {
             }));
 
             setIncomingCall(null);
-            toast.success('Call connected!');
+            if (shouldShowNotification(`call-connected:${incomingCall.callId}`, 5000)) {
+                toast.success('Call connected!', responsiveToastOptions());
+            }
         } catch (err) {
-            toast.error(err?.data?.message || 'Failed to accept call');
+            toast.error(err?.data?.message || 'Failed to accept call', responsiveToastOptions());
         }
     };
 
@@ -135,7 +146,7 @@ export const IncomingCallNotification = () => {
         stopNotificationRingtone();
         try {
             await rejectCall(incomingCall.callId).unwrap();
-            toast('Call rejected');
+            toast('Call rejected', responsiveToastOptions());
         } catch (err) {
             console.error('Reject error:', err);
         } finally {
@@ -160,66 +171,49 @@ export const IncomingCallNotification = () => {
     if (!isConsultant || !incomingCall) return null;
 
     return (
-        <div className="fixed top-4 right-4 z-[9999]">
-            <div className="bg-white rounded-2xl shadow-2xl w-96 overflow-hidden border-l-4 border-green-500">
-                <div className="bg-gradient-to-r from-green-50 to-white p-4">
-                    <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-bold text-lg text-gray-800">Incoming Call</h3>
-                        <div className="flex gap-1">
-                            {[0, 150, 300].map((d) => (
-                                <div
-                                    key={d}
-                                    className="w-2 h-2 bg-green-500 rounded-full animate-pulse"
-                                    style={{ animationDelay: `${d}ms` }}
-                                />
-                            ))}
-                        </div>
+        <NotificationShell accent="green" zIndex={9999}>
+            <NotificationHeader title="Incoming Call" pulseColor="bg-green-500" />
+            <NotificationBody
+                avatar={
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 text-lg font-bold text-white shadow-lg sm:h-14 sm:w-14 sm:text-xl md:h-16 md:text-2xl">
+                        {incomingCall.callerName?.charAt(0)?.toUpperCase() || (
+                            <User className="h-7 w-7 sm:h-8 sm:w-8" />
+                        )}
                     </div>
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                            {incomingCall.callerName?.charAt(0)?.toUpperCase() || <User size={32} />}
-                        </div>
-                        <div>
-                            <p className="font-semibold text-gray-900 text-lg">{incomingCall.callerName}</p>
-                            <p className="text-sm text-gray-500">{incomingCall.callerEmail}</p>
-                            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full mt-1 inline-block">
-                                {incomingCall.callType} Call
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex gap-3">
-                        <button
-                            type="button"
-                            onClick={handleAccept}
-                            disabled={isAccepting}
-                            className="flex-1 bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
-                        >
-                            <Phone size={18} />
-                            {isAccepting ? 'Connecting...' : 'Accept'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleReject}
-                            disabled={isRejecting}
-                            className="flex-1 bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
-                        >
-                            <PhoneOff size={18} />
-                            Reject
-                        </button>
-                        <button
-                            type="button"
-                            onClick={toggleMute}
-                            className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center transition-all"
-                        >
-                            {isMuted || isRingtoneMuted() ? (
-                                <VolumeX size={18} className="text-gray-600" />
-                            ) : (
-                                <Volume2 size={18} className="text-gray-600" />
-                            )}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                }
+                title={incomingCall.callerName || 'Unknown caller'}
+                subtitle={incomingCall.callerEmail}
+                badge={
+                    <span className="inline-block rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700 sm:text-xs">
+                        {incomingCall.callType} Call
+                    </span>
+                }
+            />
+            <NotificationActions>
+                <NotificationActionButton
+                    onClick={handleAccept}
+                    disabled={isAccepting}
+                    variant="primary"
+                    icon={Phone}
+                >
+                    {isAccepting ? 'Connecting...' : 'Accept'}
+                </NotificationActionButton>
+                <NotificationActionButton
+                    onClick={handleReject}
+                    disabled={isRejecting}
+                    variant="danger"
+                    icon={PhoneOff}
+                >
+                    Reject
+                </NotificationActionButton>
+                <NotificationIconButton onClick={toggleMute} ariaLabel={isMuted ? 'Unmute ringtone' : 'Mute ringtone'}>
+                    {isMuted || isRingtoneMuted() ? (
+                        <VolumeX size={16} className="text-gray-600 sm:size-[18px]" />
+                    ) : (
+                        <Volume2 size={16} className="text-gray-600 sm:size-[18px]" />
+                    )}
+                </NotificationIconButton>
+            </NotificationActions>
+        </NotificationShell>
     );
 };

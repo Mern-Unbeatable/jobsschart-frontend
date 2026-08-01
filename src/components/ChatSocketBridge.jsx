@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
+import { responsiveToastOptions } from '../utils/responsiveToast';
+import { shouldShowNotification } from '../utils/notificationDedupe';
 import { socketService } from '../services/socketService';
 import { baseApi } from '../features/baseApi';
 import { selectUserRole } from '../features/slices/authSlice';
@@ -30,36 +32,53 @@ export function ChatSocketBridge() {
         const onNewMessage = (data) => {
             invalidateChat();
             forward('new_message', data);
-            if (isConsultant && data?.message?.senderId !== user.id) {
+            if (
+                isConsultant
+                && data?.message?.senderId !== user.id
+                && shouldShowNotification(`chat-msg:${data.conversationId}:${data.message?.id}`, 3000)
+            ) {
                 const preview = data?.message?.message || 'New message';
                 const name = data?.message?.sender?.name || 'Customer';
-                toast(`${name}: ${preview}`, { duration: 3500, icon: '💬' });
+                toast(`${name}: ${preview}`, responsiveToastOptions({ duration: 3500, icon: '💬' }));
             }
         };
 
         const onSessionStarted = (data) => {
+            const convId = data?.conversationId;
+            if (!convId) return;
+            if (!shouldShowNotification(`session-started:${convId}`, 5000)) return;
+
             invalidateChat();
             forward('session_started', data);
+
+            // User-only toast; consultant UI handles accept in chat / notification card
             if (!isConsultant) {
-                toast.success('Consultant accepted your chat — session started!', { duration: 5000 });
+                toast.success(
+                    'Consultant accepted your chat — session started!',
+                    responsiveToastOptions({ duration: 5000 }),
+                );
             }
         };
 
         const onChatPending = (data) => {
+            const convId = data?.conversationId;
+            if (!convId) return;
+            if (!shouldShowNotification(`chat-pending:${convId}`, 5000)) return;
+
             invalidateChat();
             forward('chat_request_pending', data);
-            if (isConsultant) {
-                toast('New chat request', { duration: 4000, icon: '💬' });
-            } else {
-                toast('Waiting for consultant to accept…', { duration: 4000 });
-            }
+            // No toast: consultant sees IncomingChatNotification; user sees RealTimeChat banner/toast
         };
 
         const onChatDeclined = (data) => {
+            const convId = data?.conversationId;
+            if (!convId) return;
+            if (!shouldShowNotification(`chat-declined:${convId}`, 5000)) return;
+
             invalidateChat();
             forward('chat_request_declined', data);
             if (!isConsultant) {
-                toast.error('Consultant declined your chat request');
+                toast.error('Consultant declined your chat request', responsiveToastOptions());
             }
         };
 
@@ -78,7 +97,6 @@ export function ChatSocketBridge() {
             forward('new_file', data);
         });
         socketService.on('session_started', BRIDGE_KEY, onSessionStarted);
-        socketService.on('chat_request_accepted', BRIDGE_KEY, onSessionStarted);
         socketService.on('chat_request_pending', BRIDGE_KEY, onChatPending);
         socketService.on('incoming_chat_request', BRIDGE_KEY, onChatPending);
         socketService.on('chat_request_declined', BRIDGE_KEY, onChatDeclined);
@@ -93,7 +111,7 @@ export function ChatSocketBridge() {
 
         return () => {
             [
-                'new_message', 'new_file', 'session_started', 'chat_request_accepted',
+                'new_message', 'new_file', 'session_started',
                 'chat_request_pending', 'incoming_chat_request', 'chat_request_declined',
                 'session_ended', 'session_ending', 'registered',
             ].forEach((e) => socketService.off(e, BRIDGE_KEY));

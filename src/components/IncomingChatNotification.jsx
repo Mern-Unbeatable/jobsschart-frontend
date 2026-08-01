@@ -7,8 +7,19 @@ import {
     playChatRingtone,
     stopNotificationRingtone,
     unlockBrowserAudio,
+    setRingtoneMuted,
+    isRingtoneMuted,
 } from '../utils/notificationSound';
 import toast from 'react-hot-toast';
+import { responsiveToastOptions } from '../utils/responsiveToast';
+import { shouldShowNotification } from '../utils/notificationDedupe';
+import NotificationShell, {
+    NotificationHeader,
+    NotificationBody,
+    NotificationActions,
+    NotificationActionButton,
+    NotificationIconButton,
+} from './notifications/NotificationShell';
 
 const LISTENER_KEY = 'incoming-chat-notification';
 
@@ -81,9 +92,11 @@ export const IncomingChatNotification = () => {
         try {
             await acceptSession(incomingChat.conversationId).unwrap();
             setIncomingChat(null);
-            toast.success('Chat request accepted — session started');
+            if (shouldShowNotification(`session-accepted:${incomingChat.conversationId}`, 5000)) {
+                toast.success('Chat request accepted — session started', responsiveToastOptions());
+            }
         } catch (err) {
-            toast.error(err?.data?.message || 'Failed to accept chat request');
+            toast.error(err?.data?.message || 'Failed to accept chat request', responsiveToastOptions());
         }
     };
 
@@ -92,62 +105,74 @@ export const IncomingChatNotification = () => {
         stopNotificationRingtone();
         try {
             await declineSession(incomingChat.conversationId).unwrap();
-            toast('Chat request declined');
+            toast('Chat request declined', responsiveToastOptions());
         } catch (err) {
-            toast.error(err?.data?.message || 'Failed to decline chat request');
+            toast.error(err?.data?.message || 'Failed to decline chat request', responsiveToastOptions());
         } finally {
             setIncomingChat(null);
         }
     };
 
+    const toggleMute = () => {
+        setIsMuted((prev) => {
+            const next = !prev;
+            setRingtoneMuted(next);
+            if (next) {
+                stopNotificationRingtone();
+            } else if (incomingChat) {
+                unlockBrowserAudio();
+                playChatRingtone();
+            }
+            return next;
+        });
+    };
+
     if (!incomingChat) return null;
 
+    const sessionLabel = incomingChat.sessionType || 'CHAT';
+
     return (
-        <div className="fixed top-4 right-4 z-[9998]">
-            <div className="bg-white rounded-2xl shadow-2xl w-96 overflow-hidden border-l-4 border-[#6E35AE]">
-                <div className="bg-gradient-to-r from-[#F5F1FD] to-white p-4">
-                    <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-bold text-lg text-gray-800">💬 New Chat Request</h3>
-                        <div className="flex gap-1">
-                            {[0, 150, 300].map(d => (
-                                <div key={d} className="w-2 h-2 bg-[#6E35AE] rounded-full animate-pulse"
-                                    style={{ animationDelay: `${d}ms` }} />
-                            ))}
-                        </div>
+        <NotificationShell accent="purple" zIndex={9998}>
+            <NotificationHeader title="💬 New Chat Request" pulseColor="bg-[#6E35AE]" />
+            <NotificationBody
+                avatar={
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#6E35AE] to-[#9B59B6] text-white sm:h-14 sm:w-14">
+                        <MessageSquare className="h-6 w-6 sm:h-7 sm:w-7" />
                     </div>
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#6E35AE] to-[#9B59B6] flex items-center justify-center text-white">
-                            <MessageSquare size={28} />
-                        </div>
-                        <div>
-                            <p className="font-semibold text-gray-900">{incomingChat.customerName || 'Customer'}</p>
-                            <p className="text-sm text-gray-500">Wants to start a {incomingChat.sessionType || 'CHAT'} session</p>
-                            <span className="text-xs bg-[#F5F1FD] text-[#6E35AE] px-2 py-0.5 rounded-full mt-1 inline-block">
-                                €{incomingChat.pricePerMinute || '2.50'}/min
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex gap-3">
-                        <button onClick={handleAccept} disabled={isAccepting}
-                            className="flex-1 bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2">
-                            <Check size={18} />
-                            {isAccepting ? 'Accepting...' : 'Accept'}
-                        </button>
-                        <button onClick={handleDecline} disabled={isDeclining}
-                            className="flex-1 bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2">
-                            <X size={18} />
-                            Decline
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setIsMuted(!isMuted)}
-                            className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center"
-                        >
-                            {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                }
+                title={incomingChat.customerName || 'Customer'}
+                subtitle={`Wants to start a ${sessionLabel} session`}
+                badge={
+                    <span className="inline-block rounded-full bg-[#F5F1FD] px-2 py-0.5 text-[10px] font-medium text-[#6E35AE] sm:text-xs">
+                        €{incomingChat.pricePerMinute || '2.50'}/min
+                    </span>
+                }
+            />
+            <NotificationActions>
+                <NotificationActionButton
+                    onClick={handleAccept}
+                    disabled={isAccepting}
+                    variant="primary"
+                    icon={Check}
+                >
+                    {isAccepting ? 'Accepting...' : 'Accept'}
+                </NotificationActionButton>
+                <NotificationActionButton
+                    onClick={handleDecline}
+                    disabled={isDeclining}
+                    variant="danger"
+                    icon={X}
+                >
+                    Decline
+                </NotificationActionButton>
+                <NotificationIconButton onClick={toggleMute} ariaLabel={isMuted ? 'Unmute ringtone' : 'Mute ringtone'}>
+                    {isMuted || isRingtoneMuted() ? (
+                        <VolumeX size={16} className="text-gray-600 sm:size-[18px]" />
+                    ) : (
+                        <Volume2 size={16} className="text-gray-600 sm:size-[18px]" />
+                    )}
+                </NotificationIconButton>
+            </NotificationActions>
+        </NotificationShell>
     );
 };

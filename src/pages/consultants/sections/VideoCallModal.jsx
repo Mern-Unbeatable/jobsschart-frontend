@@ -1,6 +1,6 @@
 import React, { memo, useState, useEffect, useRef, useCallback } from 'react';
 import {
-  PhoneOff, Mic, MicOff, Video, VideoOff, Volume2,
+  PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, VolumeX,
 } from 'lucide-react';
 import CallFeedbackModal from './CallFeedbackModal';
 import { socketService } from '../../../services/socketService';
@@ -19,6 +19,8 @@ import { freezeCallUI, matchesCallId, parseServerStartTimeMs } from '../../../ut
 import { showBalanceWarning } from '../../../utils/balanceWarningUtils';
 import InCallCreditTopUp from '../../../components/credit/InCallCreditTopUp';
 import { unlockBrowserAudio } from '../../../utils/notificationSound';
+import DraggableCallPiP from '../../../components/call/DraggableCallPiP';
+import { useResponsiveCallLayout } from '../../../hooks/useResponsiveCallLayout';
 
 const LISTENER_KEY = 'video-call-modal';
 
@@ -33,6 +35,8 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   const [callState, setCallState] = useState(null);
   const [actualStartTime, setActualStartTime] = useState(null);
   const [isVideoConnected, setIsVideoConnected] = useState(false);
+  const [isSpeakerOn, setIsSpeakerOn] = useState(true);
+  const callLayout = useResponsiveCallLayout();
 
   const { user, token } = useSelector(state => state.auth);
   const [initiateCall, { isLoading: isInitiating }] = useInitiateCallMutation();
@@ -43,6 +47,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  const videoContainerRef = useRef(null);
   const timerRef = useRef(null);
   const callStateRef = useRef(null);
   const isClosingRef = useRef(false);
@@ -142,6 +147,8 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       const { local, remote } = await waitForRefs(5000);
       await twilioVideoService.connectVideo(tokenToUse, roomName, local, remote);
       setIsVideoConnected(true);
+      setIsSpeakerOn(twilioVideoService.getSpeakerOn());
+      await twilioVideoService.setSpeakerOn(true);
       console.log('✅ Video connected successfully');
       return true;
     } catch (err) {
@@ -432,6 +439,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     setCallState(null);
     setActualStartTime(null);
     setIsVideoConnected(false);
+    setIsSpeakerOn(true);
     twilioVideoService.disconnect();
     isClosingRef.current = false;
     isAcceptedRef.current = false;
@@ -449,10 +457,10 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
   if (isInitiating) {
     return (
-      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
-        <div className="bg-gray-900 w-full max-w-md rounded-2xl p-8 flex flex-col items-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-400 mb-4" />
-          <p className="text-white text-lg">Connecting video call to {consultant?.name}...</p>
+      <div className="fixed inset-0 z-[9999] flex h-[100dvh] w-screen items-center justify-center bg-black/80 p-4">
+        <div className="flex w-full max-w-md flex-col items-center rounded-2xl bg-gray-900 p-6 sm:p-8">
+          <div className="mb-4 h-10 w-10 animate-spin rounded-full border-b-2 border-green-400" />
+          <p className="text-center text-base text-white sm:text-lg">Connecting video call to {consultant?.name}...</p>
         </div>
       </div>
     );
@@ -472,11 +480,12 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[9999] p-4"
+      className="fixed inset-0 z-[9999] flex h-[100dvh] w-screen items-center justify-center bg-black/70 backdrop-blur-md p-0 md:bg-black/70 md:p-4"
       onClick={(e) => e.stopPropagation()}
     >
       <div
-        className="relative w-full max-w-sm aspect-[3/4] max-h-[80vh] rounded-2xl overflow-hidden bg-gray-900 shadow-2xl border border-white/10"
+        ref={videoContainerRef}
+        className="relative h-full w-full overflow-hidden bg-gray-900 shadow-2xl md:h-auto md:max-h-[80vh] md:max-w-sm md:rounded-2xl md:border md:border-white/10 md:aspect-[3/4]"
         onClick={e => e.stopPropagation()}
       >
         {/* Remote Video Container — Twilio appends <video> elements here */}
@@ -496,16 +505,18 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
               {callState?.isIncoming ? '● Incoming call...' : '● Waiting for answer...'}
             </p>
             {callState?.isIncoming && (
-              <div className="flex gap-4 mt-6">
+              <div className="mt-6 flex w-full max-w-xs flex-col gap-3 px-6 sm:max-w-none sm:flex-row sm:justify-center sm:px-0">
                 <button
+                  type="button"
                   onClick={handleAcceptCall}
-                  className="px-6 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white font-semibold"
+                  className="flex-1 rounded-full bg-green-500 px-6 py-3 font-semibold text-white active:bg-green-600 sm:py-2"
                 >
                   Accept
                 </button>
                 <button
+                  type="button"
                   onClick={handleEndCall}
-                  className="px-6 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold"
+                  className="flex-1 rounded-full bg-red-500 px-6 py-3 font-semibold text-white active:bg-red-600 sm:py-2"
                 >
                   Decline
                 </button>
@@ -527,23 +538,33 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none z-[6]" />
 
-        {/* Local Video PiP — only rendered when active so ref is available */}
+        {/* Local Video PiP — draggable like WhatsApp */}
         {callState?.status === 'active' && (
-          <div className="absolute top-4 right-4 w-20 h-28 rounded-xl overflow-hidden border-2 border-white/20 shadow-lg bg-gray-700 z-20">
-            <div ref={localVideoRef} className="w-full h-full" />
-            {isVideoOff && (
-              <div className="absolute inset-0 bg-gray-800 flex items-center justify-center z-[2]">
-                <VideoOff size={20} className="text-white/60" />
-              </div>
-            )}
-          </div>
+          <DraggableCallPiP
+            containerRef={videoContainerRef}
+            videoRef={localVideoRef}
+            width={callLayout.pipWidth}
+            height={callLayout.pipHeight}
+            margin={callLayout.pipMargin}
+            bottomInset={callLayout.bottomControlInset}
+            topInset={callLayout.topInset}
+            defaultCorner={callLayout.pipDefaultCorner}
+            className={callLayout.pipShellClass}
+            overlay={
+              isVideoOff ? (
+                <div className="absolute inset-0 z-[2] flex items-center justify-center bg-gray-800 pointer-events-none">
+                  <VideoOff size={20} className="text-white/60" />
+                </div>
+              ) : null
+            }
+          />
         )}
 
         {/* Top Info Bar */}
-        <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
-          <div className="bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 border border-white/10">
-            <div className={`w-2 h-2 rounded-full ${callState?.status === 'active' ? 'bg-green-400 animate-pulse' : 'bg-yellow-400 animate-pulse'}`} />
-            <p className="text-xs font-bold text-white tracking-wide">
+        <div className="absolute left-[max(0.75rem,env(safe-area-inset-left))] top-[max(0.75rem,env(safe-area-inset-top))] z-20 flex max-w-[calc(100%-5.5rem)] flex-col gap-2">
+          <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 backdrop-blur-sm">
+            <div className={`h-2 w-2 shrink-0 rounded-full ${callState?.status === 'active' ? 'bg-green-400 animate-pulse' : 'bg-yellow-400 animate-pulse'}`} />
+            <p className="truncate text-xs font-bold tracking-wide text-white">
               {callState?.status === 'active'
                 ? `${formatTime(seconds)} | €${currentBilling.toFixed(2)}`
                 : callState?.isIncoming
@@ -564,38 +585,54 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
         {/* Bottom Controls */}
         {callState?.status === 'active' && (
-          <div className="absolute bottom-8 left-0 right-0 z-20">
-            <div className="flex items-center justify-center gap-3 px-4">
+          <div className="absolute bottom-0 left-0 right-0 z-20 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3">
+            <div className={`flex items-center justify-center px-3 ${callLayout.controlGapClass}`}>
               <button
+                type="button"
                 onClick={() => {
                   const newMuted = !isMuted;
                   setIsMuted(newMuted);
                   newMuted ? twilioVideoService.mute() : twilioVideoService.unmute();
                 }}
-                className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-xl transition-all ${isMuted ? 'bg-red-500/90 text-white' : 'bg-white/15 text-white hover:bg-white/30'}`}
+                className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full backdrop-blur-xl transition-all ${isMuted ? 'bg-red-500/90 text-white' : 'bg-white/15 text-white active:bg-white/30'}`}
               >
                 {isMuted ? <MicOff size={18} /> : <Mic size={18} />}
               </button>
 
               <button
+                type="button"
                 onClick={() => {
                   const newVideoOff = !isVideoOff;
                   setIsVideoOff(newVideoOff);
                   newVideoOff ? twilioVideoService.disableVideo() : twilioVideoService.enableVideo();
                 }}
-                className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-xl transition-all ${isVideoOff ? 'bg-red-500/90 text-white' : 'bg-white/15 text-white hover:bg-white/30'}`}
+                className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full backdrop-blur-xl transition-all ${isVideoOff ? 'bg-red-500/90 text-white' : 'bg-white/15 text-white active:bg-white/30'}`}
               >
                 {isVideoOff ? <VideoOff size={18} /> : <Video size={18} />}
               </button>
 
-              <button className="w-11 h-11 rounded-full bg-white/15 text-white hover:bg-white/30 flex items-center justify-center backdrop-blur-xl transition-all">
-                <Volume2 size={18} />
+              <button
+                type="button"
+                onClick={async () => {
+                  unlockBrowserAudio();
+                  const next = await twilioVideoService.toggleSpeaker();
+                  setIsSpeakerOn(next);
+                  toast(next ? 'Sound on' : 'Sound off — you will not hear the other person', {
+                    duration: 2000,
+                    position: 'top-center',
+                  });
+                }}
+                className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full backdrop-blur-xl transition-all ${isSpeakerOn ? 'bg-white/15 text-white active:bg-white/30' : 'bg-[#6E35AE]/90 text-white'}`}
+                aria-label={isSpeakerOn ? 'Mute incoming sound' : 'Unmute incoming sound'}
+              >
+                {isSpeakerOn ? <Volume2 size={18} /> : <VolumeX size={18} />}
               </button>
 
               <button
+                type="button"
                 onClick={handleEndCall}
                 disabled={isEnding}
-                className="w-13 h-13 bg-red-500 hover:bg-red-600 disabled:opacity-50 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:scale-105"
+                className={`${callLayout.endCallBtnClass} flex items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-all active:scale-95 disabled:opacity-50`}
               >
                 <PhoneOff size={22} fill="currentColor" />
               </button>
@@ -603,7 +640,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
           </div>
         )}
 
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-white/20 rounded-full" />
+        <div className="absolute bottom-[max(0.25rem,env(safe-area-inset-bottom))] left-1/2 hidden h-1 w-10 -translate-x-1/2 rounded-full bg-white/20 md:block" />
       </div>
     </div>
   );

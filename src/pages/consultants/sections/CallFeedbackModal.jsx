@@ -47,8 +47,8 @@ const CallFeedbackModal = memo(({ consultant, seconds, totalCost, callId, onClos
     };
 
     return (
-        <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4'>
-            <div className='relative bg-[#333333] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border-t-4 border-green-500'>
+        <div className='fixed inset-0 z-[9999] flex h-[100dvh] w-screen items-center justify-center bg-black/60 p-4 backdrop-blur-sm'>
+            <div className='relative w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-2xl border-t-4 border-green-500 bg-[#333333] shadow-2xl'>
                 <button
                     onClick={handleClose}
                     className='absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10'
@@ -56,7 +56,7 @@ const CallFeedbackModal = memo(({ consultant, seconds, totalCost, callId, onClos
                     <X size={20} />
                 </button>
 
-                <div className='p-8 flex flex-col items-center'>
+                <div className='flex flex-col items-center p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:p-8'>
                     <div className='w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-4'>
                         <div className='w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white'>
                             <Check size={20} strokeWidth={4} />

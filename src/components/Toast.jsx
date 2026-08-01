@@ -15,14 +15,16 @@ const Toast = memo(({ message, type = 'success', isVisible, onClose }) => {
   const Icon = type === 'success' ? CheckCircle : AlertCircle;
 
   return (
-    <div className={`fixed bottom-6 right-6 ${bgColor} text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 z-[60] animate-in fade-in slide-in-from-bottom-4`}>
-      <Icon size={20} />
-      <p className='font-medium'>{message}</p>
+    <div className={`fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(0.75rem,env(safe-area-inset-left))] right-[max(0.75rem,env(safe-area-inset-right))] z-[60] flex max-w-[calc(100vw-1.5rem)] items-start gap-2 rounded-lg px-3 py-3 shadow-lg sm:left-auto sm:right-6 sm:max-w-sm sm:px-6 sm:py-4 ${bgColor} text-white`}>
+      <Icon size={18} className="mt-0.5 shrink-0 sm:size-5" />
+      <p className='min-w-0 flex-1 break-words text-sm font-medium leading-snug sm:text-base'>{message}</p>
       <button
+        type="button"
         onClick={onClose}
-        className='ml-2 hover:opacity-80 transition-opacity'
+        className='ml-1 shrink-0 transition-opacity active:opacity-80'
+        aria-label="Dismiss"
       >
-        <X size={18} />
+        <X size={16} className="sm:size-[18px]" />
       </button>
     </div>
   );

@@ -1,4 +1,5 @@
 import { connect as connectTwilioVideo, createLocalAudioTrack, createLocalVideoTrack } from 'twilio-video';
+import { applyRemoteListenMode } from '../utils/callAudioOutput';
 
 class TwilioVideoService {
     constructor() {
@@ -6,8 +7,11 @@ class TwilioVideoService {
         this.localTracks = [];
         this.isMuted = false;
         this.isVideoOff = false;
+        this.isSpeakerOn = true;
         this._audioContainer = null;
         this._participantListeners = new Map();
+        this._remoteAudioElements = new Set();
+        this._remoteVideoElements = new Set();
     }
 
     _getAudioContainer() {
@@ -46,6 +50,42 @@ class TwilioVideoService {
         if (this._audioContainer) {
             this._audioContainer.innerHTML = '';
         }
+        this._remoteAudioElements.clear();
+        this._remoteVideoElements.clear();
+    }
+
+    async _applySpeakerToRemoteAudio() {
+        await applyRemoteListenMode(this.isSpeakerOn);
+
+        this._remoteAudioElements.forEach((el) => {
+            if (!this.isSpeakerOn) {
+                el.muted = true;
+                el.volume = 0;
+            } else {
+                el.muted = false;
+                el.volume = 1;
+                el.play().catch(() => {});
+            }
+        });
+
+        this._remoteVideoElements.forEach((el) => {
+            el.muted = !this.isSpeakerOn;
+            el.volume = this.isSpeakerOn ? 1 : 0;
+        });
+    }
+
+    async setSpeakerOn(enabled) {
+        this.isSpeakerOn = Boolean(enabled);
+        await this._applySpeakerToRemoteAudio();
+        return this.isSpeakerOn;
+    }
+
+    async toggleSpeaker() {
+        return this.setSpeakerOn(!this.isSpeakerOn);
+    }
+
+    getSpeakerOn() {
+        return this.isSpeakerOn;
     }
 
     async _getLocalTracks(callType) {
@@ -73,13 +113,18 @@ class TwilioVideoService {
             const el = track.attach();
             el.autoplay = true;
             el.playsInline = true;
-            el.muted = false;
-            el.volume = 1;
+            el.muted = !this.isSpeakerOn;
+            el.volume = this.isSpeakerOn ? 1 : 0;
             audioContainer.appendChild(el);
+            this._remoteAudioElements.add(el);
 
             const tryPlay = () => {
                 const p = el.play();
-                if (p) p.catch(() => setTimeout(() => el.play().catch(() => {}), 500));
+                if (p) {
+                    p.then(() => this._applySpeakerToRemoteAudio()).catch(() => {
+                        setTimeout(() => el.play().then(() => this._applySpeakerToRemoteAudio()).catch(() => {}), 500);
+                    });
+                }
             };
             tryPlay();
 
@@ -95,6 +140,10 @@ class TwilioVideoService {
             if (!remoteVideoRef) return;
             const el = track.attach();
             el.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            el.setAttribute('data-twilio-remote-video', 'true');
+            el.muted = !this.isSpeakerOn;
+            el.volume = this.isSpeakerOn ? 1 : 0;
+            this._remoteVideoElements.add(el);
             remoteVideoRef.appendChild(el);
         }
     }
@@ -283,6 +332,9 @@ class TwilioVideoService {
 
         this.isMuted = false;
         this.isVideoOff = false;
+        this.isSpeakerOn = true;
+        this._remoteAudioElements.clear();
+        this._remoteVideoElements.clear();
     }
 
     disconnect() {

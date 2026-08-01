@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import router from './router/router';
 import { TOAST_CONFIG } from './config';
+import { RESPONSIVE_TOAST_CLASS } from './utils/responsiveToast';
 import store from './features/store';
 import GlobalCallHandler from './components/GlobalCallHandler';
 import { IncomingCallNotification } from './components/IncomingCallNotification';
@@ -35,7 +36,11 @@ function App() {
         <IncomingChatNotification />
         <Toaster
           position={TOAST_CONFIG.POSITION}
-          toastOptions={{ duration: TOAST_CONFIG.DURATION }}
+          containerClassName="!top-[max(0.75rem,env(safe-area-inset-top))] !left-[max(0.75rem,env(safe-area-inset-left))] !right-[max(0.75rem,env(safe-area-inset-right))]"
+          toastOptions={{
+            duration: TOAST_CONFIG.DURATION,
+            className: RESPONSIVE_TOAST_CLASS,
+          }}
         />
       </ErrorBoundary>
     </Provider>
