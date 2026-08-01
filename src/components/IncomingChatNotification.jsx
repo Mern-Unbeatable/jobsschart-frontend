@@ -4,8 +4,9 @@ import { MessageSquare, Check, X, Volume2, VolumeX } from 'lucide-react';
 import { socketService } from '../services/socketService';
 import { useAcceptSessionMutation, useDeclineSessionMutation } from '../features/api/chatApi';
 import {
-    playNotificationRingtone,
+    playChatRingtone,
     stopNotificationRingtone,
+    unlockBrowserAudio,
 } from '../utils/notificationSound';
 import toast from 'react-hot-toast';
 
@@ -27,7 +28,8 @@ export const IncomingChatNotification = () => {
 
         const handleIncoming = (data) => {
             setIncomingChat(data);
-            playNotificationRingtone();
+            unlockBrowserAudio();
+            playChatRingtone();
 
             if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
                 new Notification('💬 New Chat Request', {

@@ -4,7 +4,6 @@ import { useGetAllPackagesQuery } from "../../../features/api/packageApi";
 import { useCreateCheckoutMutation } from "../../../features/api/paymentApi";
 import toast from "react-hot-toast";
 import CreditPlanCard from "./CreditPlanCard";
-import PaymentMethodSelector from "../../../components/payment/PaymentMethodSelector";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "../../../features/slices/authSlice";
 import Swal from "sweetalert2";
@@ -16,7 +15,6 @@ const CreditPlans = memo(() => {
   const { data: packagesData, isLoading } = useGetAllPackagesQuery();
   const [createCheckout, { isLoading: isCheckingOut }] = useCreateCheckoutMutation();
   const [activePackageId, setActivePackageId] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("");
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const navigate = useNavigate();
 
@@ -45,7 +43,6 @@ const CreditPlans = memo(() => {
       const payload = {
         type: 'PACKAGE',
         packageId: packageId,
-        ...(paymentMethod ? { paymentMethod } : {}),
       };
       const result = await createCheckout(payload).unwrap();
       if (result?.url) {
@@ -97,11 +94,6 @@ const CreditPlans = memo(() => {
           </div>
         ) : (
           <>
-            <PaymentMethodSelector
-              value={paymentMethod}
-              onChange={setPaymentMethod}
-              className="mb-8"
-            />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {creditPlans.map((plan) => (
               <CreditPlanCard

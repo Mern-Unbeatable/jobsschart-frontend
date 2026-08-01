@@ -12,7 +12,7 @@ import {
 } from '../../../features/api/callApi';
 import toast from 'react-hot-toast';
 import { twilioVideoService } from '../../../services/twilioVideoService';
-import { freezeCallUI, matchesCallId } from '../../../utils/callEndUtils';
+import { freezeCallUI, matchesCallId, parseServerStartTimeMs } from '../../../utils/callEndUtils';
 import { showBalanceWarning } from '../../../utils/balanceWarningUtils';
 import InCallCreditTopUp from '../../../components/credit/InCallCreditTopUp';
 import { unlockBrowserAudio } from '../../../utils/notificationSound';
@@ -24,6 +24,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [currentBilling, setCurrentBilling] = useState(0);
+  const [sessionTotalCost, setSessionTotalCost] = useState(null);
   const [walletBalance, setWalletBalance] = useState(0);
   const [callState, setCallState] = useState(null);
   const [actualStartTime, setActualStartTime] = useState(null);
@@ -99,16 +100,20 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
     const handleCallEnding = (data) => {
       if (!matchesCallId(data, callStateRef.current?.callId)) return;
       if (callStateRef.current?.status === 'ending') return;
+      const startMs = parseServerStartTimeMs(data.serverStartTime);
+      if (startMs != null) setActualStartTime(startMs);
       freezeCallUI({
         timerRef,
         twilioVideoService,
         setSeconds,
         setCurrentBilling,
         setCallState,
-        actualStartTime: actualStartTimeRef.current,
+        actualStartTime: startMs ?? actualStartTimeRef.current,
         pricePerMinute: consultant?.pricePerMinute,
         durationSeconds: data.durationSeconds,
+        totalCost: data.totalCost,
       });
+      if (data.totalCost != null) setSessionTotalCost(parseFloat(data.totalCost));
       isConnectedRef.current = false;
     };
 
@@ -123,8 +128,15 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
       }
       twilioVideoService.disconnect();
       isConnectedRef.current = false;
+      const startMs = parseServerStartTimeMs(data.serverStartTime);
+      if (startMs != null) setActualStartTime(startMs);
       const finalSeconds = data?.durationSeconds ?? seconds;
       setSeconds(finalSeconds);
+      if (data?.totalCost != null) {
+        const cost = parseFloat(data.totalCost);
+        setSessionTotalCost(cost);
+        setCurrentBilling(cost);
+      }
       if (finalSeconds > 0) {
         setShowFeedback(true);
         isClosingRef.current = false;
@@ -157,8 +169,9 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
     socketService.on('call_accepted', LISTENER_KEY, async (data) => {
       if (isClosingRef.current || isConnectedRef.current) return;
 
-      const startTime = data.actualStartTime ? new Date(data.actualStartTime).getTime() : Date.now();
-      setActualStartTime(startTime);
+      const startTime = data.actualStartTime || data.serverStartTime;
+      const startMs = parseServerStartTimeMs(startTime) ?? Date.now();
+      setActualStartTime(startMs);
       setSeconds(0);
       setCurrentBilling(0);
 
@@ -283,7 +296,13 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
         } else {
           const result = await endCall(callStateRef.current.callId).unwrap();
           const finalDuration = result?.durationSeconds || result?.data?.durationSeconds || frozen;
+          const finalCost = result?.totalCost ?? result?.data?.totalCost ?? sessionTotalCost ?? currentBilling;
           setSeconds(finalDuration);
+          if (finalCost != null) {
+            const cost = parseFloat(finalCost);
+            setSessionTotalCost(cost);
+            setCurrentBilling(cost);
+          }
 
           if (finalDuration > 0) {
             setShowFeedback(true);
@@ -359,6 +378,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
 
     setSeconds(0);
     setCurrentBilling(0);
+    setSessionTotalCost(null);
     setShowFeedback(false);
     setCallState(null);
     setActualStartTime(null);
@@ -453,6 +473,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
         <CallFeedbackModal
           consultant={consultant}
           seconds={seconds}
+          totalCost={sessionTotalCost ?? currentBilling}
           callId={callStateRef.current?.callId}
           onClose={closeAll}
         />

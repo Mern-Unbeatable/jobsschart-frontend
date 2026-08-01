@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { XCircle, Loader2 } from "lucide-react";
 import ScheduleCard from "./components/ScheduleCard";
 import { useGetMyBookingsQuery, useCancelBookingMutation } from "../../../features/api/scheduleApi";
 import toast from "react-hot-toast";
@@ -10,14 +12,22 @@ import VideoCallModal from "../../consultants/sections/VideoCallModal";
 const UserBookedSchedule = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: bookingsData, isLoading, error } = useGetMyBookingsQuery();
+  const { data: bookingsData, isLoading, error, refetch } = useGetMyBookingsQuery();
   const [cancelBooking] = useCancelBookingMutation();
   const [showAudio, setShowAudio] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [selectedConsultant, setSelectedConsultant] = useState(null);
+  const [cancelConfirm, setCancelConfirm] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
 
 
   const bookings = bookingsData?.bookings || [];
+
+  useEffect(() => {
+    const onCancelled = () => refetch();
+    window.addEventListener('rtschedule:booking_cancelled', onCancelled);
+    return () => window.removeEventListener('rtschedule:booking_cancelled', onCancelled);
+  }, [refetch]);
 
   const upcomingBookings = useMemo(() => {
     return bookings.filter(
@@ -94,13 +104,21 @@ const UserBookedSchedule = () => {
     setShowVideo(true);
   };
 
-  const handleCancel = async (bookingId) => {
-    if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
+  const handleCancel = async () => {
+    if (!cancelConfirm) return;
+
+    setIsCancelling(true);
     try {
-      await cancelBooking(bookingId).unwrap();
-      toast.success("Appointment cancelled. You will receive a confirmation email.");
+      await cancelBooking(cancelConfirm.bookingId).unwrap();
+      toast.success("Appointment cancelled. You will receive a confirmation email.", {
+        position: "top-center",
+      });
+      setCancelConfirm(null);
+      refetch();
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to cancel appointment");
+      toast.error(err?.data?.message || "Failed to cancel appointment", { position: "top-center" });
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -156,7 +174,14 @@ const UserBookedSchedule = () => {
                   onAudioCall={() => handleAudioCall(item)}
                   onVideoCall={() => handleVideoCall(item)}
                   onChat={() => handleChat(item)}
-                  onCancel={() => handleCancel(item.id)}
+                  onCancel={() =>
+                    setCancelConfirm({
+                      bookingId: item.id,
+                      consultantName: item.consultant?.user?.name || "Consultant",
+                      date: formatBookingDate(item.bookingDate),
+                      time: formatBookingTime(item.startTime, item.endTime),
+                    })
+                  }
                   showCancel={item.status?.toUpperCase() !== "COMPLETED" && item.status?.toUpperCase() !== "CANCELLED"}
                 />
               ))}
@@ -216,6 +241,49 @@ const UserBookedSchedule = () => {
           />
         </>
       )}
+
+      {cancelConfirm &&
+        createPortal(
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-4">
+            <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+              <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-rose-100">
+                <XCircle size={24} className="text-rose-500" aria-hidden="true" />
+              </div>
+              <h3 className="mb-2 text-center text-lg font-bold text-gray-900">Cancel appointment?</h3>
+              <p className="mb-6 text-center text-sm text-gray-500">
+                Cancel your appointment with <strong>{cancelConfirm.consultantName}</strong> on{" "}
+                <strong>{cancelConfirm.date}</strong> at <strong>{cancelConfirm.time}</strong>? Your
+                consultant will be notified.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setCancelConfirm(null)}
+                  disabled={isCancelling}
+                  className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-60"
+                >
+                  Keep appointment
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  disabled={isCancelling}
+                  className="flex-1 rounded-xl bg-red-500 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-600 disabled:opacity-60"
+                >
+                  {isCancelling ? (
+                    <span className="inline-flex items-center justify-center gap-2">
+                      <Loader2 size={16} className="animate-spin" />
+                      Cancelling…
+                    </span>
+                  ) : (
+                    "Yes, cancel"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 };

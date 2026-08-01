@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {
     Send, Paperclip, ArrowLeft, Search, Phone, Video,
     MessageSquare,
@@ -17,15 +17,23 @@ import {
 } from '../../features/api/chatApi';
 import toast from 'react-hot-toast';
 import { showBalanceWarning } from '../../utils/balanceWarningUtils';
+import { formatSessionDuration, formatSessionEndMessage } from '../../utils/formatSessionDuration';
 import axios from 'axios';
 import MessageBubble from '../../components/chat/MessageBubble';
 import ConversationItem from '../../components/chat/ConversationItem';
 import BillingBanner from '../../components/chat/BillingBanner';
 import SessionSummaryModal from '../../components/chat/SessionSummaryModal';
 import StartSessionModal from '../../components/chat/StartSessionModal';
+import { useGetMeQuery } from '../../features/api/userApi';
+import { updateUser } from '../../features/slices/authSlice';
 
 const LISTENER_KEY = 'rtchat';
 const PRICE_PER_MINUTE = 2.50;
+
+const parseCreditBalance = (value) => {
+    const n = parseFloat(value);
+    return Number.isFinite(n) ? n : 0;
+};
 
 const RealTimeChat = memo(({
     className = '',
@@ -34,7 +42,21 @@ const RealTimeChat = memo(({
     onConversationChange = null,
 }) => {
     const { user, token } = useSelector(state => state.auth);
-    const walletBalance = useSelector(state => state.auth?.user?.wallet?.creditBalance || 0);
+    const dispatch = useDispatch();
+    const walletBalance = useSelector(state => state.auth?.user?.wallet?.creditBalance ?? 0);
+
+    const { data: meData, isFetching: isFetchingMe } = useGetMeQuery(undefined, {
+        skip: !token,
+        refetchOnMountOrArgChange: true,
+    });
+
+    const liveWalletBalance = useMemo(() => {
+        const fromApi = meData?.user?.wallet?.creditBalance;
+        if (fromApi !== undefined && fromApi !== null) {
+            return parseCreditBalance(fromApi);
+        }
+        return parseCreditBalance(walletBalance);
+    }, [meData?.user?.wallet?.creditBalance, walletBalance]);
 
     const isConsultant = user?.role === 'CONSULTANT' || user?.role === 'ADMIN';
 
@@ -52,7 +74,7 @@ const RealTimeChat = memo(({
     const [sessionType, setSessionType] = useState(null);
     const [sessionStartedAt, setSessionStartedAt] = useState(null);
     const [sessionTotalCost, setSessionTotalCost] = useState(0);
-    const [currentBalance, setCurrentBalance] = useState(parseFloat(walletBalance));
+    const [currentBalance, setCurrentBalance] = useState(() => parseCreditBalance(walletBalance));
     const [showStartModal, setShowStartModal] = useState(false);
     const [isEndingSession, setIsEndingSession] = useState(false);
     const [sessionSummary, setSessionSummary] = useState(null);
@@ -61,6 +83,7 @@ const RealTimeChat = memo(({
 
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
+    const forceScrollToBottomRef = useRef(true);
     const inputRef = useRef(null);
     const fileInputRef = useRef(null);
     const typingTimerRef = useRef(null);
@@ -103,6 +126,16 @@ const RealTimeChat = memo(({
 
     const openingConvRef = useRef(false);
 
+    const scrollToBottom = useCallback((behavior = 'auto') => {
+        const container = messagesContainerRef.current;
+        if (!container) return;
+        if (behavior === 'smooth') {
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        } else {
+            container.scrollTop = container.scrollHeight;
+        }
+    }, []);
+
     // ── Join all conversation rooms when list updates ─────────────
     useEffect(() => {
         if (!user?.id || !conversations?.length) return;
@@ -118,6 +151,7 @@ const RealTimeChat = memo(({
             .unwrap()
             .then(conv => {
                 if (!conv?.id) return;
+                forceScrollToBottomRef.current = true;
                 setActiveConv(conv);
                 setShowMobileSidebar(false);
                 socketService.joinConversation(conv.id);
@@ -133,6 +167,7 @@ const RealTimeChat = memo(({
     // ── Load messages when active conversation changes ────────────
     useEffect(() => {
         if (!activeConv?.id) return;
+        forceScrollToBottomRef.current = true;
         setIsLoadingMessages(true);
         setMessages([]);
 
@@ -158,10 +193,13 @@ const RealTimeChat = memo(({
         socketService.joinConversation(activeConv.id);
     }, [activeConv?.id, token, markAsRead]);
 
-    // ── Sync wallet balance from Redux ────────────────────────────
+    // ── Sync wallet balance from API + Redux ──────────────────────
     useEffect(() => {
-        setCurrentBalance(parseFloat(walletBalance));
-    }, [walletBalance]);
+        setCurrentBalance(liveWalletBalance);
+        if (meData?.user?.wallet) {
+            dispatch(updateUser({ wallet: meData.user.wallet }));
+        }
+    }, [liveWalletBalance, meData?.user?.wallet, dispatch]);
 
     // ── Realtime updates (via ChatSocketBridge window events + direct socket for billing/typing)
     useEffect(() => {
@@ -256,16 +294,19 @@ const RealTimeChat = memo(({
             if (data.durationSeconds != null) setFrozenElapsedSeconds(data.durationSeconds);
             if (data.totalCost != null) setSessionTotalCost(parseFloat(data.totalCost));
             setActiveConv((prev) => prev ? { ...prev, sessionStatus: 'ENDED', startedAt: null } : prev);
-            const totalMin = Number(data.totalMinutes || 0).toFixed(2);
             const totalCost = Number(data.totalCost || 0).toFixed(2);
+            const durationSeconds = data.durationSeconds != null
+                ? data.durationSeconds
+                : frozenElapsedSeconds;
             if (!wasAlreadyEnded && !isEndingSessionRef.current) {
-                toast.success(`Session ended · ${totalMin} min · €${totalCost}`, { duration: 4000 });
+                toast.success(formatSessionEndMessage({ durationSeconds, totalCost }), { duration: 4000 });
             }
             if (!isConsultant && !wasAlreadyEnded) {
                 setSessionSummary({
                     sessionType: data.sessionType || sessionTypeRef.current,
-                    totalMinutes: totalMin,
-                    totalCost: totalCost,
+                    durationSeconds,
+                    totalMinutes: Number(data.totalMinutes || 0),
+                    totalCost,
                 });
             }
             refetchConversations();
@@ -318,19 +359,32 @@ const RealTimeChat = memo(({
         };
     }, [user?.id, isConsultant, markAsRead, refetchConversations]);
 
-    // ── Auto-scroll (within messages container only — prevents page jump) ──
+    // ── Auto-scroll: open at latest message (WhatsApp-style) ────
     useEffect(() => {
         const container = messagesContainerRef.current;
-        if (!container) return;
+        if (!container || isLoadingMessages) return;
+
         const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
-        if (isNearBottom) {
-            container.scrollTop = container.scrollHeight;
+
+        if (forceScrollToBottomRef.current || isNearBottom) {
+            requestAnimationFrame(() => {
+                scrollToBottom(forceScrollToBottomRef.current ? 'auto' : 'smooth');
+            });
+            forceScrollToBottomRef.current = false;
         }
-    }, [messages, typingUsers]);
+    }, [messages, typingUsers, isLoadingMessages, scrollToBottom]);
+
+    // Catch late layout shifts (images) right after messages load
+    useEffect(() => {
+        if (isLoadingMessages || messages.length === 0) return;
+        const timer = setTimeout(() => scrollToBottom('auto'), 100);
+        return () => clearTimeout(timer);
+    }, [isLoadingMessages, activeConv?.id, scrollToBottom]);
 
     // ── Handlers ──────────────────────────────────────────────────
 
     const handleSelectConversation = useCallback((conv) => {
+        forceScrollToBottomRef.current = true;
         setActiveConv(conv);
         setShowMobileSidebar(false);
         setMessages([]);
@@ -367,6 +421,7 @@ const RealTimeChat = memo(({
                 sender: { id: user.id, name: user.name, avatar: user.avatar, role: user.role },
             };
             setMessages(prev => [...prev, optimistic]);
+            forceScrollToBottomRef.current = true;
 
             try {
                 const result = await sendMessage({ conversationId: activeConvRef.current.id, message: text }).unwrap();
@@ -381,8 +436,12 @@ const RealTimeChat = memo(({
 
         // User: request session if not active/pending
         if (!isSessionActive && sessionStatusRef.current !== 'PENDING') {
-            if (currentBalance < PRICE_PER_MINUTE) {
-                toast.error(`Insufficient balance. Minimum €${PRICE_PER_MINUTE} required.`);
+            if (isFetchingMe) {
+                toast.error('Loading your balance, please try again.');
+                return;
+            }
+            if (liveWalletBalance < PRICE_PER_MINUTE) {
+                toast.error(`Insufficient balance. Minimum €${PRICE_PER_MINUTE} required. Current: €${liveWalletBalance.toFixed(2)}`);
                 return;
             }
 
@@ -413,6 +472,7 @@ const RealTimeChat = memo(({
             sender: { id: user.id, name: user.name, avatar: user.avatar, role: user.role },
         };
         setMessages(prev => [...prev, optimistic]);
+        forceScrollToBottomRef.current = true;
 
         try {
             const result = await sendMessage({ conversationId: activeConvRef.current.id, message: text }).unwrap();
@@ -422,7 +482,7 @@ const RealTimeChat = memo(({
             setMessages(prev => prev.filter(m => m.id !== tempId));
             toast.error(err?.data?.message || 'Failed to send message');
         }
-    }, [inputValue, user, sendMessage, refetchConversations, isSessionActive, isConsultant, startSessionMutation, currentBalance, isStartingSession, isEndingSession]);
+    }, [inputValue, user, sendMessage, refetchConversations, isSessionActive, isConsultant, startSessionMutation, liveWalletBalance, isFetchingMe, isStartingSession, isEndingSession]);
 
     const handleFileUpload = useCallback(async (file) => {
         if (!file || !activeConvRef.current?.id) return;
@@ -445,6 +505,7 @@ const RealTimeChat = memo(({
                 sender: { id: user.id, name: user.name, avatar: user.avatar, role: user.role },
             };
             setMessages(prev => [...prev, optimistic]);
+            forceScrollToBottomRef.current = true;
             socketService.emit('send_file', { conversationId: activeConvRef.current.id, fileUrl, fileName, fileType, fileSize }, (r) => {
                 if (r?.success) setMessages(prev => prev.map(m => m.id === tempId ? r.message : m));
             });
@@ -518,10 +579,12 @@ const RealTimeChat = memo(({
 
             toast.dismiss('end-session');
 
-            const totalMin = Number(result?.totalMinutes || 0).toFixed(2);
             const totalCost = Number(result?.totalCost || 0).toFixed(2);
+            const durationSeconds = result?.durationSeconds != null
+                ? result.durationSeconds
+                : frozen;
 
-            toast.success(`Session ended · ${totalMin} min · €${totalCost}`, { duration: 4000 });
+            toast.success(formatSessionEndMessage({ durationSeconds, totalCost }), { duration: 4000 });
 
             setSessionStatus('ENDED');
             setSessionStartedAt(null);
@@ -536,8 +599,9 @@ const RealTimeChat = memo(({
             if (!isConsultant) {
                 setSessionSummary({
                     sessionType: result?.sessionType || sessionTypeRef.current || 'CHAT',
-                    totalMinutes: totalMin,
-                    totalCost: totalCost,
+                    durationSeconds,
+                    totalMinutes: Number(result?.totalMinutes || 0),
+                    totalCost,
                 });
             }
 
@@ -618,15 +682,11 @@ const RealTimeChat = memo(({
     // ── Format elapsed time for the "Ending" banner ───────────────
     const formatElapsedTime = () => {
         if (frozenElapsedSeconds != null) {
-            const mins = Math.floor(frozenElapsedSeconds / 60);
-            const secs = frozenElapsedSeconds % 60;
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
+            return formatSessionDuration(frozenElapsedSeconds);
         }
         if (!sessionStartedAt) return '';
         const seconds = Math.floor((Date.now() - new Date(sessionStartedAt).getTime()) / 1000);
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
+        return formatSessionDuration(seconds);
     };
 
     return (
@@ -761,6 +821,7 @@ const RealTimeChat = memo(({
                                     walletBalance={currentBalance}
                                     onBalanceUpdate={setCurrentBalance}
                                     onEnd={handleEndSession}
+                                    frozenElapsed={frozenElapsedSeconds}
                                     isEnding={isEndingSession}
                                 />
                             )}

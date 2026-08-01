@@ -7,7 +7,6 @@ import { useGetAllPackagesQuery } from '../../features/api/packageApi';
 import { useCreateCheckoutMutation } from '../../features/api/paymentApi';
 import { useGetMeQuery } from '../../features/api/userApi';
 import { updateUser } from '../../features/slices/authSlice';
-import PaymentMethodSelector from '../payment/PaymentMethodSelector';
 
 /**
  * Credit purchase during active chat/call sessions.
@@ -16,7 +15,6 @@ import PaymentMethodSelector from '../payment/PaymentMethodSelector';
 const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate }) => {
     const [open, setOpen] = useState(false);
     const [buyingId, setBuyingId] = useState(null);
-    const [paymentMethod, setPaymentMethod] = useState('');
     const dispatch = useDispatch();
 
     const { data: packagesData, isLoading } = useGetAllPackagesQuery(undefined, { skip: !open });
@@ -50,7 +48,6 @@ const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate }) => {
             const result = await createCheckout({
                 type: 'PACKAGE',
                 packageId,
-                ...(paymentMethod ? { paymentMethod } : {}),
             }).unwrap();
             if (result?.url) {
                 window.open(result.url, '_blank', 'noopener,noreferrer');
@@ -106,12 +103,6 @@ const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate }) => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4">
-                    <PaymentMethodSelector
-                        value={paymentMethod}
-                        onChange={setPaymentMethod}
-                        compact
-                        className="mb-4"
-                    />
                     {isLoading ? (
                         <div className="py-12 text-center text-sm text-gray-400">Loading packages…</div>
                     ) : packages.length === 0 ? (

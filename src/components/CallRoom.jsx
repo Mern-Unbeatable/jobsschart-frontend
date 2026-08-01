@@ -4,7 +4,7 @@ import { twilioVideoService } from '../services/twilioVideoService';
 import { useJoinCallMutation, useEndCallMutation } from '../features/api/callApi';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
-import { freezeCallUI, matchesCallId } from '../utils/callEndUtils';
+import { freezeCallUI, matchesCallId, parseServerStartTimeMs } from '../utils/callEndUtils';
 import { unlockBrowserAudio } from '../utils/notificationSound';
 import { isVideoCallType, parseTwilioToken, resolveTwilioRoom } from '../utils/twilioTokenUtils';
 import { acquireTwilioCallLock, releaseTwilioCallLock } from '../utils/twilioConnectionLock';
@@ -59,14 +59,17 @@ const CallRoom = ({ callData, onClose }) => {
         const handleCallEnding = (data) => {
             if (!matchesCallId(data, callIdRef.current)) return;
             if (callStatus === 'ending') return;
+            const startMs = parseServerStartTimeMs(data.serverStartTime);
+            if (startMs != null) setActualStartTime(startMs);
             freezeCallUI({
                 timerRef,
                 twilioVideoService,
                 setSeconds,
                 setCurrentBilling,
                 setCallStatus,
-                actualStartTime: actualStartTimeRef.current,
+                actualStartTime: startMs ?? actualStartTimeRef.current,
                 durationSeconds: data.durationSeconds,
+                totalCost: data.totalCost,
             });
         };
 
@@ -79,6 +82,7 @@ const CallRoom = ({ callData, onClose }) => {
             twilioVideoService.disconnect();
             hasConnectedRef.current = false;
             if (data?.durationSeconds != null) setSeconds(data.durationSeconds);
+            if (data?.totalCost != null) setCurrentBilling(parseFloat(data.totalCost));
             toast.success('Call ended');
             setTimeout(() => onCloseRef.current(), 500);
         };
@@ -150,7 +154,7 @@ const CallRoom = ({ callData, onClose }) => {
                 if (cancelled) return;
 
                 if (startTime) {
-                    setActualStartTime(new Date(startTime).getTime());
+                    setActualStartTime(parseServerStartTimeMs(startTime) ?? Date.now());
                 } else {
                     setActualStartTime(Date.now());
                 }
@@ -281,7 +285,9 @@ const CallRoom = ({ callData, onClose }) => {
 
         try {
             if (callIdRef.current) {
-                await endCall(callIdRef.current).unwrap();
+                const result = await endCall(callIdRef.current).unwrap();
+                if (result?.durationSeconds != null) setSeconds(result.durationSeconds);
+                if (result?.totalCost != null) setCurrentBilling(parseFloat(result.totalCost));
             }
             toast.success('Call ended');
             onCloseRef.current();

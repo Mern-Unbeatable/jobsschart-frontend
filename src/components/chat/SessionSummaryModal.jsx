@@ -1,6 +1,7 @@
 import React, { memo, useState } from 'react';
 import { Star } from 'lucide-react';
 import { useCreateReviewMutation } from '../../features/api/reviewApi';
+import { formatSessionDuration } from '../../utils/formatSessionDuration';
 import toast from 'react-hot-toast';
 
 const SessionSummaryModal = memo(({ summary, consultantId, consultantRecordId, consultantUserId, onClose }) => {
@@ -10,6 +11,12 @@ const SessionSummaryModal = memo(({ summary, consultantId, consultantRecordId, c
     const [createReview, { isLoading }] = useCreateReviewMutation();
 
     if (!summary) return null;
+
+    const durationLabel = summary.durationSeconds != null
+        ? formatSessionDuration(summary.durationSeconds)
+        : summary.totalMinutes != null
+            ? `${Number(summary.totalMinutes).toFixed(2)} min billed`
+            : '00:00';
 
     const handleSubmitReview = async () => {
         const recordId = consultantRecordId || consultantId;
@@ -44,7 +51,7 @@ const SessionSummaryModal = memo(({ summary, consultantId, consultantRecordId, c
                     </div>
                     <div className='flex justify-between text-sm'>
                         <span className='text-gray-500'>Duration</span>
-                        <span className='font-semibold text-gray-800'>{summary.totalMinutes || 0} min</span>
+                        <span className='font-semibold text-gray-800'>{durationLabel}</span>
                     </div>
                     <div className='border-t pt-3 flex justify-between'>
                         <span className='font-bold text-gray-800'>Total Charged</span>

@@ -15,7 +15,7 @@ import {
 } from '../../../features/api/callApi';
 import { twilioVideoService } from '../../../services/twilioVideoService';
 import toast from 'react-hot-toast';
-import { freezeCallUI, matchesCallId } from '../../../utils/callEndUtils';
+import { freezeCallUI, matchesCallId, parseServerStartTimeMs } from '../../../utils/callEndUtils';
 import { showBalanceWarning } from '../../../utils/balanceWarningUtils';
 import InCallCreditTopUp from '../../../components/credit/InCallCreditTopUp';
 import { unlockBrowserAudio } from '../../../utils/notificationSound';
@@ -28,6 +28,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [currentBilling, setCurrentBilling] = useState(0);
+  const [sessionTotalCost, setSessionTotalCost] = useState(null);
   const [walletBalance, setWalletBalance] = useState(0);
   const [callState, setCallState] = useState(null);
   const [actualStartTime, setActualStartTime] = useState(null);
@@ -180,8 +181,9 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       isAcceptedRef.current = true;
       unlockBrowserAudio();
 
-      const startTime = data.actualStartTime ? new Date(data.actualStartTime).getTime() : Date.now();
-      setActualStartTime(startTime);
+      const startTime = data.actualStartTime || data.serverStartTime;
+      const startMs = parseServerStartTimeMs(startTime) ?? Date.now();
+      setActualStartTime(startMs);
       setSeconds(0);
       setCurrentBilling(0);
 
@@ -214,16 +216,20 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     const handleCallEnding = (data) => {
       if (!matchesCallId(data, callStateRef.current?.callId)) return;
       if (callStateRef.current?.status === 'ending') return;
+      const startMs = parseServerStartTimeMs(data.serverStartTime);
+      if (startMs != null) setActualStartTime(startMs);
       freezeCallUI({
         timerRef,
         twilioVideoService,
         setSeconds,
         setCurrentBilling,
         setCallState,
-        actualStartTime: actualStartTimeRef.current,
+        actualStartTime: startMs ?? actualStartTimeRef.current,
         pricePerMinute: consultant?.pricePerMinute,
         durationSeconds: data.durationSeconds,
+        totalCost: data.totalCost,
       });
+      if (data.totalCost != null) setSessionTotalCost(parseFloat(data.totalCost));
       setIsVideoConnected(false);
     };
 
@@ -235,8 +241,15 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
       twilioVideoService.disconnect();
       setIsVideoConnected(false);
+      const startMs = parseServerStartTimeMs(data.serverStartTime);
+      if (startMs != null) setActualStartTime(startMs);
       const finalSeconds = data?.durationSeconds ?? seconds;
       setSeconds(finalSeconds);
+      if (data?.totalCost != null) {
+        const cost = parseFloat(data.totalCost);
+        setSessionTotalCost(cost);
+        setCurrentBilling(cost);
+      }
       if (finalSeconds > 0) {
         setShowFeedback(true);
         isClosingRef.current = false;
@@ -352,7 +365,13 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         } else {
           const result = await endCall(callStateRef.current.callId).unwrap();
           const finalDuration = result?.durationSeconds || result?.data?.durationSeconds || frozen;
+          const finalCost = result?.totalCost ?? result?.data?.totalCost ?? sessionTotalCost ?? currentBilling;
           setSeconds(finalDuration);
+          if (finalCost != null) {
+            const cost = parseFloat(finalCost);
+            setSessionTotalCost(cost);
+            setCurrentBilling(cost);
+          }
           if (finalDuration > 0) {
             setShowFeedback(true);
             isClosingRef.current = false;
@@ -379,6 +398,9 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
 
       const tokenToUse = result?.data?.consultantToken || result?.consultantToken || callState.userToken;
       const roomName = result?.data?.call?.roomName || callState.roomName;
+      const startMs = parseServerStartTimeMs(
+        result?.data?.call?.startTime || result?.call?.startTime
+      ) ?? Date.now();
 
       // Set active state first so video divs render, then connectVideo
       // will find the refs via waitForRefs polling.
@@ -387,7 +409,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         userToken: tokenToUse,
         status: 'active',
       }));
-      setActualStartTime(Date.now());
+      setActualStartTime(startMs);
       toast.success('Call accepted, connecting...');
 
       // Store params for the pending-connect useEffect
@@ -405,6 +427,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     pendingVideoConnectRef.current = null;
     setSeconds(0);
     setCurrentBilling(0);
+    setSessionTotalCost(null);
     setShowFeedback(false);
     setCallState(null);
     setActualStartTime(null);
@@ -440,6 +463,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       <CallFeedbackModal
         consultant={consultant}
         seconds={seconds}
+        totalCost={sessionTotalCost ?? currentBilling}
         callId={callStateRef.current?.callId}
         onClose={closeAll}
       />

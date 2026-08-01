@@ -12,6 +12,9 @@ import { IncomingChatNotification } from './components/IncomingChatNotification'
 import { SocketManager } from './components/SocketManager';
 import { ChatSocketBridge } from './components/ChatSocketBridge';
 import { CallSocketBridge } from './components/CallSocketBridge';
+import { ScheduleSocketBridge } from './components/ScheduleSocketBridge';
+import { BookingCancelledAlert } from './components/BookingCancelledAlert';
+import { ConsultantAudioInit } from './components/ConsultantAudioInit';
 import useGeoDomainRedirect from './hooks/useGeoDomainRedirect';
 
 function App() {
@@ -25,6 +28,9 @@ function App() {
         <SocketManager />
         <ChatSocketBridge />
         <CallSocketBridge />
+        <ScheduleSocketBridge />
+        <BookingCancelledAlert />
+        <ConsultantAudioInit />
         <IncomingCallNotification />
         <IncomingChatNotification />
         <Toaster

@@ -1,3 +1,10 @@
+/** Parse server start time to epoch ms (null if missing/invalid). */
+export function parseServerStartTimeMs(value) {
+    if (value == null) return null;
+    const ms = new Date(value).getTime();
+    return Number.isFinite(ms) ? ms : null;
+}
+
 /** Freeze call UI when ending — stops timer + disconnects Twilio immediately */
 export function freezeCallUI({
     timerRef,
@@ -9,6 +16,7 @@ export function freezeCallUI({
     actualStartTime,
     pricePerMinute = 2.5,
     durationSeconds,
+    totalCost,
 }) {
     if (timerRef?.current) {
         clearInterval(timerRef.current);
@@ -25,8 +33,12 @@ export function freezeCallUI({
 
     setSeconds?.(frozen);
 
-    const pricePerSecond = pricePerMinute / 60;
-    setCurrentBilling?.(Number((frozen * pricePerSecond).toFixed(2)));
+    if (totalCost != null) {
+        setCurrentBilling?.(Number(parseFloat(totalCost).toFixed(2)));
+    } else if (frozen > 0) {
+        const pricePerSecond = pricePerMinute / 60;
+        setCurrentBilling?.(Number((frozen * pricePerSecond).toFixed(2)));
+    }
 
     if (setCallState) {
         setCallState((prev) => (prev ? { ...prev, status: 'ending' } : prev));

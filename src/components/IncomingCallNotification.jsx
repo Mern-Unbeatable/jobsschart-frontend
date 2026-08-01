@@ -4,9 +4,11 @@ import { Phone, PhoneOff, User, Volume2, VolumeX } from 'lucide-react';
 import { socketService } from '../services/socketService';
 import { useAcceptCallMutation, useRejectCallMutation } from '../features/api/callApi';
 import {
-    playNotificationRingtone,
+    playCallRingtone,
     stopNotificationRingtone,
     unlockBrowserAudio,
+    setRingtoneMuted,
+    isRingtoneMuted,
 } from '../utils/notificationSound';
 import toast from 'react-hot-toast';
 import { matchesCallId } from '../utils/callEndUtils';
@@ -38,7 +40,8 @@ export const IncomingCallNotification = () => {
 
             socketService.on('incoming_call', LISTENER_KEY, (callData) => {
                 setIncomingCall(callData);
-                playNotificationRingtone();
+                unlockBrowserAudio();
+                playCallRingtone();
 
                 if (typeof Notification !== 'undefined') {
                     if (Notification.permission === 'granted') {
@@ -143,8 +146,13 @@ export const IncomingCallNotification = () => {
     const toggleMute = () => {
         setIsMuted((prev) => {
             const next = !prev;
-            const audio = document.querySelector('#notification-ringtone-preview');
-            if (audio) audio.volume = next ? 0 : 1;
+            setRingtoneMuted(next);
+            if (next) {
+                stopNotificationRingtone();
+            } else if (incomingCall) {
+                unlockBrowserAudio();
+                playCallRingtone();
+            }
             return next;
         });
     };
@@ -203,7 +211,7 @@ export const IncomingCallNotification = () => {
                             onClick={toggleMute}
                             className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center transition-all"
                         >
-                            {isMuted ? (
+                            {isMuted || isRingtoneMuted() ? (
                                 <VolumeX size={18} className="text-gray-600" />
                             ) : (
                                 <Volume2 size={18} className="text-gray-600" />

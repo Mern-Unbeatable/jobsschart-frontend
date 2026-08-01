@@ -33,11 +33,33 @@ export const consultantApi = baseApi.injectEndpoints({
         }),
 
         getConsultantAvailability: builder.query({
+            query: ({ id, date } = {}) => ({
+                url: `/availability/consultants/${id}/slots`,
+                method: 'GET',
+                params: date ? { date } : {},
+            }),
+            providesTags: (result, error, { id } = {}) => [{ type: 'Availability', id }],
+            transformResponse: (response) => response.data,
+        }),
+
+        // Weekly-only availability (separate cache from date-specific queries)
+        getConsultantWeeklyAvailability: builder.query({
             query: (id) => ({
-                url: `/consultants/${id}/availability`,
+                url: `/availability/consultants/${id}/slots`,
                 method: 'GET',
             }),
             providesTags: (result, error, id) => [{ type: 'Availability', id }],
+            transformResponse: (response) => response.data,
+        }),
+
+        // Date-specific bookable slots (separate cache from weekly query)
+        getConsultantDateAvailability: builder.query({
+            query: ({ id, date }) => ({
+                url: `/availability/consultants/${id}/slots`,
+                method: 'GET',
+                params: { date },
+            }),
+            providesTags: (result, error, { id } = {}) => [{ type: 'Availability', id }],
             transformResponse: (response) => response.data,
         }),
 
@@ -249,6 +271,8 @@ export const {
     useGetTopConsultantsQuery,
     useGetConsultantByIdQuery,
     useGetConsultantAvailabilityQuery,
+    useGetConsultantWeeklyAvailabilityQuery,
+    useGetConsultantDateAvailabilityQuery,
     useGetConsultantReviewsQuery,
 
     // Consultant profile (protected)

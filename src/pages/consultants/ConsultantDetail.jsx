@@ -94,6 +94,7 @@ const ConsultantDetail = memo(() => {
     name: consultant.name || consultant.user?.name,
     image: consultant.avatar || consultant.user?.avatar || consultant.image,
     pricePerMinute: parseFloat(consultant.pricePerMinute || 2.5),
+    firstNPrice: consultant.firstNPrice != null ? parseFloat(consultant.firstNPrice) : null,
   };
 
   const areas = consultant.specialization || consultant.areas || [];
@@ -326,6 +327,7 @@ const ConsultantDetail = memo(() => {
     </div>
   );
 });
+
 
 ConsultantDetail.displayName = "ConsultantDetail";
 export default ConsultantDetail;
