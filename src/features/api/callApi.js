@@ -118,6 +118,14 @@ export const callApi = baseApi.injectEndpoints({
             transformResponse: (response) => response?.data || response,
         }),
 
+        getTwilioStatus: builder.query({
+            query: () => ({
+                url: '/calls/twilio-status',
+                method: 'GET',
+            }),
+            transformResponse: (response) => response?.data || response,
+        }),
+
         getCallById: builder.query({
             query: (callId) => ({
                 url: `/calls/${callId}`,
@@ -151,6 +159,7 @@ export const {
     useGetCallHistoryQuery,
     useGetCallByIdQuery,
     useGetConsultantEarningsQuery,
+    useGetTwilioStatusQuery,
     useLazyGetPendingCallsQuery,
     useLazyGetCallHistoryQuery,
     useLazyGetCallByIdQuery,

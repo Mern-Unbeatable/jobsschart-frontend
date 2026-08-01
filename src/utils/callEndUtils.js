@@ -39,5 +39,6 @@ export function freezeCallUI({
 }
 
 export function matchesCallId(data, callId) {
-    return !data?.callId || !callId || data.callId === callId;
+    if (!data?.callId || !callId) return false;
+    return String(data.callId) === String(callId);
 }

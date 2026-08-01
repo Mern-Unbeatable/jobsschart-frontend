@@ -27,8 +27,8 @@ class TwilioVideoService {
 
     _cleanupBeforeConnect() {
         this._participantListeners.forEach((listeners, participant) => {
-            listeners.forEach(({ event, fn }) => {
-                try { participant.off(event, fn); } catch (_) {}
+            listeners.forEach(({ target, event, fn }) => {
+                try { (target || participant).off(event, fn); } catch (_) {}
             });
         });
         this._participantListeners.clear();
@@ -99,55 +99,38 @@ class TwilioVideoService {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    // KEY FIX: For 'group' rooms, tracks are NOT auto-subscribed.
-    // We must listen to 'trackPublished' and call publication.subscribe()
-    // manually. For already-published tracks we also call subscribe().
-    // 'trackSubscribed' fires after subscribe() succeeds — that's where
-    // we attach the media element.
-    // ─────────────────────────────────────────────────────────────────
     _attachParticipant(participant, remoteVideoRef) {
         const listeners = [];
 
-        // Helper: subscribe to a publication if not already subscribed
-        const subscribeToPublication = (publication) => {
-            if (publication.isSubscribed) {
-                // Already subscribed — attach immediately
-                if (publication.track) {
-                    this._attachTrack(publication.track, remoteVideoRef);
-                }
-            } else {
-                // For group rooms: manually subscribe
-                publication.subscribe().catch(err => {
-                    console.warn('subscribe() failed:', err.message);
-                });
+        const attachIfReady = (publication) => {
+            if (publication?.track) {
+                this._attachTrack(publication.track, remoteVideoRef);
             }
         };
 
-        // Handle tracks already published when we join
-        participant.tracks.forEach(publication => {
-            subscribeToPublication(publication);
+        // Tracks already subscribed when we join
+        participant.tracks.forEach((publication) => {
+            attachIfReady(publication);
         });
 
-        // Handle tracks published after we join (group rooms)
-        const onTrackPublished = (publication) => {
-            subscribeToPublication(publication);
-        };
-        participant.on('trackPublished', onTrackPublished);
-        listeners.push({ event: 'trackPublished', fn: onTrackPublished });
-
-        // trackSubscribed fires when subscribe() resolves — attach here
-        const onSubscribed = (track) => {
+        // automaticSubscription: true — SDK subscribes for us; attach when ready
+        const onTrackSubscribed = (track) => {
             this._attachTrack(track, remoteVideoRef);
         };
-        participant.on('trackSubscribed', onSubscribed);
-        listeners.push({ event: 'trackSubscribed', fn: onSubscribed });
+        participant.on('trackSubscribed', onTrackSubscribed);
+        listeners.push({ target: participant, event: 'trackSubscribed', fn: onTrackSubscribed });
+
+        const onTrackPublished = (publication) => {
+            attachIfReady(publication);
+        };
+        participant.on('trackPublished', onTrackPublished);
+        listeners.push({ target: participant, event: 'trackPublished', fn: onTrackPublished });
 
         const onUnsubscribed = (track) => {
             track.detach().forEach(el => el.remove());
         };
         participant.on('trackUnsubscribed', onUnsubscribed);
-        listeners.push({ event: 'trackUnsubscribed', fn: onUnsubscribed });
+        listeners.push({ target: participant, event: 'trackUnsubscribed', fn: onUnsubscribed });
 
         this._participantListeners.set(participant, listeners);
     }
@@ -278,8 +261,8 @@ class TwilioVideoService {
 
     cleanup() {
         this._participantListeners.forEach((listeners, participant) => {
-            listeners.forEach(({ event, fn }) => {
-                try { participant.off(event, fn); } catch (_) {}
+            listeners.forEach(({ target, event, fn }) => {
+                try { (target || participant).off(event, fn); } catch (_) {}
             });
         });
         this._participantListeners.clear();

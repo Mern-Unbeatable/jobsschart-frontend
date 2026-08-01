@@ -9,6 +9,7 @@ import {
     unlockBrowserAudio,
 } from '../utils/notificationSound';
 import toast from 'react-hot-toast';
+import { matchesCallId } from '../utils/callEndUtils';
 
 const LISTENER_KEY = 'incoming-call-notification';
 
@@ -16,6 +17,8 @@ export const IncomingCallNotification = () => {
     const [incomingCall, setIncomingCall] = useState(null);
     const [isMuted, setIsMuted] = useState(false);
     const reconnectTimerRef = useRef(null);
+    const incomingCallRef = useRef(null);
+    incomingCallRef.current = incomingCall;
     const { user, token, isAuthenticated } = useSelector(state => state.auth);
     const [acceptCall, { isLoading: isAccepting }] = useAcceptCallMutation();
     const [rejectCall, { isLoading: isRejecting }] = useRejectCallMutation();
@@ -54,8 +57,12 @@ export const IncomingCallNotification = () => {
             socketService.on('call_rejected', LISTENER_KEY, dismissIncoming);
         };
 
-        const onCallEnding = () => dismissIncoming();
-        const onCallEnded = () => dismissIncoming();
+        const onCallEnding = (e) => {
+            if (matchesCallId(e.detail, incomingCallRef.current?.callId)) dismissIncoming();
+        };
+        const onCallEnded = (e) => {
+            if (matchesCallId(e.detail, incomingCallRef.current?.callId)) dismissIncoming();
+        };
         const onCallRejectedEvt = () => dismissIncoming();
 
         window.addEventListener('rtcall:call_ending', onCallEnding);
@@ -100,7 +107,7 @@ export const IncomingCallNotification = () => {
             const result = await acceptCall(incomingCall.callId).unwrap();
             const freshToken = result?.consultantToken || result?.token;
             const roomName = result?.call?.roomName || incomingCall.roomName;
-            const callType = result?.call?.callType || incomingCall.callType;
+            const callType = (result?.call?.callType || incomingCall.callType || 'PHONE').toUpperCase();
 
             window.dispatchEvent(new CustomEvent('open-call-window', {
                 detail: {
@@ -109,6 +116,7 @@ export const IncomingCallNotification = () => {
                     token: freshToken,
                     callType,
                     callerName: incomingCall.callerName,
+                    startTime: result?.call?.startTime,
                 },
             }));
 

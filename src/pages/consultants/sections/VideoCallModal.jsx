@@ -145,7 +145,12 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       return true;
     } catch (err) {
       console.error('❌ Video connect error:', err);
-      toast.error('Failed to connect video');
+      const msg = String(err?.message || '');
+      if (msg.includes('issuer/subject') || msg.includes('AccessTokenIssuerInvalid')) {
+        toast.error('Video server credentials are misconfigured. Contact support.');
+      } else {
+        toast.error('Failed to connect video. Check camera/mic permissions.');
+      }
       return false;
     }
   }, [waitForRefs]);
