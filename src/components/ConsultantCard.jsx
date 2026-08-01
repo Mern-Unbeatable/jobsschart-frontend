@@ -1,18 +1,61 @@
 import React, { memo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 import { Phone, Video, MessageSquare, Star } from "lucide-react";
 import AudioCallModal from "../pages/consultants/sections/AudioCallModal";
 import VideoCallModal from "../pages/consultants/sections/VideoCallModal";
 import { usePresence } from "../hooks/usePresence";
 import { getStatusStyle, toDisplayStatus } from "../utils/status";
+import {
+  selectIsAuthenticated,
+  selectUser,
+  selectUserRole,
+} from "../features/slices/authSlice";
+import {
+  canUserContactConsultant,
+  getConsultantUserId,
+} from "../utils/consultantList";
 
 const ConsultantCard = memo(({ consultantsData }) => {
   const navigate = useNavigate();
   const { getStatus } = usePresence();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectUser);
+  const userRole = useSelector(selectUserRole);
 
   const [showAudio, setShowAudio] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [selectedConsultant, setSelectedConsultant] = useState(null);
+
+  const getContactPermission = (consultant) =>
+    canUserContactConsultant({
+      viewerRole: userRole,
+      viewerUserId: user?.id,
+      consultant,
+    });
+
+  const ensureCanContact = (consultant) => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to use this service.", { position: "top-center" });
+      navigate("/login");
+      return false;
+    }
+
+    const permission = getContactPermission(consultant);
+    if (!permission.allowed) {
+      if (permission.reason === "restricted_role") {
+        toast.error("This action is only available for regular users.", {
+          position: "top-center",
+        });
+      } else if (permission.reason === "self") {
+        toast.error("You cannot contact yourself.", { position: "top-center" });
+      }
+      return false;
+    }
+
+    return true;
+  };
 
   const handleCardClick = (consultantId) => {
     navigate(`/consultants/${consultantId}`);
@@ -20,9 +63,11 @@ const ConsultantCard = memo(({ consultantsData }) => {
 
   const handleAudioCall = (e, consultant) => {
     e.stopPropagation();
+    if (!ensureCanContact(consultant)) return;
+
     setSelectedConsultant({
       ...consultant,
-      userId: consultant.userId || consultant.user?.id || consultant.id,
+      userId: getConsultantUserId(consultant),
       pricePerMinute: parseFloat(consultant.pricePerMinute || 2.5),
       name: consultant.user?.name || consultant.name,
       image: consultant.user?.avatar || consultant.avatar,
@@ -32,9 +77,11 @@ const ConsultantCard = memo(({ consultantsData }) => {
 
   const handleVideoCall = (e, consultant) => {
     e.stopPropagation();
+    if (!ensureCanContact(consultant)) return;
+
     setSelectedConsultant({
       ...consultant,
-      userId: consultant.userId || consultant.user?.id || consultant.id,
+      userId: getConsultantUserId(consultant),
       pricePerMinute: parseFloat(consultant.pricePerMinute || 2.5),
       name: consultant.user?.name || consultant.name,
       image: consultant.user?.avatar || consultant.avatar,
@@ -42,9 +89,10 @@ const ConsultantCard = memo(({ consultantsData }) => {
     setShowVideo(true);
   };
 
-  const handleChat = (e, consultantId) => {
+  const handleChat = (e, consultant) => {
     e.stopPropagation();
-    navigate(`/consultants/${consultantId}/chat`);
+    if (!ensureCanContact(consultant)) return;
+    navigate(`/consultants/${consultant.id}/chat`);
   };
 
   const consultants = consultantsData?.consultants || [];
@@ -54,12 +102,13 @@ const ConsultantCard = memo(({ consultantsData }) => {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {consultants.map((consultant) => {
-          const consultantUserId = consultant.userId || consultant.user?.id;
+          const consultantUserId = getConsultantUserId(consultant);
           const rawStatus = getStatus(
             consultantUserId,
             consultant.onlineStatus,
           );
           const displayStatus = toDisplayStatus(rawStatus);
+          const canContact = getContactPermission(consultant).allowed;
 
           return (
             <div
@@ -132,21 +181,39 @@ const ConsultantCard = memo(({ consultantsData }) => {
                   <button
                     type="button"
                     onClick={(e) => handleAudioCall(e, consultant)}
-                    className="flex-1 h-12 bg-[#D2C0E6] text-[#6E35AE] rounded-lg flex items-center justify-center hover:bg-[#D4C4E5] transition-colors cursor-pointer"
+                    disabled={!canContact}
+                    className={`flex-1 h-12 rounded-lg flex items-center justify-center transition-colors ${
+                      canContact
+                        ? "bg-[#D2C0E6] text-[#6E35AE] hover:bg-[#D4C4E5] cursor-pointer"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    }`}
+                    aria-label="Audio call"
                   >
                     <Phone size={20} className="stroke-[1.5]" />
                   </button>
                   <button
                     type="button"
                     onClick={(e) => handleVideoCall(e, consultant)}
-                    className="flex-1 h-12 bg-[#D2C0E6] text-[#6E35AE] rounded-lg flex items-center justify-center hover:bg-[#D4C4E5] transition-colors cursor-pointer"
+                    disabled={!canContact}
+                    className={`flex-1 h-12 rounded-lg flex items-center justify-center transition-colors ${
+                      canContact
+                        ? "bg-[#D2C0E6] text-[#6E35AE] hover:bg-[#D4C4E5] cursor-pointer"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    }`}
+                    aria-label="Video call"
                   >
                     <Video size={20} className="stroke-[1.5]" />
                   </button>
                   <button
                     type="button"
-                    onClick={(e) => handleChat(e, consultant.id)}
-                    className="flex-1 h-12 bg-[#D2C0E6] text-[#6E35AE] rounded-lg flex items-center justify-center hover:bg-[#D4C4E5] transition-colors cursor-pointer"
+                    onClick={(e) => handleChat(e, consultant)}
+                    disabled={!canContact}
+                    className={`flex-1 h-12 rounded-lg flex items-center justify-center transition-colors ${
+                      canContact
+                        ? "bg-[#D2C0E6] text-[#6E35AE] hover:bg-[#D4C4E5] cursor-pointer"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    }`}
+                    aria-label="Chat"
                   >
                     <MessageSquare size={20} className="stroke-[1.5]" />
                   </button>

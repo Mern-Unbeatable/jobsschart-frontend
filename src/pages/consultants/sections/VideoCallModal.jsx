@@ -1,6 +1,6 @@
 import React, { memo, useState, useEffect, useRef, useCallback } from 'react';
 import {
-  PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, VolumeX,
+  PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, Phone,
 } from 'lucide-react';
 import CallFeedbackModal from './CallFeedbackModal';
 import { socketService } from '../../../services/socketService';
@@ -19,6 +19,7 @@ import { freezeCallUI, matchesCallId, parseServerStartTimeMs } from '../../../ut
 import { showBalanceWarning } from '../../../utils/balanceWarningUtils';
 import InCallCreditTopUp from '../../../components/credit/InCallCreditTopUp';
 import { unlockBrowserAudio } from '../../../utils/notificationSound';
+import { getSpeakerAriaLabel, getSpeakerToastMessage } from '../../../utils/callAudioOutput';
 import DraggableCallPiP from '../../../components/call/DraggableCallPiP';
 import { useResponsiveCallLayout } from '../../../hooks/useResponsiveCallLayout';
 
@@ -148,7 +149,6 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       await twilioVideoService.connectVideo(tokenToUse, roomName, local, remote);
       setIsVideoConnected(true);
       setIsSpeakerOn(twilioVideoService.getSpeakerOn());
-      await twilioVideoService.setSpeakerOn(true);
       console.log('✅ Video connected successfully');
       return true;
     } catch (err) {
@@ -616,16 +616,16 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
                 onClick={async () => {
                   unlockBrowserAudio();
                   const next = await twilioVideoService.toggleSpeaker();
-                  setIsSpeakerOn(next);
-                  toast(next ? 'Sound on' : 'Sound off — you will not hear the other person', {
+                  setIsSpeakerOn(next.on);
+                  toast(getSpeakerToastMessage(next.on, { supported: next.supported }), {
                     duration: 2000,
                     position: 'top-center',
                   });
                 }}
                 className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full backdrop-blur-xl transition-all ${isSpeakerOn ? 'bg-white/15 text-white active:bg-white/30' : 'bg-[#6E35AE]/90 text-white'}`}
-                aria-label={isSpeakerOn ? 'Mute incoming sound' : 'Unmute incoming sound'}
+                aria-label={getSpeakerAriaLabel(isSpeakerOn)}
               >
-                {isSpeakerOn ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                {isSpeakerOn ? <Volume2 size={18} /> : <Phone size={18} />}
               </button>
 
               <button

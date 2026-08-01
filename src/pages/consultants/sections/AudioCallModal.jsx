@@ -1,5 +1,5 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
-import { PhoneOff, Mic, Volume2, VolumeX, MicOff } from 'lucide-react';
+import { PhoneOff, Mic, Volume2, MicOff, Phone } from 'lucide-react';
 import CallFeedbackModal from './CallFeedbackModal';
 import { socketService } from '../../../services/socketService';
 import { useSelector } from 'react-redux';
@@ -16,6 +16,7 @@ import { freezeCallUI, matchesCallId, parseServerStartTimeMs } from '../../../ut
 import { showBalanceWarning } from '../../../utils/balanceWarningUtils';
 import InCallCreditTopUp from '../../../components/credit/InCallCreditTopUp';
 import { unlockBrowserAudio } from '../../../utils/notificationSound';
+import { getSpeakerAriaLabel, getSpeakerToastMessage } from '../../../utils/callAudioOutput';
 import { useResponsiveCallLayout } from '../../../hooks/useResponsiveCallLayout';
 
 const LISTENER_KEY = 'audio-call-modal';
@@ -23,7 +24,7 @@ const LISTENER_KEY = 'audio-call-modal';
 const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
   const [seconds, setSeconds] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
-  const [isSpeakerOn, setIsSpeakerOn] = useState(true);
+  const [isSpeakerOn, setIsSpeakerOn] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const callLayout = useResponsiveCallLayout();
   const [currentBilling, setCurrentBilling] = useState(0);
@@ -199,8 +200,7 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
         try {
           isConnectedRef.current = true;
           await twilioVideoService.connectAudio(tokenToUse, roomName);
-          setIsSpeakerOn(true);
-          await twilioVideoService.setSpeakerOn(true);
+          setIsSpeakerOn(twilioVideoService.getSpeakerOn());
           console.log(' User audio connected successfully');
         } catch (err) {
           console.error(' Audio connect error:', err);
@@ -476,16 +476,16 @@ const AudioCallModal = memo(({ isOpen, onClose, consultant }) => {
               onClick={async () => {
                 unlockBrowserAudio();
                 const next = await twilioVideoService.toggleSpeaker();
-                setIsSpeakerOn(next);
-                toast(next ? 'Sound on' : 'Sound off — you will not hear the other person', {
+                setIsSpeakerOn(next.on);
+                toast(getSpeakerToastMessage(next.on, { supported: next.supported }), {
                   duration: 2000,
                   position: 'top-center',
                 });
               }}
-              className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full ${isSpeakerOn ? 'bg-white/10' : 'bg-[#6E35AE]'} text-white`}
-              aria-label={isSpeakerOn ? 'Mute incoming sound' : 'Unmute incoming sound'}
+              className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full ${isSpeakerOn ? 'bg-[#6E35AE]' : 'bg-white/10'} text-white`}
+              aria-label={getSpeakerAriaLabel(isSpeakerOn)}
             >
-              {isSpeakerOn ? <Volume2 size={20} /> : <VolumeX size={20} />}
+              {isSpeakerOn ? <Volume2 size={20} /> : <Phone size={20} />}
             </button>
           </div>
         </div>

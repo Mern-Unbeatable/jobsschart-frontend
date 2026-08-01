@@ -1,14 +1,24 @@
 import React, { useState, useMemo, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import ConsultantsHero from './sections/ConsultantsHero'
 import ConsultantCard from '../../components/ConsultantCard'
 import Pagination from '../../components/Pagination'
 import AdvertisingSection from '../home/sections/AdvertisingSection'
 import { useGetAllConsultantsQuery } from '../../features/api/consultantApi'
+import { usePresence } from '../../hooks/usePresence'
+import { selectUser, selectUserRole } from '../../features/slices/authSlice'
+import {
+  isConsultantSelf,
+  sortConsultantsByPresence,
+} from '../../utils/consultantList'
 
 const Consultants = () => {
   const { data: consultantsData, isLoading, error } = useGetAllConsultantsQuery({})
   const { t } = useTranslation()
+  const { getStatus } = usePresence()
+  const user = useSelector(selectUser)
+  const userRole = useSelector(selectUserRole)
   const [searchTerm, setSearchTerm] = useState('')
   const [expertise, setExpertise] = useState('all')
   const [topic, setTopic] = useState('all')
@@ -68,8 +78,13 @@ const Consultants = () => {
       )
     }
 
-    return filtered
-  }, [consultants, searchTerm, expertise, topic])
+    const isConsultantViewer = userRole === 'CONSULTANT' || userRole === 'ADMIN'
+    if (isConsultantViewer && user?.id) {
+      filtered = filtered.filter((consultant) => !isConsultantSelf(user.id, consultant))
+    }
+
+    return sortConsultantsByPresence(filtered, getStatus)
+  }, [consultants, searchTerm, expertise, topic, getStatus, user?.id, userRole])
 
   // Pagination logic
   const itemsPerPage = 8

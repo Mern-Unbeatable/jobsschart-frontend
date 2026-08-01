@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, VolumeX } from 'lucide-react';
+import { PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, Phone } from 'lucide-react';
 import { twilioVideoService } from '../services/twilioVideoService';
 import { useJoinCallMutation, useEndCallMutation } from '../features/api/callApi';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { freezeCallUI, matchesCallId, parseServerStartTimeMs } from '../utils/callEndUtils';
 import { unlockBrowserAudio } from '../utils/notificationSound';
+import { getSpeakerAriaLabel, getSpeakerToastMessage } from '../utils/callAudioOutput';
 import { shouldShowNotification } from '../utils/notificationDedupe';
 import { isVideoCallType, parseTwilioToken, resolveTwilioRoom } from '../utils/twilioTokenUtils';
 import { acquireTwilioCallLock, releaseTwilioCallLock } from '../utils/twilioConnectionLock';
@@ -22,7 +23,7 @@ const CallRoom = ({ callData, onClose }) => {
     const [connectError, setConnectError] = useState(null);
     const [connectAttempt, setConnectAttempt] = useState(0);
     const [currentBilling, setCurrentBilling] = useState(0);
-    const [isSpeakerOn, setIsSpeakerOn] = useState(true);
+    const [isSpeakerOn, setIsSpeakerOn] = useState(isVideoCall);
 
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
@@ -176,8 +177,7 @@ const CallRoom = ({ callData, onClose }) => {
                     try {
                         await twilioVideoService.connectVideo(tokenToUse, roomName, localEl, remoteEl);
                         hasConnectedRef.current = true;
-                        setIsSpeakerOn(true);
-                        await twilioVideoService.setSpeakerOn(true);
+                        setIsSpeakerOn(twilioVideoService.getSpeakerOn());
                         toast.success('Video call connected');
                     } catch (videoError) {
                         console.warn('Video failed, falling back to audio:', videoError);
@@ -185,8 +185,7 @@ const CallRoom = ({ callData, onClose }) => {
                         if (cancelled) return;
                         await twilioVideoService.connectAudio(tokenToUse, roomName);
                         hasConnectedRef.current = true;
-                        setIsSpeakerOn(true);
-                        await twilioVideoService.setSpeakerOn(true);
+                        setIsSpeakerOn(twilioVideoService.getSpeakerOn());
                         toast('Connected with audio only', { icon: '📞' });
                     }
                 } else {
@@ -194,9 +193,8 @@ const CallRoom = ({ callData, onClose }) => {
                     await twilioVideoService.connectAudio(tokenToUse, roomName);
                     if (cancelled) return;
                     hasConnectedRef.current = true;
-                    setIsSpeakerOn(true);
-                    await twilioVideoService.setSpeakerOn(true);
                     setCallStatus('active');
+                    setIsSpeakerOn(twilioVideoService.getSpeakerOn());
                     toast.success('Audio call connected');
                 }
             } catch (error) {
@@ -316,8 +314,8 @@ const CallRoom = ({ callData, onClose }) => {
     const handleToggleSpeaker = async () => {
         unlockBrowserAudio();
         const next = await twilioVideoService.toggleSpeaker();
-        setIsSpeakerOn(next);
-        toast(next ? 'Sound on' : 'Sound off — you will not hear the other person', {
+        setIsSpeakerOn(next.on);
+        toast(getSpeakerToastMessage(next.on, { supported: next.supported }), {
             duration: 2000,
             position: 'top-center',
         });
@@ -406,10 +404,10 @@ const CallRoom = ({ callData, onClose }) => {
                         <button
                             type="button"
                             onClick={handleToggleSpeaker}
-                            className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full transition-all ${isSpeakerOn ? 'bg-gray-700 active:bg-gray-600' : 'bg-[#6E35AE]'} text-white`}
-                            aria-label={isSpeakerOn ? 'Mute incoming sound' : 'Unmute incoming sound'}
+                            className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full transition-all ${isSpeakerOn ? 'bg-[#6E35AE]' : 'bg-gray-700 active:bg-gray-600'} text-white`}
+                            aria-label={getSpeakerAriaLabel(isSpeakerOn)}
                         >
-                            {isSpeakerOn ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                            {isSpeakerOn ? <Volume2 size={20} /> : <Phone size={20} />}
                         </button>
                         <button
                             type="button"
@@ -488,10 +486,10 @@ const CallRoom = ({ callData, onClose }) => {
                     <button
                         type="button"
                         onClick={handleToggleSpeaker}
-                        className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full transition-all ${isSpeakerOn ? 'bg-gray-700 active:bg-gray-600' : 'bg-[#6E35AE]'} text-white`}
-                        aria-label={isSpeakerOn ? 'Mute incoming sound' : 'Unmute incoming sound'}
+                        className={`${callLayout.controlBtnClass} flex items-center justify-center rounded-full transition-all ${isSpeakerOn ? 'bg-[#6E35AE]' : 'bg-gray-700 active:bg-gray-600'} text-white`}
+                        aria-label={getSpeakerAriaLabel(isSpeakerOn)}
                     >
-                        {isSpeakerOn ? <Volume2 size={24} /> : <VolumeX size={24} />}
+                        {isSpeakerOn ? <Volume2 size={24} /> : <Phone size={24} />}
                     </button>
                 </div>
             </div>

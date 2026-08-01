@@ -1,5 +1,5 @@
 import { connect as connectTwilioVideo, createLocalAudioTrack, createLocalVideoTrack } from 'twilio-video';
-import { applyRemoteListenMode } from '../utils/callAudioOutput';
+import { applyAudioOutputRoute } from '../utils/callAudioOutput';
 
 class TwilioVideoService {
     constructor() {
@@ -7,7 +7,8 @@ class TwilioVideoService {
         this.localTracks = [];
         this.isMuted = false;
         this.isVideoOff = false;
-        this.isSpeakerOn = true;
+        /** true = loudspeaker, false = earpiece */
+        this.isSpeakerOn = false;
         this._audioContainer = null;
         this._participantListeners = new Map();
         this._remoteAudioElements = new Set();
@@ -54,30 +55,18 @@ class TwilioVideoService {
         this._remoteVideoElements.clear();
     }
 
+    _getRemoteElements() {
+        return [...this._remoteAudioElements, ...this._remoteVideoElements];
+    }
+
     async _applySpeakerToRemoteAudio() {
-        await applyRemoteListenMode(this.isSpeakerOn);
-
-        this._remoteAudioElements.forEach((el) => {
-            if (!this.isSpeakerOn) {
-                el.muted = true;
-                el.volume = 0;
-            } else {
-                el.muted = false;
-                el.volume = 1;
-                el.play().catch(() => {});
-            }
-        });
-
-        this._remoteVideoElements.forEach((el) => {
-            el.muted = !this.isSpeakerOn;
-            el.volume = this.isSpeakerOn ? 1 : 0;
-        });
+        return applyAudioOutputRoute(this.isSpeakerOn, this._getRemoteElements());
     }
 
     async setSpeakerOn(enabled) {
         this.isSpeakerOn = Boolean(enabled);
-        await this._applySpeakerToRemoteAudio();
-        return this.isSpeakerOn;
+        const routeInfo = await this._applySpeakerToRemoteAudio();
+        return { on: this.isSpeakerOn, ...routeInfo };
     }
 
     async toggleSpeaker() {
@@ -113,8 +102,9 @@ class TwilioVideoService {
             const el = track.attach();
             el.autoplay = true;
             el.playsInline = true;
-            el.muted = !this.isSpeakerOn;
-            el.volume = this.isSpeakerOn ? 1 : 0;
+            el.setAttribute('playsinline', 'true');
+            el.muted = false;
+            el.volume = 1;
             audioContainer.appendChild(el);
             this._remoteAudioElements.add(el);
 
@@ -141,10 +131,12 @@ class TwilioVideoService {
             const el = track.attach();
             el.style.cssText = 'width:100%;height:100%;object-fit:cover;';
             el.setAttribute('data-twilio-remote-video', 'true');
-            el.muted = !this.isSpeakerOn;
-            el.volume = this.isSpeakerOn ? 1 : 0;
+            el.setAttribute('playsinline', 'true');
+            el.muted = false;
+            el.volume = 1;
             this._remoteVideoElements.add(el);
             remoteVideoRef.appendChild(el);
+            this._applySpeakerToRemoteAudio();
         }
     }
 
@@ -157,12 +149,10 @@ class TwilioVideoService {
             }
         };
 
-        // Tracks already subscribed when we join
         participant.tracks.forEach((publication) => {
             attachIfReady(publication);
         });
 
-        // automaticSubscription: true — SDK subscribes for us; attach when ready
         const onTrackSubscribed = (track) => {
             this._attachTrack(track, remoteVideoRef);
         };
@@ -186,6 +176,7 @@ class TwilioVideoService {
 
     async connectVideo(token, roomName, localVideoRef, remoteVideoRef) {
         this._cleanupBeforeConnect();
+        this.isSpeakerOn = true;
 
         const localTracks = await this._getLocalTracks('VIDEO');
         this.localTracks = localTracks;
@@ -203,7 +194,6 @@ class TwilioVideoService {
 
         if (remoteVideoRef) remoteVideoRef.innerHTML = '';
 
-        // Attach local video to PiP
         localTracks.forEach(track => {
             if (track.kind === 'video' && localVideoRef) {
                 const el = track.attach();
@@ -213,12 +203,10 @@ class TwilioVideoService {
             }
         });
 
-        // Wire up remote participants already in the room
         this.room.participants.forEach(participant => {
             this._attachParticipant(participant, remoteVideoRef);
         });
 
-        // Wire up participants who join after us
         this.room.on('participantConnected', participant => {
             this._attachParticipant(participant, remoteVideoRef);
         });
@@ -232,11 +220,13 @@ class TwilioVideoService {
 
         this.room.on('disconnected', () => { this.cleanup(); });
 
+        await this._applySpeakerToRemoteAudio();
         return this.room;
     }
 
     async connectAudio(token, roomName, onConnect, onDisconnect) {
         this._cleanupBeforeConnect();
+        this.isSpeakerOn = false;
 
         const localTracks = await this._getLocalTracks('PHONE');
         this.localTracks = localTracks;
@@ -277,6 +267,7 @@ class TwilioVideoService {
             setTimeout(() => onConnect?.(), 200);
         }
 
+        await this._applySpeakerToRemoteAudio();
         return this.room;
     }
 
@@ -332,7 +323,7 @@ class TwilioVideoService {
 
         this.isMuted = false;
         this.isVideoOff = false;
-        this.isSpeakerOn = true;
+        this.isSpeakerOn = false;
         this._remoteAudioElements.clear();
         this._remoteVideoElements.clear();
     }
