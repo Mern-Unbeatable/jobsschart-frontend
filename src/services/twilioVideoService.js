@@ -1,5 +1,5 @@
 import { connect as connectTwilioVideo, createLocalAudioTrack, createLocalVideoTrack } from 'twilio-video';
-import { applyAudioOutputRoute } from '../utils/callAudioOutput';
+import { applyAudioOutputRoute, getRemoteMediaElements, releaseCallAudioRoutes } from '../utils/callAudioOutput';
 
 class TwilioVideoService {
     constructor() {
@@ -50,6 +50,7 @@ class TwilioVideoService {
         }
 
         if (this._audioContainer) {
+            releaseCallAudioRoutes(this._getRemoteElements());
             this._audioContainer.innerHTML = '';
         }
         this._teardownAudioRouteObserver();
@@ -68,13 +69,18 @@ class TwilioVideoService {
         const container = this._getAudioContainer();
         this._teardownAudioRouteObserver();
         this._routeObserver = new MutationObserver(() => {
-            this._applySpeakerToRemoteAudio();
+            clearTimeout(this._routeApplyTimer);
+            this._routeApplyTimer = setTimeout(() => {
+                this._applySpeakerToRemoteAudio(true);
+            }, 60);
         });
         this._routeObserver.observe(container, { childList: true, subtree: true });
     }
 
     _getRemoteElements() {
-        return [...this._remoteAudioElements, ...this._remoteVideoElements];
+        const fromSet = [...this._remoteAudioElements, ...this._remoteVideoElements];
+        const fromDom = getRemoteMediaElements();
+        return [...new Set([...fromSet, ...fromDom])];
     }
 
     async _applySpeakerToRemoteAudio(forceRefresh = false) {
@@ -83,8 +89,11 @@ class TwilioVideoService {
 
     async setSpeakerOn(enabled) {
         this.isSpeakerOn = Boolean(enabled);
-        const routeInfo = await this._applySpeakerToRemoteAudio(true);
-        return { on: this.isSpeakerOn, ...routeInfo };
+        await this._applySpeakerToRemoteAudio(true);
+        // Chrome sometimes needs a second pass after the user-gesture toggle.
+        await new Promise((resolve) => setTimeout(resolve, 80));
+        const confirmed = await this._applySpeakerToRemoteAudio(true);
+        return { on: this.isSpeakerOn, ...confirmed };
     }
 
     async toggleSpeaker() {
@@ -122,7 +131,6 @@ class TwilioVideoService {
             el.playsInline = true;
             el.setAttribute('playsinline', 'true');
             el.muted = false;
-            el.volume = 1;
             audioContainer.appendChild(el);
             this._remoteAudioElements.add(el);
             this._setupAudioRouteObserver();
@@ -152,7 +160,6 @@ class TwilioVideoService {
             el.setAttribute('data-twilio-remote-video', 'true');
             el.setAttribute('playsinline', 'true');
             el.muted = false;
-            el.volume = 1;
             this._remoteVideoElements.add(el);
             remoteVideoRef.appendChild(el);
             this._applySpeakerToRemoteAudio(true);
@@ -341,6 +348,7 @@ class TwilioVideoService {
         }
 
         if (this._audioContainer) {
+            releaseCallAudioRoutes(this._getRemoteElements());
             this._audioContainer.innerHTML = '';
         }
 
