@@ -75,7 +75,7 @@ module.exports = (env, argv) => {
     : 5173;
 
   const allowedHost =
-    rawEnv.REACT_APP_ALLOWED_HOST || 'jbosschart.maktechgroup.tech';
+    rawEnv.REACT_APP_ALLOWED_HOST || 'illorac.com';
 
   return {
     entry: './src/index.jsx',
