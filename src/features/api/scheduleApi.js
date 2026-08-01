@@ -51,6 +51,7 @@ export const scheduleApi = baseApi.injectEndpoints({
       query: (bookingId) => ({
         url: `/schedule/bookings/${bookingId}/cancel`,
         method: 'PATCH',
+        body: { status: 'CANCELLED' },
       }),
       invalidatesTags: ['Session'],
       transformResponse: (response) => response.data,
@@ -67,6 +68,7 @@ export const scheduleApi = baseApi.injectEndpoints({
       query: (bookingId) => ({
         url: `/schedule/consultant/bookings/${bookingId}/confirm`,
         method: 'PATCH',
+        body: { status: 'CONFIRMED' },
       }),
       invalidatesTags: ['Session'],
       transformResponse: (response) => response.data,
@@ -75,6 +77,7 @@ export const scheduleApi = baseApi.injectEndpoints({
       query: (bookingId) => ({
         url: `/schedule/consultant/bookings/${bookingId}/complete`,
         method: 'PATCH',
+        body: { status: 'COMPLETED' },
       }),
       invalidatesTags: ['Session'],
       transformResponse: (response) => response.data,

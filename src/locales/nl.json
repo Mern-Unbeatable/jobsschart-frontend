@@ -96,7 +96,10 @@
       "upcomingSchedule": "Aankomende planning",
       "scheduleCard": {
         "statusUpcoming": "Aankomend",
+        "statusPending": "In afwachting",
+        "statusConfirmed": "Bevestigd",
         "statusComplete": "Voltooid",
+        "statusCancelled": "Geannuleerd",
         "callDoctor": "Bel arts",
         "startVideoCall": "Videogesprek starten",
         "openChat": "Chat openen",

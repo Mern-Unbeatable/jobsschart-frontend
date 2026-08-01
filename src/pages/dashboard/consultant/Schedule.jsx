@@ -9,12 +9,16 @@ import {
   XCircle,
   X,
   Loader2,
+  CheckCircle,
+  CheckCheck,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   useGetConsultantBookingsQuery,
   useGetConsultantUpcomingBookingsQuery,
   useCancelConsultantBookingMutation,
+  useConfirmConsultantBookingMutation,
+  useCompleteConsultantBookingMutation,
 } from "../../../features/api/scheduleApi";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -82,6 +86,20 @@ function getCalendarWeeks(year, month) {
   return weeks;
 }
 
+function getStatusBadge(status) {
+  const normalized = status?.toUpperCase();
+  if (normalized === "CONFIRMED") {
+    return { label: "Confirmed", className: "text-[#3a9f4d] bg-[#e6f9eb] border border-[#b8ebc2]" };
+  }
+  if (normalized === "PENDING") {
+    return { label: "Pending", className: "text-amber-700 bg-[#fff7e6] border border-amber-200" };
+  }
+  if (normalized === "COMPLETED") {
+    return { label: "Completed", className: "text-[#3a9f4d] bg-[#e6f9eb] border border-[#b8ebc2]" };
+  }
+  return { label: status || "Unknown", className: "text-[#6e35ae] bg-purple-50 border border-purple-100" };
+}
+
 function mapBookingToSession(booking, index) {
   const name = booking.user?.name || booking.user?.username || "Client";
   const firstName = name.split(" ")[0];
@@ -95,6 +113,8 @@ function mapBookingToSession(booking, index) {
     color: SESSION_COLORS[index % SESSION_COLORS.length],
     status: booking.status,
     canCancel: ["PENDING", "CONFIRMED"].includes(booking.status),
+    canConfirm: booking.status === "PENDING",
+    canComplete: booking.status === "CONFIRMED",
   };
 }
 
@@ -103,6 +123,8 @@ const ConsultantSchedule = () => {
   const [modalDateKey, setModalDateKey] = useState(null);
   const [isModalClosing, setIsModalClosing] = useState(false);
   const [cancellingId, setCancellingId] = useState(null);
+  const [actioningId, setActioningId] = useState(null);
+  const [actionType, setActionType] = useState(null);
   const [cancelConfirm, setCancelConfirm] = useState(null);
   const closeTimerRef = useRef(null);
 
@@ -111,6 +133,8 @@ const ConsultantSchedule = () => {
   const { data: upcomingData, isLoading: isLoadingUpcoming, refetch: refetchUpcoming } =
     useGetConsultantUpcomingBookingsQuery({ limit: 50 });
   const [cancelBooking] = useCancelConsultantBookingMutation();
+  const [confirmBooking] = useConfirmConsultantBookingMutation();
+  const [completeBooking] = useCompleteConsultantBookingMutation();
 
   const allBookings = bookingsData?.bookings || [];
   const upcomingBookings = upcomingData?.bookings || [];
@@ -167,12 +191,16 @@ const ConsultantSchedule = () => {
   );
 
   useEffect(() => {
-    const onBookingCancelled = () => {
+    const refresh = () => {
       refetchBookings();
       refetchUpcoming();
     };
-    window.addEventListener("rtschedule:booking_cancelled", onBookingCancelled);
-    return () => window.removeEventListener("rtschedule:booking_cancelled", onBookingCancelled);
+    window.addEventListener("rtschedule:booking_cancelled", refresh);
+    window.addEventListener("rtschedule:new_booking", refresh);
+    return () => {
+      window.removeEventListener("rtschedule:booking_cancelled", refresh);
+      window.removeEventListener("rtschedule:new_booking", refresh);
+    };
   }, [refetchBookings, refetchUpcoming]);
 
   useEffect(() => {
@@ -216,6 +244,111 @@ const ConsultantSchedule = () => {
     } finally {
       setCancellingId(null);
     }
+  };
+
+  const handleConfirm = async (bookingId, clientName) => {
+    setActioningId(bookingId);
+    setActionType("confirm");
+    try {
+      await confirmBooking(bookingId).unwrap();
+      toast.success(`Appointment with ${clientName} accepted. The client has been notified.`, {
+        position: "top-center",
+      });
+      refetchBookings();
+      refetchUpcoming();
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to accept appointment", { position: "top-center" });
+    } finally {
+      setActioningId(null);
+      setActionType(null);
+    }
+  };
+
+  const handleComplete = async (bookingId, clientName) => {
+    setActioningId(bookingId);
+    setActionType("complete");
+    try {
+      await completeBooking(bookingId).unwrap();
+      toast.success(`Appointment with ${clientName} marked as completed.`, {
+        position: "top-center",
+      });
+      refetchBookings();
+      refetchUpcoming();
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to complete appointment", { position: "top-center" });
+    } finally {
+      setActioningId(null);
+      setActionType(null);
+    }
+  };
+
+  const renderBookingActions = (booking, clientName) => {
+    const canConfirm = booking.status === "PENDING";
+    const canComplete = booking.status === "CONFIRMED";
+    const canCancel = ["PENDING", "CONFIRMED"].includes(booking.status);
+    const isCancelling = cancellingId === booking.id;
+    const isConfirming = actioningId === booking.id && actionType === "confirm";
+    const isCompleting = actioningId === booking.id && actionType === "complete";
+    const isBusy = isCancelling || isConfirming || isCompleting;
+    const statusBadge = getStatusBadge(booking.status);
+
+    return (
+      <div className="flex flex-col gap-2">
+        <span className={`inline-flex w-fit rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide ${statusBadge.className}`}>
+          {statusBadge.label}
+        </span>
+
+        {canConfirm && (
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() => handleConfirm(booking.id, clientName)}
+            className="flex w-full items-center justify-center gap-2 rounded bg-[#6e35ae] px-6 py-3 text-base text-white transition-colors duration-200 hover:bg-[#582791] disabled:opacity-60"
+          >
+            {isConfirming ? (
+              <Loader2 size={20} className="animate-spin" aria-hidden="true" />
+            ) : (
+              <CheckCircle size={20} aria-hidden="true" />
+            )}
+            {isConfirming ? "Accepting…" : "Accept"}
+          </button>
+        )}
+
+        {canComplete && (
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() => handleComplete(booking.id, clientName)}
+            className="flex w-full items-center justify-center gap-2 rounded bg-[#05bc27] px-6 py-3 text-base text-white transition-colors duration-200 hover:bg-[#049a20] disabled:opacity-60"
+          >
+            {isCompleting ? (
+              <Loader2 size={20} className="animate-spin" aria-hidden="true" />
+            ) : (
+              <CheckCheck size={20} aria-hidden="true" />
+            )}
+            {isCompleting ? "Completing…" : "Mark Complete"}
+          </button>
+        )}
+
+        {canCancel ? (
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() => requestCancel(booking.id, clientName)}
+            className="flex w-full items-center justify-center gap-2 rounded bg-[#fce7e7] px-6 py-3 text-base text-[#ce0a0a] transition-colors duration-200 hover:bg-red-100 disabled:opacity-60"
+          >
+            {isCancelling ? (
+              <Loader2 size={20} className="animate-spin" aria-hidden="true" />
+            ) : (
+              <XCircle size={20} aria-hidden="true" />
+            )}
+            {isCancelling ? "Cancelling…" : "Cancel"}
+          </button>
+        ) : !canConfirm && !canComplete ? (
+          <p className="text-center text-sm text-gray-400">No actions available</p>
+        ) : null}
+      </div>
+    );
   };
 
   const isLoading = isLoadingBookings || isLoadingUpcoming;
@@ -379,8 +512,6 @@ const ConsultantSchedule = () => {
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {displayBookings.map((booking) => {
               const clientName = booking.user?.name || booking.user?.username || "Client";
-              const canCancel = ["PENDING", "CONFIRMED"].includes(booking.status);
-              const isCancelling = cancellingId === booking.id;
 
               return (
                 <article
@@ -397,9 +528,6 @@ const ConsultantSchedule = () => {
                     </div>
                     <div>
                       <p className="text-xl font-medium text-[#050609]">{clientName}</p>
-                      <span className="text-xs font-medium uppercase tracking-wide text-[#6e35ae]">
-                        {booking.status}
-                      </span>
                     </div>
                   </div>
 
@@ -418,23 +546,7 @@ const ConsultantSchedule = () => {
                     </div>
                   </div>
 
-                  {canCancel ? (
-                    <button
-                      type="button"
-                      disabled={isCancelling}
-                      onClick={() => requestCancel(booking.id, clientName)}
-                      className="flex w-full items-center justify-center gap-2 rounded bg-[#fce7e7] px-6 py-3 text-base text-[#ce0a0a] transition-colors duration-200 hover:bg-red-100 disabled:opacity-60"
-                    >
-                      {isCancelling ? (
-                        <Loader2 size={20} className="animate-spin" aria-hidden="true" />
-                      ) : (
-                        <XCircle size={20} aria-hidden="true" />
-                      )}
-                      {isCancelling ? "Cancelling…" : "Cancel"}
-                    </button>
-                  ) : (
-                    <p className="text-center text-sm text-gray-400">Cannot cancel this session</p>
-                  )}
+                  {renderBookingActions(booking, clientName)}
                 </article>
               );
             })}
@@ -487,26 +599,11 @@ const ConsultantSchedule = () => {
                         <div className="min-w-0 flex-1">
                           <span className="block text-sm font-semibold text-[#101828]">{session.fullName}</span>
                           <span className="block text-sm font-medium text-[#6a7282]">{session.modalTime}</span>
-                          <span className="mt-1 inline-block text-xs font-medium uppercase text-[#6e35ae]">
-                            {session.status}
-                          </span>
                         </div>
                       </div>
-                      {session.canCancel && (
-                        <button
-                          type="button"
-                          disabled={cancellingId === session.id}
-                          onClick={() => requestCancel(session.id, session.fullName)}
-                          className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-[#fce7e7] px-4 py-2 text-sm font-medium text-[#ce0a0a] transition-colors hover:bg-red-100 disabled:opacity-60"
-                        >
-                          {cancellingId === session.id ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : (
-                            <XCircle size={16} />
-                          )}
-                          {cancellingId === session.id ? "Cancelling…" : "Cancel appointment"}
-                        </button>
-                      )}
+                      <div className="mt-3">
+                        {renderBookingActions(session.booking, session.fullName)}
+                      </div>
                     </div>
                   ))
                 )}

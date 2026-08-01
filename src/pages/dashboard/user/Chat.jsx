@@ -1,6 +1,5 @@
 import React, { memo, useEffect } from 'react';
 import RealTimeChat from '../../consultants/RealTimeChat';
-import UserChatPage from '../../consultants/UserChatPage';
 
 const UserDashboardChat = memo(() => {
   useEffect(() => {
@@ -8,13 +7,15 @@ const UserDashboardChat = memo(() => {
   }, []);
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <div className='container mx-auto px-4 lg:px-6 py-6'>
-        <h1 className='text-2xl font-bold text-gray-900 mb-6'>Messages</h1>
-        <div style={{ height: 'calc(100vh - 180px)' }}>
-          <UserChatPage />
-        </div>
+    <div className="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
+      <div className="shrink-0">
+        <h1 className="dashboard-page-title">Messages</h1>
+        <p className="dashboard-page-subtitle mt-1">
+          Chat with your consultants.
+        </p>
       </div>
+
+      <RealTimeChat className="min-h-0 flex-1 h-full" showSidebar />
     </div>
   );
 });

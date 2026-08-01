@@ -96,7 +96,10 @@
       "upcomingSchedule": "Upcoming Schedule",
       "scheduleCard": {
         "statusUpcoming": "Upcoming",
+        "statusPending": "Pending",
+        "statusConfirmed": "Confirmed",
         "statusComplete": "Complete",
+        "statusCancelled": "Cancelled",
         "callDoctor": "Call doctor",
         "startVideoCall": "Start video call",
         "openChat": "Open chat",
