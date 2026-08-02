@@ -28,6 +28,7 @@ import SessionSummaryModal from '../../components/chat/SessionSummaryModal';
 import StartSessionModal from '../../components/chat/StartSessionModal';
 import { useGetMeQuery } from '../../features/api/userApi';
 import { updateUser } from '../../features/slices/authSlice';
+import { markConsultationCompleted } from '../../utils/consultantChatHistory';
 
 const LISTENER_KEY = 'rtchat';
 const PRICE_PER_MINUTE = 2.50;
@@ -42,6 +43,7 @@ const RealTimeChat = memo(({
     initialOtherUserId = null,
     showSidebar = true,
     onConversationChange = null,
+    onSessionEnded = null,
 }) => {
     const { user, token } = useSelector(state => state.auth);
     const dispatch = useDispatch();
@@ -120,6 +122,10 @@ const RealTimeChat = memo(({
 
     const isSessionActive = sessionStatus === 'ACTIVE';
     const isSessionPending = sessionStatus === 'PENDING';
+    const isHistoryLocked = isConsultant && (
+        sessionStatus === 'ENDED'
+        || activeConv?.sessionStatus === 'ENDED'
+    );
     // Users can send to start a session (IDLE/ENDED) or while waiting (PENDING); consultants only when ACTIVE
     const canSend = !!inputValue.trim() && !isUploading && !isStartingSession && !isEndingSession
         && sessionStatus !== 'ENDING'
@@ -159,7 +165,7 @@ const RealTimeChat = memo(({
                 setActiveConv(conv);
                 setShowMobileSidebar(false);
                 socketService.joinConversation(conv.id);
-                if (onConversationChange) onConversationChange(conv.id);
+                if (onConversationChange) onConversationChange(conv.id, conv);
                 refetchConversations();
             })
             .catch(() => toast.error('Could not open conversation.'))
@@ -167,6 +173,13 @@ const RealTimeChat = memo(({
                 openingConvRef.current = false;
             });
     }, [initialOtherUserId, user?.id]);
+
+    const lockConsultantHistory = useCallback((conversationId) => {
+        if (!isConsultant || !conversationId) return;
+        setMessages([]);
+        markConsultationCompleted(conversationId);
+        onSessionEnded?.(conversationId);
+    }, [isConsultant, onSessionEnded]);
 
     // ── Load messages when active conversation changes ────────────
     useEffect(() => {
@@ -177,25 +190,42 @@ const RealTimeChat = memo(({
 
         const isActive = activeConv.sessionStatus === 'ACTIVE';
         const isPending = activeConv.sessionStatus === 'PENDING';
-        setSessionStatus(isActive ? 'ACTIVE' : isPending ? 'PENDING' : null);
+        const isEnded = activeConv.sessionStatus === 'ENDED';
+        setSessionStatus(isActive ? 'ACTIVE' : isPending ? 'PENDING' : isEnded ? 'ENDED' : null);
         setSessionType(activeConv.sessionType || null);
         setSessionTotalCost(parseFloat(activeConv.totalCost || 0));
         setSessionStartedAt(activeConv.startedAt || null);
+
+        if (isConsultant && isEnded) {
+            setIsLoadingMessages(false);
+            return;
+        }
 
         fetch(
             `${process.env.REACT_APP_API_BASE_URL}/chat/conversations/${activeConv.id}/messages?limit=50`,
             { headers: { Authorization: `Bearer ${token}` } }
         )
-            .then(r => r.json())
-            .then(data => {
+            .then(async (r) => {
+                const data = await r.json();
+                if (!r.ok) {
+                    if (isConsultant && (r.status === 403 || data?.message?.includes('cannot access chat history'))) {
+                        setMessages([]);
+                        return;
+                    }
+                    throw new Error(data?.message || 'Failed to load messages');
+                }
                 setMessages(data?.data?.messages || []);
-                setIsLoadingMessages(false);
             })
-            .catch(() => setIsLoadingMessages(false));
+            .catch(() => {
+                if (isConsultant && isEnded) {
+                    setMessages([]);
+                }
+            })
+            .finally(() => setIsLoadingMessages(false));
 
         markAsRead(activeConv.id);
         socketService.joinConversation(activeConv.id);
-    }, [activeConv?.id, token, markAsRead]);
+    }, [activeConv?.id, activeConv?.sessionStatus, token, markAsRead, isConsultant]);
 
     // ── Sync wallet balance from API + Redux ──────────────────────
     useEffect(() => {
@@ -311,6 +341,9 @@ const RealTimeChat = memo(({
                 }
             }
             skipSessionEndToastRef.current = false;
+            if (isConsultant) {
+                lockConsultantHistory(data.conversationId);
+            }
             if (!isConsultant && !wasAlreadyEnded) {
                 setSessionSummary({
                     sessionType: data.sessionType || sessionTypeRef.current,
@@ -367,7 +400,7 @@ const RealTimeChat = memo(({
             ['user_typing', 'messages_read', 'billing_tick', 'balance_warning']
                 .forEach(e => socketService.off(e, LISTENER_KEY));
         };
-    }, [user?.id, isConsultant, markAsRead, refetchConversations]);
+    }, [user?.id, isConsultant, markAsRead, refetchConversations, lockConsultantHistory]);
 
     // ── Auto-scroll: open at latest message (WhatsApp-style) ────
     useEffect(() => {
@@ -406,7 +439,7 @@ const RealTimeChat = memo(({
         setSessionSummary(null);
         setIsStartingSession(false);
         setIsEndingSession(false);
-        if (onConversationChange && conv?.id) onConversationChange(conv.id);
+        if (onConversationChange && conv?.id) onConversationChange(conv.id, conv);
     }, [onConversationChange]);
 
     const handleSend = useCallback(async () => {
@@ -622,6 +655,8 @@ const RealTimeChat = memo(({
                     totalMinutes: Number(result?.totalMinutes || 0),
                     totalCost,
                 });
+            } else {
+                lockConsultantHistory(activeConvRef.current.id);
             }
 
             refetchConversations();
@@ -650,7 +685,7 @@ const RealTimeChat = memo(({
             setSessionStatus('ACTIVE');
             toast.error(apiMsg || 'Failed to end session. Please try again.');
         }
-    }, [endSessionMutation, isConsultant, isEndingSession]);
+    }, [endSessionMutation, isConsultant, isEndingSession, lockConsultantHistory]);
 
     const handleTyping = useCallback((e) => {
         setInputValue(e.target.value);
@@ -729,7 +764,9 @@ const RealTimeChat = memo(({
                                 ? <div className='flex items-center justify-center h-48 text-gray-400 text-sm'>No conversations yet</div>
                                 : filteredConversations.map(conv => (
                                     <ConversationItem key={conv.id} conv={conv}
-                                        isActive={activeConv?.id === conv.id} onClick={handleSelectConversation} />
+                                        isActive={activeConv?.id === conv.id}
+                                        isConsultant={isConsultant}
+                                        onClick={handleSelectConversation} />
                                 ))
                             }
                         </div>
@@ -812,6 +849,18 @@ const RealTimeChat = memo(({
                                 </div>
                             )}
 
+                            {/* Consultant: session ended — history not available */}
+                            {isHistoryLocked && (
+                                <div className='px-4 py-3 bg-gray-50 border-b border-gray-200 text-center shrink-0'>
+                                    <p className='text-sm text-gray-600 font-medium'>
+                                        Consultation completed
+                                    </p>
+                                    <p className='text-xs text-gray-500 mt-1'>
+                                        Chat history is only available to the customer after a session ends.
+                                    </p>
+                                </div>
+                            )}
+
                             {/* Info banner — users before session starts */}
                             {!isSessionActive && !isSessionPending && !isConsultant && sessionStatus !== 'ENDING' && (
                                 <div className='px-4 py-2 bg-amber-50 border-b border-amber-200 text-center shrink-0'>
@@ -855,8 +904,12 @@ const RealTimeChat = memo(({
                                 ) : messages.length === 0 ? (
                                     <div className='flex flex-col items-center justify-center h-full text-gray-400 gap-3'>
                                         <MessageSquare size={32} className='text-gray-200' />
-                                        <p className='text-sm'>No messages yet</p>
-                                        {!isSessionActive && !isConsultant && sessionStatus !== 'ENDING' && (
+                                        <p className='text-sm'>
+                                            {isHistoryLocked
+                                                ? 'Previous messages are not available'
+                                                : 'No messages yet'}
+                                        </p>
+                                        {!isSessionActive && !isConsultant && sessionStatus !== 'ENDING' && !isHistoryLocked && (
                                             <p className='text-xs text-gray-300'>Type a message below to begin</p>
                                         )}
                                     </div>

@@ -100,7 +100,7 @@ const ConsultantsTable = memo(({
                         }}
                         onStatusChange={(s) => handleStatusChange(c.id, s)}
                         onDelete={() => {
-                          setDeleteTarget({ id: c.id, name: c.name });
+                          setDeleteTarget({ id: c.id, userId: c.userId, name: c.name });
                           setOpenMenuId(null);
                         }}
                       />
@@ -166,7 +166,7 @@ const ConsultantsTable = memo(({
                     }}
                     onStatusChange={(s) => handleStatusChange(c.id, s)}
                     onDelete={() => {
-                      setDeleteTarget({ id: c.id, name: c.name });
+                      setDeleteTarget({ id: c.id, userId: c.userId, name: c.name });
                       setOpenMenuId(null);
                     }}
                   />

@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 import {
   CalendarDays,
   Clock3,
@@ -30,6 +31,8 @@ const ScheduleCard = ({
   onChat,
   onCancel,
   showCancel = true,
+  canContact = false,
+  contactHint = "",
 }) => {
   const { t } = useTranslation();
   const normalizedStatus = status?.toUpperCase();
@@ -60,15 +63,42 @@ const ScheduleCard = ({
       .toUpperCase()
     : "C";
 
-  const handleAction = (event, action) => {
+  const handleAction = (event, action, allowed = true) => {
     event.stopPropagation();
+    if (!allowed) {
+      toast.error(
+        contactHint || "Call and chat are not available for this booking yet.",
+        { position: "top-center" },
+      );
+      return;
+    }
     action?.();
+  };
+
+  const actionButtonClass = (allowed) =>
+    `flex h-9 items-center justify-center rounded-xl transition-all active:scale-95 ${
+      allowed
+        ? "bg-[#d2c0e6]/50 text-[#6e35ae] hover:bg-[#d2c0e6] cursor-pointer"
+        : "bg-gray-100 text-gray-300 cursor-not-allowed"
+    }`;
+
+  const handleCardClick = () => {
+    if (!canContact) {
+      toast.error(
+        contactHint || "Call and chat are not available for this booking yet.",
+        { position: "top-center" },
+      );
+      return;
+    }
+    onViewConsultant?.();
   };
 
   return (
     <article
-      className="flex min-h-52 flex-col rounded-[10px] border border-gray-100 bg-[#f8f3fd] p-4 shadow-xs cursor-pointer"
-      onClick={() => onViewConsultant?.()}
+      className={`flex min-h-52 flex-col rounded-[10px] border border-gray-100 bg-[#f8f3fd] p-4 shadow-xs ${
+        canContact ? "cursor-pointer" : "cursor-default"
+      }`}
+      onClick={handleCardClick}
     >
       <div className="flex items-start gap-3">
         {avatar ? (
@@ -112,24 +142,27 @@ const ScheduleCard = ({
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
-            onClick={(event) => handleAction(event, onAudioCall)}
-            className="flex h-9 items-center justify-center rounded-xl bg-[#d2c0e6]/50 text-[#6e35ae] transition-all hover:bg-[#d2c0e6] active:scale-95 cursor-pointer"
+            onClick={(event) => handleAction(event, onAudioCall, canContact)}
+            aria-disabled={!canContact}
+            className={actionButtonClass(canContact)}
             aria-label={t("dashboard.user.scheduleCard.callDoctor", { defaultValue: "Call" })}
           >
             <Phone size={16} aria-hidden="true" />
           </button>
           <button
             type="button"
-            onClick={(event) => handleAction(event, onVideoCall)}
-            className="flex h-9 items-center justify-center rounded-xl bg-[#d2c0e6]/50 text-[#6e35ae] transition-all hover:bg-[#d2c0e6] active:scale-95 cursor-pointer"
+            onClick={(event) => handleAction(event, onVideoCall, canContact)}
+            aria-disabled={!canContact}
+            className={actionButtonClass(canContact)}
             aria-label={t("dashboard.user.scheduleCard.startVideoCall", { defaultValue: "Video call" })}
           >
             <Video size={16} aria-hidden="true" />
           </button>
           <button
             type="button"
-            onClick={(event) => handleAction(event, onChat)}
-            className="flex h-9 items-center justify-center rounded-xl bg-[#d2c0e6]/50 text-[#6e35ae] transition-all hover:bg-[#d2c0e6] active:scale-95 cursor-pointer"
+            onClick={(event) => handleAction(event, onChat, canContact)}
+            aria-disabled={!canContact}
+            className={actionButtonClass(canContact)}
             aria-label={t("dashboard.user.scheduleCard.openChat", { defaultValue: "Chat" })}
           >
             <MessageSquare size={16} aria-hidden="true" />

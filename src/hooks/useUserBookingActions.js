@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useCancelBookingMutation } from '../features/api/scheduleApi';
+import {
+  canContactForBooking,
+  getBookingSessionAccess,
+  getContactDisabledMessage,
+} from '../utils/bookingSessionAccess';
 
 export function getConsultantRouteId(booking) {
   return (
@@ -42,6 +47,8 @@ export function useUserBookingActions({ onCancelled } = {}) {
   const [isCancelling, setIsCancelling] = useState(false);
 
   const handleViewConsultant = (booking) => {
+    if (!ensureBookingContactAllowed(booking)) return;
+
     const consultantId = getConsultantRouteId(booking);
     if (!consultantId) {
       toast.error('Consultant details are unavailable.', { position: 'top-center' });
@@ -50,7 +57,16 @@ export function useUserBookingActions({ onCancelled } = {}) {
     navigate(`/consultants/${consultantId}`);
   };
 
+  const ensureBookingContactAllowed = (booking) => {
+    const access = getBookingSessionAccess(booking);
+    if (access.canStartCall && access.canStartChat) return true;
+
+    toast.error(getContactDisabledMessage(access), { position: 'top-center' });
+    return false;
+  };
+
   const handleAudioCall = (booking) => {
+    if (!ensureBookingContactAllowed(booking)) return;
     const consultant = getConsultantFromBooking(booking);
     if (!consultant.userId) {
       toast.error('Cannot start call — consultant not found.', { position: 'top-center' });
@@ -61,6 +77,7 @@ export function useUserBookingActions({ onCancelled } = {}) {
   };
 
   const handleVideoCall = (booking) => {
+    if (!ensureBookingContactAllowed(booking)) return;
     const consultant = getConsultantFromBooking(booking);
     if (!consultant.userId) {
       toast.error('Cannot start video call — consultant not found.', { position: 'top-center' });
@@ -71,6 +88,7 @@ export function useUserBookingActions({ onCancelled } = {}) {
   };
 
   const handleChat = (booking) => {
+    if (!ensureBookingContactAllowed(booking)) return;
     const consultantId = getConsultantRouteId(booking);
     if (!consultantId) {
       toast.error('Cannot open chat — consultant not found.', { position: 'top-center' });
@@ -130,5 +148,8 @@ export function useUserBookingActions({ onCancelled } = {}) {
     closeCancelConfirm,
     handleCancel,
     closeCallModals,
+    canContactForBooking,
+    getBookingSessionAccess,
+    getContactDisabledMessage,
   };
 }

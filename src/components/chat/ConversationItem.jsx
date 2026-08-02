@@ -1,11 +1,12 @@
 import React, { memo } from 'react';
 
-const ConversationItem = memo(({ conv, isActive, onClick }) => {
+const ConversationItem = memo(({ conv, isActive, onClick, isConsultant = false }) => {
     const lastMsg = conv.lastMessage;
     const time = lastMsg
         ? new Date(lastMsg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         : '';
     const isActiveSession = conv.sessionStatus === 'ACTIVE';
+    const isEndedSession = conv.sessionStatus === 'ENDED';
     const hasUnread = conv.unreadCount > 0;
 
     return (
@@ -34,7 +35,9 @@ const ConversationItem = memo(({ conv, isActive, onClick }) => {
                     <p className={`text-xs truncate ${hasUnread ? 'font-medium text-gray-700' : 'text-gray-500'}`}>
                         {isActiveSession
                             ? <span className='text-red-500 font-medium'>● Live session</span>
-                            : lastMsg?.message || (lastMsg?.fileUrl ? '📎 File' : 'No messages yet')
+                            : isConsultant && isEndedSession
+                                ? <span className='text-gray-400 italic'>Session ended</span>
+                                : lastMsg?.message || (lastMsg?.fileUrl ? '📎 File' : 'No messages yet')
                         }
                     </p>
                     {hasUnread && (

@@ -15,6 +15,7 @@ import {
 } from "../../../../features/api/consultantApi";
 import { useChangePasswordMutation } from "../../../../features/api/authApi";
 import { useUpdateProfileMutation } from "../../../../features/api/userApi";
+import { getApiErrorMessage } from "../../../../utils/apiErrorUtils";
 
 const INITIAL_PROFILE = {
   name: "",
@@ -103,7 +104,7 @@ const ConsultantProfile = memo(() => {
         toast.success("New time slot added.");
       } catch (err2) {
         toast.dismiss(loadingToast);
-        toast.error(err2?.data?.message || err?.data?.message || "Failed to add time slot.");
+        toast.error(getApiErrorMessage(err, "Failed to add time slot."));
       }
     }
   }, [addAvailabilitySlots]);
@@ -116,7 +117,7 @@ const ConsultantProfile = memo(() => {
       toast.success("Time slot removed.");
     } catch (err) {
       toast.dismiss(loadingToast);
-      toast.error(err?.data?.message || "Failed to remove time slot.");
+      toast.error(getApiErrorMessage(err, "Failed to remove time slot."));
     }
   }, [deleteAvailabilitySlot]);
 
@@ -154,7 +155,7 @@ const ConsultantProfile = memo(() => {
       toast.success("Avatar updated successfully.");
     } catch (err) {
       toast.dismiss(loadingToast);
-      toast.error(err?.data?.message || "Failed to upload avatar.");
+      toast.error(getApiErrorMessage(err, "Failed to upload avatar."));
     }
   }, [updateProfile, refetchProfile]);
 
@@ -187,7 +188,7 @@ const ConsultantProfile = memo(() => {
       toast.success("Profile updated successfully.");
     } catch (err) {
       toast.dismiss(loadingToast);
-      toast.error(err?.data?.message || "Failed to update profile.");
+      toast.error(getApiErrorMessage(err, "Failed to update profile."));
     }
   }, [profile, updateMyConsultantProfile, updateProfile, refetchProfile]);
 
@@ -217,7 +218,7 @@ const ConsultantProfile = memo(() => {
       setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
       toast.dismiss(loadingToast);
-      toast.error(err?.data?.message || "Failed to update password.");
+      toast.error(getApiErrorMessage(err, "Failed to update password."));
     }
   }, [passwordForm, changePassword]);
 

@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -20,7 +20,9 @@ import BookScheduleModal from "./sections/BookScheduleModal";
 import { useGetConsultantByIdQuery } from "../../features/api/consultantApi";
 import RealTimeChat from "./RealTimeChat";
 import { useConsultantStatus } from "../../hooks/usePresence";
+import { useConsultantScheduleContactGate } from "../../hooks/useConsultantScheduleContactGate";
 import { getStatusBadgeStyle, toDisplayStatus } from "../../utils/status";
+import { getContactDisabledMessage } from "../../utils/bookingSessionAccess";
 import {
   selectIsAuthenticated,
   selectUserRole,
@@ -64,13 +66,42 @@ const ConsultantDetail = memo(() => {
     null;
 
   const consultantUserId = consultant?.userId || consultant?.user?.id;
+  const consultantRecordId = consultant?.id || id;
+  const {
+    assertCanContact: assertScheduleContact,
+    canContact: canScheduleContact,
+    isRestricted: hasActiveScheduleBooking,
+    access: scheduleAccess,
+    isLoading: isScheduleGateLoading,
+  } = useConsultantScheduleContactGate(
+    consultantRecordId,
+    { skip: isRestrictedRole || !consultantRecordId },
+  );
   const liveStatus = useConsultantStatus(
     consultantUserId,
     consultant?.onlineStatus,
   );
   const displayStatus = toDisplayStatus(liveStatus);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (isRestrictedRole || !isAuthenticated || isScheduleGateLoading || !hasActiveScheduleBooking) {
+      return;
+    }
+    if (!canScheduleContact) {
+      toast.error(getContactDisabledMessage(scheduleAccess), { position: "top-center" });
+      navigate("/user/dashboard", { replace: true });
+    }
+  }, [
+    isRestrictedRole,
+    isAuthenticated,
+    isScheduleGateLoading,
+    hasActiveScheduleBooking,
+    canScheduleContact,
+    scheduleAccess,
+    navigate,
+  ]);
+
+  if (isLoading || (isAuthenticated && !isRestrictedRole && isScheduleGateLoading)) {
     return (
       <div className="min-h-screen bg-[#FBFDFF] flex items-center justify-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6E35AE]" />
@@ -78,7 +109,7 @@ const ConsultantDetail = memo(() => {
     );
   }
 
-  if (!consultant) {
+  if (!consultant || (hasActiveScheduleBooking && !canScheduleContact && isAuthenticated && !isRestrictedRole)) {
     return (
       <div className="min-h-screen bg-[#FBFDFF] flex items-center justify-center">
         <p className="text-gray-500">Consultant not found</p>
@@ -101,12 +132,20 @@ const ConsultantDetail = memo(() => {
   const reviews = consultant.reviews || [];
 
   const handleChatNow = () => {
+    if (!assertScheduleContact()) return;
     const recordId = consultantForModal.consultantId || consultant.id;
     if (!recordId) {
       console.error("Consultant id not found");
       return;
     }
     navigate(`/consultants/${recordId}/chat`);
+  };
+
+  const handleScheduledContactAction = (callback) => {
+    handleAction(() => {
+      if (!assertScheduleContact()) return;
+      callback();
+    });
   };
 
   return (
@@ -183,7 +222,7 @@ const ConsultantDetail = memo(() => {
             {/* Action buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
               <button
-                onClick={() => handleAction(() => setShowAudioCall(true))}
+                onClick={() => handleScheduledContactAction(() => setShowAudioCall(true))}
                 disabled={isRestrictedRole}
                 className={`bg-green-500/60 text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-green-500/70 cursor-pointer"
                   }`}
@@ -191,7 +230,7 @@ const ConsultantDetail = memo(() => {
                 <Phone size={20} /> Call Now
               </button>
               <button
-                onClick={() => handleAction(() => setShowVideoCall(true))}
+                onClick={() => handleScheduledContactAction(() => setShowVideoCall(true))}
                 disabled={isRestrictedRole}
                 className={`bg-[#6E35AE] text-white py-3.5 rounded-lg flex items-center justify-center gap-2 text-base font-semibold transition-all ${isRestrictedRole ? "opacity-50 cursor-not-allowed" : "hover:bg-[#5A2A8A] cursor-pointer"
                   }`}

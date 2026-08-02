@@ -7,6 +7,11 @@ import ScheduleCard from "./components/ScheduleCard";
 import { useGetUpcomingBookingsQuery } from "../../../features/api/scheduleApi";
 import { getConsultantRouteId, useUserBookingActions } from "../../../hooks/useUserBookingActions";
 import UserBookingModals from "../../../components/booking/UserBookingModals";
+import {
+  canContactForBooking,
+  getBookingSessionAccess,
+  getContactDisabledMessage,
+} from "../../../utils/bookingSessionAccess";
 
 const UserDashboard = () => {
   const { t } = useTranslation();
@@ -139,7 +144,11 @@ const UserDashboard = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-              {upcomingBookings.map((item) => (
+              {upcomingBookings.map((item) => {
+                const sessionAccess = getBookingSessionAccess(item);
+                const canContact = canContactForBooking(item);
+
+                return (
                 <ScheduleCard
                   key={item.id}
                   consultantId={getConsultantRouteId(item)}
@@ -148,6 +157,8 @@ const UserDashboard = () => {
                   date={formatBookingDate(item.bookingDate)}
                   time={formatBookingTime(item.startTime, item.endTime)}
                   status={item.status}
+                  canContact={canContact}
+                  contactHint={canContact ? "" : getContactDisabledMessage(sessionAccess)}
                   onViewConsultant={() => handleViewConsultant(item)}
                   onAudioCall={() => handleAudioCall(item)}
                   onVideoCall={() => handleVideoCall(item)}
@@ -163,7 +174,8 @@ const UserDashboard = () => {
                     item.status?.toUpperCase() !== "CANCELLED"
                   }
                 />
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

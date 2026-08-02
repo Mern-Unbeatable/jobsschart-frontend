@@ -2,39 +2,31 @@
 import React, { memo, useCallback, useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import RealTimeChat from '../../consultants/RealTimeChat';
-
-const COMPLETED_CONSULTATION_STORAGE_KEY = 'completedConsultationConversationIds';
+import { clearCompletedConsultation, isConsultationCompleted } from '../../../utils/consultantChatHistory';
 
 const ConsultantChat = memo(() => {
   const [showCompletedModal, setShowCompletedModal] = useState(false);
   const [completedConversationId, setCompletedConversationId] = useState(null);
 
-  const handleConversationChange = useCallback((conversationId) => {
-    try {
-      const saved = localStorage.getItem(COMPLETED_CONSULTATION_STORAGE_KEY);
-      const ids = saved ? JSON.parse(saved) : [];
-      if (Array.isArray(ids) && ids.includes(conversationId)) {
-        setCompletedConversationId(conversationId);
-        setShowCompletedModal(true);
-      }
-    } catch {
-
-    }
+  const openCompletedModal = useCallback((conversationId) => {
+    if (!conversationId) return;
+    setCompletedConversationId(conversationId);
+    setShowCompletedModal(true);
   }, []);
 
-  const handleTranscriptSend = useCallback(() => {
-    try {
-      const saved = localStorage.getItem(COMPLETED_CONSULTATION_STORAGE_KEY);
-      const ids = saved ? JSON.parse(saved) : [];
-      const next = Array.isArray(ids)
-        ? ids.filter((id) => id !== completedConversationId)
-        : [];
-      localStorage.setItem(
-        COMPLETED_CONSULTATION_STORAGE_KEY,
-        JSON.stringify(next),
-      );
-    } catch {
+  const handleConversationChange = useCallback((conversationId, conv) => {
+    if (conv?.sessionStatus === 'ENDED' || isConsultationCompleted(conversationId)) {
+      openCompletedModal(conversationId);
+    }
+  }, [openCompletedModal]);
 
+  const handleSessionEnded = useCallback((conversationId) => {
+    openCompletedModal(conversationId);
+  }, [openCompletedModal]);
+
+  const handleDismissCompleted = useCallback(() => {
+    if (completedConversationId) {
+      clearCompletedConsultation(completedConversationId);
     }
     setShowCompletedModal(false);
     setCompletedConversationId(null);
@@ -43,7 +35,6 @@ const ConsultantChat = memo(() => {
   return (
     <>
       <div className='flex flex-col gap-4 h-full min-h-0 overflow-hidden'>
-        {/* Page header */}
         <div className='shrink-0'>
           <h1 className='dashboard-page-title'>Messages</h1>
           <p className='dashboard-page-subtitle mt-1'>
@@ -51,15 +42,14 @@ const ConsultantChat = memo(() => {
           </p>
         </div>
 
-
         <RealTimeChat
           className='flex-1 min-h-0 h-full'
           showSidebar={true}
           onConversationChange={handleConversationChange}
+          onSessionEnded={handleSessionEnded}
         />
       </div>
 
-      {/* ── Consultation Completed Modal ───────────────────────── */}
       {showCompletedModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4'>
           <div className='w-full max-w-[527px] rounded-[10px] border border-[#e7f1f1] bg-white px-4.5 py-5.75'>
@@ -71,15 +61,20 @@ const ConsultantChat = memo(() => {
                   aria-hidden='true'
                 />
               </div>
-              <h2 className='w-full text-center text-[28px] font-semibold text-[#1a1b1c]'>
-                Consultation Completed
-              </h2>
+              <div className='text-center space-y-2'>
+                <h2 className='text-[28px] font-semibold text-[#1a1b1c]'>
+                  Consultation Completed
+                </h2>
+                <p className='text-sm text-gray-500 max-w-sm'>
+                  This chat session has ended. For privacy, previous messages are only available to the customer.
+                </p>
+              </div>
               <button
                 type='button'
-                onClick={handleTranscriptSend}
+                onClick={handleDismissCompleted}
                 className='rounded bg-[#8631da] px-6 py-2.5 text-sm text-white transition-colors duration-150 hover:bg-[#6e35ae]'
               >
-                Transcript Send To Mail
+                OK
               </button>
             </div>
           </div>

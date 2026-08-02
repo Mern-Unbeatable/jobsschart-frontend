@@ -14,7 +14,7 @@ import StatusBadge from "./StatusBadge";
 import InfoCard from "./InfoCard";
 import AdminVerificationPanel from "./AdminVerificationPanel";
 
-function ConsultantDetail({ consultant: c, onBack }) {
+function ConsultantDetail({ consultant: c, onBack, onVerificationReviewed }) {
   const wrapRef = useRef(null);
   useEffect(() => {
     if (!wrapRef.current) return;
@@ -151,7 +151,7 @@ function ConsultantDetail({ consultant: c, onBack }) {
       </div>
 
       <div className="detail-card">
-        <AdminVerificationPanel consultant={c} />
+        <AdminVerificationPanel consultant={c} onReviewed={onVerificationReviewed} />
       </div>
     </div>
   );
