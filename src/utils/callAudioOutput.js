@@ -1,23 +1,33 @@
 /**
- * Chrome-compatible call audio routing (earpiece vs loudspeaker).
+ * Remote call audio routing (earpiece vs loudspeaker).
  *
- * Strategy:
- * 1. Pipe each remote <audio>/<video> through Web Audio (GainNode) so volume
- *    changes always take effect in Chrome.
- * 2. Route output with AudioContext.setSinkId() (Chrome 110+) when available,
- *    otherwise HTMLMediaElement.setSinkId().
- * 3. When no real earpiece exists (desktop Chrome), duck gain for "earpiece" mode.
+ * Mobile (Android/iOS): route HTMLMediaElement output directly with setSinkId().
+ * Web Audio is NOT used on mobile — it usually forces the loudspeaker.
+ *
+ * Desktop Chrome: optional Web Audio gain ducking when no earpiece device exists.
  */
 
 const SPEAKER_GAIN = 1;
-/** Desktop / unknown-output fallback when earpiece hardware is unavailable */
-const EARPIECE_FALLBACK_GAIN = 0.18;
+const EARPIECE_FALLBACK_GAIN = 0.12;
 
 /** @type {WeakMap<HTMLMediaElement, { ctx: AudioContext, gain: GainNode, source: MediaElementAudioSourceNode }>} */
 const elementGraphs = new WeakMap();
 
 let cachedOutputs = null;
 let cacheTimestamp = 0;
+
+export function isMobileBrowser() {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent || '';
+  return (
+    /Android|iPhone|iPad|iPod|Mobile/i.test(ua)
+    || (navigator.maxTouchPoints > 1 && typeof window !== 'undefined' && window.innerWidth < 1024)
+  );
+}
+
+function isAndroidBrowser() {
+  return /Android/i.test(navigator.userAgent || '');
+}
 
 function getTwilioAudioElements() {
   const container = document.getElementById('twilio-audio-container');
@@ -44,17 +54,18 @@ function normalizeLabel(label = '') {
 }
 
 function isEarpieceDevice(device) {
-  const label = normalizeLabel(device.label);
-  const id = device.deviceId || '';
+  const label = normalizeLabel(device?.label);
+  const id = device?.deviceId || '';
   return (
     id === 'communications'
     || /earpiece|receiver|handset|built-in receiver|internal receiver|phone earpiece/i.test(label)
+    || (isAndroidBrowser() && /^phone$|ear piece|in-ear/i.test(label))
   );
 }
 
 function isSpeakerDevice(device) {
-  const label = normalizeLabel(device.label);
-  const id = device.deviceId || '';
+  const label = normalizeLabel(device?.label);
+  const id = device?.deviceId || '';
   if (id === 'communications') return false;
   return (
     id === 'default'
@@ -63,15 +74,15 @@ function isSpeakerDevice(device) {
 }
 
 function isHeadphoneDevice(device) {
-  const label = normalizeLabel(device.label);
-  return /headphone|headset|earbud|airpod|bluetooth|usb audio|hdmi/i.test(label);
+  const label = normalizeLabel(device?.label);
+  return /headphone|headset|earbud|airpod|bluetooth|usb audio|hdmi|wired/i.test(label);
 }
 
 async function enumerateAudioOutputs(forceRefresh = false) {
   if (!navigator.mediaDevices?.enumerateDevices) return [];
 
   const now = Date.now();
-  if (!forceRefresh && cachedOutputs && now - cacheTimestamp < 800) {
+  if (!forceRefresh && cachedOutputs && now - cacheTimestamp < 500) {
     return cachedOutputs;
   }
 
@@ -83,6 +94,19 @@ async function enumerateAudioOutputs(forceRefresh = false) {
   } catch {
     return cachedOutputs || [];
   }
+}
+
+function releaseElementGraph(el) {
+  const graph = elementGraphs.get(el);
+  if (!graph) return;
+  try {
+    graph.source.disconnect();
+    graph.gain.disconnect();
+    graph.ctx.close();
+  } catch {
+    // ignore
+  }
+  elementGraphs.delete(el);
 }
 
 /**
@@ -105,7 +129,9 @@ function pickSinkId(outputs, useLoudspeaker) {
   );
 
   if (useLoudspeaker) {
-    const explicitSpeaker = speakers.find((d) => d.deviceId !== 'default') || speakers[0];
+    const explicitSpeaker =
+      speakers.find((d) => d.deviceId !== 'default' && d.deviceId !== 'communications')
+      || speakers[0];
     const sinkId =
       explicitSpeaker?.deviceId
       || headphones[0]?.deviceId
@@ -113,6 +139,16 @@ function pickSinkId(outputs, useLoudspeaker) {
       || 'default';
 
     return { sinkId, explicitEarpiece: false, explicitSpeaker: true };
+  }
+
+  // ── Earpiece / receiver mode ──────────────────────────────────
+  const communications = outputs.find((d) => d.deviceId === 'communications');
+  if (communications) {
+    return {
+      sinkId: communications.deviceId,
+      explicitEarpiece: true,
+      explicitSpeaker: false,
+    };
   }
 
   if (earpieces.length) {
@@ -123,12 +159,24 @@ function pickSinkId(outputs, useLoudspeaker) {
     };
   }
 
-  const nonDefault = outputs.find(
+  if (isAndroidBrowser() && outputs.length >= 2) {
+    const likelySpeaker = speakers[0] || outputs.find((d) => d.deviceId === 'default');
+    const alternate = outputs.find((d) => d !== likelySpeaker && d.deviceId !== 'default');
+    if (alternate?.deviceId) {
+      return {
+        sinkId: alternate.deviceId,
+        explicitEarpiece: true,
+        explicitSpeaker: false,
+      };
+    }
+  }
+
+  const nonSpeaker = outputs.find(
     (d) => d.deviceId !== 'default' && !isSpeakerDevice(d),
   );
-  if (nonDefault?.deviceId) {
+  if (nonSpeaker?.deviceId) {
     return {
-      sinkId: nonDefault.deviceId,
+      sinkId: nonSpeaker.deviceId,
       explicitEarpiece: false,
       explicitSpeaker: false,
     };
@@ -141,6 +189,18 @@ function pickSinkId(outputs, useLoudspeaker) {
   };
 }
 
+async function setOutputSink(target, sinkId) {
+  if (!target?.setSinkId || sinkId == null) return false;
+
+  try {
+    await target.setSinkId(sinkId);
+    return target.sinkId === sinkId;
+  } catch (err) {
+    console.warn('[callAudio] setSinkId failed:', sinkId, err?.message || err);
+    return false;
+  }
+}
+
 async function ensureElementGraph(el) {
   const existing = elementGraphs.get(el);
   if (existing) {
@@ -151,9 +211,7 @@ async function ensureElementGraph(el) {
     }
   }
 
-  if (!el.srcObject && !el.src) {
-    return null;
-  }
+  if (!el.srcObject && !el.src) return null;
 
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   if (!AudioCtx) return null;
@@ -179,22 +237,63 @@ async function ensureElementGraph(el) {
   }
 }
 
-async function setOutputSink(target, sinkId) {
-  if (!sinkId) return false;
-
-  if (target?.setSinkId) {
-    try {
-      await target.setSinkId(sinkId);
-      return target.sinkId === sinkId;
-    } catch (err) {
-      console.warn('[callAudio] setSinkId failed:', err?.message || err);
-    }
+async function applyAudioSessionType(useSpeaker) {
+  if (!('audioSession' in navigator)) return false;
+  try {
+    navigator.audioSession.type = useSpeaker ? 'playback' : 'voice';
+    return true;
+  } catch {
+    return false;
   }
-
-  return false;
 }
 
-async function routeElement(el, useSpeaker, route) {
+async function routeElementDirect(el, useSpeaker, route) {
+  releaseElementGraph(el);
+
+  await applyAudioSessionType(useSpeaker);
+
+  el.muted = false;
+  el.volume = 1;
+  el.setAttribute('playsinline', 'true');
+  el.setAttribute('webkit-playsinline', 'true');
+
+  let sinkApplied = false;
+  const candidates = [];
+
+  if (useSpeaker) {
+    if (route.sinkId) candidates.push(route.sinkId);
+    candidates.push('default');
+  } else if (route.sinkId) {
+    candidates.push(route.sinkId);
+    if (isAndroidBrowser()) candidates.push('communications');
+  }
+
+  for (const sinkId of candidates) {
+    if (sinkId == null) continue;
+    sinkApplied = await setOutputSink(el, sinkId);
+    if (sinkApplied) break;
+  }
+
+  const usedSoftFallback = !useSpeaker && !sinkApplied;
+  if (usedSoftFallback) {
+    el.volume = EARPIECE_FALLBACK_GAIN;
+  }
+
+  try {
+    await el.play();
+  } catch {
+    // stream may not be ready
+  }
+
+  return {
+    gainValue: el.volume,
+    sinkApplied,
+    hasGraph: false,
+    usedSoftFallback,
+  };
+}
+
+async function routeElementWithGraph(el, useSpeaker, route) {
   const { sinkId, explicitEarpiece } = route;
   const useSoftEarpiece = !useSpeaker && !explicitEarpiece;
 
@@ -202,7 +301,6 @@ async function routeElement(el, useSpeaker, route) {
   el.volume = 1;
 
   const graph = await ensureElementGraph(el);
-
   const gainValue = useSpeaker
     ? SPEAKER_GAIN
     : (useSoftEarpiece ? EARPIECE_FALLBACK_GAIN : SPEAKER_GAIN);
@@ -214,12 +312,6 @@ async function routeElement(el, useSpeaker, route) {
     }
   } else {
     el.volume = gainValue;
-  }
-
-  try {
-    await el.play();
-  } catch {
-    // stream may not be ready
   }
 
   let sinkApplied = false;
@@ -246,6 +338,13 @@ async function routeElement(el, useSpeaker, route) {
   };
 }
 
+async function routeElement(el, useSpeaker, route) {
+  if (isMobileBrowser()) {
+    return routeElementDirect(el, useSpeaker, route);
+  }
+  return routeElementWithGraph(el, useSpeaker, route);
+}
+
 /**
  * @param {boolean} useLoudspeaker
  * @param {HTMLMediaElement[]} [elements]
@@ -261,7 +360,13 @@ export async function applyAudioOutputRoute(useLoudspeaker, elements = null, opt
       supported: false,
       elementCount: 0,
       usedSoftFallback: false,
+      mobile: isMobileBrowser(),
     };
+  }
+
+  if (isMobileBrowser()) {
+    mediaEls.forEach(releaseElementGraph);
+    await applyAudioSessionType(useSpeaker);
   }
 
   const outputs = await enumerateAudioOutputs(Boolean(options.forceRefresh));
@@ -269,6 +374,7 @@ export async function applyAudioOutputRoute(useLoudspeaker, elements = null, opt
 
   let applied = 0;
   let usedSoftFallback = false;
+  let sinkAppliedAny = false;
   let lastGain = useSpeaker ? SPEAKER_GAIN : EARPIECE_FALLBACK_GAIN;
 
   for (const el of mediaEls) {
@@ -276,6 +382,7 @@ export async function applyAudioOutputRoute(useLoudspeaker, elements = null, opt
     if (result) {
       applied += 1;
       usedSoftFallback = usedSoftFallback || result.usedSoftFallback;
+      sinkAppliedAny = sinkAppliedAny || result.sinkApplied;
       lastGain = result.gainValue;
     }
   }
@@ -285,43 +392,40 @@ export async function applyAudioOutputRoute(useLoudspeaker, elements = null, opt
     supported: applied > 0,
     sinkId: route.sinkId,
     elementCount: mediaEls.length,
-    hardwareRouted: Boolean(route.sinkId && route.explicitEarpiece),
+    hardwareRouted: sinkAppliedAny || route.explicitEarpiece,
     usedSoftFallback,
     volume: lastGain,
     explicitEarpiece: route.explicitEarpiece,
+    mobile: isMobileBrowser(),
   };
 }
 
 export function releaseCallAudioRoutes(elements = null) {
   const targets = elements?.length ? elements : getRemoteMediaElements();
   for (const el of targets) {
-    const graph = elementGraphs.get(el);
-    if (!graph) continue;
-    try {
-      graph.source.disconnect();
-      graph.gain.disconnect();
-      graph.ctx.close();
-    } catch {
-      // ignore
-    }
-    elementGraphs.delete(el);
+    releaseElementGraph(el);
   }
 }
 
-export function getSpeakerToastMessage(useLoudspeaker, { supported, usedSoftFallback } = {}) {
+export function getSpeakerToastMessage(useLoudspeaker, { supported, usedSoftFallback, mobile, hardwareRouted } = {}) {
   if (useLoudspeaker) {
-    return supported === false
-      ? 'Loudspeaker on (limited on this browser)'
-      : 'Loudspeaker on';
+    if (supported === false) return 'Loudspeaker on (limited on this browser)';
+    return 'Loudspeaker on';
+  }
+
+  if (mobile && hardwareRouted) {
+    return 'Earpiece mode';
   }
 
   if (usedSoftFallback) {
-    return 'Earpiece mode — audio volume reduced';
+    return 'Earpiece mode — audio volume reduced (hardware routing unavailable)';
   }
 
-  return supported === false
-    ? 'Earpiece mode (limited on this browser)'
-    : 'Earpiece mode';
+  if (supported === false) {
+    return 'Earpiece mode (limited on this browser)';
+  }
+
+  return 'Earpiece mode';
 }
 
 export function getSpeakerAriaLabel(useLoudspeaker) {

@@ -83,21 +83,12 @@ const ScheduleCard = ({
     }`;
 
   const handleCardClick = () => {
-    if (!canContact) {
-      toast.error(
-        contactHint || "Call and chat are not available for this booking yet.",
-        { position: "top-center" },
-      );
-      return;
-    }
     onViewConsultant?.();
   };
 
   return (
     <article
-      className={`flex min-h-52 flex-col rounded-[10px] border border-gray-100 bg-[#f8f3fd] p-4 shadow-xs ${
-        canContact ? "cursor-pointer" : "cursor-default"
-      }`}
+      className="flex min-h-52 flex-col rounded-[10px] border border-gray-100 bg-[#f8f3fd] p-4 shadow-xs cursor-pointer"
       onClick={handleCardClick}
     >
       <div className="flex items-start gap-3">

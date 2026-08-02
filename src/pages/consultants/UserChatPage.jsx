@@ -7,8 +7,6 @@ import CommonAdsSection from '../../components/CommonAdsSection';
 
 import { useGetConsultantByIdQuery } from '../../features/api/consultantApi';
 import { selectIsAuthenticated } from '../../features/slices/authSlice';
-import { useConsultantScheduleContactGate } from '../../hooks/useConsultantScheduleContactGate';
-import { getContactDisabledMessage } from '../../utils/bookingSessionAccess';
 import toast from 'react-hot-toast';
 import RealTimeChat from './RealTimeChat';
 
@@ -28,14 +26,6 @@ const UserChatPage = memo(() => {
     error: consultantError
   } = useGetConsultantByIdQuery(consultantId, {
     skip: !consultantId
-  });
-
-  const {
-    canContact,
-    access,
-    isLoading: isBookingGateLoading,
-  } = useConsultantScheduleContactGate(consultantId, {
-    skip: !isAuthenticated || !consultantId,
   });
 
   useEffect(() => {
@@ -77,12 +67,6 @@ const UserChatPage = memo(() => {
     }
   }, [isAuthenticated, consultantId, navigate]);
 
-  useEffect(() => {
-    if (!isAuthenticated || isBookingGateLoading || canContact) return;
-    toast.error(getContactDisabledMessage(access), { position: 'top-center' });
-    navigate('/user/dashboard', { replace: true });
-  }, [isAuthenticated, isBookingGateLoading, canContact, access, navigate]);
-
   // Handle loading state
   // if (consultantLoading) {
   //   return (
@@ -96,18 +80,6 @@ const UserChatPage = memo(() => {
   // }
 
   if (!isAuthenticated) {
-    return null;
-  }
-
-  if (isBookingGateLoading) {
-    return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#6E35AE]' />
-      </div>
-    );
-  }
-
-  if (!canContact) {
     return null;
   }
 

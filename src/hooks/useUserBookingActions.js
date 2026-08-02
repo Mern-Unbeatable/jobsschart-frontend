@@ -47,8 +47,6 @@ export function useUserBookingActions({ onCancelled } = {}) {
   const [isCancelling, setIsCancelling] = useState(false);
 
   const handleViewConsultant = (booking) => {
-    if (!ensureBookingContactAllowed(booking)) return;
-
     const consultantId = getConsultantRouteId(booking);
     if (!consultantId) {
       toast.error('Consultant details are unavailable.', { position: 'top-center' });

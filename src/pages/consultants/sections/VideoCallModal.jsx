@@ -617,7 +617,12 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
                   unlockBrowserAudio();
                   const next = await twilioVideoService.toggleSpeaker();
                   setIsSpeakerOn(next.on);
-                  toast(getSpeakerToastMessage(next.on, { supported: next.supported, usedSoftFallback: next.usedSoftFallback }), {
+                  toast(getSpeakerToastMessage(next.on, {
+                    supported: next.supported,
+                    usedSoftFallback: next.usedSoftFallback,
+                    mobile: next.mobile,
+                    hardwareRouted: next.hardwareRouted,
+                  }), {
                     duration: 2000,
                     position: 'top-center',
                   });

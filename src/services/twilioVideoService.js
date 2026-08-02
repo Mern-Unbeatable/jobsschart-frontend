@@ -89,9 +89,17 @@ class TwilioVideoService {
 
     async setSpeakerOn(enabled) {
         this.isSpeakerOn = Boolean(enabled);
+
+        if (typeof navigator?.mediaDevices?.enumerateDevices === 'function') {
+            try {
+                await navigator.mediaDevices.enumerateDevices();
+            } catch {
+                // ignore
+            }
+        }
+
         await this._applySpeakerToRemoteAudio(true);
-        // Chrome sometimes needs a second pass after the user-gesture toggle.
-        await new Promise((resolve) => setTimeout(resolve, 80));
+        await new Promise((resolve) => setTimeout(resolve, 120));
         const confirmed = await this._applySpeakerToRemoteAudio(true);
         return { on: this.isSpeakerOn, ...confirmed };
     }
@@ -130,6 +138,7 @@ class TwilioVideoService {
             el.autoplay = true;
             el.playsInline = true;
             el.setAttribute('playsinline', 'true');
+            el.setAttribute('webkit-playsinline', 'true');
             el.muted = false;
             audioContainer.appendChild(el);
             this._remoteAudioElements.add(el);
@@ -159,6 +168,7 @@ class TwilioVideoService {
             el.style.cssText = 'width:100%;height:100%;object-fit:cover;';
             el.setAttribute('data-twilio-remote-video', 'true');
             el.setAttribute('playsinline', 'true');
+            el.setAttribute('webkit-playsinline', 'true');
             el.muted = false;
             this._remoteVideoElements.add(el);
             remoteVideoRef.appendChild(el);
