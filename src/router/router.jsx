@@ -39,6 +39,7 @@ const ConsultantChatPage = lazy(
   () => import("../pages/consultants/UserChatPage"),
 );
 const Credit = lazy(() => import("../pages/credit/Credit"));
+const PaymentSuccess = lazy(() => import("../pages/payment/PaymentSuccess"));
 const Webshop = lazy(() => import("../pages/webshop/Webshop"));
 const ProductDetail = lazy(() => import("../pages/webshop/ProductDetail"));
 const Checkout = lazy(() => import("../pages/webshop/Checkout"));
@@ -219,6 +220,7 @@ const router = createBrowserRouter(
           element={<ConsultantChatPage />}
         />
         <Route path={ROUTES.CREDIT} element={<Credit />} />
+        <Route path={ROUTES.PAYMENT_SUCCESS} element={<PaymentSuccess />} />
         <Route path={ROUTES.WEBSHOP} element={<Webshop />} />
         <Route path={ROUTES.PRODUCT_DETAIL} element={<ProductDetail />} />
         <Route path={ROUTES.CHECKOUT} element={<Checkout />} />

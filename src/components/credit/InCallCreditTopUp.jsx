@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useGetAllPackagesQuery } from '../../features/api/packageApi';
 import { useCreateCheckoutMutation } from '../../features/api/paymentApi';
+import { storeMollieCheckoutSession } from '../../utils/mollieCheckout';
 import { useGetMeQuery } from '../../features/api/userApi';
 import { updateUser } from '../../features/slices/authSlice';
 
@@ -53,6 +54,7 @@ const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate, showForUserO
                 packageId,
             }).unwrap();
             if (result?.url) {
+                storeMollieCheckoutSession(result.sessionId);
                 window.open(result.url, '_blank', 'noopener,noreferrer');
                 toast.success('Payment opened in a new tab. Credits apply automatically after payment.');
             } else {

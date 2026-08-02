@@ -17,12 +17,12 @@ export const paymentApi = baseApi.injectEndpoints({
     }),
 
     verifyPayment: builder.query({
-      query: ({ paymentId, orderId, signature }) => ({
+      query: ({ session_id }) => ({
         url: '/payments/verify',
         method: 'GET',
-        params: { paymentId, orderId, signature },
+        params: { session_id },
       }),
-      providesTags: (result, error, { paymentId }) => [{ type: 'Payment', id: paymentId }],
+      providesTags: (result, error, { session_id }) => [{ type: 'Payment', id: session_id }],
       transformResponse: (response) => response.data,
     }),
 

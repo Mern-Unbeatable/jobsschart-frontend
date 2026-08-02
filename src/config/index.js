@@ -34,6 +34,7 @@ export const ROUTES = {
   CONSULTANT_DETAIL_CHAT: '/consultants/:id/chat',
 
   CREDIT: '/credit',
+  PAYMENT_SUCCESS: '/payment/success',
   WEBSHOP: '/webshop',
   PRODUCT_DETAIL: '/webshop/:id',
   CHECKOUT: '/checkout',

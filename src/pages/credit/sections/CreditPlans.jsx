@@ -9,6 +9,7 @@ import { selectIsAuthenticated } from "../../../features/slices/authSlice";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../../config";
+import { redirectToMollieCheckout } from "../../../utils/mollieCheckout";
 
 const CreditPlans = memo(() => {
   const { t } = useTranslation();
@@ -45,9 +46,7 @@ const CreditPlans = memo(() => {
         packageId: packageId,
       };
       const result = await createCheckout(payload).unwrap();
-      if (result?.url) {
-        window.location.href = result.url;
-      } else {
+      if (!redirectToMollieCheckout(result)) {
         toast.error('Could not initiate payment. Please try again.');
       }
     } catch (err) {

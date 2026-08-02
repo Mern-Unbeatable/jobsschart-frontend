@@ -2,6 +2,7 @@ import React, { memo, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSEO } from "../../hooks/useSEO";
 import { useCreateCheckoutMutation } from "../../features/api/paymentApi";
+import { redirectToMollieCheckout } from "../../utils/mollieCheckout";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../features/slices/authSlice";
@@ -83,10 +84,7 @@ const Checkout = memo(() => {
 
       const result = await createCheckout(payload).unwrap();
 
-      // Backend returns { url, sessionId } — redirect to Stripe checkout
-      if (result?.url) {
-        window.location.href = result.url;
-      } else {
+      if (!redirectToMollieCheckout(result)) {
         toast.error("Could not initiate payment. Please try again.");
       }
     } catch (err) {

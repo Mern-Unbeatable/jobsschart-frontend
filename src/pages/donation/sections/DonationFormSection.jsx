@@ -11,6 +11,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useCreateCheckoutMutation } from "../../../features/api/paymentApi";
+import { redirectToMollieCheckout } from "../../../utils/mollieCheckout";
 import toast from "react-hot-toast";
 
 const MIN_DONATION_AMOUNT = 100;
@@ -107,9 +108,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
       }
 
       const result = await createCheckout(data).unwrap();
-      if (result?.url) {
-        window.location.href = result.url;
-      } else {
+      if (!redirectToMollieCheckout(result)) {
         toast.error("Could not initiate payment. Please try again.");
       }
     } catch (err) {
