@@ -16,6 +16,7 @@ import {
   canUserContactConsultant,
   getConsultantUserId,
 } from "../utils/consultantList";
+import { redirectToLogin } from "../utils/authLoginRedirect";
 
 const ConsultantCard = memo(({ consultantsData }) => {
   const navigate = useNavigate();
@@ -35,10 +36,12 @@ const ConsultantCard = memo(({ consultantsData }) => {
       consultant,
     });
 
-  const ensureCanContact = (consultant) => {
+  const ensureCanContact = (consultant, { returnTo } = {}) => {
     if (!isAuthenticated) {
       toast.error("Please log in to use this service.", { position: "top-center" });
-      navigate("/login");
+      redirectToLogin(navigate, {
+        from: returnTo || `/consultants/${consultant.id}`,
+      });
       return false;
     }
 
@@ -91,7 +94,7 @@ const ConsultantCard = memo(({ consultantsData }) => {
 
   const handleChat = (e, consultant) => {
     e.stopPropagation();
-    if (!ensureCanContact(consultant)) return;
+    if (!ensureCanContact(consultant, { returnTo: `/consultants/${consultant.id}/chat` })) return;
     navigate(`/consultants/${consultant.id}/chat`);
   };
 

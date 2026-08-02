@@ -25,6 +25,7 @@ import {
   selectIsAuthenticated,
   selectUserRole,
 } from "../../features/slices/authSlice";
+import { redirectToLogin } from "../../utils/authLoginRedirect";
 
 const ConsultantDetail = memo(() => {
   const { id } = useParams();
@@ -42,10 +43,12 @@ const ConsultantDetail = memo(() => {
     userRole?.toUpperCase() === "ADMIN"
   );
 
-  const handleAction = (callback) => {
+  const handleAction = (callback, { returnTo } = {}) => {
     if (!isAuthenticated) {
       toast.error("Please log in to use this service.", { position: "top-center" });
-      navigate("/login");
+      redirectToLogin(navigate, {
+        from: returnTo || `/consultants/${id}`,
+      });
       return;
     }
     if (isRestrictedRole) {

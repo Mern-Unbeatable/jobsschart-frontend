@@ -106,6 +106,8 @@ axiosInstance.interceptors.response.use(
       } catch {
         const { store, clearCredentials } = await getAuthRuntime();
         store.dispatch(clearCredentials());
+        const { stashAuthReturnUrl } = await import('../utils/authLoginRedirect');
+        stashAuthReturnUrl();
         window.location.replace(ROUTES.LOGIN);
         return Promise.reject(error);
       }

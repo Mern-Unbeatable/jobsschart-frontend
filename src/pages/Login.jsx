@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useSignInMutation } from "../features/api/authApi";
 import {
@@ -10,11 +10,13 @@ import { ROUTES, getDashboardRoute } from "../config";
 import { Eye, EyeOff, ArrowLeft, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { getApiErrorMessage, getApiFieldErrors } from "../utils/apiErrorUtils";
+import { consumeAuthReturnUrl } from "../utils/authLoginRedirect";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const authLoading = useSelector(selectAuthLoading);
 
@@ -79,10 +81,15 @@ const Login = () => {
           "Login successful! Redirecting...",
       );
 
-      const redirectPath = getDashboardRoute(user?.role);
+      const returnTo = location.state?.from || consumeAuthReturnUrl();
 
       setTimeout(() => {
-        navigate(redirectPath, { replace: true });
+        if (returnTo) {
+          navigate(returnTo, { replace: true });
+          return;
+        }
+
+        navigate(getDashboardRoute(user?.role), { replace: true });
       }, 100);
     } catch (error) {
       console.error("Login error:", error);
