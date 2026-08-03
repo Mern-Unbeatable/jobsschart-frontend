@@ -113,14 +113,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
     }
   }, [incomingCallData, isOpen]);
 
-  // ─────────────────────────────────────────────────────────────────
-  // KEY FIX: connectVideo using the LIVE ref values at call time.
-  // We do NOT use useCallback with captured refs — instead we read
-  // remoteVideoRef.current and localVideoRef.current at the moment
-  // we actually call twilioVideoService.connectVideo, after waiting
-  // for them to be present in the DOM via a polling loop (no guessed
-  // timeout).
-  // ─────────────────────────────────────────────────────────────────
+
   const waitForRefs = useCallback((maxMs = 5000) => {
     return new Promise((resolve, reject) => {
       const start = Date.now();
@@ -149,10 +142,10 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
       await twilioVideoService.connectVideo(tokenToUse, roomName, local, remote);
       setIsVideoConnected(true);
       setIsSpeakerOn(twilioVideoService.getSpeakerOn());
-      console.log('✅ Video connected successfully');
+      console.log(' Video connected successfully');
       return true;
     } catch (err) {
-      console.error('❌ Video connect error:', err);
+      console.error(' Video connect error:', err);
       const msg = String(err?.message || '');
       if (msg.includes('issuer/subject') || msg.includes('AccessTokenIssuerInvalid')) {
         toast.error('Video server credentials are misconfigured. Contact support.');
@@ -317,7 +310,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
         }
 
         // Clear orphaned PENDING calls from previous failed attempts
-        await clearStuckCalls().unwrap().catch(() => {});
+        await clearStuckCalls().unwrap().catch(() => { });
 
         const response = await initiateCall({
           consultantId: consultantUserId,
@@ -504,7 +497,7 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
             <p className="text-yellow-400 text-sm mt-2 animate-pulse">
               {callState?.isIncoming ? '● Incoming call...' : '● Waiting for answer...'}
             </p>
-            {callState?.isIncoming && (
+            {callState?.isIncoming ? (
               <div className="mt-6 flex w-full max-w-xs flex-col gap-3 px-6 sm:max-w-none sm:flex-row sm:justify-center sm:px-0">
                 <button
                   type="button"
@@ -519,6 +512,18 @@ const VideoCallModal = memo(({ isOpen, onClose, consultant, callData: incomingCa
                   className="flex-1 rounded-full bg-red-500 px-6 py-3 font-semibold text-white active:bg-red-600 sm:py-2"
                 >
                   Decline
+                </button>
+              </div>
+            ) : (
+              <div className="mt-8">
+                <button
+                  type="button"
+                  onClick={handleEndCall}
+                  disabled={isEnding}
+                  className={`${callLayout.endCallBtnClass} flex items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-all active:scale-95 disabled:opacity-50`}
+                  aria-label="Cancel call"
+                >
+                  <PhoneOff size={22} fill="currentColor" />
                 </button>
               </div>
             )}

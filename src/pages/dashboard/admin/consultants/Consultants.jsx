@@ -34,7 +34,9 @@ const AdminConsultants = () => {
   const [page, setPage] = useState(1);
   const btnRefs = useRef({});
 
-  const { data: apiResponse, isLoading, error, refetch } = useGetAllConsultantsQuery();
+  const { data: apiResponse, isLoading, error, refetch } = useGetAllConsultantsQuery({
+    includeUnapproved: true,
+  });
   const [approveConsultant] = useApproveConsultantMutation();
   const [updateUserStatus] = useUpdateUserStatusMutation();
   const [deleteUser] = useDeleteUserMutation();
