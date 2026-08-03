@@ -163,6 +163,7 @@ export const userApi = baseApi.injectEndpoints({
         { type: 'User', id },
         'AllUsers',
         'AdminStats',
+        'Consultant',
       ],
       transformResponse: (response) => response.data,
     }),

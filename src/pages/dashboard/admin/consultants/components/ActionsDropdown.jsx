@@ -79,7 +79,7 @@ function ActionsDropdown({ anchorEl, onSeeDetails, onStatusChange, onDelete }) {
           {s}
         </button>
       ))}
-      {/* <div className="border-t border-gray-100">
+      <div className="border-t border-gray-100">
         <button
           type="button"
           onClick={onDelete}
@@ -87,7 +87,7 @@ function ActionsDropdown({ anchorEl, onSeeDetails, onStatusChange, onDelete }) {
         >
           Delete
         </button>
-      </div> */}
+      </div>
     </div>,
     document.body,
   );
