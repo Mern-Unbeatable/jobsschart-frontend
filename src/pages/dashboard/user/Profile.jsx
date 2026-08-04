@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import { User, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
-import { selectUser } from "../../../features/slices/authSlice";
+import { selectUser, updateUser } from "../../../features/slices/authSlice";
 import { useGetMeQuery, useUpdateProfileMutation } from "../../../features/api/userApi";
 import { useChangePasswordMutation } from "../../../features/api/authApi";
+import ProfileAvatar from "../consultant/profile/components/ProfileAvatar";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const UserProfile = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   
   const { data: apiUserData, isLoading, refetch } = useGetMeQuery();
   const reduxUser = useSelector(selectUser);
@@ -100,6 +102,25 @@ const UserProfile = () => {
     }
   };
 
+  const handleAvatarChange = useCallback(async (file) => {
+    const loadingToast = toast.loading("Uploading image...");
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+      const result = await updateProfile(formData).unwrap();
+      const updatedUser = result?.user || result;
+      if (updatedUser) {
+        dispatch(updateUser(updatedUser));
+      }
+      refetch();
+      toast.dismiss(loadingToast);
+      toast.success("Avatar updated successfully.");
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error(error?.data?.message || "Failed to upload avatar.");
+    }
+  }, [updateProfile, refetch, dispatch]);
+
   const handleUpdatePassword = async () => {
     const nextErrors = {};
 
@@ -164,15 +185,12 @@ const UserProfile = () => {
         {/* Profile Details Card */}
         <section className="rounded-[20px] border border-gray-100 bg-white px-5 py-8 md:px-10 md:py-12 flex flex-col gap-6">
           <div className="flex items-center gap-4">
-            <div className="flex h-22.25 w-22.25 items-center justify-center rounded-full bg-[#e9eaeb] text-[#616874]">
-              <User size={52} aria-hidden="true" />
-            </div>
-            <div>
-              <p className="text-3xl font-semibold text-[#0c0c0c]">{currentUser?.name || "User"}</p>
-              <p className="text-base text-[#464646]">
-                {currentUser?.email || ""}
-              </p>
-            </div>
+            <ProfileAvatar
+              name={currentUser?.name || "User"}
+              email={currentUser?.email || ""}
+              avatar={currentUser?.avatar}
+              onAvatarChange={handleAvatarChange}
+            />
           </div>
 
           <div className="space-y-6">
