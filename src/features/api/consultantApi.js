@@ -150,17 +150,53 @@ export const consultantApi = baseApi.injectEndpoints({
             providesTags: ['AvailabilitySlots'],
             transformResponse: (response) => {
                 const data = response?.data || response;
-                return { slots: data?.weeklySlots || data?.slots || [] };
+                const weeklySlots = data?.weeklySlots || [];
+                const allSlots = data?.allSlots || [];
+                const rawSlots = weeklySlots.length > 0 ? weeklySlots : (data?.slots || allSlots || []);
+
+                const slots = [...rawSlots]
+                    .map((slot) => ({
+                        id: slot.id,
+                        dayOfWeek: slot.dayOfWeek,
+                        dayLabel: slot.dayLabel || slot.dayOfWeek,
+                        dayOrder: typeof slot.dayOrder === 'number' ? slot.dayOrder : undefined,
+                        startTime: slot.startTime,
+                        endTime: slot.endTime,
+                        isActive: slot.isActive !== false,
+                        type: slot.type || 'weekly',
+                    }))
+                    .filter((slot) => slot.isActive !== false)
+                    .sort((a, b) => {
+                        if (typeof a.dayOrder === 'number' && typeof b.dayOrder === 'number') {
+                            return a.dayOrder - b.dayOrder;
+                        }
+                        return String(a.dayOfWeek || '').localeCompare(String(b.dayOfWeek || ''));
+                    });
+
+                return { slots, weeklySlots, allSlots };
             },
         }),
 
         addAvailabilitySlots: builder.mutation({
             query: (data) => {
-                const slots = data.slots || [{
-                    dayOfWeek: (data.day || 'SUNDAY').toUpperCase(),
-                    startTime: data.from || data.startTime || '09:00',
-                    endTime: data.to || data.endTime || '21:00',
-                }];
+                const toApiSlot = (slot = {}) => ({
+                    dayOfWeek: (
+                        slot.dayOfWeek ||
+                        slot.day ||
+                        data.dayOfWeek ||
+                        data.day ||
+                        'SUNDAY'
+                    )
+                        .toString()
+                        .toUpperCase(),
+                    startTime: slot.startTime || slot.from || data.from || data.startTime || '09:00',
+                    endTime: slot.endTime || slot.to || data.to || data.endTime || '21:00',
+                });
+
+                const slots = Array.isArray(data?.slots)
+                    ? data.slots.map(toApiSlot)
+                    : [toApiSlot(data)];
+
                 return {
                     url: '/availability/slots/bulk',
                     method: 'POST',
@@ -172,15 +208,23 @@ export const consultantApi = baseApi.injectEndpoints({
         }),
 
         updateAvailabilitySlot: builder.mutation({
-            query: ({ slotId, ...data }) => ({
-                url: `/availability/slots/${slotId}`,
-                method: 'PATCH',
-                body: {
-                    dayOfWeek: data.dayOfWeek || (data.day ? data.day.toUpperCase() : undefined),
-                    startTime: data.from || data.startTime,
-                    endTime: data.to || data.endTime,
-                },
-            }),
+            query: ({ slotId, ...data }) => {
+                const body = {};
+                if (data.dayOfWeek || data.day) {
+                    body.dayOfWeek = (data.dayOfWeek || data.day).toString().toUpperCase();
+                }
+                if (data.startTime || data.from) {
+                    body.startTime = data.startTime || data.from;
+                }
+                if (data.endTime || data.to) {
+                    body.endTime = data.endTime || data.to;
+                }
+                return {
+                    url: `/availability/slots/${slotId}`,
+                    method: 'PATCH',
+                    body,
+                };
+            },
             invalidatesTags: ['AvailabilitySlots', 'Availability'],
             transformResponse: (response) => response.data,
         }),

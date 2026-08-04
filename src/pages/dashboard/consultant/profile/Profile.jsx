@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import Swal from "sweetalert2";
 import ProfileAvatar from "./components/ProfileAvatar";
 import AccountInfoForm from "./components/AccountInfoForm";
 import AvailabilitySlots from "./components/AvailabilitySlots";
@@ -42,7 +43,8 @@ const ConsultantProfile = memo(() => {
   const { data: slotsData, isLoading: isSlotsLoading } = useGetMyAvailabilitySlotsQuery();
 
   const [updateMyConsultantProfile] = useUpdateMyConsultantProfileMutation();
-  const [addAvailabilitySlots] = useAddAvailabilitySlotsMutation();
+  const [addAvailabilitySlots, { isLoading: isAddingSlot }] =
+    useAddAvailabilitySlotsMutation();
   const [updateAvailabilitySlot] = useUpdateAvailabilitySlotMutation();
   const [deleteAvailabilitySlot] = useDeleteAvailabilitySlotMutation();
   const [changePassword] = useChangePasswordMutation();
@@ -65,19 +67,20 @@ const ConsultantProfile = memo(() => {
     }
   }, [profileData]);
 
-  // Initialize slots state from API response
+  // Initialize slots state from /availability/my-slots response
   useEffect(() => {
-    if (slotsData?.slots) {
-      setSlots(slotsData.slots.map(s => ({
+    const apiSlots = slotsData?.slots;
+    if (!Array.isArray(apiSlots)) return;
+
+    setSlots(
+      apiSlots.map((s) => ({
         id: s.id,
-        day: s.dayLabel || s.dayOfWeek || s.day || 'Monday',
-        from: s.startTime || s.from || '09:00',
-        to: s.endTime || s.to || '21:00',
+        day: s.dayLabel || s.dayOfWeek || "Monday",
         dayOfWeek: s.dayOfWeek,
-      })));
-    } else if (Array.isArray(slotsData)) {
-      setSlots(slotsData);
-    }
+        from: (s.startTime || "09:00").slice(0, 5),
+        to: (s.endTime || "17:00").slice(0, 5),
+      })),
+    );
   }, [slotsData]);
 
   const handleProfileChange = useCallback((field, value) => {
@@ -88,24 +91,34 @@ const ConsultantProfile = memo(() => {
     setPasswordForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleAddTimeSlot = useCallback(async () => {
-    const loadingToast = toast.loading("Adding time slot...");
-    const newSlot = { day: "Sunday", from: "09:00", to: "21:00" };
+  const handleAddTimeSlot = useCallback(async ({ dayOfWeek, startTime, endTime }) => {
     try {
-      // Try array payload format first
-      await addAvailabilitySlots({ slots: [newSlot] }).unwrap();
-      toast.dismiss(loadingToast);
-      toast.success("New time slot added.");
+      await addAvailabilitySlots({
+        slots: [
+          {
+            dayOfWeek,
+            startTime,
+            endTime,
+          },
+        ],
+      }).unwrap();
+
+      await Swal.fire({
+        icon: "success",
+        title: "Time Slot Added",
+        text: "Your availability slot has been saved successfully.",
+        confirmButtonColor: "#6e35ae",
+      });
+
+      return true;
     } catch (err) {
-      try {
-        // Fallback to flat payload format
-        await addAvailabilitySlots(newSlot).unwrap();
-        toast.dismiss(loadingToast);
-        toast.success("New time slot added.");
-      } catch (err2) {
-        toast.dismiss(loadingToast);
-        toast.error(getApiErrorMessage(err, "Failed to add time slot."));
-      }
+      await Swal.fire({
+        icon: "error",
+        title: "Failed to Add Slot",
+        text: getApiErrorMessage(err, "Failed to add time slot."),
+        confirmButtonColor: "#6e35ae",
+      });
+      return false;
     }
   }, [addAvailabilitySlots]);
 
@@ -123,24 +136,31 @@ const ConsultantProfile = memo(() => {
 
   const handleSlotChange = useCallback(async (id, field, value) => {
     setSlots((prev) =>
-      prev.map((slot) => (slot.id === id ? { ...slot, [field]: value } : slot)),
+      prev.map((slot) => {
+        if (slot.id !== id) return slot;
+        if (field === "day") {
+          const dayLabel =
+            value.charAt(0) + value.slice(1).toLowerCase();
+          return {
+            ...slot,
+            day: dayLabel,
+            dayOfWeek: value.toUpperCase(),
+          };
+        }
+        return { ...slot, [field]: value };
+      }),
     );
-
-    const dayMap = {
-      Sunday: 'SUNDAY', Monday: 'MONDAY', Tuesday: 'TUESDAY',
-      Wednesday: 'WEDNESDAY', Thursday: 'THURSDAY', Friday: 'FRIDAY', Saturday: 'SATURDAY',
-    };
 
     try {
       const payload = {};
-      if (field === 'day') payload.dayOfWeek = dayMap[value] || value.toUpperCase();
-      if (field === 'from') payload.startTime = value;
-      if (field === 'to') payload.endTime = value;
+      if (field === "day") payload.dayOfWeek = value.toUpperCase();
+      if (field === "from") payload.startTime = value;
+      if (field === "to") payload.endTime = value;
       if (Object.keys(payload).length > 0) {
         await updateAvailabilitySlot({ slotId: id, ...payload }).unwrap();
       }
     } catch {
-      // Silent fail on debounced edits — user can retry
+      // Silent fail on live edits — user can retry
     }
   }, [updateAvailabilitySlot]);
 
@@ -259,6 +279,7 @@ const ConsultantProfile = memo(() => {
             onAdd={handleAddTimeSlot}
             onRemove={handleRemoveTimeSlot}
             onChange={handleSlotChange}
+            isAdding={isAddingSlot}
           />
         </div>
       </div>
