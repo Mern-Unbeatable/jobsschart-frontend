@@ -127,7 +127,7 @@ const ConsultantCard = memo(({ consultantsData }) => {
                       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop"
                     }
                     alt={consultant.user?.name || "Consultant"}
-                    className="w-full h-60 object-cover"
+                    className="w-full h-60 object-cover object-top"
                     onError={(e) => {
                       e.target.src =
                         "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop";

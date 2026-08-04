@@ -119,14 +119,14 @@ const ConsultantDetail = memo(() => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-start">
           {/* Left: Image */}
           <div className="lg:col-span-5">
-            <div className="relative rounded-2xl overflow-hidden aspect-square shadow-sm border border-gray-100">
+            <div className="relative rounded-2xl overflow-hidden aspect-[3/4] sm:aspect-[4/5] lg:aspect-square shadow-sm border border-gray-100">
               <img
                 src={
                   consultantForModal.image ||
                   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop"
                 }
                 alt={consultantForModal.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
                 onError={(e) => {
                   e.target.src =
                     "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop";

@@ -1,12 +1,14 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { selectUser } from "../../../features/slices/authSlice";
 import { Wallet } from "lucide-react";
 import ScheduleCard from "./components/ScheduleCard";
 import { useGetUpcomingBookingsQuery } from "../../../features/api/scheduleApi";
 import { getConsultantRouteId, useUserBookingActions } from "../../../hooks/useUserBookingActions";
 import UserBookingModals from "../../../components/booking/UserBookingModals";
+import { ROUTES } from "../../../config";
 import {
   canContactForBooking,
   getBookingSessionAccess,
@@ -15,6 +17,7 @@ import {
 
 const UserDashboard = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const user = useSelector(selectUser);
   const { data: bookingsData, isLoading, error, refetch } = useGetUpcomingBookingsQuery();
   const upcomingBookings = bookingsData?.bookings || [];
@@ -104,6 +107,7 @@ const UserDashboard = () => {
 
             <button
               type="button"
+              onClick={() => navigate(ROUTES.CREDIT)}
               className="inline-flex w-full items-center justify-center rounded bg-green-500/60 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-[#6E35AE]"
             >
               {t("dashboard.user.buyCreditsButton")}

@@ -12,7 +12,7 @@ export const toDisplayStatus = (raw = "") => {
 export const getStatusBadgeStyle = (display) => {
   switch (display) {
     case "Online":
-      return "bg-green-500/90 text-white";
+      return "bg-[#05BC27] text-white";
     case "Busy":
       return "bg-yellow-500/90 text-white";
     default:
