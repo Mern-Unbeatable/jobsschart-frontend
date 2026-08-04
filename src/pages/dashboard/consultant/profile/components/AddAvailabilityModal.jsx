@@ -22,16 +22,27 @@ export default function AddAvailabilityModal({
   onClose,
   onSubmit,
   isSubmitting = false,
+  mode = "add",
+  initialValues = null,
 }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [error, setError] = useState("");
+  const isEdit = mode === "edit";
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+
+    if (isEdit && initialValues) {
+      setForm({
+        dayOfWeek: initialValues.dayOfWeek || "MONDAY",
+        startTime: (initialValues.startTime || initialValues.from || "09:00").slice(0, 5),
+        endTime: (initialValues.endTime || initialValues.to || "17:00").slice(0, 5),
+      });
+    } else {
       setForm(INITIAL_FORM);
-      setError("");
     }
-  }, [open]);
+    setError("");
+  }, [open, isEdit, initialValues]);
 
   if (!open) return null;
 
@@ -62,7 +73,7 @@ export default function AddAvailabilityModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4"
+      className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 px-4"
       onClick={onClose}
     >
       <div
@@ -71,7 +82,7 @@ export default function AddAvailabilityModal({
       >
         <div className="mb-5 flex items-center justify-between">
           <h3 className="text-xl font-semibold text-[#1d1d1d]">
-            Add Time Slot
+            {isEdit ? "Edit Time Slot" : "Add Time Slot"}
           </h3>
           <button
             type="button"
@@ -148,7 +159,13 @@ export default function AddAvailabilityModal({
               disabled={isSubmitting}
               className="rounded-lg bg-[#6e35ae] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#5f2f98] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSubmitting ? "Saving..." : "Add Slot"}
+              {isSubmitting
+                ? isEdit
+                  ? "Updating..."
+                  : "Saving..."
+                : isEdit
+                  ? "Update Slot"
+                  : "Add Slot"}
             </button>
           </div>
         </form>

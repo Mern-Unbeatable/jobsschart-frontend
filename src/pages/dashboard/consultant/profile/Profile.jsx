@@ -45,7 +45,8 @@ const ConsultantProfile = memo(() => {
   const [updateMyConsultantProfile] = useUpdateMyConsultantProfileMutation();
   const [addAvailabilitySlots, { isLoading: isAddingSlot }] =
     useAddAvailabilitySlotsMutation();
-  const [updateAvailabilitySlot] = useUpdateAvailabilitySlotMutation();
+  const [updateAvailabilitySlot, { isLoading: isEditingSlot }] =
+    useUpdateAvailabilitySlotMutation();
   const [deleteAvailabilitySlot] = useDeleteAvailabilitySlotMutation();
   const [changePassword] = useChangePasswordMutation();
   const [updateProfile] = useUpdateProfileMutation();
@@ -134,33 +135,31 @@ const ConsultantProfile = memo(() => {
     }
   }, [deleteAvailabilitySlot]);
 
-  const handleSlotChange = useCallback(async (id, field, value) => {
-    setSlots((prev) =>
-      prev.map((slot) => {
-        if (slot.id !== id) return slot;
-        if (field === "day") {
-          const dayLabel =
-            value.charAt(0) + value.slice(1).toLowerCase();
-          return {
-            ...slot,
-            day: dayLabel,
-            dayOfWeek: value.toUpperCase(),
-          };
-        }
-        return { ...slot, [field]: value };
-      }),
-    );
-
+  const handleEditTimeSlot = useCallback(async (slotId, { dayOfWeek, startTime, endTime }) => {
     try {
-      const payload = {};
-      if (field === "day") payload.dayOfWeek = value.toUpperCase();
-      if (field === "from") payload.startTime = value;
-      if (field === "to") payload.endTime = value;
-      if (Object.keys(payload).length > 0) {
-        await updateAvailabilitySlot({ slotId: id, ...payload }).unwrap();
-      }
-    } catch {
-      // Silent fail on live edits — user can retry
+      await updateAvailabilitySlot({
+        slotId,
+        dayOfWeek,
+        startTime,
+        endTime,
+      }).unwrap();
+
+      await Swal.fire({
+        icon: "success",
+        title: "Time Slot Updated",
+        text: "Your availability slot has been updated successfully.",
+        confirmButtonColor: "#6e35ae",
+      });
+
+      return true;
+    } catch (err) {
+      await Swal.fire({
+        icon: "error",
+        title: "Failed to Update Slot",
+        text: getApiErrorMessage(err, "Failed to update time slot."),
+        confirmButtonColor: "#6e35ae",
+      });
+      return false;
     }
   }, [updateAvailabilitySlot]);
 
@@ -277,9 +276,10 @@ const ConsultantProfile = memo(() => {
           <AvailabilitySlots
             slots={slots}
             onAdd={handleAddTimeSlot}
+            onEdit={handleEditTimeSlot}
             onRemove={handleRemoveTimeSlot}
-            onChange={handleSlotChange}
             isAdding={isAddingSlot}
+            isEditing={isEditingSlot}
           />
         </div>
       </div>

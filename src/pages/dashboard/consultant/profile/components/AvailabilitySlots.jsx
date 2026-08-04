@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CalendarClock, Plus, Trash2 } from "lucide-react";
+import { CalendarClock, Pencil, Plus, Trash2 } from "lucide-react";
 import AddAvailabilityModal from "./AddAvailabilityModal";
 
 const DAYS = [
@@ -12,20 +12,39 @@ const DAYS = [
   { value: "SATURDAY", label: "Saturday" },
 ];
 
+const getDayLabel = (slot) => {
+  if (slot.day) return slot.day;
+  const match = DAYS.find((day) => day.value === slot.dayOfWeek);
+  return match?.label || slot.dayOfWeek || "—";
+};
+
 export default function AvailabilitySlots({
   slots = [],
   onAdd,
+  onEdit,
   onRemove,
-  onChange,
   isAdding = false,
+  isEditing = false,
 }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalState, setModalState] = useState({
+    open: false,
+    mode: "add",
+    slot: null,
+  });
+
+  const closeModal = () => {
+    setModalState({ open: false, mode: "add", slot: null });
+  };
 
   const handleSubmit = async (payload) => {
-    const success = await onAdd(payload);
-    if (success) {
-      setIsModalOpen(false);
+    if (modalState.mode === "edit" && modalState.slot?.id) {
+      const success = await onEdit(modalState.slot.id, payload);
+      if (success) closeModal();
+      return;
     }
+
+    const success = await onAdd(payload);
+    if (success) closeModal();
   };
 
   return (
@@ -38,7 +57,9 @@ export default function AvailabilitySlots({
 
         <button
           type="button"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() =>
+            setModalState({ open: true, mode: "add", slot: null })
+          }
           className="inline-flex h-8 items-center gap-1.5 rounded-md bg-[#6e35ae] px-3 text-sm font-medium text-white transition-colors duration-200 hover:bg-[#5f2f98]"
         >
           <Plus size={12} />
@@ -60,65 +81,57 @@ export default function AvailabilitySlots({
               className="flex flex-col gap-3 lg:flex-row lg:items-center"
             >
               <div className="lg:min-w-0 lg:flex-1">
-                <select
-                  value={slot.dayOfWeek || ""}
-                  onChange={(event) =>
-                    onChange(slot.id, "day", event.target.value)
-                  }
-                  className="h-10 w-full rounded-lg border border-[#b9b9b9] bg-white px-3 text-sm text-[#1d1d1d] focus:outline-none focus:ring-2 focus:ring-green-500/60"
-                >
-                  {DAYS.map((day) => (
-                    <option key={day.value} value={day.value}>
-                      {day.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex h-10 w-full items-center rounded-lg border border-[#b9b9b9] bg-gray-50 px-3 text-sm text-[#1d1d1d]">
+                  {getDayLabel(slot)}
+                </div>
               </div>
 
               <div className="relative lg:w-38 lg:shrink-0">
-                <input
-                  type="time"
-                  value={slot.from || ""}
-                  onChange={(event) =>
-                    onChange(slot.id, "from", event.target.value)
-                  }
-                  step="900"
-                  className="h-10 w-full rounded-lg border border-[#b9b9b9] px-3 text-sm text-[#1d1d1d] focus:outline-none focus:ring-2 focus:ring-green-500/60"
-                />
+                <div className="flex h-10 w-full items-center rounded-lg border border-[#b9b9b9] bg-gray-50 px-3 text-sm text-[#1d1d1d]">
+                  {slot.from || "—"}
+                </div>
               </div>
 
               <span className="hidden text-sm text-[#616874] lg:block">-</span>
 
               <div className="relative lg:w-38 lg:shrink-0">
-                <input
-                  type="time"
-                  value={slot.to || ""}
-                  onChange={(event) =>
-                    onChange(slot.id, "to", event.target.value)
-                  }
-                  step="900"
-                  className="h-10 w-full rounded-lg border border-[#b9b9b9] px-3 text-sm text-[#1d1d1d] focus:outline-none focus:ring-2 focus:ring-green-500/60"
-                />
+                <div className="flex h-10 w-full items-center rounded-lg border border-[#b9b9b9] bg-gray-50 px-3 text-sm text-[#1d1d1d]">
+                  {slot.to || "—"}
+                </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => onRemove(slot.id)}
-                className="mx-auto p-0.5 text-[#ef4444] transition-colors duration-200 hover:text-[#dc2626] lg:mx-0 lg:ml-2 lg:shrink-0"
-                aria-label="Remove time slot"
-              >
-                <Trash2 size={16} />
-              </button>
+              <div className="mx-auto flex items-center gap-2 lg:mx-0 lg:ml-2 lg:shrink-0">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setModalState({ open: true, mode: "edit", slot })
+                  }
+                  className="p-0.5 text-[#6e35ae] transition-colors duration-200 hover:text-[#5f2f98]"
+                  aria-label="Edit time slot"
+                >
+                  <Pencil size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRemove(slot.id)}
+                  className="p-0.5 text-[#ef4444] transition-colors duration-200 hover:text-[#dc2626]"
+                  aria-label="Remove time slot"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
             </div>
           ))}
         </div>
       )}
 
       <AddAvailabilityModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        open={modalState.open}
+        mode={modalState.mode}
+        initialValues={modalState.slot}
+        onClose={closeModal}
         onSubmit={handleSubmit}
-        isSubmitting={isAdding}
+        isSubmitting={modalState.mode === "edit" ? isEditing : isAdding}
       />
     </div>
   );
