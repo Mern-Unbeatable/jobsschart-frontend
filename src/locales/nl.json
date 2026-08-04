@@ -179,7 +179,8 @@
     },
     "consultantsSection": {
       "title": "Beschikbare consultants",
-      "description": "Onze experts staan klaar om u te helpen. Kies een consultant en start uw sessie direct."
+      "description": "Onze experts staan klaar om u te helpen. Kies een consultant en start uw sessie direct.",
+      "viewAll": "Bekijk alles"
     },
     "communitySection": {
       "title": "Word vandaag nog gratis lid van onze spirituele gemeenschap.",

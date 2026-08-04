@@ -179,7 +179,8 @@
     },
     "consultantsSection": {
       "title": "Available Consultants",
-      "description": "Our experts are ready to help you. Choose a consultant and start your session immediately."
+      "description": "Our experts are ready to help you. Choose a consultant and start your session immediately.",
+      "viewAll": "View All"
     },
     "communitySection": {
       "title": "Join our spiritual community today for free.",
