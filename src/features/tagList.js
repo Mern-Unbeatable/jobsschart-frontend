@@ -27,4 +27,5 @@ export const tagList = [
   'Session',
   'Campaign',
   'Faq',
+  'Activity',
 ];

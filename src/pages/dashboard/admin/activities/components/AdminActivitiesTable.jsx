@@ -1,7 +1,17 @@
 import React, { memo } from "react";
 import { Edit, Trash2 } from "lucide-react";
+import Pagination from "./Pagination";
 
-const AdminActivitiesTable = memo(({ activities, onEditClick, onDeleteClick }) => {
+const AdminActivitiesTable = memo(({ 
+  activities, 
+  onEditClick, 
+  onDeleteClick,
+  page,
+  totalResults,
+  pageSize,
+  totalPages,
+  onPageChange
+}) => {
   return (
     <div className="bg-white rounded-xl border border-purple-100/50 shadow-sm overflow-hidden" data-reveal>
       <div className="overflow-x-auto">
@@ -12,7 +22,6 @@ const AdminActivitiesTable = memo(({ activities, onEditClick, onDeleteClick }) =
               <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Host</th>
               <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Date &amp; Time</th>
               <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Price (EN/NL)</th>
               <th className="p-4 text-sm font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
@@ -46,10 +55,6 @@ const AdminActivitiesTable = memo(({ activities, onEditClick, onDeleteClick }) =
                       {item.type}
                     </span>
                   </td>
-                  <td className="p-4 text-sm font-medium text-gray-900">
-                    <div>{item.price}</div>
-                    <div className="text-sm text-gray-400 font-medium mt-0.5">{item.priceNl}</div>
-                  </td>
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button
@@ -70,7 +75,7 @@ const AdminActivitiesTable = memo(({ activities, onEditClick, onDeleteClick }) =
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="p-8 text-center text-gray-400 font-semibold">
+                <td colSpan="5" className="p-8 text-center text-gray-400 font-semibold">
                   No activities found.
                 </td>
               </tr>
@@ -78,6 +83,16 @@ const AdminActivitiesTable = memo(({ activities, onEditClick, onDeleteClick }) =
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          page={page}
+          totalResults={totalResults}
+          pageSize={pageSize}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
+      )}
     </div>
   );
 });
