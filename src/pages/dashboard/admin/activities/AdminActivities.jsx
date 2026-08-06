@@ -19,18 +19,30 @@ import {
 
 const AdminActivities = () => {
   const [page, setPage] = useState(1);
-  const { data: activitiesResponse, isLoading } = useGetActivitiesQuery({ page, limit: 3});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState("all");
+
+  const queryParams = {
+    page,
+    limit: 3,
+    ...(filterType !== "all" && { type: filterType }),
+    ...(searchQuery.trim() !== "" && { search: searchQuery.trim() })
+  };
+
+  const { data: activitiesResponse, isLoading } = useGetActivitiesQuery(queryParams);
   const [createActivity] = useCreateActivityMutation();
   const [updateActivity] = useUpdateActivityMutation();
   const [deleteActivity] = useDeleteActivityMutation();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState("all");
-  
   const [showAddEditModal, setShowAddEditModal] = useState(false);
   const [editingActivity, setEditingActivity] = useState(null);
 
   const pageRef = useRef(null);
+
+  // Reset page to 1 when filters change to avoid page index mismatch
+  useEffect(() => {
+    setPage(1);
+  }, [filterType, searchQuery]);
 
   // Normalize backend fields to frontend expected fields
   const rawActivities = activitiesResponse?.activities || activitiesResponse?.data || [];
@@ -96,26 +108,51 @@ const AdminActivities = () => {
 
   const handleSave = async (payload) => {
     try {
-      const body = {
-        type: payload.type,
-        title: payload.titleEn || payload.title,
-        description: payload.descriptionEn || payload.description,
-        host: payload.host,
-        hostTitle: payload.hostTitleEn || payload.hostTitle,
-        date: payload.date,
-        time: payload.time,
-        price: payload.price,
-        location: payload.locationEn || payload.location,
-        duration: payload.durationEn || payload.duration,
-        tags: payload.tags || [],
-        image: payload.image,
-      };
+      const formData = new FormData();
+      formData.append("type", payload.type);
+      formData.append("title", payload.titleEn || payload.title || "");
+      formData.append("description", payload.descriptionEn || payload.description || "");
+      formData.append("host", payload.host || "");
+      
+      const hostTitle = payload.hostTitleEn || payload.hostTitle || "";
+      if (hostTitle) {
+        formData.append("hostTitle", hostTitle);
+      }
+      
+      formData.append("date", payload.date || "");
+      formData.append("time", payload.time || "");
+      
+      if (payload.price) {
+        formData.append("price", payload.price);
+      }
+      
+      const location = payload.locationEn || payload.location || "";
+      if (location) {
+        formData.append("location", location);
+      }
+      
+      const duration = payload.durationEn || payload.duration || "";
+      if (duration) {
+        formData.append("duration", duration);
+      }
+
+      // Convert tags array to comma-separated string for form-data
+      if (payload.tags && payload.tags.length > 0) {
+        formData.append("tags", payload.tags.join(","));
+      }
+
+      // If a file was selected, append the file object, else keep existing image url if editing
+      if (payload.imageFile) {
+        formData.append("image", payload.imageFile);
+      } else if (payload.image && !payload.image.startsWith("data:")) {
+        formData.append("image", payload.image);
+      }
 
       if (editingActivity) {
-        await updateActivity({ id: editingActivity.id || editingActivity._id, body }).unwrap();
+        await updateActivity({ id: editingActivity.id || editingActivity._id, body: formData }).unwrap();
         toast.success("Activity updated successfully");
       } else {
-        await createActivity(body).unwrap();
+        await createActivity(formData).unwrap();
         toast.success("Activity created successfully");
       }
       setShowAddEditModal(false);
@@ -123,20 +160,6 @@ const AdminActivities = () => {
       toast.error("Failed to save activity");
     }
   };
-
-  // Filter items
-  const filtered = activities.filter(item => {
-    const titleEn = item.titleEn || "";
-    const titleNl = item.titleNl || "";
-    const host = item.host || "";
-    const matchesSearch = 
-      titleEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      titleNl.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      host.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesType = filterType === "all" || item.type === filterType;
-    return matchesSearch && matchesType;
-  });
 
   return (
     <div ref={pageRef} className="flex flex-col gap-8 mx-auto">
@@ -161,7 +184,7 @@ const AdminActivities = () => {
         </div>
       ) : (
         <AdminActivitiesTable 
-          activities={filtered} 
+          activities={activities} 
           onEditClick={openEditModal} 
           onDeleteClick={handleDelete} 
           page={page}

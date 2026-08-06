@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect } from "react";
+import React, { memo, useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -20,6 +20,8 @@ const AdminActivityModal = memo(({ activity, onClose, onSave }) => {
   const [formDurationEn, setFormDurationEn] = useState("60 Mins");
   const [formDurationNl, setFormDurationNl] = useState("60 Min");
   const [formImage, setFormImage] = useState("");
+  const [formImageFile, setFormImageFile] = useState(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (activity) {
@@ -88,6 +90,7 @@ const AdminActivityModal = memo(({ activity, onClose, onSave }) => {
       durationEn: formDurationEn,
       durationNl: formDurationNl,
       image: formImage || "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+      imageFile: formImageFile,
       tags: formType === "event" ? ["Meditation"] : ["Business"]
     });
   };
@@ -281,16 +284,38 @@ const AdminActivityModal = memo(({ activity, onClose, onSave }) => {
               </div>
             </div>
 
-            {/* Image URL */}
+            {/* Image Upload */}
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Image URL</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Activity Image</label>
               <input
-                type="text"
-                placeholder="https://example.com/image.jpg"
-                value={formImage}
-                onChange={(e) => setFormImage(e.target.value)}
-                className="w-full px-4 py-2.5 border border-purple-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#6E35AE]"
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setFormImageFile(file);
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setFormImage(reader.result);
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+                className="hidden"
               />
+              <div className="flex gap-4 items-center">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-4 py-2.5 bg-purple-50 hover:bg-purple-100 text-[#6E35AE] border border-purple-200 rounded-lg text-sm font-semibold cursor-pointer transition-colors"
+                >
+                  Choose Image
+                </button>
+                {formImage && (
+                  <img src={formImage} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-purple-100" />
+                )}
+              </div>
             </div>
 
             {/* Descriptions */}
