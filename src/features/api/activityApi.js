@@ -48,6 +48,16 @@ export const activityApi = baseApi.injectEndpoints({
       invalidatesTags: ['Activity'],
       transformResponse: (response) => response.data,
     }),
+
+    registerActivity: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/activities/${id}/register`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Activity'],
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
@@ -57,4 +67,5 @@ export const {
   useCreateActivityMutation,
   useUpdateActivityMutation,
   useDeleteActivityMutation,
+  useRegisterActivityMutation,
 } = activityApi;

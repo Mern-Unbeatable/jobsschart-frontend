@@ -3,28 +3,42 @@ import { useTranslation } from "react-i18next";
 import { X, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
+import { useRegisterActivityMutation } from "../../features/api/activityApi";
+
 const ActivityRegisterModal = memo(({ activity, onClose }) => {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language || "en";
 
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
+  const [register, { isLoading }] = useRegisterActivityMutation();
 
   if (!activity) return null;
 
   const title = currentLang === "nl" ? activity.titleNl : activity.titleEn;
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     if (!regName || !regEmail) {
       toast.error(currentLang === "nl" ? "Vul alle velden in." : "Please fill in all fields.");
       return;
     }
     
-    toast.success(t("activities.successMessage"));
-    setRegName("");
-    setRegEmail("");
-    onClose();
+    try {
+      await register({
+        id: activity.id || activity._id,
+        body: {
+          fullName: regName,
+          emailAddress: regEmail,
+        }
+      }).unwrap();
+      toast.success(t("activities.successMessage") || "Registered successfully!");
+      setRegName("");
+      setRegEmail("");
+      onClose();
+    } catch (err) {
+      toast.error(err?.data?.message || (currentLang === "nl" ? "Registratie mislukt." : "Registration failed."));
+    }
   };
 
   return (
@@ -76,15 +90,19 @@ const ActivityRegisterModal = memo(({ activity, onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-700 text-sm font-bold hover:bg-[#FAF8FD]"
+              disabled={isLoading}
+              className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-700 text-sm font-bold hover:bg-[#FAF8FD] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {currentLang === "nl" ? "Annuleren" : "Cancel"}
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 rounded-xl bg-[#6E35AE] text-white text-sm font-bold hover:bg-[#562590] cursor-pointer"
+              disabled={isLoading}
+              className="flex-1 px-4 py-3 rounded-xl bg-[#6E35AE] text-white text-sm font-bold hover:bg-[#562590] disabled:bg-purple-400 disabled:cursor-not-allowed cursor-pointer"
             >
-              {t("activities.confirmRegistration")}
+              {isLoading 
+                ? (currentLang === "nl" ? "Bezig met registreren..." : "Registering...")
+                : t("activities.confirmRegistration")}
             </button>
           </div>
         </form>
