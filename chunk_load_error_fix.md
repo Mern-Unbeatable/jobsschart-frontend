@@ -1,4 +1,15 @@
-import React, { Suspense } from "react";
+# ChunkLoadError Fix in router.jsx
+
+This document preserves the original code and details the changes made to resolve `ChunkLoadError` for clients.
+
+## Problem Description
+When a new version of the frontend is built and deployed, Webpack's generated chunk filenames change. Clients who already have the site open in their browsers try to lazy-load routes using the old chunk filenames, which no longer exist on the server. This triggers a `ChunkLoadError` and breaks the application interface.
+
+## Original Code
+Previously, React's built-in `lazy` was imported directly and used to load components asynchronously:
+
+```javascript
+import React, { lazy, Suspense } from "react";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -16,25 +27,6 @@ import {
   selectIsAuthenticated,
   selectUserRole,
 } from "../features/slices/authSlice";
-
-// Custom lazy implementation that handles ChunkLoadErrors gracefully
-const lazy = (importFn) => {
-  return React.lazy(async () => {
-    try {
-      const component = await importFn();
-      window.sessionStorage.removeItem("lazy-retry-done");
-      return component;
-    } catch (error) {
-      const hasRetried = window.sessionStorage.getItem("lazy-retry-done");
-      if (!hasRetried) {
-        window.sessionStorage.setItem("lazy-retry-done", "true");
-        window.location.reload();
-        return new Promise(() => {}); // Return pending promise to avoid rendering broken state before reload
-      }
-      throw error;
-    }
-  });
-};
 
 // Derive a relative segment from an absolute route path
 const seg = (route, basePath) => {
@@ -487,3 +479,4 @@ const router = createBrowserRouter(
 );
 
 export default router;
+```
