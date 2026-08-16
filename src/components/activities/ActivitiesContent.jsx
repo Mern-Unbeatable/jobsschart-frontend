@@ -43,7 +43,7 @@ const ActivitiesContent = memo(() => {
   const filteredActivities = activities.filter((activity) => {
     const title = currentLang === "nl" ? activity.titleNl : activity.titleEn;
     const desc = currentLang === "nl" ? activity.descriptionNl : activity.descriptionEn;
-    
+
     const matchesSearch =
       title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       activity.host.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -62,11 +62,11 @@ const ActivitiesContent = memo(() => {
       {/* Main Content Area */}
       <section className="py-12 container mx-auto px-6">
         {/* Controls Layout */}
-        <ActivitiesFilter 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          searchQuery={searchQuery} 
-          setSearchQuery={setSearchQuery} 
+        <ActivitiesFilter
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
         />
 
         {/* Grid List */}
@@ -85,12 +85,13 @@ const ActivitiesContent = memo(() => {
               />
             ))}
           </div>
+
         ) : (
           <div className="text-center py-16 bg-white rounded-3xl border border-purple-100/50 shadow-sm">
             <Filter className="mx-auto text-gray-300 mb-4" size={48} />
             <p className="text-gray-500 font-semibold">
-              {currentLang === "nl" 
-                ? "Geen activiteiten gevonden die voldoen aan uw criteria." 
+              {currentLang === "nl"
+                ? "Geen activiteiten gevonden die voldoen aan uw criteria."
                 : "No activities found matching your criteria."}
             </p>
           </div>

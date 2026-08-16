@@ -15,3 +15,4 @@ const Activities = memo(() => {
 Activities.displayName = 'Activities';
 
 export default Activities;
+
