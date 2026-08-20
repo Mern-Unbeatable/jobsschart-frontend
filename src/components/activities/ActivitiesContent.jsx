@@ -8,6 +8,7 @@ import ActivityCard from "./ActivityCard";
 import ActivityDetailsModal from "./ActivityDetailsModal";
 import ActivityRegisterModal from "./ActivityRegisterModal";
 import { useGetActivitiesQuery } from "../../features/api/activityApi";
+import { resolveI18n } from "../../utils/resolveI18n";
 
 const ActivitiesContent = memo(() => {
   const { i18n } = useTranslation();
@@ -25,18 +26,18 @@ const ActivitiesContent = memo(() => {
     ? rawActivities.map(item => ({
         ...item,
         id: item.id || item._id,
-        titleEn: item.titleEn || item.title || "",
-        titleNl: item.titleNl || item.title || "",
-        descriptionEn: item.descriptionEn || item.description || "",
-        descriptionNl: item.descriptionNl || item.description || "",
-        hostTitleEn: item.hostTitleEn || item.hostTitle || "",
-        hostTitleNl: item.hostTitleNl || item.hostTitle || "",
+        titleEn: resolveI18n(item.title, 'en'),
+        titleNl: resolveI18n(item.title, 'nl'),
+        descriptionEn: resolveI18n(item.description, 'en'),
+        descriptionNl: resolveI18n(item.description, 'nl'),
+        hostTitleEn: resolveI18n(item.hostTitle, 'en'),
+        hostTitleNl: resolveI18n(item.hostTitle, 'nl'),
         price: item.price || "",
         priceNl: item.priceNl || item.price || "",
-        locationEn: item.locationEn || item.location || "",
-        locationNl: item.locationNl || item.location || "",
-        durationEn: item.durationEn || item.duration || "",
-        durationNl: item.durationNl || item.duration || "",
+        locationEn: resolveI18n(item.location, 'en'),
+        locationNl: resolveI18n(item.location, 'nl'),
+        durationEn: resolveI18n(item.duration, 'en'),
+        durationNl: resolveI18n(item.duration, 'nl'),
       }))
     : [];
 

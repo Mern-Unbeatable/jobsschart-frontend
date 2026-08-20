@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { useCreatePostMutation } from "../../../features/api/postApi";
 
 const ShareExperienceModal = memo(({ isOpen, onClose }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [createPost, { isLoading }] = useCreatePostMutation();
 
   const [formData, setFormData] = useState({
@@ -55,6 +55,7 @@ const ShareExperienceModal = memo(({ isOpen, onClose }) => {
       category: formData.category,
       subCategory: formData.subcategory,
       postType: "THOUGHT",
+      sourceLang: i18n.language?.startsWith('nl') ? 'nl' : 'en',
     };
 
     const loadingToast = toast.loading("Creating post...");

@@ -1,15 +1,18 @@
 import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
+import { resolveI18n } from "../../../../../utils/resolveI18n";
 
 const OrderCard = memo(({ order, onCancel }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const title = resolveI18n(order.title, i18n.language);
+  const description = resolveI18n(order.description, i18n.language);
 
   return (
     <article className="rounded-xl border border-gray-100 bg-white px-4 py-4 sm:px-5">
       <div className="flex flex-col gap-4 md:flex-row md:items-start lg:items-center">
         <img
           src={order.image}
-          alt={order.title}
+          alt={title}
           className="h-48 w-full rounded-lg object-cover sm:h-56 md:h-40 md:w-56 md:shrink-0 lg:h-44"
           loading="lazy"
         />
@@ -19,10 +22,10 @@ const OrderCard = memo(({ order, onCancel }) => {
             {t("dashboard.user.orders.orderIdLabel")} {order.id}
           </p>
           <h2 className="text-xl leading-tight font-medium text-[#333333] sm:text-2xl">
-            {order.title}
+            {title}
           </h2>
           <p className="text-base leading-7 text-[#545454]">
-            {order.description}
+            {description}
           </p>
           <p className="text-2xl leading-tight font-medium text-black">
             {order.price}

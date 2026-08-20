@@ -9,6 +9,7 @@ import { useGetConsultantByIdQuery } from '../../features/api/consultantApi';
 import { selectIsAuthenticated } from '../../features/slices/authSlice';
 import toast from 'react-hot-toast';
 import RealTimeChat from './RealTimeChat';
+import { resolveI18nArray } from '../../utils/resolveI18n';
 
 const UserChatPage = memo(() => {
 
@@ -119,7 +120,10 @@ const UserChatPage = memo(() => {
 
   const consultantName = consultant.user?.name || consultant.name || 'Consultant';
   const consultantAvatar = consultant.user?.avatar || consultant.avatar;
-  const consultantSpecializations = consultant.specialization || consultant.specializations || [];
+  const consultantSpecializations = resolveI18nArray(
+    consultant.specialization || consultant.specializations,
+    'en'
+  );
   const isOnline = consultant.onlineStatus === 'ONLINE' || consultant.user?.onlineStatus === 'ONLINE';
   const pricePerMinute = consultant.pricePerMinute || 2.50;
 

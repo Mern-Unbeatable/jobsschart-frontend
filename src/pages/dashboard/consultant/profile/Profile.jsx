@@ -17,6 +17,7 @@ import {
 import { useChangePasswordMutation } from "../../../../features/api/authApi";
 import { useUpdateProfileMutation } from "../../../../features/api/userApi";
 import { getApiErrorMessage } from "../../../../utils/apiErrorUtils";
+import { resolveI18n, resolveI18nArray } from "../../../../utils/resolveI18n";
 
 const INITIAL_PROFILE = {
   name: "",
@@ -59,8 +60,8 @@ const ConsultantProfile = memo(() => {
         name: p.user?.name || "",
         email: p.user?.email || "",
         phone: p.user?.phone || "",
-        about: p.bio || "",
-        expertise: p.specialization?.join(", ") || "",
+        about: resolveI18n(p.bio, 'en'),
+        expertise: resolveI18nArray(p.specialization, 'en').join(', '),
         experience: p.experience || "",
         language: p.user?.language || "",
         location: p.user?.location || "",
@@ -186,6 +187,7 @@ const ConsultantProfile = memo(() => {
         specialization: profile.expertise
           ? profile.expertise.split(",").map((s) => s.trim()).filter(Boolean)
           : [],
+        sourceLang: 'en',
       };
 
       const userPayload = {

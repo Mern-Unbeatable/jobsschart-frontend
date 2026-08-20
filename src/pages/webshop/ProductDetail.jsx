@@ -6,8 +6,11 @@ import { useGetProductByIdQuery } from "../../features/api/productApi";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "../../features/slices/authSlice";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
+import { resolveI18n, resolveI18nArray } from "../../utils/resolveI18n";
 
 const ProductDetail = memo(() => {
+  const { i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
@@ -20,6 +23,13 @@ const ProductDetail = memo(() => {
 
   // API response: { product: { ... } }
   const product = data?.product || data || null;
+
+  const name = resolveI18n(product?.name, i18n.language);
+  const subTitle = resolveI18n(product?.subTitle, i18n.language);
+  const descriptionText = resolveI18n(product?.description, i18n.language);
+  const features = resolveI18nArray(product?.features, i18n.language);
+  const whatsInside = resolveI18nArray(product?.whatsInside, i18n.language);
+  const benefits = resolveI18nArray(product?.benefits, i18n.language);
 
   /* ── Loading skeleton ── */
   if (isLoading) {
@@ -84,7 +94,7 @@ const ProductDetail = memo(() => {
                 <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm mb-4">
                   <img
                     src={mainImage}
-                    alt={product.name}
+                    alt={name}
                     className="w-full h-120 object-cover"
                   />
                 </div>
@@ -120,34 +130,34 @@ const ProductDetail = memo(() => {
           {/* Right: Product Info */}
           <div className="flex flex-col">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
-              {product.name}
+              {name}
             </h1>
-            {product.subTitle && (
-              <p className="text-lg text-gray-500 mb-4">{product.subTitle}</p>
+            {subTitle && (
+              <p className="text-lg text-gray-500 mb-4">{subTitle}</p>
             )}
 
             <div className="text-3xl font-bold text-green-500/60  mb-2">
               €{price.toFixed(2)}
             </div>
 
-            {product.description && (
+            {descriptionText && (
               <>
                 <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
                   Product Description
                 </h3>
                 <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                  {product.description}
+                  {descriptionText}
                 </p>
               </>
             )}
 
-            {product.features?.length > 0 && (
+            {features?.length > 0 && (
               <>
                 <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
                   Features
                 </h3>
                 <ul className="space-y-3 mb-10">
-                  {product.features.map((feature, idx) => (
+                  {features.map((feature, idx) => (
                     <li
                       key={idx}
                       className="flex items-center gap-3 text-lg text-gray-600"
@@ -210,15 +220,15 @@ const ProductDetail = memo(() => {
         </div>
 
         {/* What's Inside & Benefits Horizontal Grid */}
-        {(product.whatsInside?.length > 0 || product.benefits?.length > 0) && (
+        {(whatsInside?.length > 0 || benefits?.length > 0) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-20">
-            {product.whatsInside?.length > 0 && (
+            {whatsInside?.length > 0 && (
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
                   What's Inside
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {product.whatsInside.map((item, idx) => (
+                  {whatsInside.map((item, idx) => (
                     <span
                       key={idx}
                       className="px-5 py-2.5 bg-[#F2F2F2] text-gray-600 rounded-lg text-base font-medium"
@@ -230,13 +240,13 @@ const ProductDetail = memo(() => {
               </div>
             )}
 
-            {product.benefits?.length > 0 && (
+            {benefits?.length > 0 && (
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
                   Benefits
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {product.benefits.map((benefit, idx) => (
+                  {benefits.map((benefit, idx) => (
                     <span
                       key={idx}
                       className="px-5 py-2.5 bg-[#F2F2F2] text-gray-600 rounded-lg text-base font-medium"

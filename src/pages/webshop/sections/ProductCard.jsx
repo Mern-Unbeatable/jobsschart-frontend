@@ -1,12 +1,17 @@
 import React, { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "../../../features/slices/authSlice";
 import Swal from "sweetalert2";
+import { resolveI18n } from "../../../utils/resolveI18n";
 
 const ProductCard = memo(({ product }) => {
+  const { i18n } = useTranslation();
   const navigate = useNavigate();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const name = resolveI18n(product?.name, i18n.language);
+  const description = resolveI18n(product?.description, i18n.language);
 
   const handleBuyNow = (e) => {
     e.stopPropagation();
@@ -40,7 +45,7 @@ const ProductCard = memo(({ product }) => {
       <div className="relative aspect-square mb-4 rounded-lg overflow-hidden border border-gray-100">
         <img
           src={product.image}
-          alt={product.name}
+          alt={name}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
         />
       </div>
@@ -48,11 +53,11 @@ const ProductCard = memo(({ product }) => {
       {/* Product Details */}
       <div className="flex flex-col grow px-1">
         <h3 className="text-2xl font-semibold text-gray-800 mb-2  leading-tight">
-          {product.name}
+          {name}
         </h3>
 
         <p className="text-base h-12 text-gray-600 mb-4 line-clamp-3 leading-relaxed">
-          {product.description}
+          {description}
         </p>
 
         <div className="text-2xl font-semibold text-gray-900 mb-4 ">

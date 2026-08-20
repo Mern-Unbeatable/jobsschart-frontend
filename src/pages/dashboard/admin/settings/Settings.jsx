@@ -30,6 +30,7 @@ import {
   useCreateCategoryMutation,
   useDeleteCategoryMutation,
 } from '../../../../features/api/categoryApi';
+import { resolveI18n, resolveI18nArray } from '../../../../utils/resolveI18n';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -162,12 +163,12 @@ const Settings = () => {
     setIsModalClosing(false);
     setEditingPlanId(plan.id);
     setPriceForm({
-      name: plan.name,
+      name: resolveI18n(plan.name, 'en'),
       price: String(plan.price),
       minutes: String(plan.minutes || 0),
       credits: String(plan.credits || 0),
-      description: plan.description || '',
-      featured: (plan.features || []).join('\n'),
+      description: resolveI18n(plan.description, 'en'),
+      featured: resolveI18nArray(plan.features, 'en').join('\n'),
     });
     setPriceErrors({});
     setActiveModal('price');

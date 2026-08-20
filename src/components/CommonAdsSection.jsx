@@ -1,5 +1,7 @@
 import React, { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useGetActiveCampaignsQuery } from '../features/api/campaignApi';
+import { resolveI18n } from '../utils/resolveI18n';
 
 const CommonAdsSection = memo(
   ({
@@ -7,6 +9,7 @@ const CommonAdsSection = memo(
     containerClassName = 'container mx-auto px-4 lg:px-6',
     placement = '',
   }) => {
+    const { i18n } = useTranslation();
     const { data, isLoading } = useGetActiveCampaignsQuery();
 
     const activeCampaigns = data?.campaigns || [];
@@ -52,7 +55,8 @@ const CommonAdsSection = memo(
     }
 
     if (campaign) {
-      const description = campaign.description || "";
+      const title = resolveI18n(campaign.title, i18n.language);
+      const description = resolveI18n(campaign.description, i18n.language);
       const displayLink = campaign.linkUrl
         ? campaign.linkUrl.replace(/https?:\/\/(www\.)?/, "")
         : "";
@@ -64,7 +68,7 @@ const CommonAdsSection = memo(
             <>
               <img
                 src={campaign.image}
-                alt={campaign.title || 'Advertisement'}
+                alt={title || 'Advertisement'}
                 className='w-full h-full object-cover'
               />
               {/* Dark Overlay */}
@@ -74,9 +78,9 @@ const CommonAdsSection = memo(
 
           {/* Centered Content Overlay */}
           <div className={`absolute inset-0 flex flex-col items-center justify-center p-4 md:p-6 text-center z-10 ${campaign.image ? 'text-white' : 'text-[#6E35AE]'}`}>
-            {campaign.title && (
+            {title && (
               <h4 className={`text-base md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 tracking-wide line-clamp-1 ${campaign.image ? 'text-white drop-shadow-md' : 'text-[#6E35AE]'}`}>
-                {campaign.title}
+                {title}
               </h4>
             )}
             {description && (

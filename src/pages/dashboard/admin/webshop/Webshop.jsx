@@ -11,6 +11,7 @@ import {
   useGetProductsQuery,
   useDeleteProductMutation,
 } from "../../../../features/api/productApi";
+import { resolveI18n } from "../../../../utils/resolveI18n";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -182,7 +183,7 @@ const AdminWebshop = () => {
                   })
                 }
                 onDelete={() =>
-                  setDeleteTarget({ id: product.id, name: product.name })
+                  setDeleteTarget({ id: product.id, name: resolveI18n(product.name, 'en') })
                 }
               />
             </div>

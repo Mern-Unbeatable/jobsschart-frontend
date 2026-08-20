@@ -7,9 +7,10 @@ import { ChevronDown, MessageSquare, Send, ThumbsUp, Loader2 } from "lucide-reac
 import { ROUTES } from "../../../config";
 import { selectUser, selectIsAuthenticated } from "../../../features/slices/authSlice";
 import { useGetCommentsQuery, useCreateCommentMutation, useToggleLikePostMutation } from "../../../features/api/postApi";
+import { resolveI18n } from "../../../utils/resolveI18n";
 
 const PostCommentSection = ({ postId, onClose }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const { data: commentsData, isLoading } = useGetCommentsQuery(postId);
@@ -37,7 +38,11 @@ const PostCommentSection = ({ postId, onClose }) => {
     }
     if (!commentText.trim()) return;
     try {
-      await createComment({ postId, content: commentText.trim() }).unwrap();
+      await createComment({
+        postId,
+        content: commentText.trim(),
+        sourceLang: i18n.language?.startsWith('nl') ? 'nl' : 'en',
+      }).unwrap();
       setCommentText("");
     } catch (err) {
       console.error("Failed to add comment:", err);
@@ -80,7 +85,7 @@ const PostCommentSection = ({ postId, onClose }) => {
                 </span>
               </div>
               <p className="text-sm leading-relaxed text-gray-700">
-                {comment.content}
+                {resolveI18n(comment.content, i18n.language)}
               </p>
             </div>
           ))}
@@ -119,7 +124,7 @@ const PostCommentSection = ({ postId, onClose }) => {
 };
 
 const PostsList = memo(({ posts }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [openReplyIndex, setOpenReplyIndex] = useState(null);
   const currentUser = useSelector(selectUser);
@@ -187,9 +192,9 @@ const PostsList = memo(({ posts }) => {
             <span className="text-base text-gray-400 font-medium tracking-tight">
               {post.user?.name || "Anonymous"}
             </span>
-            <h3 className="text-2xl text-[#1B1B1B] mt-2 mb-3">{post.title}</h3>
+            <h3 className="text-2xl text-[#1B1B1B] mt-2 mb-3">{resolveI18n(post.title, i18n.language)}</h3>
             <p className="text-gray-500 text-base leading-relaxed mb-6 border-b border-gray-100 pb-6">
-              {post.content}
+              {resolveI18n(post.content, i18n.language)}
             </p>
             <div className="flex items-center gap-4 text-gray-400">
               <button

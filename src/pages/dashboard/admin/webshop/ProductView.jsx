@@ -4,6 +4,7 @@ import { ArrowLeft, CircleCheck } from "lucide-react";
 import { gsap } from "gsap";
 import { ROUTES } from "../../../../config";
 import { useGetProductByIdQuery } from "../../../../features/api/productApi";
+import { resolveI18n, resolveI18nArray } from "../../../../utils/resolveI18n";
 
 const IMG_MAIN =
   "https://www.figma.com/api/mcp/asset/a210cb64-a86e-4731-a765-c53d8334de62";
@@ -107,16 +108,22 @@ const ProductView = () => {
     );
   }, [product?.id]);
 
+  const productName = resolveI18n(product?.name, 'en');
+  const productDescription = resolveI18n(product?.description, 'en');
+
   const features = useMemo(() => {
-    return product?.features || BASE_FEATURES;
+    const list = resolveI18nArray(product?.features, 'en');
+    return list.length > 0 ? list : BASE_FEATURES;
   }, [product]);
 
   const inside = useMemo(() => {
-    return product?.inside || product?.whatsInside || WHATS_INSIDE;
+    const list = resolveI18nArray(product?.inside || product?.whatsInside, 'en');
+    return list.length > 0 ? list : WHATS_INSIDE;
   }, [product]);
 
   const benefits = useMemo(() => {
-    return product?.benefits || BENEFITS;
+    const list = resolveI18nArray(product?.benefits, 'en');
+    return list.length > 0 ? list : BENEFITS;
   }, [product]);
 
   if (isLoading) {
@@ -160,7 +167,7 @@ const ProductView = () => {
             {activeImage ? (
               <img
                 src={activeImage}
-                alt={product.name}
+                alt={productName}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -184,7 +191,7 @@ const ProductView = () => {
                 >
                   <img
                     src={img}
-                    alt={`${product.name} preview ${i + 1}`}
+                    alt={`${productName} preview ${i + 1}`}
                     className="w-full h-full object-cover"
                   />
                 </button>
@@ -199,10 +206,10 @@ const ProductView = () => {
               className="text-3xl md:text-4xl font-medium text-[#333] leading-tight"
               style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
-              {product.name}
+              {productName}
             </h1>
             <p className="text-base md:text-lg text-[#545454]">
-              {product.description}
+              {productDescription}
             </p>
             <p
               className="text-3xl md:text-4xl font-medium text-green-500/60"
@@ -222,7 +229,7 @@ const ProductView = () => {
             </h2>
             <div className="h-px bg-[#d4d4d4]" />
             <p className="text-base md:text-lg text-[#545454] leading-relaxed">
-              {product.longDescription || product.description || "No description available."}
+              {productDescription || "No description available."}
             </p>
           </div>
 

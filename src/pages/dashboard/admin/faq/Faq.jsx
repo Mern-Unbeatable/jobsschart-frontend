@@ -14,6 +14,7 @@ import {
   useGetAllCommunityQuestionsAdminQuery,
   useAnswerCommunityQuestionAdminMutation,
 } from '../../../../features/api/faqApi';
+import { resolveI18n } from '../../../../utils/resolveI18n';
 
 const FAQ_TABS = [
   {
@@ -49,8 +50,8 @@ const AdminFaq = () => {
   const openEditor = (faq = null) => {
     setEditorMode(faq ? 'edit' : 'create');
     setEditingFaqId(faq?.id ?? null);
-    setDraftQuestion(faq?.question || '');
-    setDraftAnswer(faq?.answer || '');
+    setDraftQuestion(faq ? resolveI18n(faq.question, 'en') : '');
+    setDraftAnswer(faq ? resolveI18n(faq.answer, 'en') : '');
     setIsEditorOpen(true);
   };
 
@@ -74,6 +75,7 @@ const AdminFaq = () => {
           id: editingFaqId,
           question: draftQuestion,
           answer: draftAnswer,
+          sourceLang: 'en',
         }).unwrap();
         toast.dismiss(loadingToast);
         toast.success("FAQ updated successfully");
@@ -83,6 +85,7 @@ const AdminFaq = () => {
           question: draftQuestion,
           answer: draftAnswer,
           sortOrder: 1,
+          sourceLang: 'en',
         }).unwrap();
         toast.dismiss(loadingToast);
         toast.success("FAQ created successfully");
@@ -119,7 +122,10 @@ const AdminFaq = () => {
 
   const openAnswerModal = (pendingQuestion) => {
     setSelectedPendingQuestion(pendingQuestion);
-    setPublishQuestionTitle(pendingQuestion.subject || pendingQuestion.question);
+    setPublishQuestionTitle(
+      resolveI18n(pendingQuestion.subject, 'en')
+      || resolveI18n(pendingQuestion.question, 'en')
+    );
     setPublishAnswerContent('');
     setIsAnswerModalOpen(true);
   };
@@ -142,6 +148,7 @@ const AdminFaq = () => {
       await answerCommunityQuestion({
         id: selectedPendingQuestion.id,
         answer: publishAnswerContent,
+        sourceLang: 'en',
       }).unwrap();
       toast.dismiss(loadingToast);
       toast.success("Question answered successfully");

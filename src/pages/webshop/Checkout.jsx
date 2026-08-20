@@ -6,10 +6,13 @@ import { redirectToMollieCheckout } from "../../utils/mollieCheckout";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../features/slices/authSlice";
+import { useTranslation } from "react-i18next";
+import { resolveI18n } from "../../utils/resolveI18n";
 
 const Checkout = memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { i18n } = useTranslation();
   const { product, quantity } = location.state || {};
   const user = useSelector(selectUser);
 
@@ -47,6 +50,8 @@ const Checkout = memo(() => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const productName = resolveI18n(product?.name, i18n.language);
 
   const subtotal = product ? parseFloat(product.price || 0) * quantity : 0;
   const deliveryFee = 15.0;
@@ -247,13 +252,13 @@ const Checkout = memo(() => {
                 {productImage && (
                   <img
                     src={productImage}
-                    alt={product.name}
+                    alt={productName}
                     className="w-16 h-16 rounded-lg object-cover border border-gray-200 shrink-0"
                   />
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-800 truncate">
-                    {product.name}
+                    {productName}
                   </p>
                   <p className="text-xs text-gray-500">Qty: {quantity}</p>
                 </div>

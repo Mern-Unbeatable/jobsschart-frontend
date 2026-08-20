@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ChevronRight, MessageSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useGetMyQuestionsQuery } from '../../../../features/api/faqApi';
+import { resolveI18n } from '../../../../utils/resolveI18n';
 import TicketDetailModal from './TicketDetailModal';
 
 const statusStyles = {
@@ -11,6 +13,7 @@ const statusStyles = {
 };
 
 const RecentTicketsSection = () => {
+  const { i18n } = useTranslation();
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -70,7 +73,7 @@ const RecentTicketsSection = () => {
                   </div>
                   <div className='min-w-0'>
                     <h3 className='truncate text-base font-semibold text-[#2f2f2f] sm:text-base'>
-                      {ticket.subject}
+                      {resolveI18n(ticket.subject, i18n.language)}
                     </h3>
                     <p className='mt-1 text-sm text-gray-400 sm:text-sm'>
                       ID: #{ticket.id.slice(0, 8)} • Opened {new Date(ticket.createdAt).toLocaleDateString()}

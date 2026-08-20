@@ -1,8 +1,11 @@
 import React, { useRef } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { gsap } from "gsap";
+import { useTranslation } from "react-i18next";
+import { resolveI18n } from "../../../../../utils/resolveI18n";
 
 function ProductCard({ product, onView, onEdit, onDelete }) {
+  const { i18n } = useTranslation();
   const cardRef = useRef(null);
   const editRef = useRef(null);
   const deleteRef = useRef(null);
@@ -20,6 +23,8 @@ function ProductCard({ product, onView, onEdit, onDelete }) {
     typeof product.price === "string"
       ? parseFloat(product.price)
       : product.price || 0;
+  const productName = resolveI18n(product?.name, i18n.language);
+  const productDescription = resolveI18n(product?.description, i18n.language);
   const productImage = product.gallery?.[0] || product.image || "/logo1.webp";
 
   return (
@@ -40,7 +45,7 @@ function ProductCard({ product, onView, onEdit, onDelete }) {
       <div className="w-full h-48 sm:h-56 lg:h-64 rounded-lg overflow-hidden shrink-0">
         <img
           src={productImage}
-          alt={product.name}
+          alt={productName}
           className="w-full h-full object-cover"
         />
       </div>
@@ -52,10 +57,10 @@ function ProductCard({ product, onView, onEdit, onDelete }) {
             className="text-xl font-medium text-[#333] leading-tight"
             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
           >
-            {product.name}
+            {productName}
           </h3>
           <p className="text-sm text-[#545454] leading-relaxed line-clamp-3">
-            {product.description}
+            {productDescription}
           </p>
         </div>
 

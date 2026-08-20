@@ -10,15 +10,17 @@ const BASE_URL =
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
   credentials: 'include',
-  prepareHeaders: (headers, { getState, extra }) => {
+  prepareHeaders: (headers, { getState }) => {
     const token = getState()?.auth?.token;
     if (token) {
       headers.set('authorization', `Bearer ${token}`);
     }
-    // Do NOT set Content-Type here — for FormData the browser must set it
-    // automatically so it includes the correct multipart boundary.
-    // For non-multipart requests, RTK Query's fetchBaseQuery defaults to
-    // application/json when body is a plain object.
+
+    const language = getState()?.language?.current
+      || (typeof localStorage !== 'undefined' && (localStorage.getItem('language') || localStorage.getItem('locale')))
+      || 'en';
+    headers.set('Accept-Language', language);
+
     return headers;
   },
 });

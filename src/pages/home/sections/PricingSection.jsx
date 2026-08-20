@@ -6,8 +6,11 @@ import { ROUTES } from "../../../config";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "../../../features/slices/authSlice";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
+import { resolveI18n, resolveI18nArray } from "../../../utils/resolveI18n";
 
 const PricingSection = memo(() => {
+  const { i18n } = useTranslation();
   const { data: packagesData, isLoading } = useGetAllPackagesQuery();
   const navigate = useNavigate();
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -54,7 +57,7 @@ const PricingSection = memo(() => {
                
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-2xl font-poppins font-bold text-gray-800">
-                    {plan.name}
+                    {resolveI18n(plan.name, i18n.language)}
                   </h3>
                   {plan.credits !== undefined && (
                     <span className="px-3 py-1 bg-[#F5EFFE] text-[#6E35AE] text-xs font-semibold rounded-full border border-[#E9D5FF]">
@@ -77,7 +80,7 @@ const PricingSection = memo(() => {
 
                 {/* Secondary Pricing Text / Description */}
                 <p className="text-base text-gray-600 mb-6 font-poppins line-clamp-2 h-12">
-                  {plan.description ||
+                  {resolveI18n(plan.description, i18n.language) ||
                     (plan.minutes > 0 ? `${plan.minutes} minutes session` : "")}
                 </p>
 
@@ -111,7 +114,7 @@ const PricingSection = memo(() => {
               <div>
                 {/* Features List */}
                 <ul className="space-y-4 pt-4 border-t border-[#F5EFFE]">
-                  {(plan.features || []).map((feature, idx) => (
+                  {(resolveI18nArray(plan.features, i18n.language)).map((feature, idx) => (
                     <li
                       key={idx}
                       className="flex items-center gap-3 text-gray-600 text-base"

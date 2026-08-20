@@ -1,50 +1,29 @@
-
-
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
-
-// Updated data to include the exact SAP Calendar Integration content with basic markdown for bolding
-const TICKET_RESPONSES = {
-  'TK-SAP': {
-    id: 'TK-SAP',
-    question:
-      '"Can I sync my external SAP calendar directly with the EliteConsult portal? I\'ve been trying to automate my bookings but can\'t find the API key for calendar integration..."',
-    response: {
-      title: 'Re: SAP Calendar Integration',
-      date: 'Oct 24, 02:45 PM',
-      content:
-        'Hello! Thank you for reaching out. Yes, you can certainly synchronize your SAP environment directly with our platform to automate your scheduling workflow.\n**How to find your API Key:**\n  Navigate to the **Integration Settings** tab in your main profile menu.\n  Select External Providers and choose SAP from the list.\n  Click on "**Generate API Token**"; your unique key will appear immediately.\n  Ensure your SAP instance firewall allows outbound traffic to our domain.\nPlease let us know if you encounter any specific error codes during the handshake process. We are here to ensure your automation is seamless.',
-    },
-  },
-  'TK-8829': {
-    id: 'TK-8829',
-    question:
-      'I have been experiencing issues with Stripe payout synchronization. The payments are not reflecting in our merchant account immediately after session completion. Can we debug this issue?',
-    response: {
-      title: 'Re: Issue with Stripe Payout Synchronization',
-      date: 'Oct 13, 02:45 PM',
-      content:
-        'Hello! Thank you for bringing this to our attention. We have identified a potential delay in the webhook processing. Here are the steps we recommend:\n**How to verify your Stripe integration:**\n  Navigate to your Developer Settings in your dashboard.\n  Check the Webhook endpoint configuration.\n  Ensure your firewall allows our IP addresses for payout notifications.\n  Verify that your Stripe API key is up to date.\nOur team has already marked this for priority review. We expect this to be resolved within 24 hours. Please monitor your account and let us know immediately if the issue persists.',
-    },
-  },
-};
+import { useTranslation } from 'react-i18next';
+import { resolveI18n } from '../../../../utils/resolveI18n';
 
 const TicketDetailModal = ({ ticket, isOpen, onClose }) => {
+  const { i18n } = useTranslation();
   if (!isOpen || !ticket) return null;
+
+  const subject = resolveI18n(ticket.subject, i18n.language);
+  const question = resolveI18n(ticket.question, i18n.language) || 'No details available';
+  const answer = resolveI18n(ticket.answer, i18n.language)
+    || 'No response yet. Our admin team will review and answer your question shortly.';
 
   const ticketData = {
     id: ticket.id,
-    question: ticket.question || "No details available",
+    question,
     response: {
-      title: ticket.subject ? `Re: ${ticket.subject}` : "Response",
-      date: ticket.answeredAt ? new Date(ticket.answeredAt).toLocaleString() : "",
-      content: ticket.answer || "No response yet. Our admin team will review and answer your question shortly.",
+      title: subject ? `Re: ${subject}` : 'Response',
+      date: ticket.answeredAt ? new Date(ticket.answeredAt).toLocaleString() : '',
+      content: answer,
     },
   };
 
-  // Helper function to render bold text wrapped in **
   const renderFormattedText = (text) => {
-    const parts = text.split(/(\*\*.*?\*\*)/g);
+    const parts = String(text || '').split(/(\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
         return (
@@ -60,8 +39,6 @@ const TicketDetailModal = ({ ticket, isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
       <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[20px] bg-white shadow-2xl">
-        
-        {/* Header */}
         <div className="sticky top-0 bg-white px-8 pt-8 pb-6">
           <button
             type="button"
@@ -74,10 +51,7 @@ const TicketDetailModal = ({ ticket, isOpen, onClose }) => {
           <div className="mt-6 h-[1px] w-full bg-gray-100"></div>
         </div>
 
-        {/* Content */}
         <div className="space-y-8 px-8 pb-10 pt-2">
-          
-          {/* Question Section */}
           <section>
             <div className="mb-4 flex items-center gap-3">
               <div className="flex h-6 w-6 items-center justify-center rounded-[4px] bg-[#6B4E90] text-sm font-bold text-white shadow-sm">
@@ -85,8 +59,7 @@ const TicketDetailModal = ({ ticket, isOpen, onClose }) => {
               </div>
               <h2 className="text-[19px] font-medium text-gray-900">Your Question</h2>
             </div>
-            
-            {/* Custom Question Box with Purple Left Border */}
+
             <div className="flex overflow-hidden rounded-xl bg-[#F8F9FA]">
               <div className="w-[5px] shrink-0 bg-[#6B4E90]"></div>
               <div className="p-5 text-[15px] italic leading-relaxed text-[#5A5A5A] w-full break-words">
@@ -95,10 +68,12 @@ const TicketDetailModal = ({ ticket, isOpen, onClose }) => {
             </div>
           </section>
 
-          {/* Response Section */}
           <section>
             <div className="mb-5 flex items-baseline justify-between gap-4">
-              <h3 className="text-[26px] font-bold tracking-tight text-gray-900" style={{ fontFamily: 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}>
+              <h3
+                className="text-[26px] font-bold tracking-tight text-gray-900"
+                style={{ fontFamily: 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}
+              >
                 {ticketData.response.title}
               </h3>
               {ticketData.response.date && (
@@ -107,9 +82,9 @@ const TicketDetailModal = ({ ticket, isOpen, onClose }) => {
                 </p>
               )}
             </div>
-            
+
             <div className="text-[15px] leading-relaxed text-[#4A4A4A]">
-              {ticketData.response.content.split('\n').map((line, idx, array) => {
+              {String(ticketData.response.content).split('\n').map((line, idx, array) => {
                 const isBoldHeader = line.startsWith('**') && line.endsWith('**') && line.includes(':');
                 const isIndented = line.startsWith('  ');
                 const isLastLine = idx === array.length - 1;
@@ -130,16 +105,14 @@ const TicketDetailModal = ({ ticket, isOpen, onClose }) => {
                   );
                 }
 
-                // Normal Paragraphs
                 return (
-                  <p key={idx} className={isLastLine ? "mt-5" : "mt-0"}>
+                  <p key={idx} className={isLastLine ? 'mt-5' : 'mt-0'}>
                     {renderFormattedText(line)}
                   </p>
                 );
               })}
             </div>
           </section>
-
         </div>
       </div>
     </div>

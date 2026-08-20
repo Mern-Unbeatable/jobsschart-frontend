@@ -12,10 +12,11 @@ import {
   isConsultantSelf,
   sortConsultantsByPresence,
 } from '../../utils/consultantList'
+import { resolveI18nArray } from '../../utils/resolveI18n'
 
 const Consultants = () => {
   const { data: consultantsData, isLoading, error } = useGetAllConsultantsQuery({})
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { getStatus } = usePresence()
   const user = useSelector(selectUser)
   const userRole = useSelector(selectUserRole)
@@ -60,21 +61,24 @@ const Consultants = () => {
     if (searchTerm) {
       filtered = filtered.filter(consultant =>
         consultant.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        consultant.specialization?.some(spec => spec.toLowerCase().includes(searchTerm.toLowerCase()))
+        resolveI18nArray(consultant.specialization, i18n.language)
+          .some(spec => String(spec).toLowerCase().includes(searchTerm.toLowerCase()))
       )
     }
 
     // Expertise filter
     if (expertise !== 'all') {
       filtered = filtered.filter(consultant =>
-        consultant.specialization?.some(spec => spec.toLowerCase() === expertise.toLowerCase())
+        resolveI18nArray(consultant.specialization, i18n.language)
+          .some(spec => String(spec).toLowerCase() === expertise.toLowerCase())
       )
     }
 
     // Topic filter
     if (topic !== 'all') {
       filtered = filtered.filter(consultant =>
-        consultant.specialization?.some(spec => spec.toLowerCase().includes(topic.toLowerCase()))
+        resolveI18nArray(consultant.specialization, i18n.language)
+          .some(spec => String(spec).toLowerCase().includes(topic.toLowerCase()))
       )
     }
 
@@ -84,7 +88,7 @@ const Consultants = () => {
     }
 
     return sortConsultantsByPresence(filtered, getStatus)
-  }, [consultants, searchTerm, expertise, topic, getStatus, user?.id, userRole])
+  }, [consultants, searchTerm, expertise, topic, getStatus, user?.id, userRole, i18n.language])
 
   // Pagination logic
   const itemsPerPage = 8

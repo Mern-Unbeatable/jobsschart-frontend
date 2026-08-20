@@ -8,9 +8,10 @@ import {
   useGetBlogsQuery,
   useGetAllBlogCategoriesQuery,
 } from "../../features/api/blogApi";
+import { resolveI18n } from "../../utils/resolveI18n";
 
 const BlogContent = memo(() => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeCategory, setActiveCategory] = useState("all");
 
   const { data: categoriesData } = useGetAllBlogCategoriesQuery();
@@ -23,9 +24,12 @@ const BlogContent = memo(() => {
   const categories = useMemo(() => {
     return [
       { value: "all", label: t("blog.page.categories.all") },
-      ...blogCategories.map((c) => ({ value: c.id, label: c.name })),
+      ...blogCategories.map((c) => ({
+        value: c.id,
+        label: resolveI18n(c.name, i18n.language),
+      })),
     ];
-  }, [blogCategories, t]);
+  }, [blogCategories, t, i18n.language]);
 
   const filteredBlogs = useMemo(() => {
     const rawBlogs = blogsData?.blogs || [];
@@ -40,15 +44,15 @@ const BlogContent = memo(() => {
           })
         : "N/A",
       author: b.user?.name || "Admin",
-      title: b.title,
-      desc: b.content || "",
+      title: resolveI18n(b.title, i18n.language),
+      desc: resolveI18n(b.excerpt, i18n.language) || resolveI18n(b.content, i18n.language),
       categoryId: b.categoryId,
       slug: b.slug,
     }));
 
     if (activeCategory === "all") return normalized;
     return normalized.filter((blog) => blog.categoryId === activeCategory);
-  }, [blogsData, activeCategory]);
+  }, [blogsData, activeCategory, i18n.language]);
 
   return (
     <div className="bg-[#FBFDFF] py-14 md:py-20   ">

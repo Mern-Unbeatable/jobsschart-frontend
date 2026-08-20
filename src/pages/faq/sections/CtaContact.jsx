@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import { useCreateCommunityQuestionMutation } from "../../../features/api/faqApi";
 
 const CtaContact = () => {
+  const { i18n } = useTranslation();
   const [topic, setTopic] = useState("");
   const [subject, setSubject] = useState("");
   const [question, setQuestion] = useState("");
@@ -22,6 +24,7 @@ const CtaContact = () => {
         topic,
         subject,
         question,
+        sourceLang: i18n.language?.startsWith('nl') ? 'nl' : 'en',
       }).unwrap();
 
       toast.success("Question submitted successfully!");

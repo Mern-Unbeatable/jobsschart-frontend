@@ -8,12 +8,15 @@ import {
   Linkedin,
   Twitter,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import AdsSection from "./sections/AdsSection";
 import { useGetBlogBySlugQuery } from "../../features/api/blogApi";
+import { resolveI18n } from "../../utils/resolveI18n";
 
 const BlogDetail = memo(() => {
   const { blogId } = useParams(); // Contains the slug
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
 
   const { data: blogData, isLoading, error } = useGetBlogBySlugQuery(blogId);
 
@@ -59,6 +62,8 @@ const BlogDetail = memo(() => {
   }
 
   const blog = blogData.blog;
+  const title = resolveI18n(blog.title, i18n.language);
+  const content = resolveI18n(blog.content, i18n.language);
 
   return (
     <div className="bg-white min-h-screen py-14 md:py-20">
@@ -74,7 +79,7 @@ const BlogDetail = memo(() => {
 
         {/* 1. Blog Title */}
         <h1 className="text-3xl md:text-4xl lg:text-5xl text-gray-800 mb-6 leading-tight font-medium">
-          {blog.title}
+          {title}
         </h1>
 
         {/* 2. Meta Information */}
@@ -95,7 +100,7 @@ const BlogDetail = memo(() => {
           {blogImg ? (
             <img
               src={blogImg}
-              alt={blog.title}
+              alt={title}
               className="w-full h-auto md:h-150 object-cover"
             />
           ) : (
@@ -123,9 +128,10 @@ const BlogDetail = memo(() => {
         <hr className="border-gray-100 mb-10" />
 
         {/* 5. Blog Content Area */}
-        <div className="max-w-none text-gray-600 text-base leading-relaxed whitespace-pre-wrap pb-12">
-          {blog.content}
-        </div>
+        <div
+          className="max-w-none text-gray-600 text-base leading-relaxed pb-12 prose prose-sm md:prose-base"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
       </div>
       {/* 6. Ads Section */}
       <AdsSection />

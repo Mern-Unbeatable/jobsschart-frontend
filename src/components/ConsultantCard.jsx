@@ -1,6 +1,7 @@
 import React, { memo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { Phone, Video, MessageSquare, Star } from "lucide-react";
 import AudioCallModal from "../pages/consultants/sections/AudioCallModal";
@@ -17,9 +18,11 @@ import {
   getConsultantUserId,
 } from "../utils/consultantList";
 import { redirectToLogin } from "../utils/authLoginRedirect";
+import { resolveI18nArray } from "../utils/resolveI18n";
 
 const ConsultantCard = memo(({ consultantsData }) => {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
   const { getStatus } = usePresence();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
@@ -163,9 +166,10 @@ const ConsultantCard = memo(({ consultantsData }) => {
                   </div>
 
                   <p className="text-base text-gray-500 mb-4 font-poppins h-6 truncate">
-                    {consultant.specialization?.length > 0
-                      ? consultant.specialization[0]
-                      : "Consultant"}
+                    {(() => {
+                      const specs = resolveI18nArray(consultant.specialization, i18n.language);
+                      return specs.length > 0 ? specs[0] : "Consultant";
+                    })()}
                   </p>
 
                   <div className="mb-4">

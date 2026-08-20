@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 const MIN_DONATION_AMOUNT = 100;
 
 const DonationFormSection = memo(({ formData, setFormData }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const fileInputRef = useRef(null);
   const [createCheckout, { isLoading: isCheckingOut }] =
     useCreateCheckoutMutation();
@@ -87,6 +87,10 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
       data.append("donationData[phone]", formData.phone);
       data.append("donationData[amount]", formData.amount);
       data.append("donationData[benefit]", formData.benefit);
+      data.append(
+        "donationData[sourceLang]",
+        i18n.language?.startsWith("nl") ? "nl" : "en",
+      );
 
       if (formData.donorType === "business") {
         data.append(

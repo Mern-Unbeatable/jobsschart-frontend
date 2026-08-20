@@ -8,6 +8,7 @@ import {
   useCreateProductMutation,
   useUpdateProductMutation,
 } from "../../../../features/api/productApi";
+import { resolveI18n, resolveI18nArray } from "../../../../utils/resolveI18n";
 
 const CATEGORY_OPTIONS = [
   "Spiritual Items",
@@ -52,18 +53,17 @@ const toMultiline = (value) => {
 };
 
 const mapProductToForm = (product) => ({
-  title: product?.name || "",
-  // API returns `productCategory` (e.g. "HealingTools"), NOT `productCategoryId`
+  title: resolveI18n(product?.name, 'en'),
   category:
     REVERSE_CATEGORY_MAP[product?.productCategory] ||
     REVERSE_CATEGORY_MAP[product?.productCategoryId] ||
     "",
   price: product?.price ? String(product.price) : "",
   stock: product?.stock ? String(product.stock) : "",
-  description: product?.description || "",
-  features: toMultiline(product?.features),
-  inside: toMultiline(product?.whatsInside || product?.inside),
-  benefits: toMultiline(product?.benefits),
+  description: resolveI18n(product?.description, 'en'),
+  features: resolveI18nArray(product?.features, 'en').join('\n'),
+  inside: resolveI18nArray(product?.whatsInside || product?.inside, 'en').join('\n'),
+  benefits: resolveI18nArray(product?.benefits, 'en').join('\n'),
 });
 
 const AdminAddNewProduct = () => {

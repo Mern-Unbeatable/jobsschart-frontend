@@ -3,8 +3,10 @@ import { createPortal } from 'react-dom';
 import { Plus, X, ExternalLink, CreditCard } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useGetAllPackagesQuery } from '../../features/api/packageApi';
 import { useCreateCheckoutMutation } from '../../features/api/paymentApi';
+import { resolveI18n } from '../../utils/resolveI18n';
 import { storeMollieCheckoutSession } from '../../utils/mollieCheckout';
 import { useGetMeQuery } from '../../features/api/userApi';
 import { updateUser } from '../../features/slices/authSlice';
@@ -14,6 +16,7 @@ import { updateUser } from '../../features/slices/authSlice';
  * Opens a portal modal above call UI (z-index > call modal) so it is never clipped.
  */
 const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate, showForUserOnly = true }) => {
+    const { i18n } = useTranslation();
     const [open, setOpen] = useState(false);
     const [buyingId, setBuyingId] = useState(null);
     const dispatch = useDispatch();
@@ -128,7 +131,9 @@ const InCallCreditTopUp = memo(({ compact = false, onBalanceUpdate, showForUserO
                                                     €{parseFloat(pkg.price || 0).toFixed(2)}
                                                 </p>
                                                 {pkg.name && (
-                                                    <p className="text-xs text-gray-500 mt-0.5 truncate">{pkg.name}</p>
+                                                    <p className="text-xs text-gray-500 mt-0.5 truncate">
+                                                        {resolveI18n(pkg.name, i18n.language)}
+                                                    </p>
                                                 )}
                                             </div>
                                             <span className="shrink-0 text-sm font-semibold text-[#6E35AE] bg-[#6E35AE]/10 px-3 py-1 rounded-full">

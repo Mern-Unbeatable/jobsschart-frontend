@@ -25,6 +25,7 @@ import {
   selectIsAuthenticated,
   selectUserRole,
 } from "../../features/slices/authSlice";
+import { resolveI18n, resolveI18nArray } from "../../utils/resolveI18n";
 import { redirectToLogin } from "../../utils/authLoginRedirect";
 
 const ConsultantDetail = memo(() => {
@@ -100,8 +101,14 @@ const ConsultantDetail = memo(() => {
     firstNPrice: consultant.firstNPrice != null ? parseFloat(consultant.firstNPrice) : null,
   };
 
-  const areas = consultant.specialization || consultant.areas || [];
+  const areas = resolveI18nArray(
+    consultant.specialization || consultant.areas,
+    i18n.language
+  );
   const reviews = consultant.reviews || [];
+  const bioText =
+    resolveI18n(consultant.bio, i18n.language)
+    || "Professional consultant ready to help you.";
 
   const handleChatNow = () => {
     const recordId = consultantForModal.consultantId || consultant.id;
@@ -156,9 +163,7 @@ const ConsultantDetail = memo(() => {
               About Me
             </h2>
             <p className="text-gray-600 leading-relaxed mb-8 text-base md:text-lg">
-              {(i18n.language?.startsWith('nl') && consultant.bioNl)
-                ? consultant.bioNl
-                : (consultant.bio || "Professional consultant ready to help you.")}
+              {bioText}
             </p>
 
             <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
@@ -294,7 +299,7 @@ const ConsultantDetail = memo(() => {
                     </div>
                   </div>
                   <p className="text-sm text-gray-500 italic">
-                    "{rev.comment || rev.text}"
+                    "{resolveI18n(rev.comment || rev.text, i18n.language)}"
                   </p>
                 </div>
               ))}

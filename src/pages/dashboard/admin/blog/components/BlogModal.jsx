@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { X, ImagePlus } from "lucide-react";
+import { resolveI18n } from "../../../../../utils/resolveI18n";
 
 const BlogModal = ({
   isOpen,
@@ -123,7 +124,7 @@ const BlogModal = ({
                 <option value="">Select Category</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.name}
+                    {resolveI18n(category.name, "en")}
                   </option>
                 ))}
               </select>

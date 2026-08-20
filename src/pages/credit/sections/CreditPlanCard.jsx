@@ -1,13 +1,20 @@
 import React, { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { Check, Loader2 } from "lucide-react";
+import { resolveI18n, resolveI18nArray } from "../../../utils/resolveI18n";
 
 const CreditPlanCard = memo(({ plan, onBuyCredits, isCheckingOut }) => {
+  const { i18n } = useTranslation();
+  const name = resolveI18n(plan?.name, i18n.language);
+  const description = resolveI18n(plan?.description, i18n.language);
+  const features = resolveI18nArray(plan?.features, i18n.language);
+
   return (
     <div className="rounded-xl bg-white p-6 border border-[#00000033] flex flex-col justify-start h-full">
       <div>
         {/* Plan Name & Credits Badge */}
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-2xl font-poppins font-bold text-gray-800">{plan.name}</h3>
+          <h3 className="text-2xl font-poppins font-bold text-gray-800">{name}</h3>
           {plan.credits !== undefined && (
             <span className="px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full border border-green-200">
               {plan.credits} Credits
@@ -27,7 +34,7 @@ const CreditPlanCard = memo(({ plan, onBuyCredits, isCheckingOut }) => {
 
         {/* Secondary Pricing Text / Description */}
         <p className="text-base text-gray-600 mb-4 font-poppins line-clamp-2 h-12">
-          {plan.description ||
+          {description ||
             (plan.minutes > 0 ? `${plan.minutes} minutes session` : "")}
         </p>
 
@@ -51,7 +58,7 @@ const CreditPlanCard = memo(({ plan, onBuyCredits, isCheckingOut }) => {
       <div>
         {/* Features List */}
         <ul className="space-y-4 border-gray-100">
-          {(plan.features || []).map((feature, idx) => (
+          {features.map((feature, idx) => (
             <li
               key={idx}
               className="flex items-center gap-3 text-gray-600 text-base"

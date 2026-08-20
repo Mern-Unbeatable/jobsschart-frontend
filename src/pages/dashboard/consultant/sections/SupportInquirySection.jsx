@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import { useCreateCommunityQuestionMutation } from "../../../../features/api/faqApi";
 
 const SupportInquirySection = () => {
+  const { i18n } = useTranslation();
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [createCommunityQuestion, { isLoading }] = useCreateCommunityQuestionMutation();
@@ -20,6 +22,7 @@ const SupportInquirySection = () => {
         subject,
         question: message,
         topic: "Support",
+        sourceLang: i18n.language?.startsWith('nl') ? 'nl' : 'en',
       }).unwrap();
 
       toast.success("Support ticket submitted successfully!");

@@ -3,8 +3,11 @@ import { useSelector } from "react-redux";
 import { HelpCircle } from "lucide-react";
 import { useGetMyQuestionsQuery } from "../../../features/api/faqApi";
 import { selectIsAuthenticated, selectUser } from "../../../features/slices/authSlice";
+import { useTranslation } from "react-i18next";
+import { resolveI18n } from "../../../utils/resolveI18n";
 
 const PendingQuestions = () => {
+  const { i18n } = useTranslation();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
 
@@ -42,14 +45,16 @@ const PendingQuestions = () => {
             </div>
             <div className="flex-1">
               <div className="flex justify-between items-start gap-4">
-                <p className="text-base font-semibold text-[#2b2540]">{it.subject}</p>
+                <p className="text-base font-semibold text-[#2b2540]">{resolveI18n(it.subject, i18n.language)}</p>
                 {it.topic && (
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#6E35AE]/10 text-[#6E35AE]">
-                    {it.topic}
+                    {resolveI18n(it.topic, i18n.language)}
                   </span>
                 )}
               </div>
-              <p className="mt-2 text-sm text-[#6b6b78]">{it.question}</p>
+              <p className="mt-2 text-sm text-[#6b6b78]">
+                {resolveI18n(it.question, i18n.language)}
+              </p>
               <div className="mt-3 flex items-center gap-3">
                 <span className="inline-flex items-center rounded-lg bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-800 shadow-sm">
                   Pending Answer

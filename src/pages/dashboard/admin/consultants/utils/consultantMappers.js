@@ -1,3 +1,5 @@
+import { resolveI18n, resolveI18nArray } from '../../../../../utils/resolveI18n';
+
 const API_ORIGIN = (process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api/v1')
   .replace(/\/api\/v1\/?$/, '');
 
@@ -9,7 +11,9 @@ export function resolveAssetUrl(url) {
 }
 
 export function mapBackendConsultant(c) {
-  const specialization = Array.isArray(c.specialization) ? c.specialization : [];
+  const specialization = resolveI18nArray(c.specialization, 'en');
+  const bio = resolveI18n(c.bio, 'en');
+  const category = resolveI18n(c.category, 'en');
 
   let status = 'Pending';
   if (c.user?.status === 'SUSPENDED' || c.user?.status === 'Suspended') {
@@ -24,17 +28,17 @@ export function mapBackendConsultant(c) {
     id: c.id,
     userId: c.userId || c.user?.id,
     name,
-    title: c.user?.bio || c.bio || 'Professional Consultant',
+    title: c.user?.bio || bio || 'Professional Consultant',
     email: c.user?.email || 'N/A',
     phone: c.user?.phone || 'N/A',
     address: c.user?.location || 'N/A',
-    category: c.category || specialization[0] || 'Consultant',
+    category: category || specialization[0] || 'Consultant',
     status,
     verificationStatus: c.verificationStatus || 'UNVERIFIED',
     avatar:
       c.user?.avatar
       || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=E2AB0B&color=fff`,
-    about: c.bio || 'No description available.',
+    about: bio || 'No description available.',
     experience: { years: 'N/A', role: 'Consulting' },
     languages: ['English'],
     location: { place: c.user?.location || 'N/A', note: 'Remote and in-person' },

@@ -1,7 +1,10 @@
 import React from "react";
 import { HelpCircle, MessageSquareText } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { resolveI18n } from "../../../../utils/resolveI18n";
 
 const FaqPendingQuestionsSection = ({ items, onAnswer }) => {
+  const { i18n } = useTranslation();
   return (
     <div className="rounded-xl border border-[#ece8f6] bg-white shadow-[0_10px_30px_rgba(17,12,46,0.06)]">
       <div className="border-b border-[#ede7f6] px-6 py-4 sm:px-8">
@@ -22,10 +25,10 @@ const FaqPendingQuestionsSection = ({ items, onAnswer }) => {
 
             <div className="min-w-0 flex-1">
               <h4 className="text-base font-bold leading-6 text-[#33334a]">
-                {item.subject}
+                {resolveI18n(item.subject, i18n.language)}
               </h4>
               <p className="mt-1 text-sm text-[#6f6a81] leading-relaxed">
-                {item.question}
+                {resolveI18n(item.question, i18n.language)}
               </p>
               
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#8b84a3]">
@@ -34,7 +37,7 @@ const FaqPendingQuestionsSection = ({ items, onAnswer }) => {
                 </span>
                 {item.topic && (
                   <span className="font-medium bg-[#ece3ff] px-2.5 py-0.5 rounded-full text-[#8b6ac1]">
-                    {item.topic}
+                    {resolveI18n(item.topic, i18n.language)}
                   </span>
                 )}
                 <span>•</span>

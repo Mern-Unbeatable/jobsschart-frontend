@@ -16,6 +16,7 @@ import {
   useUpdateActivityMutation,
   useDeleteActivityMutation
 } from "../../../../features/api/activityApi";
+import { resolveI18n } from "../../../../utils/resolveI18n";
 
 const AdminActivities = () => {
   const [page, setPage] = useState(1);
@@ -50,18 +51,18 @@ const AdminActivities = () => {
     ? rawActivities.map(item => ({
         ...item,
         id: item.id || item._id,
-        titleEn: item.titleEn || item.title || "",
-        titleNl: item.titleNl || item.title || "",
-        descriptionEn: item.descriptionEn || item.description || "",
-        descriptionNl: item.descriptionNl || item.description || "",
-        hostTitleEn: item.hostTitleEn || item.hostTitle || "",
-        hostTitleNl: item.hostTitleNl || item.hostTitle || "",
+        titleEn: resolveI18n(item.title, 'en') || item.titleEn || "",
+        titleNl: resolveI18n(item.title, 'nl') || item.titleNl || "",
+        descriptionEn: resolveI18n(item.description, 'en') || item.descriptionEn || "",
+        descriptionNl: resolveI18n(item.description, 'nl') || item.descriptionNl || "",
+        hostTitleEn: resolveI18n(item.hostTitle, 'en') || item.hostTitleEn || "",
+        hostTitleNl: resolveI18n(item.hostTitle, 'nl') || item.hostTitleNl || "",
         price: item.price || "",
         priceNl: item.priceNl || item.price || "",
-        locationEn: item.locationEn || item.location || "",
-        locationNl: item.locationNl || item.location || "",
-        durationEn: item.durationEn || item.duration || "",
-        durationNl: item.durationNl || item.duration || "",
+        locationEn: resolveI18n(item.location, 'en') || item.locationEn || "",
+        locationNl: resolveI18n(item.location, 'nl') || item.locationNl || "",
+        durationEn: resolveI18n(item.duration, 'en') || item.durationEn || "",
+        durationNl: resolveI18n(item.duration, 'nl') || item.durationNl || "",
       }))
     : [];
 
@@ -110,38 +111,46 @@ const AdminActivities = () => {
     try {
       const formData = new FormData();
       formData.append("type", payload.type);
-      formData.append("title", payload.titleEn || payload.title || "");
-      formData.append("description", payload.descriptionEn || payload.description || "");
+      formData.append("title", JSON.stringify({
+        en: payload.titleEn || payload.title || "",
+        nl: payload.titleNl || payload.titleEn || payload.title || "",
+      }));
+      formData.append("description", JSON.stringify({
+        en: payload.descriptionEn || payload.description || "",
+        nl: payload.descriptionNl || payload.descriptionEn || payload.description || "",
+      }));
       formData.append("host", payload.host || "");
-      
-      const hostTitle = payload.hostTitleEn || payload.hostTitle || "";
-      if (hostTitle) {
-        formData.append("hostTitle", hostTitle);
+      formData.append("sourceLang", "en");
+
+      const hostTitleEn = payload.hostTitleEn || payload.hostTitle || "";
+      const hostTitleNl = payload.hostTitleNl || hostTitleEn;
+      if (hostTitleEn || hostTitleNl) {
+        formData.append("hostTitle", JSON.stringify({ en: hostTitleEn, nl: hostTitleNl }));
       }
-      
+
       formData.append("date", payload.date || "");
       formData.append("time", payload.time || "");
-      
+
       if (payload.price) {
         formData.append("price", payload.price);
       }
-      
-      const location = payload.locationEn || payload.location || "";
-      if (location) {
-        formData.append("location", location);
-      }
-      
-      const duration = payload.durationEn || payload.duration || "";
-      if (duration) {
-        formData.append("duration", duration);
+
+      const locationEn = payload.locationEn || payload.location || "";
+      const locationNl = payload.locationNl || locationEn;
+      if (locationEn || locationNl) {
+        formData.append("location", JSON.stringify({ en: locationEn, nl: locationNl }));
       }
 
-      // Convert tags array to comma-separated string for form-data
+      const durationEn = payload.durationEn || payload.duration || "";
+      const durationNl = payload.durationNl || durationEn;
+      if (durationEn || durationNl) {
+        formData.append("duration", JSON.stringify({ en: durationEn, nl: durationNl }));
+      }
+
       if (payload.tags && payload.tags.length > 0) {
         formData.append("tags", payload.tags.join(","));
       }
 
-      // If a file was selected, append the file object, else keep existing image url if editing
       if (payload.imageFile) {
         formData.append("image", payload.imageFile);
       } else if (payload.image && !payload.image.startsWith("data:")) {

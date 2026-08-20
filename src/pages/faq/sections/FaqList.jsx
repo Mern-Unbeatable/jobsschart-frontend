@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { HelpCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { resolveI18n } from '../../../utils/resolveI18n';
 
 const FaqList = ({ faqs }) => {
+  const { i18n } = useTranslation();
   const [openId, setOpenId] = useState(null);
 
   const toggleOpen = (id) => {
@@ -17,7 +20,9 @@ const FaqList = ({ faqs }) => {
             onClick={() => toggleOpen(f.id)}
             className="w-full text-left px-4 py-4 flex justify-between items-center hover:bg-[#f8f6fc] transition-colors"
           >
-            <span className="text-base font-medium">{f.question}</span>
+            <span className="text-base font-medium">
+              {resolveI18n(f.question, i18n.language)}
+            </span>
             <button
               type="button"
               aria-hidden
@@ -29,7 +34,7 @@ const FaqList = ({ faqs }) => {
           </button>
           {openId === f.id && (
             <div className="px-4 pb-4 text-base text-[#595367] border-t border-[#efeaf8]">
-              {f.answer}
+              {resolveI18n(f.answer, i18n.language)}
             </div>
           )}
         </div>

@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { ChevronDown, Ticket } from "lucide-react";
 import { useGetFaqsQuery } from "../../../../features/api/faqApi";
+import { useTranslation } from "react-i18next";
+import { resolveI18n } from "../../../../utils/resolveI18n";
 
 const FaqSection = () => {
+  const { i18n } = useTranslation();
   const [openFaqId, setOpenFaqId] = useState(null);
   const { data, isLoading } = useGetFaqsQuery();
   const faqs = data?.faqs || [];
@@ -46,7 +49,7 @@ const FaqSection = () => {
               >
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-base font-semibold text-[#2f2f2f] sm:text-base">
-                    {item.question}
+                    {resolveI18n(item.question, i18n.language)}
                   </span>
                   <ChevronDown
                     size={18}
@@ -58,7 +61,7 @@ const FaqSection = () => {
                 </div>
                 {isOpen && (
                   <p className="mt-3 max-w-3xl text-base leading-6 text-gray-500">
-                    {item.answer}
+                    {resolveI18n(item.answer, i18n.language)}
                   </p>
                 )}
               </button>

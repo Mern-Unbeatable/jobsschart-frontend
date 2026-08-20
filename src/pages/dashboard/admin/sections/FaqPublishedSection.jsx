@@ -1,5 +1,7 @@
 import React from 'react';
 import { PenLine, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { resolveI18n } from '../../../../utils/resolveI18n';
 
 const FAQ_TABS = [
   {
@@ -9,6 +11,7 @@ const FAQ_TABS = [
 ];
 
 const FaqPublishedSection = ({ activeTab, onTabChange, faqs, onEdit, onDelete }) => {
+  const { i18n } = useTranslation();
   return (
     <div className='rounded-xl border border-[#ece8f6] bg-white shadow-[0_10px_30px_rgba(17,12,46,0.06)]'>
       <div className='border-b border-[#ede7f6] px-2 pt-2'>
@@ -53,7 +56,7 @@ const FaqPublishedSection = ({ activeTab, onTabChange, faqs, onEdit, onDelete })
               >
                 <div className='min-w-0 pr-6'>
                   <p className='text-base font-semibold text-[#242424]'>
-                    {faq.question}
+                    {resolveI18n(faq.question, i18n.language)}
                   </p>
                 </div>
 

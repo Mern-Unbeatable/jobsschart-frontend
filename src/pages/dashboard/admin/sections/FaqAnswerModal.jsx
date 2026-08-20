@@ -9,6 +9,8 @@ import {
   X,
   PenLine,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { resolveI18n } from '../../../../utils/resolveI18n';
 
 const FaqAnswerModal = ({
   isOpen,
@@ -20,7 +22,13 @@ const FaqAnswerModal = ({
   onClose,
   onPublish,
 }) => {
+  const { i18n } = useTranslation();
   if (!isOpen || !pendingQuestion) return null;
+
+  const pendingQuestionText = resolveI18n(
+    pendingQuestion.question,
+    i18n.language
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/45 px-4 py-4 sm:py-6 backdrop-blur-[1px]">
@@ -50,7 +58,7 @@ const FaqAnswerModal = ({
             </div>
 
             <div className="rounded-lg border-l-4 border-[#7a5ab6] bg-[#f4f1f8] px-3 py-3 text-base leading-6 sm:leading-7 text-[#54505f] break-words">
-              {pendingQuestion.question}
+              {pendingQuestionText}
             </div>
           </div>
 

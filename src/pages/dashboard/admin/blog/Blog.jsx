@@ -19,6 +19,7 @@ import {
   useUpdateBlogMutation,
   useDeleteBlogMutation,
 } from "../../../../features/api/blogApi";
+import { resolveI18n } from "../../../../utils/resolveI18n";
 
 const EMPTY_FORM = {
   title: "",
@@ -65,17 +66,19 @@ const Blog = () => {
   }, [categoriesData]);
 
   const filterCategoriesList = useMemo(() => {
-    return ["All", ...blogCategories.map((c) => c.name)];
+    return ["All", ...blogCategories.map((c) => resolveI18n(c.name, "en"))];
   }, [blogCategories]);
 
   const normalizedBlogs = useMemo(() => {
     const rawBlogs = blogsData?.blogs || [];
     return rawBlogs.map((b) => ({
       id: b.id,
-      category: b.category?.name || "Uncategorized",
+      category: resolveI18n(b.category?.name, "en") || "Uncategorized",
       categoryId: b.categoryId,
-      title: b.title,
-      description: b.content || "",
+      title: resolveI18n(b.title, "en"),
+      i18nTitle: b.title,
+      description: resolveI18n(b.content, "en"),
+      i18nContent: b.content,
       slug: b.slug,
       status: b.status,
       date: b.createdAt
@@ -151,10 +154,10 @@ const Blog = () => {
     setEditingBlogId(blog.id);
     setEditingBlog(blog);
     setFormData({
-      title: blog.title,
+      title: resolveI18n(blog.i18nTitle, "en") || blog.title || "",
       slug: blog.slug || "",
       categoryId: blog.categoryId || "",
-      content: blog.description || "",
+      content: resolveI18n(blog.i18nContent, "en") || blog.description || "",
       image: blog.image || "",
       imageFile: null,
       status: blog.status || "PUBLISHED",

@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { X, Download, Loader2 } from "lucide-react";
 import { gsap } from "gsap";
 import { useGetDonationByIdQuery } from "../../../../../features/api/donationApi";
+import { resolveI18n } from "../../../../../utils/resolveI18n";
 
 function DonationDetailModal({ donorId, onClose }) {
   const overlayRef = useRef(null);
@@ -122,14 +123,14 @@ function DonationDetailModal({ donorId, onClose }) {
                 <p className="text-sm font-medium text-[#4A5565]">
                   Benefit / Support Cause
                 </p>
-                <p className="text-base text-[#0A0A0A]">{donor.benefit}</p>
+                <p className="text-base text-[#0A0A0A]">{resolveI18n(donor.benefit, 'en')}</p>
               </div>
             )}
             {/* Description */}
             <div className="flex flex-col gap-1">
               <p className="text-sm font-medium text-[#4A5565]">Description</p>
               <p className="text-sm text-[#0A0A0A]">
-                {donor.description || "—"}
+                {resolveI18n(donor.description, 'en') || "—"}
               </p>
             </div>
             {/* Website */}

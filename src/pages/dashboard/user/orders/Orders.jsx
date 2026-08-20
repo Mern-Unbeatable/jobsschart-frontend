@@ -3,12 +3,13 @@ import { useTranslation } from "react-i18next";
 import UserTabBar from "./components/UserTabBar";
 import OrderCard from "./components/OrderCard";
 import { useGetMyOrdersQuery } from "../../../../features/api/orderApi";
+import { resolveI18n } from "../../../../utils/resolveI18n";
 
-const mapUserOrder = (order) => {
+const mapUserOrder = (order, locale = 'en') => {
   const firstItem = order.items?.[0];
-  const title = firstItem?.product?.name || "Product Name";
+  const title = resolveI18n(firstItem?.product?.name, locale) || "Product Name";
   const description =
-    firstItem?.product?.description || "No description available.";
+    resolveI18n(firstItem?.product?.description, locale) || "No description available.";
   const image =
     firstItem?.product?.image ||
     (firstItem?.product?.gallery && firstItem.product.gallery[0]) ||
@@ -32,13 +33,13 @@ const mapUserOrder = (order) => {
 };
 
 const UserOrders = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [tab, setTab] = useState("recent");
   const { data: apiResponse, isLoading, error } = useGetMyOrdersQuery();
   const orders = useMemo(() => {
     if (!apiResponse?.orders) return [];
-    return apiResponse.orders.map(mapUserOrder);
-  }, [apiResponse]);
+    return apiResponse.orders.map((order) => mapUserOrder(order, i18n.language));
+  }, [apiResponse, i18n.language]);
 
   const visibleOrders = useMemo(
     () => orders.filter((item) => item.status === tab),
