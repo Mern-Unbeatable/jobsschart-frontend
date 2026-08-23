@@ -125,7 +125,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
   };
 
   return (
-    <div className="container mx-auto px-4 lg:px-6 pb-14 md:pb-16 lg:pb-20">
+    <div id="donation-form" className="container mx-auto px-4 lg:px-6 pb-14 md:pb-16 lg:pb-20">
       {/* Header Section */}
       <div className="mb-10">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
