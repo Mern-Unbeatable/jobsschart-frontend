@@ -46,7 +46,7 @@ const Donation = memo(() => {
     <div className="min-h-screen bg-[#F3FAF5]">
       <HeroSection />
       <ImpactSection />
-      {/* <SupportNetworkSection /> */}
+
       <DonationFormSection formData={formData} setFormData={setFormData} />
       <CommonAdsSection
         containerClassName="container mx-auto pb-14 md:pb-20 px-4 lg:px-6"
