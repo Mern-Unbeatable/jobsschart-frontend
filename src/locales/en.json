@@ -289,22 +289,22 @@
       }
     },
     "benefit": {
-      "eyebrow": "Additional Benefit for Donators",
+      "eyebrow": "Additional Benefit for Donors",
       "title": "Promote Your Business",
-      "p1": "As a token of appreciation for supporting our mission, donators will receive the opportunity to advertise their business, brand, or logo within our community free of charge for one full year.",
+      "p1": "As a token of appreciation for supporting our mission, donors will receive the opportunity to advertise their business, brand, or logo within our community free of charge for one full year.",
       "p2": "This allows us to support both the growth of our platform and the visibility of entrepreneurs and businesses within our network."
     }
   },
   "donationForm": {
     "header": {
-      "title": "Support Network mediums",
+      "title": "Support Illorac",
       "subtitle": "Based on the Law of Giving and Receiving"
     },
     "quote": "\"What you give will return to you in another form.\"",
     "attribution": "Inspired by the Deepak Chopra Principle",
     "formHeader": {
-      "title": "Choose Your Contribution",
-      "subtitle": "Your support helps us grow and reach more souls."
+      "title": "Donate",
+      "subtitle": "Enter your amount and continue to a secure payment. Choose iDEAL, Visa, or bank payment."
     },
     "fields": {
       "name": {
@@ -320,11 +320,15 @@
         "placeholder": "Enter your phone number..."
       },
       "amount": {
-        "label": "Amount (€)",
-        "placeholder": "e.g. 100.00",
-        "hint": "Minimum donation: €100.00",
-        "minError": "Minimum donation amount is €100.00.",
+        "label": "Donation amount (€)",
+        "placeholder": "Enter any amount",
+        "hint": "Choose freely how much you want to donate.",
+        "invalidError": "Please enter a valid amount greater than 0.",
         "requiredError": "Please enter a donation amount."
+      },
+      "benefit": {
+        "label": "Benefit / Support Cause",
+        "placeholder": "Why do you want to support or donate to us? (optional)"
       },
       "requiredError": "Please fill in all required fields.",
       "businessName": {
@@ -349,20 +353,28 @@
       }
     },
     "donorType": {
-      "label": "Donator Type",
-      "individual": "Individual Donator",
-      "business": "Business Donator"
+      "label": "Donor type:",
+      "individual": "Individual Donor",
+      "business": "Business Donor"
     },
     "businessType": {
       "local": "Local Business",
       "online": "Online Business"
     },
     "benefits": {
-      "title": "Business Donator Benefits",
+      "title": "Business Donor Benefits",
       "adPlacement": "Website ad placement",
       "visibility": "Visibility boost"
     },
-    "button": "Donate €{{amount}} Now"
+    "paymentMethods": {
+      "title": "Available payment methods",
+      "ideal": "iDEAL",
+      "visa": "Visa",
+      "bank": "Bank payment"
+    },
+    "button": "Donate",
+    "buttonWithAmount": "Donate €{{amount}}",
+    "processing": "Redirecting to payment..."
   },
   "community": {
     "page": {

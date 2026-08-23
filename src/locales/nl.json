@@ -425,22 +425,22 @@
       }
     },
     "benefit": {
-      "eyebrow": "Extra voordeel voor donatoren",
+      "eyebrow": "Extra voordeel voor donateurs",
       "title": "Promoot uw bedrijf",
-      "p1": "Als blijk van waardering voor het ondersteunen van onze missie, krijgen donatoren de mogelijkheid om hun bedrijf, merk of logo een jaar lang gratis te promoten binnen onze gemeenschap.",
+      "p1": "Als blijk van waardering voor het ondersteunen van onze missie, krijgen donateurs de mogelijkheid om hun bedrijf, merk of logo een jaar lang gratis te promoten binnen onze gemeenschap.",
       "p2": "Dit stelt ons in staat om zowel de groei van ons platform als de zichtbaarheid van ondernemers en bedrijven in ons netwerk te ondersteunen."
     }
   },
   "donationForm": {
     "header": {
-      "title": "Ondersteuning van netwerkmedia",
+      "title": "Support Illorac",
       "subtitle": "Gebaseerd op de wet van geven en ontvangen."
     },
     "quote": "\"Wat je geeft zal in een andere vorm naar je terugkeren.\"",
     "attribution": "Geïnspireerd door het Deepak Chopra-principe",
     "formHeader": {
-      "title": "Kies je bijdrage",
-      "subtitle": "Uw steun helpt ons groeien en meer zielen bereiken."
+      "title": "Doneren",
+      "subtitle": "Vul je bedrag in en ga door naar een veilige betaling. Kies iDEAL, Visa of bankbetaling."
     },
     "fields": {
       "name": {
@@ -456,11 +456,15 @@
         "placeholder": "Voer uw telefoonnummer in..."
       },
       "amount": {
-        "label": "Bedrag (€)",
-        "placeholder": "bijv. 100.00",
-        "hint": "Minimumdonatie: €100.00",
-        "minError": "Het minimumdonatiebedrag is €100.00.",
+        "label": "Donatiebedrag (€)",
+        "placeholder": "Vul zelf je bedrag in",
+        "hint": "Kies zelf hoeveel je wilt doneren.",
+        "invalidError": "Voer een geldig bedrag groter dan 0 in.",
         "requiredError": "Voer een donatiebedrag in."
+      },
+      "benefit": {
+        "label": "Voordeel / Steunreden",
+        "placeholder": "Waarom wilt u ons steunen of doneren? (optioneel)"
       },
       "requiredError": "Vul alle verplichte velden in.",
       "businessName": {
@@ -485,20 +489,28 @@
       }
     },
     "donorType": {
-      "label": "Donator type",
-      "individual": "Individuele donator",
-      "business": "Zakelijke donator"
+      "label": "Donateur type:",
+      "individual": "Individuele Donateur",
+      "business": "Zakelijke Donateur"
     },
     "businessType": {
       "local": "Lokaal bedrijf",
       "online": "Online bedrijf"
     },
     "benefits": {
-      "title": "Voordelen zakelijke donator",
+      "title": "Voordelen zakelijke donateur",
       "adPlacement": "Website advertentieplaatsing",
       "visibility": "Zichtbaarheid verbetering"
     },
-    "button": "€{{amount}} nu doneren"
+    "paymentMethods": {
+      "title": "Beschikbare betaalmethoden",
+      "ideal": "iDEAL",
+      "visa": "Visa",
+      "bank": "Bankbetaling"
+    },
+    "button": "Doneren",
+    "buttonWithAmount": "Doneer €{{amount}}",
+    "processing": "Doorsturen naar betaling..."
   },
   "community": {
     "page": {

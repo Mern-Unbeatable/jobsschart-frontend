@@ -16,7 +16,7 @@ const Donation = memo(() => {
     phone: user?.phone || "",
     amount: "",
     donorType: "individual",
-    benefit: "Feed a Family",
+    benefit: "",
     businessType: "local",
     businessName: "",
     description: "",
@@ -43,7 +43,7 @@ const Donation = memo(() => {
   });
 
   return (
-    <div className="min-h-screen bg-[#FBFDFF]">
+    <div className="min-h-screen bg-[#F3FAF5]">
       <HeroSection />
       <ImpactSection />
       {/* <SupportNetworkSection /> */}
@@ -51,7 +51,7 @@ const Donation = memo(() => {
       <CommonAdsSection
         containerClassName="container mx-auto pb-14 md:pb-20 px-4 lg:px-6"
         title="Advertisement Area"
-        titleClassName="text-black font-bold text-2xl tracking-widest uppercase"
+        titleClassName="text-gray-800 font-bold text-2xl tracking-widest uppercase"
         placement="DONATION"
       />
     </div>

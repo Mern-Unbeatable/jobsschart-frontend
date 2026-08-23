@@ -9,12 +9,16 @@ import {
   Link,
   UploadCloud,
   Loader2,
+  CreditCard,
+  Landmark,
 } from "lucide-react";
 import { useCreateCheckoutMutation } from "../../../features/api/paymentApi";
 import { redirectToMollieCheckout } from "../../../utils/mollieCheckout";
 import toast from "react-hot-toast";
 
-const MIN_DONATION_AMOUNT = 100;
+const labelClass = "block text-lg font-semibold text-gray-800 mb-2.5";
+const inputClass =
+  "w-full px-4 py-3.5 border border-emerald-200 bg-white rounded-lg text-base md:text-lg text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100";
 
 const DonationFormSection = memo(({ formData, setFormData }) => {
   const { t, i18n } = useTranslation();
@@ -38,17 +42,11 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
 
   const getAmountError = (value) => {
     if (!value) {
-      return t(
-        "donationForm.fields.amount.requiredError",
-        "Please enter a donation amount.",
-      );
+      return t("donationForm.fields.amount.requiredError");
     }
     const amountValue = Number(value);
-    if (Number.isNaN(amountValue) || amountValue < MIN_DONATION_AMOUNT) {
-      return t(
-        "donationForm.fields.amount.minError",
-        "Minimum donation amount is €100.00.",
-      );
+    if (Number.isNaN(amountValue) || amountValue <= 0) {
+      return t("donationForm.fields.amount.invalidError");
     }
     return "";
   };
@@ -61,12 +59,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
       !formData.phone ||
       !formData.amount
     ) {
-      toast.error(
-        t(
-          "donationForm.fields.requiredError",
-          "Please fill in all required fields.",
-        ),
-      );
+      toast.error(t("donationForm.fields.requiredError"));
       return;
     }
 
@@ -86,7 +79,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
       data.append("donationData[email]", formData.email);
       data.append("donationData[phone]", formData.phone);
       data.append("donationData[amount]", formData.amount);
-      data.append("donationData[benefit]", formData.benefit);
+      data.append("donationData[benefit]", formData.benefit || "");
       data.append(
         "donationData[sourceLang]",
         i18n.language?.startsWith("nl") ? "nl" : "en",
@@ -124,52 +117,68 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
     }
   };
 
+  const paymentMethods = [
+    {
+      key: "ideal",
+      label: t("donationForm.paymentMethods.ideal"),
+      icon: Landmark,
+    },
+    {
+      key: "visa",
+      label: t("donationForm.paymentMethods.visa"),
+      icon: CreditCard,
+    },
+    {
+      key: "bank",
+      label: t("donationForm.paymentMethods.bank"),
+      icon: Landmark,
+    },
+  ];
+
   return (
-    <div id="donation-form" className="container mx-auto px-4 lg:px-6 pb-14 md:pb-16 lg:pb-20">
-      {/* Header Section */}
-      <div className="mb-10">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+    <div
+      id="donation-form"
+      className="container mx-auto px-4 lg:px-6 pb-14 md:pb-16 lg:pb-20"
+    >
+      <div className="mb-8">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
           {t("donationForm.header.title")}
         </h2>
-        <p className="text-gray-500 text-base">
+        <p className="text-gray-700 text-lg md:text-xl font-medium">
           {t("donationForm.header.subtitle")}
         </p>
       </div>
 
-      {/* Quote Box */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200 mb-12 ">
-        <p className="text-gray-700 font-bold text-xl mb-2 ">
+      <div className="bg-emerald-50 rounded-xl p-5 md:p-6 border border-emerald-200 mb-8">
+        <p className="text-gray-900 font-semibold text-xl md:text-2xl mb-2">
           {t("donationForm.quote")}
         </p>
-        <p className="text-gray-400 text-base">
+        <p className="text-gray-700 text-base md:text-lg">
           {t("donationForm.attribution")}
         </p>
       </div>
 
-      {/* Main Form Container */}
-      <div className="bg-white rounded-xl  border border-gray-100 overflow-hidden">
-        {/* Form Header */}
-        <div className="bg-[#F1EBF7] p-4 lg:p-6 border-b border-gray-100">
-          <h3 className="text-xl font-bold text-gray-800 mb-1 ">
+      <div className="bg-white rounded-xl border border-emerald-200 overflow-hidden shadow-sm">
+        <div className="bg-emerald-50 p-5 lg:p-6 border-b border-emerald-200">
+          <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             {t("donationForm.formHeader.title")}
           </h3>
-          <p className="text-gray-500 text-base">
+          <p className="text-gray-700 text-base md:text-lg font-medium leading-relaxed">
             {t("donationForm.formHeader.subtitle")}
           </p>
         </div>
 
-        <div className="p-4 lg:p-6">
+        <div className="p-4 lg:p-6 bg-[#F7FCF9]">
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
-            {/* Standard Inputs */}
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-5">
               <div>
-                <label className="block text-base  text-gray-600 mb-2">
+                <label className={labelClass}>
                   {t("donationForm.fields.name.label")}
                 </label>
                 <input
                   type="text"
                   placeholder={t("donationForm.fields.name.placeholder")}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-green-500/60"
+                  className={inputClass}
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -179,13 +188,13 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base  text-gray-600 mb-2">
+                  <label className={labelClass}>
                     {t("donationForm.fields.email.label")}
                   </label>
                   <input
                     type="email"
                     placeholder={t("donationForm.fields.email.placeholder")}
-                    className="w-full px-4 py-3 border border-gray-200 bg-gray-100 cursor-not-allowed rounded-md text-sm focus:outline-none"
+                    className={`${inputClass} bg-emerald-50 cursor-not-allowed`}
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
@@ -194,13 +203,13 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-base  text-gray-600 mb-2">
+                  <label className={labelClass}>
                     {t("donationForm.fields.phone.label")}
                   </label>
                   <input
                     type="tel"
                     placeholder={t("donationForm.fields.phone.placeholder")}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-green-500/60"
+                    className={inputClass}
                     value={formData.phone}
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
@@ -209,91 +218,86 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-base  text-gray-600 mb-2">
-                    {t("donationForm.fields.amount.label")}
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    placeholder={t("donationForm.fields.amount.placeholder")}
-                    className={`w-full px-4 py-3 border rounded-md text-sm focus:outline-none ${
-                      amountError
-                        ? "border-red-400 focus:border-red-500"
-                        : "border-gray-200 focus:border-green-500/60"
-                    }`}
-                    value={formData.amount}
-                    onChange={(e) => {
-                      const nextAmount = e.target.value;
-                      setFormData({ ...formData, amount: nextAmount });
-                      if (amountError) {
-                        setAmountError(getAmountError(nextAmount));
-                      }
-                    }}
-                    onBlur={() => {
-                      if (formData.amount) {
-                        setAmountError(getAmountError(formData.amount));
-                      }
-                    }}
-                  />
-                  {amountError ? (
-                    <p className="mt-1.5 text-xs text-red-500">{amountError}</p>
-                  ) : (
-                    <p className="mt-1.5 text-xs text-gray-500">
-                      {t(
-                        "donationForm.fields.amount.hint",
-                        "Minimum donation: €100.00",
-                      )}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-base text-gray-600 mb-2">
-                    Benefit / Support Cause
-                  </label>
-                  <select
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-green-500/60 bg-white"
-                    value={formData.benefit}
-                    onChange={(e) =>
-                      setFormData({ ...formData, benefit: e.target.value })
+              <div>
+                <label className={labelClass}>
+                  {t("donationForm.fields.amount.label")}
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  placeholder={t("donationForm.fields.amount.placeholder")}
+                  className={`${inputClass} ${
+                    amountError
+                      ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                      : ""
+                  }`}
+                  value={formData.amount}
+                  onChange={(e) => {
+                    const nextAmount = e.target.value;
+                    setFormData({ ...formData, amount: nextAmount });
+                    if (amountError) {
+                      setAmountError(getAmountError(nextAmount));
                     }
-                  >
-                    <option value="Feed a Family">Feed a Family</option>
-                    <option value="Support Education">Support Education</option>
-                    <option value="Medical Support">Medical Support</option>
-                    <option value="General Fund">General Fund</option>
-                  </select>
-                </div>
+                  }}
+                  onBlur={() => {
+                    if (formData.amount) {
+                      setAmountError(getAmountError(formData.amount));
+                    }
+                  }}
+                />
+                {amountError ? (
+                  <p className="mt-2 text-sm md:text-base text-red-600 font-medium">
+                    {amountError}
+                  </p>
+                ) : (
+                  <p className="mt-2 text-sm md:text-base text-gray-600 font-medium">
+                    {t("donationForm.fields.amount.hint")}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className={labelClass}>
+                  {t("donationForm.fields.benefit.label")}
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder={t("donationForm.fields.benefit.placeholder")}
+                  className={`${inputClass} resize-none`}
+                  value={formData.benefit}
+                  onChange={(e) =>
+                    setFormData({ ...formData, benefit: e.target.value })
+                  }
+                />
               </div>
             </div>
 
-            {/* Donator Type Selection */}
-            <div className="pt-4">
-              <label className="block text-lg text-gray-600 mb-4">
+            <div>
+              <label className="block text-lg md:text-xl font-semibold text-gray-800 mb-3">
                 {t("donationForm.donorType.label")}
               </label>
-              <div className="flex gap-4 max-w-md">
+              <div className="flex gap-3 max-w-lg">
                 <button
                   type="button"
                   onClick={() =>
                     setFormData({ ...formData, donorType: "individual" })
                   }
-                  className={`flex-1 py-6 rounded-lg border-2 flex flex-col items-center gap-2 transition-all ${
+                  className={`flex-1 py-5 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${
                     formData.donorType === "individual"
-                      ? "border-green-500/60 bg-[#F5F1FD]"
-                      : "border-gray-100 bg-white"
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-emerald-200 bg-white"
                   }`}
                 >
                   <User
-                    size={20}
+                    size={24}
                     className={
                       formData.donorType === "individual"
-                        ? "text-green-500/60"
-                        : "text-gray-400"
+                        ? "text-emerald-600"
+                        : "text-gray-500"
                     }
                   />
-                  <span className="text-base font-bold text-gray-700">
+                  <span className="text-base md:text-lg font-bold text-gray-800 text-center px-1">
                     {t("donationForm.donorType.individual")}
                   </span>
                 </button>
@@ -302,62 +306,60 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   onClick={() =>
                     setFormData({ ...formData, donorType: "business" })
                   }
-                  className={`flex-1 py-6 rounded-lg border-2 flex flex-col items-center gap-2 transition-all ${
+                  className={`flex-1 py-5 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${
                     formData.donorType === "business"
-                      ? "border-green-500/60 bg-[#F5F1FD]"
-                      : "border-gray-100 bg-white"
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-emerald-200 bg-white"
                   }`}
                 >
                   <Building2
-                    size={20}
+                    size={24}
                     className={
                       formData.donorType === "business"
-                        ? "text-green-500/60"
-                        : "text-gray-400"
+                        ? "text-emerald-600"
+                        : "text-gray-500"
                     }
                   />
-                  <span className="text-base font-bold text-gray-700">
+                  <span className="text-base md:text-lg font-bold text-gray-800 text-center px-1">
                     {t("donationForm.donorType.business")}
                   </span>
                 </button>
               </div>
             </div>
 
-            {/* Conditional Business Fields */}
             {isBusiness && (
-              <div className="space-y-6 pt-6 border-t border-gray-100 animate-in fade-in duration-500">
-                {/* Business Type Toggle */}
-                <div className="flex bg-gray-100 p-1 rounded-full w-fit">
+              <div className="space-y-5 pt-4 border-t border-emerald-100">
+                <div className="flex bg-emerald-50 p-1 rounded-full w-fit">
                   <button
                     type="button"
                     onClick={() =>
                       setFormData({ ...formData, businessType: "local" })
                     }
-                    className={`px-6 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all ${
+                    className={`px-5 py-2 rounded-full text-base font-bold flex items-center gap-2 transition-all ${
                       formData.businessType === "local"
-                        ? "bg-white shadow-sm text-gray-800"
-                        : "text-gray-400"
+                        ? "bg-white shadow-sm text-gray-900"
+                        : "text-gray-600"
                     }`}
                   >
-                    <MapPin size={12} /> {t("donationForm.businessType.local")}
+                    <MapPin size={14} /> {t("donationForm.businessType.local")}
                   </button>
                   <button
                     type="button"
                     onClick={() =>
                       setFormData({ ...formData, businessType: "online" })
                     }
-                    className={`px-6 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all ${
+                    className={`px-5 py-2 rounded-full text-base font-bold flex items-center gap-2 transition-all ${
                       formData.businessType === "online"
-                        ? "bg-white shadow-sm text-gray-800"
-                        : "text-gray-400"
+                        ? "bg-white shadow-sm text-gray-900"
+                        : "text-gray-600"
                     }`}
                   >
-                    <Globe size={12} /> {t("donationForm.businessType.online")}
+                    <Globe size={14} /> {t("donationForm.businessType.online")}
                   </button>
                 </div>
 
                 <div>
-                  <label className="block text-base font-bold text-gray-600 mb-2">
+                  <label className={labelClass}>
                     {t("donationForm.fields.businessName.label")}
                   </label>
                   <input
@@ -365,7 +367,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                     placeholder={t(
                       "donationForm.fields.businessName.placeholder",
                     )}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded text-sm focus:outline-none"
+                    className={inputClass}
                     value={formData.businessName}
                     onChange={(e) =>
                       setFormData({ ...formData, businessName: e.target.value })
@@ -374,11 +376,11 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                 </div>
 
                 <div>
-                  <div className="flex justify-between mb-2">
-                    <label className="block text-base font-bold text-gray-600">
+                  <div className="flex justify-between mb-2.5">
+                    <label className="block text-lg font-semibold text-gray-800">
                       {t("donationForm.fields.description.label")}
                     </label>
-                    <span className="text-[10px] text-gray-400">
+                    <span className="text-sm text-gray-500 font-medium">
                       {formData.description.length}/200
                     </span>
                   </div>
@@ -388,7 +390,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                     placeholder={t(
                       "donationForm.fields.description.placeholder",
                     )}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded text-sm focus:outline-none resize-none"
+                    className={`${inputClass} resize-none`}
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
@@ -397,7 +399,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                 </div>
 
                 <div>
-                  <label className="block text-base font-bold text-gray-600 mb-2">
+                  <label className={labelClass}>
                     {formData.businessType === "online"
                       ? t("donationForm.fields.website.label")
                       : t("donationForm.fields.location.label")}
@@ -405,13 +407,13 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                   <div className="relative">
                     {formData.businessType === "online" ? (
                       <Link
-                        size={14}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={16}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
                       />
                     ) : (
                       <MapPin
-                        size={14}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={16}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
                       />
                     )}
                     <input
@@ -421,7 +423,7 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                           ? t("donationForm.fields.website.placeholder")
                           : t("donationForm.fields.location.placeholder")
                       }
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded text-sm focus:outline-none"
+                      className={`${inputClass} pl-10`}
                       value={
                         formData.businessType === "online"
                           ? formData.websiteUrl
@@ -440,12 +442,12 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                 </div>
 
                 <div>
-                  <label className="block text-base font-bold text-gray-600 mb-2">
+                  <label className={labelClass}>
                     {t("donationForm.fields.image.label")}
                   </label>
                   <div
                     onClick={handleFileClick}
-                    className="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-white hover:border-green-500/60 cursor-pointer transition-colors"
+                    className="border-2 border-dashed border-emerald-300 rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-white hover:border-emerald-500 cursor-pointer transition-colors"
                   >
                     <input
                       type="file"
@@ -460,64 +462,82 @@ const DonationFormSection = memo(({ formData, setFormData }) => {
                           <img
                             src={URL.createObjectURL(formData.image)}
                             alt="Preview"
-                            className="w-24 h-24 object-cover rounded-lg border border-gray-200"
+                            className="w-24 h-24 object-cover rounded-lg border border-emerald-200"
                           />
                         )}
-                        <span className="text-xs text-gray-500 font-medium">
+                        <span className="text-sm md:text-base text-gray-700 font-medium">
                           {formData.image.name}
                         </span>
                       </div>
                     ) : (
                       <>
-                        <UploadCloud size={28} className="text-gray-300" />
-                        <p className="text-[11px] text-gray-400 font-medium">
+                        <UploadCloud size={32} className="text-emerald-500" />
+                        <p className="text-sm md:text-base text-gray-600 font-medium">
                           {t("donationForm.fields.image.placeholder")}
                         </p>
                       </>
                     )}
                   </div>
                 </div>
+
+                <div className="bg-emerald-50 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp size={18} className="text-emerald-600" />
+                    <h4 className="text-lg font-bold text-gray-900">
+                      {t("donationForm.benefits.title")}
+                    </h4>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-lg border border-emerald-200">
+                      <Globe size={16} className="text-emerald-600" />
+                      <span className="text-base text-gray-800 font-semibold">
+                        {t("donationForm.benefits.adPlacement")}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-lg border border-emerald-200">
+                      <TrendingUp size={16} className="text-emerald-600" />
+                      <span className="text-base text-gray-800 font-semibold">
+                        {t("donationForm.benefits.visibility")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Benefits Footer */}
-            <div className="bg-gray-50/50 rounded-2xl p-6 mt-8">
-              <div className="flex items-center gap-2 mb-4">
-                <TrendingUp size={16} className="text-gray-600" />
-                <h4 className="text-base font-bold text-gray-800">
-                  {t("donationForm.benefits.title")}
-                </h4>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm">
-                  <Globe size={14} className="text-gray-400" />
-                  <span className="text-base text-gray-600 font-bold">
-                    {t("donationForm.benefits.adPlacement")}
+            <div className="rounded-xl border border-emerald-200 bg-white p-5">
+              <p className="text-base md:text-lg font-semibold text-gray-800 mb-3">
+                {t("donationForm.paymentMethods.title")}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {paymentMethods.map(({ key, label, icon: Icon }) => (
+                  <span
+                    key={key}
+                    className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-2 text-base font-medium text-gray-800"
+                  >
+                    <Icon size={16} />
+                    {label}
                   </span>
-                </div>
-                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm">
-                  <TrendingUp size={14} className="text-gray-400" />
-                  <span className="text-base text-gray-600 font-bold">
-                    {t("donationForm.benefits.visibility")}
-                  </span>
-                </div>
+                ))}
               </div>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={isCheckingOut}
-                className="bg-green-500/60  text-white text-sm font-bold py-3 px-8 rounded transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="w-full sm:w-auto min-w-[240px] justify-center bg-emerald-500 hover:bg-emerald-600 text-white text-lg font-bold py-4 px-10 rounded-full transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-md shadow-emerald-200"
               >
                 {isCheckingOut && (
                   <Loader2 className="animate-spin h-5 w-5 text-white" />
                 )}
                 {isCheckingOut
-                  ? "Processing..."
-                  : t("donationForm.button", {
-                      amount: formData.amount || "100",
-                    })}
+                  ? t("donationForm.processing")
+                  : formData.amount
+                    ? t("donationForm.buttonWithAmount", {
+                        amount: formData.amount,
+                      })
+                    : t("donationForm.button")}
               </button>
             </div>
           </form>
