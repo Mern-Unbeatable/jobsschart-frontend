@@ -157,6 +157,9 @@ const ConsultantEarnings = lazy(
 const ConsultantPayout = lazy(
   () => import("../pages/dashboard/consultant/payout/Payout"),
 );
+const ConsultantBlog = lazy(
+  () => import("../pages/dashboard/consultant/blog/Blog"),
+);
 const ConsultantSettings = lazy(
   () => import("../pages/dashboard/consultant/Settings"),
 );
@@ -473,6 +476,10 @@ const router = createBrowserRouter(
         <Route
           path={seg(ROUTES.CONSULTANT_PAYOUT, ROUTES.CONSULTANT)}
           element={<ConsultantPayout />}
+        />
+        <Route
+          path={seg(ROUTES.CONSULTANT_BLOG, ROUTES.CONSULTANT)}
+          element={<ConsultantBlog />}
         />
         <Route
           path={seg(ROUTES.CONSULTANT_SETTINGS, ROUTES.CONSULTANT)}

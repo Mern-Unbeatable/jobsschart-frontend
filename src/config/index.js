@@ -92,6 +92,7 @@ export const ROUTES = {
   CONSULTANT_SUPPORT_TICKETS: '/consultant/support-tickets',
   CONSULTANT_EARNINGS: '/consultant/earnings',
   CONSULTANT_PAYOUT: '/consultant/payout',
+  CONSULTANT_BLOG: '/consultant/blog',
   CONSULTANT_SETTINGS: '/consultant/settings',
 };
 

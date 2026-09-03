@@ -9,6 +9,7 @@ import {
   Wallet,
   User,
   Euro,
+  FileText,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -24,10 +25,10 @@ const NAV_ITEMS = [
     icon: History,
   },
   { name: 'Chat', path: ROUTES.CONSULTANT_CHAT, icon: MessageCircle },
- 
   { name: 'Earnings', path: ROUTES.CONSULTANT_EARNINGS, icon: Euro },
   { name: 'Payout', path: ROUTES.CONSULTANT_PAYOUT, icon: Wallet },
-   {
+  { name: 'Blog', path: ROUTES.CONSULTANT_BLOG, icon: FileText },
+  {
     name: 'Support Tickets',
     path: ROUTES.CONSULTANT_SUPPORT_TICKETS,
     icon: Ticket,
