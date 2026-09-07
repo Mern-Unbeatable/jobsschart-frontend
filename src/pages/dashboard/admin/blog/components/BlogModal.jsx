@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { X, ImagePlus } from "lucide-react";
+import { X, ImagePlus, Loader2 } from "lucide-react";
 import { resolveI18n } from "../../../../../utils/resolveI18n";
 
 const BlogModal = ({
@@ -14,6 +14,7 @@ const BlogModal = ({
   categories = [],
   requireApproval = false,
   lastError = null,
+  isSaving = false,
 }) => {
   const fileInputRef = useRef(null);
 
@@ -192,13 +193,19 @@ const BlogModal = ({
 
           <button
             type="submit"
-            className="rounded bg-green-500/60 px-5 py-2 text-base font-medium text-white transition hover:brightness-95"
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 rounded bg-green-500/60 px-5 py-2 text-base font-medium text-white transition hover:brightness-95 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {requireApproval
-              ? isEditMode
-                ? "Update & Resubmit"
-                : "Submit for Approval"
-              : "Save"}
+            {isSaving && (
+              <Loader2 size={15} className="animate-spin" aria-hidden="true" />
+            )}
+            {isSaving
+              ? "Saving…"
+              : requireApproval
+                ? isEditMode
+                  ? "Update & Resubmit"
+                  : "Submit for Approval"
+                : "Save"}
           </button>
 
           {lastError && (

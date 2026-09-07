@@ -53,6 +53,7 @@ const Blog = () => {
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [pendingReset, setPendingReset] = useState(false);
   const [lastError, setLastError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
   const closeTimerRef = useRef(null);
 
   const { data: blogsData, isLoading } = useGetMyBlogsQuery({
@@ -113,6 +114,7 @@ const Blog = () => {
     closeTimerRef.current = setTimeout(() => {
       setIsModalOpen(false);
       setIsModalClosing(false);
+      setIsSaving(false);
       if (pendingReset) {
         setEditingBlogId(null);
         setEditingBlog(null);
@@ -141,6 +143,7 @@ const Blog = () => {
     setEditingBlog(null);
     setFormData(EMPTY_FORM);
     setLastError(null);
+    setIsSaving(false);
     setIsModalOpen(true);
   };
 
@@ -162,6 +165,7 @@ const Blog = () => {
       imageFile: null,
     });
     setLastError(null);
+    setIsSaving(false);
     setIsModalOpen(true);
   };
 
@@ -201,6 +205,7 @@ const Blog = () => {
   const handleSave = async (event) => {
     event.preventDefault();
     setLastError(null);
+    setIsSaving(true);
 
     const preparedTitle = formData.title.trim();
     const preparedContent = formData.content.trim();
@@ -262,6 +267,8 @@ const Blog = () => {
         const msg = err?.data?.message || "Failed to update blog";
         setLastError(msg);
         toast.error(msg);
+      } finally {
+        setIsSaving(false);
       }
     } else {
       fd.append("title", preparedTitle);
@@ -281,6 +288,8 @@ const Blog = () => {
         const msg = err?.data?.message || "Failed to submit blog";
         setLastError(msg);
         toast.error(msg);
+      } finally {
+        setIsSaving(false);
       }
     }
   };
@@ -375,6 +384,7 @@ const Blog = () => {
         categories={blogCategories}
         requireApproval
         lastError={lastError}
+        isSaving={isSaving}
       />
     </section>
   );
