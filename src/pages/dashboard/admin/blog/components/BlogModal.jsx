@@ -12,6 +12,7 @@ const BlogModal = ({
   onSave,
   onClose,
   categories = [],
+  requireApproval = false,
 }) => {
   const fileInputRef = useRef(null);
 
@@ -38,9 +39,7 @@ const BlogModal = ({
   return (
     <div
       className={`fixed inset-0 z-40 flex items-center justify-center bg-black/55 px-4 ${
-        isClosing
-          ? "animate-modal-overlay-out"
-          : "animate-modal-overlay"
+        isClosing ? "animate-modal-overlay-out" : "animate-modal-overlay"
       } ${isClosing ? "pointer-events-none" : ""}`}
       aria-modal="true"
       role="dialog"
@@ -66,9 +65,7 @@ const BlogModal = ({
 
         <form className="space-y-3" onSubmit={onSave}>
           <label className="block">
-            <span className="mb-1 block text-base text-[#333333]">
-              Title
-            </span>
+            <span className="mb-1 block text-base text-[#333333]">Title</span>
             <input
               type="text"
               value={formData.title}
@@ -90,9 +87,7 @@ const BlogModal = ({
           </label>
 
           <label className="block">
-            <span className="mb-1 block text-base text-[#333333]">
-              Slug
-            </span>
+            <span className="mb-1 block text-base text-[#333333]">Slug</span>
             <input
               type="text"
               value={formData.slug}
@@ -108,16 +103,18 @@ const BlogModal = ({
             />
           </label>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div
+            className={`grid grid-cols-1 gap-3 ${
+              requireApproval ? "" : "sm:grid-cols-2"
+            }`}
+          >
             <label className="block">
               <span className="mb-1 block text-base text-[#333333]">
                 Category
               </span>
               <select
                 value={formData.categoryId}
-                onChange={(e) =>
-                  onChangeField("categoryId", e.target.value)
-                }
+                onChange={(e) => onChangeField("categoryId", e.target.value)}
                 className="w-full rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent focus:ring-green-500/60"
                 required
               >
@@ -130,32 +127,33 @@ const BlogModal = ({
               </select>
             </label>
 
-            <label className="block">
-              <span className="mb-1 block text-base text-[#333333]">
-                Status
-              </span>
-              <select
-                value={formData.status}
-                onChange={(e) =>
-                  onChangeField("status", e.target.value)
-                }
-                className="w-full rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent focus:ring-green-500/60"
-              >
-                <option value="PUBLISHED">Published</option>
-                <option value="DRAFT">Draft</option>
-              </select>
-            </label>
+            {requireApproval ? (
+              <p className="rounded-md bg-amber-50 px-3 py-2.5 text-sm text-amber-800 ring-1 ring-amber-200">
+                Your blog will be submitted for admin approval. It will go live
+                only after an admin publishes it.
+              </p>
+            ) : (
+              <label className="block">
+                <span className="mb-1 block text-base text-[#333333]">
+                  Status
+                </span>
+                <select
+                  value={formData.status}
+                  onChange={(e) => onChangeField("status", e.target.value)}
+                  className="w-full rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent focus:ring-green-500/60"
+                >
+                  <option value="PUBLISHED">Published</option>
+                  <option value="DRAFT">Draft</option>
+                </select>
+              </label>
+            )}
           </div>
 
           <label className="block">
-            <span className="mb-1 block text-base text-[#333333]">
-              Content
-            </span>
+            <span className="mb-1 block text-base text-[#333333]">Content</span>
             <textarea
               value={formData.content}
-              onChange={(e) =>
-                onChangeField("content", e.target.value)
-              }
+              onChange={(e) => onChangeField("content", e.target.value)}
               rows={4}
               placeholder="Write detailed blog content here"
               className="w-full resize-none rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent placeholder:text-[#8A8A8A] focus:ring-green-500/60"
@@ -195,7 +193,11 @@ const BlogModal = ({
             type="submit"
             className="rounded bg-green-500/60 px-5 py-2 text-base font-medium text-white transition hover:brightness-95"
           >
-            Save
+            {requireApproval
+              ? isEditMode
+                ? "Update & Resubmit"
+                : "Submit for Approval"
+              : "Save"}
           </button>
         </form>
       </div>
