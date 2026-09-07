@@ -54,7 +54,7 @@ module.exports = (env, argv) => {
   if (isProd && !fallbacks.REACT_APP_API_BASE_URL) {
     throw new Error(
       "[webpack] REACT_APP_API_BASE_URL is not set. " +
-      "Set it in .env.production before running a production build."
+        "Set it in .env.production before running a production build.",
     );
   }
 
