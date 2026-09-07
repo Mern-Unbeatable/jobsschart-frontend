@@ -50,6 +50,14 @@ module.exports = (env, argv) => {
   }
   envKeys["process.env.NODE_ENV"] = JSON.stringify(argv.mode);
 
+  // Fail the build immediately if the API URL is missing in production
+  if (isProd && !fallbacks.REACT_APP_API_BASE_URL) {
+    throw new Error(
+      "[webpack] REACT_APP_API_BASE_URL is not set. " +
+      "Set it in .env.production before running a production build."
+    );
+  }
+
   // ── Debug logging (remove after confirming it works) ────────
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("BUILD MODE:", argv.mode);
@@ -183,6 +191,10 @@ module.exports = (env, argv) => {
       hot: true,
       open: true,
       compress: true,
+      // Force HMR WebSocket to localhost so it never leaks the production hostname
+      client: {
+        webSocketURL: `ws://localhost:${devPort}/ws`,
+      },
       headers: {
         "Access-Control-Allow-Origin": `https://${allowedHost}`,
         "Access-Control-Allow-Headers":
