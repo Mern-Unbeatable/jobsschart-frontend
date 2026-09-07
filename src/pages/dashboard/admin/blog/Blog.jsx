@@ -11,20 +11,18 @@ import BlogHeader from "./components/BlogHeader";
 import CategoryFilters from "./components/CategoryFilters";
 import BlogCard from "./components/BlogCard";
 import BlogModal from "./components/BlogModal";
+import Pagination from "../../../../components/Pagination";
 import {
-  useGetBlogsQuery,
-  useGetDraftBlogsQuery,
+  useGetAdminBlogsQuery,
+  useGetPendingConsultantBlogsQuery,
   useGetAllBlogCategoriesQuery,
   useCreateBlogMutation,
   useUpdateBlogMutation,
   useDeleteBlogMutation,
+  useApproveBlogMutation,
+  useRejectBlogMutation,
 } from "../../../../features/api/blogApi";
 import { resolveI18n } from "../../../../utils/resolveI18n";
-import {
-  getPendingConsultantBlogs,
-  approveConsultantBlog,
-  deleteConsultantBlog,
-} from "../../../../utils/consultantBlogStorage";
 import {
   BookOpen,
   Users,
@@ -34,9 +32,12 @@ import {
   FileText,
   AlertCircle,
   Loader2,
+  XCircle,
 } from "lucide-react";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
+const PAGE_LIMIT = 12;
+
 const EMPTY_FORM = {
   title: "",
   slug: "",
@@ -76,6 +77,28 @@ const LoadingState = () => (
   </div>
 );
 
+// ─── Normalize a blog row from the API ────────────────────────────────────────
+const normalizeBlog = (b) => ({
+  id: b.id,
+  category: resolveI18n(b.category?.name, "en") || "Uncategorized",
+  categoryId: b.categoryId,
+  title: resolveI18n(b.title, "en"),
+  i18nTitle: b.title,
+  description: resolveI18n(b.content, "en"),
+  i18nContent: b.content,
+  slug: b.slug,
+  status: b.status,
+  date: b.createdAt
+    ? new Date(b.createdAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "N/A",
+  author: b.user?.name || "Admin",
+  image: Array.isArray(b.image) ? b.image[0] || null : b.image || null,
+});
+
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 const Blog = () => {
   // ── Active top-level tab: "ADMIN" or "CONSULTANT" ──
@@ -84,8 +107,9 @@ const Blog = () => {
   // ── Admin sub-tab: "PUBLISHED" or "DRAFT" ──
   const [adminSubTab, setAdminSubTab] = useState("PUBLISHED");
 
-  // ── Consultant pending local state ──
-  const [localPendingTick, setLocalPendingTick] = useState(0);
+  // ── Pagination ──
+  const [adminPage, setAdminPage] = useState(1);
+  const [consultantPage, setConsultantPage] = useState(1);
 
   // ── Category filter ──
   const [activeCategory, setActiveCategory] = useState("All");
@@ -101,106 +125,63 @@ const Blog = () => {
   const closeTimerRef = useRef(null);
 
   // ── API hooks ──
-  const { data: publishedBlogsData, isLoading: isPublishedLoading } =
-    useGetBlogsQuery(undefined, {
-      skip: mainTab !== "ADMIN" || adminSubTab !== "PUBLISHED",
-    });
+  const { data: adminBlogsData, isLoading: isAdminBlogsLoading } =
+    useGetAdminBlogsQuery(
+      { status: adminSubTab, page: adminPage, limit: PAGE_LIMIT },
+      { skip: mainTab !== "ADMIN" },
+    );
 
-  const { data: draftBlogsData, isLoading: isDraftsLoading } =
-    useGetDraftBlogsQuery(undefined, {
-      skip: mainTab !== "ADMIN" || adminSubTab !== "DRAFT",
-    });
+  const { data: pendingData, isLoading: isPendingLoading } =
+    useGetPendingConsultantBlogsQuery(
+      { page: consultantPage, limit: PAGE_LIMIT },
+      { skip: mainTab !== "CONSULTANT" },
+    );
 
   const { data: categoriesData } = useGetAllBlogCategoriesQuery();
   const [createBlog] = useCreateBlogMutation();
   const [updateBlog] = useUpdateBlogMutation();
   const [deleteBlog] = useDeleteBlogMutation();
-
-  // ── Derived: refresh consultant pending ──
-  const refreshLocalPending = useCallback(() => {
-    setLocalPendingTick((n) => n + 1);
-  }, []);
+  const [approveBlog] = useApproveBlogMutation();
+  const [rejectBlog] = useRejectBlogMutation();
 
   // ── Blog categories ──
   const blogCategories = useMemo(
     () => categoriesData?.categories || [],
-    [categoriesData]
+    [categoriesData],
   );
 
   const filterCategoriesList = useMemo(
     () => ["All", ...blogCategories.map((c) => resolveI18n(c.name, "en"))],
-    [blogCategories]
+    [blogCategories],
   );
 
-  // ── Admin blogs (normalized) ──
-  const adminBlogsData =
-    adminSubTab === "PUBLISHED" ? publishedBlogsData : draftBlogsData;
-  const isAdminBlogsLoading =
-    adminSubTab === "PUBLISHED" ? isPublishedLoading : isDraftsLoading;
+  // ── Admin blogs (normalized + filtered) ──
+  const normalizedAdminBlogs = useMemo(
+    () => (adminBlogsData?.blogs || []).map(normalizeBlog),
+    [adminBlogsData],
+  );
 
-  const normalizedAdminBlogs = useMemo(() => {
-    const rawBlogs = adminBlogsData?.blogs || [];
-    return rawBlogs.map((b) => ({
-      id: b.id,
-      category: resolveI18n(b.category?.name, "en") || "Uncategorized",
-      categoryId: b.categoryId,
-      title: resolveI18n(b.title, "en"),
-      i18nTitle: b.title,
-      description: resolveI18n(b.content, "en"),
-      i18nContent: b.content,
-      slug: b.slug,
-      status: b.status,
-      date: b.createdAt
-        ? new Date(b.createdAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })
-        : "N/A",
-      author: b.user?.name || "Admin",
-      image: Array.isArray(b.image) ? b.image[0] || null : b.image || null,
-      isLocalConsultant: false,
-    }));
-  }, [adminBlogsData]);
+  const adminTotalPages = adminBlogsData?.meta?.totalPages || 1;
 
-  // ── Consultant pending blogs (normalized) ──
-  const normalizedConsultantBlogs = useMemo(() => {
-    return getPendingConsultantBlogs().map((b) => ({
-      id: b.id,
-      category: b.category || "Uncategorized",
-      categoryId: b.categoryId,
-      title: b.title,
-      i18nTitle: b.title,
-      description: b.content,
-      i18nContent: b.content,
-      slug: b.slug,
-      status: b.status,
-      date: b.createdAt
-        ? new Date(b.createdAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })
-        : "N/A",
-      author: b.author || "Consultant",
-      image: b.image || null,
-      isLocalConsultant: true,
-    }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localPendingTick]);
-
-  const pendingConsultantCount = normalizedConsultantBlogs.length;
-
-  // ── Category filtering ──
   const filteredAdminBlogs = useMemo(() => {
     if (activeCategory === "All") return normalizedAdminBlogs;
     return normalizedAdminBlogs.filter((b) => b.category === activeCategory);
   }, [activeCategory, normalizedAdminBlogs]);
 
+  // ── Consultant pending blogs (normalized + filtered) ──
+  const normalizedConsultantBlogs = useMemo(
+    () => (pendingData?.blogs || []).map(normalizeBlog),
+    [pendingData],
+  );
+
+  const consultantTotalPages = pendingData?.meta?.totalPages || 1;
+  const pendingConsultantCount =
+    pendingData?.meta?.total ?? normalizedConsultantBlogs.length;
+
   const filteredConsultantBlogs = useMemo(() => {
     if (activeCategory === "All") return normalizedConsultantBlogs;
     return normalizedConsultantBlogs.filter(
-      (b) => b.category === activeCategory
+      (b) => b.category === activeCategory,
     );
   }, [activeCategory, normalizedConsultantBlogs]);
 
@@ -214,6 +195,7 @@ const Blog = () => {
       setIsModalClosing(false);
       if (pendingReset) {
         setEditingBlogId(null);
+        setEditingBlog(null);
         setFormData(EMPTY_FORM);
         setPendingReset(false);
       }
@@ -225,7 +207,7 @@ const Blog = () => {
     () => () => {
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     },
-    []
+    [],
   );
 
   const handleOpenCreate = () => {
@@ -277,16 +259,6 @@ const Blog = () => {
     });
     if (!result.isConfirmed) return;
 
-    const localBlog = normalizedConsultantBlogs.find(
-      (b) => String(b.id) === String(id)
-    );
-    if (localBlog) {
-      deleteConsultantBlog(id);
-      refreshLocalPending();
-      toast.success("Blog deleted");
-      return;
-    }
-
     try {
       await deleteBlog(id).unwrap();
       toast.success("Blog deleted successfully");
@@ -308,20 +280,32 @@ const Blog = () => {
     });
     if (!result.isConfirmed) return;
 
-    if (blog.isLocalConsultant) {
-      approveConsultantBlog(blog.id);
-      refreshLocalPending();
-      toast.success("Blog approved and published!");
-      return;
-    }
-
     try {
-      const fd = new FormData();
-      fd.append("status", "PUBLISHED");
-      await updateBlog({ id: blog.id, body: fd }).unwrap();
+      await approveBlog(blog.id).unwrap();
       toast.success("Blog approved and published!");
     } catch (err) {
       toast.error(err?.data?.message || "Failed to approve blog");
+    }
+  };
+
+  // ── Reject consultant blog ──
+  const handleReject = async (blog) => {
+    const result = await Swal.fire({
+      title: "Reject this blog?",
+      text: `"${blog.title}" will be marked as rejected.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, reject",
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      await rejectBlog(blog.id).unwrap();
+      toast.success("Blog rejected.");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to reject blog");
     }
   };
 
@@ -356,7 +340,10 @@ const Blog = () => {
 
     if (editingBlogId) {
       let hasChanges = false;
-      if (preparedTitle !== editingBlog?.title) {
+      if (
+        preparedTitle !==
+        (resolveI18n(editingBlog?.i18nTitle, "en") || editingBlog?.title || "")
+      ) {
         fd.append("title", preparedTitle);
         hasChanges = true;
       }
@@ -368,7 +355,12 @@ const Blog = () => {
         fd.append("categoryId", formData.categoryId);
         hasChanges = true;
       }
-      if (preparedContent !== editingBlog?.description) {
+      if (
+        preparedContent !==
+        (resolveI18n(editingBlog?.i18nContent, "en") ||
+          editingBlog?.description ||
+          "")
+      ) {
         fd.append("content", preparedContent);
         hasChanges = true;
       }
@@ -413,7 +405,9 @@ const Blog = () => {
       const details = err?.data?.errors
         ? Array.isArray(err.data.errors)
           ? err.data.errors
-              .map((e) => (typeof e === "object" ? JSON.stringify(e) : String(e)))
+              .map((e) =>
+                typeof e === "object" ? JSON.stringify(e) : String(e),
+              )
               .join(" | ")
           : JSON.stringify(err.data.errors)
         : err?.data?.message || JSON.stringify(err?.data || err);
@@ -424,7 +418,7 @@ const Blog = () => {
 
   const isEditMode = Boolean(editingBlogId);
 
-  // ─── Tab switch helper ─────────────────────────────────────────────────────
+  // ─── Tab switch helpers ────────────────────────────────────────────────────
   const switchMainTab = (tab) => {
     setMainTab(tab);
     setActiveCategory("All");
@@ -432,6 +426,7 @@ const Blog = () => {
 
   const switchAdminSubTab = (tab) => {
     setAdminSubTab(tab);
+    setAdminPage(1);
     setActiveCategory("All");
   };
 
@@ -439,14 +434,10 @@ const Blog = () => {
   return (
     <section className="space-y-6">
       {/* Page Header */}
-      <BlogHeader
-        onAddClick={handleOpenCreate}
-        pendingCount={pendingConsultantCount}
-      />
+      <BlogHeader onAddClick={handleOpenCreate} />
 
-   
+      {/* Main Tabs */}
       <div className="flex flex-wrap gap-3">
-        {/* Admin Blogs Tab */}
         <button
           type="button"
           onClick={() => switchMainTab("ADMIN")}
@@ -460,7 +451,6 @@ const Blog = () => {
           My Blogs
         </button>
 
-        {/* Consultant Review Tab */}
         <button
           type="button"
           onClick={() => switchMainTab("CONSULTANT")}
@@ -514,7 +504,10 @@ const Blog = () => {
           <CategoryFilters
             categories={filterCategoriesList}
             activeCategory={activeCategory}
-            onSelectCategory={setActiveCategory}
+            onSelectCategory={(cat) => {
+              setActiveCategory(cat);
+              setAdminPage(1);
+            }}
           />
 
           {/* Blog Grid */}
@@ -535,16 +528,25 @@ const Blog = () => {
               }
             />
           ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-              {filteredAdminBlogs.map((blog) => (
-                <BlogCard
-                  key={blog.id}
-                  blog={blog}
-                  onEdit={handleOpenEdit}
-                  onDelete={handleDelete}
+            <>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                {filteredAdminBlogs.map((blog) => (
+                  <BlogCard
+                    key={blog.id}
+                    blog={blog}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
+              {adminTotalPages > 1 && (
+                <Pagination
+                  currentPage={adminPage}
+                  totalPages={adminTotalPages}
+                  onPageChange={setAdminPage}
                 />
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       )}
@@ -554,7 +556,7 @@ const Blog = () => {
          ══════════════════════════════════════════════════════ */}
       {mainTab === "CONSULTANT" && (
         <div className="space-y-5">
-          {/* Section info banner */}
+          {/* Info banner */}
           <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
             <AlertCircle
               size={18}
@@ -566,8 +568,8 @@ const Blog = () => {
               </p>
               <p className="text-sm text-amber-700">
                 These blog posts have been submitted by consultants and are
-                waiting for your approval. Review the content and click{" "}
-                <strong>Approve</strong> to publish.
+                waiting for your approval. Click <strong>Approve</strong> to
+                publish or <strong>Reject</strong> to decline.
               </p>
             </div>
           </div>
@@ -581,12 +583,12 @@ const Blog = () => {
               <div>
                 <p className="text-xs text-[#8A8AAA]">Pending Review</p>
                 <p className="text-lg font-bold text-[#1A1A2E]">
-                  {pendingConsultantCount}
+                  {isPendingLoading ? "…" : pendingConsultantCount}
                 </p>
               </div>
             </div>
 
-            {pendingConsultantCount === 0 && (
+            {!isPendingLoading && pendingConsultantCount === 0 && (
               <div className="inline-flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5">
                 <CheckCircle2 size={16} className="text-emerald-600" />
                 <p className="text-sm font-medium text-emerald-700">
@@ -597,38 +599,52 @@ const Blog = () => {
           </div>
 
           {/* Category Filters */}
-          {pendingConsultantCount > 0 && (
+          {normalizedConsultantBlogs.length > 0 && (
             <CategoryFilters
               categories={[
                 "All",
                 ...Array.from(
-                  new Set(normalizedConsultantBlogs.map((b) => b.category))
+                  new Set(normalizedConsultantBlogs.map((b) => b.category)),
                 ),
               ]}
               activeCategory={activeCategory}
-              onSelectCategory={setActiveCategory}
+              onSelectCategory={(cat) => {
+                setActiveCategory(cat);
+                setConsultantPage(1);
+              }}
             />
           )}
 
           {/* Consultant Blog Cards */}
-          {filteredConsultantBlogs.length === 0 ? (
+          {isPendingLoading ? (
+            <LoadingState />
+          ) : filteredConsultantBlogs.length === 0 ? (
             <EmptyState
               icon={Users}
               title="No consultant submissions"
               subtitle="When consultants submit blog posts for review, they will appear here."
             />
           ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-              {filteredConsultantBlogs.map((blog) => (
-                <BlogCard
-                  key={blog.id}
-                  blog={blog}
-                  onDelete={handleDelete}
-                  onApprove={handleApprove}
-                  draftStatusLabel="Pending Review"
+            <>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                {filteredConsultantBlogs.map((blog) => (
+                  <ConsultantBlogCard
+                    key={blog.id}
+                    blog={blog}
+                    onApprove={handleApprove}
+                    onReject={handleReject}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
+              {consultantTotalPages > 1 && (
+                <Pagination
+                  currentPage={consultantPage}
+                  totalPages={consultantTotalPages}
+                  onPageChange={setConsultantPage}
                 />
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       )}
@@ -644,9 +660,82 @@ const Blog = () => {
         onSave={handleSave}
         onClose={handleCloseModal}
         categories={blogCategories}
+        lastError={lastError}
       />
     </section>
   );
 };
+
+// ─── Consultant request card with Approve + Reject + Delete ──────────────────
+const ConsultantBlogCard = ({ blog, onApprove, onReject, onDelete }) => (
+  <article className="flex h-full flex-col rounded-2xl border border-amber-200 bg-white p-4">
+    {blog.image ? (
+      <img
+        src={blog.image}
+        alt={blog.title}
+        className="h-48 w-full rounded-lg object-cover sm:h-56"
+        loading="lazy"
+      />
+    ) : (
+      <div className="flex h-48 w-full items-center justify-center rounded-lg bg-gray-100 text-sm font-medium text-gray-400 border border-dashed border-gray-300 sm:h-56">
+        No Image
+      </div>
+    )}
+
+    <div className="flex flex-1 flex-col pt-4">
+      <div className="flex flex-wrap items-center gap-2 text-sm text-[#545454]">
+        <span className="inline-flex items-center gap-1">
+          <Users size={13} aria-hidden="true" />
+          {blog.author}
+        </span>
+        <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+          Pending Review
+        </span>
+        {blog.category !== "Uncategorized" && (
+          <span className="text-xs text-[#8A8AAA]">{blog.category}</span>
+        )}
+      </div>
+
+      <h2
+        className="mt-3 text-xl font-medium leading-tight text-[#333333]"
+        style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+      >
+        {blog.title}
+      </h2>
+
+      <p className="mt-2 text-sm leading-relaxed text-[#545454] line-clamp-3">
+        {blog.description}
+      </p>
+
+      <p className="mt-2 text-xs text-[#8A8AAA]">{blog.date}</p>
+
+      <div className="mt-auto grid grid-cols-1 gap-2 pt-5 sm:grid-cols-3">
+        <button
+          type="button"
+          onClick={() => onApprove(blog)}
+          className="inline-flex items-center justify-center gap-1.5 rounded border border-green-600 bg-green-600 px-3 py-2 text-sm text-white transition hover:brightness-95"
+        >
+          <CheckCircle2 size={14} aria-hidden="true" />
+          Approve
+        </button>
+        <button
+          type="button"
+          onClick={() => onReject(blog)}
+          className="inline-flex items-center justify-center gap-1.5 rounded border border-red-500 bg-white px-3 py-2 text-sm text-red-600 transition hover:bg-red-50"
+        >
+          <XCircle size={14} aria-hidden="true" />
+          Reject
+        </button>
+        <button
+          type="button"
+          onClick={() => onDelete(blog.id)}
+          className="inline-flex items-center justify-center gap-1.5 rounded border border-[#6E35AE] bg-white px-3 py-2 text-sm text-[#6E35AE] transition hover:bg-[#F8F4FD]"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </article>
+);
 
 export default Blog;

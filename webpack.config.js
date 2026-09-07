@@ -28,12 +28,8 @@ module.exports = (env, argv) => {
   const fallbacks = {
     REACT_APP_NAME: rawEnv.REACT_APP_NAME || 'NM',
     REACT_APP_VERSION: rawEnv.REACT_APP_VERSION || '1.0.0',
-    REACT_APP_API_BASE_URL:
-      rawEnv.REACT_APP_API_BASE_URL ||
-      'https://api.illorac.nl/api/v1',
-    REACT_APP_SOCKET_URL:
-      rawEnv.REACT_APP_SOCKET_URL ||
-      'https://api.illorac.nl',
+    REACT_APP_API_BASE_URL: rawEnv.REACT_APP_API_BASE_URL,
+    REACT_APP_SOCKET_URL: rawEnv.REACT_APP_SOCKET_URL,
     REACT_APP_API_TIMEOUT: rawEnv.REACT_APP_API_TIMEOUT || '10000',
     REACT_APP_API_RETRY_ATTEMPTS:
       rawEnv.REACT_APP_API_RETRY_ATTEMPTS || '3',

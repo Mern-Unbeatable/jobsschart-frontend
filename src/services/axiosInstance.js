@@ -1,26 +1,25 @@
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { API_CONFIG, ROUTES } from '../config';
-import { API_ENDPOINTS } from './httpEndpoint';
+import axios from "axios";
+import Cookies from "js-cookie";
+import { API_CONFIG, ROUTES } from "../config";
+import { API_ENDPOINTS } from "./httpEndpoint";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const getAuthRuntime = async () => {
-  const [{ default: store }, { clearCredentials, setCredentials }] = await Promise.all([
-    import('../features/store'),
-    import('../features/slices/authSlice'),
-  ]);
+  const [{ default: store }, { clearCredentials, setCredentials }] =
+    await Promise.all([
+      import("../features/store"),
+      import("../features/slices/authSlice"),
+    ]);
 
   return { store, clearCredentials, setCredentials };
 };
 
-
-const FALLBACK_BASE_URL = 'https://api.illorac.nl/api/v1';
 const axiosInstance = axios.create({
-  baseURL: API_CONFIG.BASE_URL || FALLBACK_BASE_URL,
+  baseURL: API_CONFIG.BASE_URL,
   timeout: API_CONFIG.TIMEOUT || 10000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -31,22 +30,25 @@ axiosInstance.interceptors.request.use(
   (config) => {
     if (!config.baseURL) {
       throw new Error(
-        'Missing REACT_APP_API_BASE_URL. Set it in .env.development and restart dev server.',
+        "Missing REACT_APP_API_BASE_URL. Set it in .env.development and restart dev server.",
       );
     }
 
-    const token = Cookies.get('token');
+    const token = Cookies.get("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    const locale = localStorage.getItem('language') || localStorage.getItem('locale') || 'en';
-    config.headers['Accept-Language'] = locale;
+    const locale =
+      localStorage.getItem("language") ||
+      localStorage.getItem("locale") ||
+      "en";
+    config.headers["Accept-Language"] = locale;
 
     return config;
   },
   (error) => {
-    console.error('Request Error:', error);
+    console.error("Request Error:", error);
     return Promise.reject(error);
   },
 );
@@ -74,18 +76,18 @@ axiosInstance.interceptors.response.use(
       try {
         // Deduplicate: if another request already triggered refresh, wait for it
         if (!refreshPromise) {
-          const refreshToken = Cookies.get('refreshToken');
-          if (!refreshToken) throw new Error('No refresh token');
+          const refreshToken = Cookies.get("refreshToken");
+          if (!refreshToken) throw new Error("No refresh token");
 
           if (!API_CONFIG.BASE_URL) {
-            throw new Error('Missing REACT_APP_API_BASE_URL');
+            throw new Error("Missing REACT_APP_API_BASE_URL");
           }
 
           refreshPromise = axios
             .post(
               `${API_CONFIG.BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
               { refreshToken },
-              { headers: { 'Content-Type': 'application/json' } },
+              { headers: { "Content-Type": "application/json" } },
             )
             .then((res) => res.data)
             .finally(() => {
@@ -106,7 +108,8 @@ axiosInstance.interceptors.response.use(
       } catch {
         const { store, clearCredentials } = await getAuthRuntime();
         store.dispatch(clearCredentials());
-        const { stashAuthReturnUrl } = await import('../utils/authLoginRedirect');
+        const { stashAuthReturnUrl } =
+          await import("../utils/authLoginRedirect");
         stashAuthReturnUrl();
         window.location.replace(ROUTES.LOGIN);
         return Promise.reject(error);
@@ -114,20 +117,20 @@ axiosInstance.interceptors.response.use(
     }
 
     if (error.response?.status === 403) {
-      console.error('Access Forbidden:', error.response.data);
+      console.error("Access Forbidden:", error.response.data);
     }
 
     if (error.response?.status >= 500) {
-      console.error('Server Error:', error.response.data);
+      console.error("Server Error:", error.response.data);
     }
 
     if (!error.response) {
-      console.error('Network Error:', error.message);
+      console.error("Network Error:", error.message);
     }
 
     return Promise.reject({
       message:
-        error.response?.data?.message || error.message || 'An error occurred',
+        error.response?.data?.message || error.message || "An error occurred",
       status: error.response?.status,
       data: error.response?.data,
     });
