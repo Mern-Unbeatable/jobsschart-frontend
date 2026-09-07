@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../../../features/slices/authSlice";
 import BlogHeader from "./components/BlogHeader";
 import CategoryFilters from "./components/CategoryFilters";
 import BlogCard from "./components/BlogCard";
@@ -52,10 +54,15 @@ const EMPTY_FORM = {
 
 const MODAL_CLOSE_ANIMATION_MS = 280;
 
-// ─── Sub-tab config ───────────────────────────────────────────────────────────
+// ─── Sub-tab configs ──────────────────────────────────────────────────────────
 const ADMIN_SUB_TABS = [
   { key: "PUBLISHED", label: "Published", icon: Globe },
   { key: "DRAFT", label: "Drafts", icon: FileText },
+];
+
+const CONSULTANT_SUB_TABS = [
+  { key: "PENDING", label: "Pending Review", icon: Clock },
+  { key: "PUBLISHED", label: "Published", icon: CheckCircle2 },
 ];
 
 // ─── Empty state component ────────────────────────────────────────────────────
@@ -98,20 +105,28 @@ const normalizeBlog = (b) => ({
       })
     : "N/A",
   author: b.user?.name || "Admin",
+  authorId: b.user?.id || null,
+  userRole: b.user?.role || null,
   image: Array.isArray(b.image) ? b.image[0] || null : b.image || null,
 });
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 const Blog = () => {
+  const currentUser = useSelector(selectUser);
+
   // ── Active top-level tab: "ADMIN" or "CONSULTANT" ──
   const [mainTab, setMainTab] = useState("ADMIN");
 
   // ── Admin sub-tab: "PUBLISHED" or "DRAFT" ──
   const [adminSubTab, setAdminSubTab] = useState("PUBLISHED");
 
+  // ── Consultant sub-tab: "PENDING" or "PUBLISHED" ──
+  const [consultantSubTab, setConsultantSubTab] = useState("PENDING");
+
   // ── Pagination ──
   const [adminPage, setAdminPage] = useState(1);
-  const [consultantPage, setConsultantPage] = useState(1);
+  const [consultantPendingPage, setConsultantPendingPage] = useState(1);
+  const [consultantPublishedPage, setConsultantPublishedPage] = useState(1);
 
   // ── Category filter ──
   const [activeCategory, setActiveCategory] = useState("All");
@@ -131,15 +146,34 @@ const Blog = () => {
   // ── API hooks ──
   const { data: adminBlogsData, isLoading: isAdminBlogsLoading } =
     useGetAdminBlogsQuery(
-      { status: adminSubTab, page: adminPage, limit: PAGE_LIMIT },
-      { skip: mainTab !== "ADMIN" },
+      {
+        status: adminSubTab,
+        userRole: "ADMIN",
+        userId: currentUser?.id,
+        page: adminPage,
+        limit: PAGE_LIMIT,
+      },
+      { skip: mainTab !== "ADMIN" || !currentUser?.id },
     );
 
   const { data: pendingData, isLoading: isPendingLoading } =
     useGetPendingConsultantBlogsQuery(
-      { page: consultantPage, limit: PAGE_LIMIT },
-      { skip: mainTab !== "CONSULTANT" },
+      { page: consultantPendingPage, limit: PAGE_LIMIT },
+      { skip: mainTab !== "CONSULTANT" || consultantSubTab !== "PENDING" },
     );
+
+  const {
+    data: consultantPublishedData,
+    isLoading: isConsultantPublishedLoading,
+  } = useGetAdminBlogsQuery(
+    {
+      status: "PUBLISHED",
+      userRole: "CONSULTANT",
+      page: consultantPublishedPage,
+      limit: PAGE_LIMIT,
+    },
+    { skip: mainTab !== "CONSULTANT" || consultantSubTab !== "PUBLISHED" },
+  );
 
   const { data: categoriesData } = useGetAllBlogCategoriesQuery();
   const [createBlog] = useCreateBlogMutation();
@@ -160,8 +194,12 @@ const Blog = () => {
   );
 
   // ── Admin blogs (normalized + filtered) ──
+  // Client-side guard: exclude any CONSULTANT-authored blog that slipped through
   const normalizedAdminBlogs = useMemo(
-    () => (adminBlogsData?.blogs || []).map(normalizeBlog),
+    () =>
+      (adminBlogsData?.blogs || [])
+        .map(normalizeBlog)
+        .filter((b) => b.userRole !== "CONSULTANT"),
     [adminBlogsData],
   );
 
@@ -172,22 +210,43 @@ const Blog = () => {
     return normalizedAdminBlogs.filter((b) => b.category === activeCategory);
   }, [activeCategory, normalizedAdminBlogs]);
 
-  // ── Consultant pending blogs (normalized + filtered) ──
-  const normalizedConsultantBlogs = useMemo(
+  // ── Consultant pending blogs ──
+  // No role filter needed: PENDING_APPROVAL status is only ever set for CONSULTANT authors
+  const normalizedConsultantPendingBlogs = useMemo(
     () => (pendingData?.blogs || []).map(normalizeBlog),
     [pendingData],
   );
+  const consultantPendingTotalPages = pendingData?.meta?.totalPages || 1;
+  // Derive badge from the filtered list so it always matches what the UI shows
+  const pendingConsultantCount = normalizedConsultantPendingBlogs.length;
 
-  const consultantTotalPages = pendingData?.meta?.totalPages || 1;
-  const pendingConsultantCount =
-    pendingData?.meta?.total ?? normalizedConsultantBlogs.length;
+  // ── Consultant published blogs ──
+  // Role confirmed → strict CONSULTANT check.
+  // Role absent (old API) → exclude the current admin's own posts as a proxy filter.
+  const normalizedConsultantPublishedBlogs = useMemo(
+    () =>
+      (consultantPublishedData?.blogs || [])
+        .map(normalizeBlog)
+        .filter(
+          (b) =>
+            b.userRole === "CONSULTANT" ||
+            (b.userRole === null && b.authorId !== currentUser?.id),
+        ),
+    [consultantPublishedData, currentUser?.id],
+  );
+  const consultantPublishedTotalPages =
+    consultantPublishedData?.meta?.totalPages || 1;
+
+  // ── Active consultant list based on sub-tab ──
+  const activeConsultantBlogs =
+    consultantSubTab === "PENDING"
+      ? normalizedConsultantPendingBlogs
+      : normalizedConsultantPublishedBlogs;
 
   const filteredConsultantBlogs = useMemo(() => {
-    if (activeCategory === "All") return normalizedConsultantBlogs;
-    return normalizedConsultantBlogs.filter(
-      (b) => b.category === activeCategory,
-    );
-  }, [activeCategory, normalizedConsultantBlogs]);
+    if (activeCategory === "All") return activeConsultantBlogs;
+    return activeConsultantBlogs.filter((b) => b.category === activeCategory);
+  }, [activeCategory, activeConsultantBlogs]);
 
   // ── Modal helpers ──
   const handleCloseModal = useCallback(() => {
@@ -379,15 +438,20 @@ const Blog = () => {
       if (formData.imageFile) {
         fd.append("image", formData.imageFile);
         hasChanges = true;
+      } else if (formData.image && !formData.image.startsWith("data:")) {
+        // Preserve existing server URL so the backend never sees an absent image field
+        fd.append("image", formData.image);
       }
       if (!hasChanges) {
         toast.error("No changes detected");
+        setIsSaving(false);
         handleCloseModal();
         return;
       }
     } else {
       if (!preparedTitle || !preparedContent || !formData.categoryId) {
         toast.error("Please fill in all required fields");
+        setIsSaving(false);
         return;
       }
       fd.append("title", preparedTitle);
@@ -438,6 +502,13 @@ const Blog = () => {
     setActiveCategory("All");
   };
 
+  const switchConsultantSubTab = (tab) => {
+    setConsultantSubTab(tab);
+    setConsultantPendingPage(1);
+    setConsultantPublishedPage(1);
+    setActiveCategory("All");
+  };
+
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <section className="space-y-6">
@@ -456,7 +527,7 @@ const Blog = () => {
           }`}
         >
           <BookOpen size={16} />
-          My Blogs
+          Admin Blogs
         </button>
 
         <button
@@ -469,7 +540,7 @@ const Blog = () => {
           }`}
         >
           <Users size={16} />
-          Consultant Requests
+          Consultant Blogs
           {pendingConsultantCount > 0 && (
             <span
               className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-bold ${
@@ -561,100 +632,155 @@ const Blog = () => {
       )}
 
       {/* ══════════════════════════════════════════════════════
-          CONSULTANT REQUESTS SECTION
+          CONSULTANT BLOGS SECTION
          ══════════════════════════════════════════════════════ */}
       {mainTab === "CONSULTANT" && (
         <div className="space-y-5">
-          {/* Info banner */}
-          <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-            <AlertCircle
-              size={18}
-              className="mt-0.5 flex-shrink-0 text-amber-600"
-            />
-            <div>
-              <p className="text-sm font-semibold text-amber-800">
-                Review before publishing
-              </p>
-              <p className="text-sm text-amber-700">
-                These blog posts have been submitted by consultants and are
-                waiting for your approval. Click <strong>Approve</strong> to
-                publish or <strong>Reject</strong> to decline.
-              </p>
-            </div>
+          {/* Sub-tabs: Pending Review / Published */}
+          <div className="flex items-center gap-2 rounded-xl border border-[#EBEBF0] bg-[#F8F6FD] p-1 w-fit">
+            {CONSULTANT_SUB_TABS.map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => switchConsultantSubTab(key)}
+                className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                  consultantSubTab === key
+                    ? "bg-white text-[#7C3AED] shadow-sm shadow-[#9B59D6]/10"
+                    : "text-[#8A8AAA] hover:text-[#555570]"
+                }`}
+              >
+                <Icon size={15} />
+                {label}
+                {key === "PENDING" && pendingConsultantCount > 0 && (
+                  <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-white">
+                    {pendingConsultantCount}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
 
-          {/* Stats row */}
-          <div className="flex flex-wrap gap-4">
-            <div className="inline-flex items-center gap-2.5 rounded-xl border border-amber-200 bg-white px-4 py-2.5 shadow-sm">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100">
-                <Clock size={16} className="text-amber-600" />
-              </div>
-              <div>
-                <p className="text-xs text-[#8A8AAA]">Pending Review</p>
-                <p className="text-lg font-bold text-[#1A1A2E]">
-                  {isPendingLoading ? "…" : pendingConsultantCount}
+          {/* ── PENDING REVIEW ── */}
+          {consultantSubTab === "PENDING" && (
+            <div className="space-y-5">
+              <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                <AlertCircle
+                  size={18}
+                  className="mt-0.5 shrink-0 text-amber-600"
+                />
+                <p className="text-sm text-amber-700">
+                  Review and <strong>Approve</strong> or <strong>Reject</strong>{" "}
+                  blog posts submitted by consultants before they go live.
                 </p>
               </div>
-            </div>
 
-            {!isPendingLoading && pendingConsultantCount === 0 && (
-              <div className="inline-flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5">
-                <CheckCircle2 size={16} className="text-emerald-600" />
-                <p className="text-sm font-medium text-emerald-700">
-                  All caught up! No pending requests.
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Category Filters */}
-          {normalizedConsultantBlogs.length > 0 && (
-            <CategoryFilters
-              categories={[
-                "All",
-                ...Array.from(
-                  new Set(normalizedConsultantBlogs.map((b) => b.category)),
-                ),
-              ]}
-              activeCategory={activeCategory}
-              onSelectCategory={(cat) => {
-                setActiveCategory(cat);
-                setConsultantPage(1);
-              }}
-            />
-          )}
-
-          {/* Consultant Blog Cards */}
-          {isPendingLoading ? (
-            <LoadingState />
-          ) : filteredConsultantBlogs.length === 0 ? (
-            <EmptyState
-              icon={Users}
-              title="No consultant submissions"
-              subtitle="When consultants submit blog posts for review, they will appear here."
-            />
-          ) : (
-            <>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                {filteredConsultantBlogs.map((blog) => (
-                  <ConsultantBlogCard
-                    key={blog.id}
-                    blog={blog}
-                    onApprove={handleApprove}
-                    onReject={handleReject}
-                    onDelete={handleDelete}
-                    onPreview={setPreviewBlog}
-                  />
-                ))}
-              </div>
-              {consultantTotalPages > 1 && (
-                <Pagination
-                  currentPage={consultantPage}
-                  totalPages={consultantTotalPages}
-                  onPageChange={setConsultantPage}
+              {/* Category filters */}
+              {normalizedConsultantPendingBlogs.length > 0 && (
+                <CategoryFilters
+                  categories={[
+                    "All",
+                    ...Array.from(
+                      new Set(
+                        normalizedConsultantPendingBlogs.map((b) => b.category),
+                      ),
+                    ),
+                  ]}
+                  activeCategory={activeCategory}
+                  onSelectCategory={(cat) => {
+                    setActiveCategory(cat);
+                    setConsultantPendingPage(1);
+                  }}
                 />
               )}
-            </>
+
+              {isPendingLoading ? (
+                <LoadingState />
+              ) : filteredConsultantBlogs.length === 0 ? (
+                <EmptyState
+                  icon={Clock}
+                  title="No pending submissions"
+                  subtitle="When consultants submit blog posts for review, they will appear here."
+                />
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                    {filteredConsultantBlogs.map((blog) => (
+                      <ConsultantBlogCard
+                        key={blog.id}
+                        blog={blog}
+                        onApprove={handleApprove}
+                        onReject={handleReject}
+                        onDelete={handleDelete}
+                        onPreview={setPreviewBlog}
+                      />
+                    ))}
+                  </div>
+                  {consultantPendingTotalPages > 1 && (
+                    <Pagination
+                      currentPage={consultantPendingPage}
+                      totalPages={consultantPendingTotalPages}
+                      onPageChange={setConsultantPendingPage}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ── PUBLISHED ── */}
+          {consultantSubTab === "PUBLISHED" && (
+            <div className="space-y-5">
+              {/* Category filters */}
+              {normalizedConsultantPublishedBlogs.length > 0 && (
+                <CategoryFilters
+                  categories={[
+                    "All",
+                    ...Array.from(
+                      new Set(
+                        normalizedConsultantPublishedBlogs.map(
+                          (b) => b.category,
+                        ),
+                      ),
+                    ),
+                  ]}
+                  activeCategory={activeCategory}
+                  onSelectCategory={(cat) => {
+                    setActiveCategory(cat);
+                    setConsultantPublishedPage(1);
+                  }}
+                />
+              )}
+
+              {isConsultantPublishedLoading ? (
+                <LoadingState />
+              ) : filteredConsultantBlogs.length === 0 ? (
+                <EmptyState
+                  icon={Globe}
+                  title="No published consultant blogs"
+                  subtitle="Approved consultant blogs will appear here once published."
+                />
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                    {filteredConsultantBlogs.map((blog) => (
+                      <BlogCard
+                        key={blog.id}
+                        blog={blog}
+                        onDelete={handleDelete}
+                        onPreview={setPreviewBlog}
+                      />
+                    ))}
+                  </div>
+                  {consultantPublishedTotalPages > 1 && (
+                    <Pagination
+                      currentPage={consultantPublishedPage}
+                      totalPages={consultantPublishedTotalPages}
+                      onPageChange={setConsultantPublishedPage}
+                    />
+                  )}
+                </>
+              )}
+            </div>
           )}
         </div>
       )}

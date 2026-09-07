@@ -223,6 +223,7 @@ const Blog = () => {
 
     if (!preparedTitle || !preparedContent || !formData.categoryId) {
       toast.error("Please fill in all required fields");
+      setIsSaving(false);
       return;
     }
 
@@ -256,10 +257,14 @@ const Blog = () => {
       if (formData.imageFile) {
         fd.append("image", formData.imageFile);
         hasChanges = true;
+      } else if (formData.image && !formData.image.startsWith("data:")) {
+        // Preserve existing server URL so the backend never sees an absent image field
+        fd.append("image", formData.image);
       }
 
       if (!hasChanges) {
         toast.error("No changes detected");
+        setIsSaving(false);
         handleCloseModal();
         return;
       }
