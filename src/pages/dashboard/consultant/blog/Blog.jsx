@@ -11,6 +11,7 @@ import BlogHeader from "../../admin/blog/components/BlogHeader";
 import CategoryFilters from "../../admin/blog/components/CategoryFilters";
 import BlogCard from "../../admin/blog/components/BlogCard";
 import BlogModal from "../../admin/blog/components/BlogModal";
+import BlogPreviewModal from "../../admin/blog/components/BlogPreviewModal";
 import Pagination from "../../../../components/Pagination";
 import {
   useGetMyBlogsQuery,
@@ -54,9 +55,14 @@ const Blog = () => {
   const [pendingReset, setPendingReset] = useState(false);
   const [lastError, setLastError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [previewBlog, setPreviewBlog] = useState(null);
   const closeTimerRef = useRef(null);
 
-  const { data: blogsData, isLoading } = useGetMyBlogsQuery({
+  const {
+    data: blogsData,
+    isLoading,
+    isFetching,
+  } = useGetMyBlogsQuery({
     status: TAB_STATUS[activeTab],
     page,
     limit: PAGE_LIMIT,
@@ -336,13 +342,13 @@ const Blog = () => {
       />
 
       {/* Blog grid */}
-      {isLoading ? (
+      {isLoading || isFetching ? (
         <div className="flex flex-col items-center justify-center gap-3 py-20">
           <Loader2 size={32} className="animate-spin text-[#9B59D6]" />
           <p className="text-sm text-[#8A8AAA]">Loading blogs…</p>
         </div>
       ) : filteredBlogs.length === 0 ? (
-        <div className="py-24 text-center text-base text-gray-400">
+        <div className="text-center text-base text-gray-400 border-2 border-dashed py-10">
           {activeTab === "PENDING_APPROVAL"
             ? "No blogs waiting for approval."
             : "No published blogs yet. Submit a blog for admin approval to get started."}
@@ -358,6 +364,7 @@ const Blog = () => {
                   activeTab === "PENDING_APPROVAL" ? handleOpenEdit : undefined
                 }
                 onDelete={handleDelete}
+                onPreview={setPreviewBlog}
                 draftStatusLabel="Pending Approval"
               />
             ))}
@@ -385,6 +392,11 @@ const Blog = () => {
         requireApproval
         lastError={lastError}
         isSaving={isSaving}
+      />
+
+      <BlogPreviewModal
+        blog={previewBlog}
+        onClose={() => setPreviewBlog(null)}
       />
     </section>
   );

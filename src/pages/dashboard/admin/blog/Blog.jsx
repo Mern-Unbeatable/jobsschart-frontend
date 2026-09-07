@@ -11,6 +11,7 @@ import BlogHeader from "./components/BlogHeader";
 import CategoryFilters from "./components/CategoryFilters";
 import BlogCard from "./components/BlogCard";
 import BlogModal from "./components/BlogModal";
+import BlogPreviewModal from "./components/BlogPreviewModal";
 import Pagination from "../../../../components/Pagination";
 import {
   useGetAdminBlogsQuery,
@@ -33,6 +34,7 @@ import {
   AlertCircle,
   Loader2,
   XCircle,
+  Eye,
 } from "lucide-react";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -123,6 +125,7 @@ const Blog = () => {
   const [pendingReset, setPendingReset] = useState(false);
   const [lastError, setLastError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [previewBlog, setPreviewBlog] = useState(null);
   const closeTimerRef = useRef(null);
 
   // ── API hooks ──
@@ -541,6 +544,7 @@ const Blog = () => {
                     blog={blog}
                     onEdit={handleOpenEdit}
                     onDelete={handleDelete}
+                    onPreview={setPreviewBlog}
                   />
                 ))}
               </div>
@@ -639,6 +643,7 @@ const Blog = () => {
                     onApprove={handleApprove}
                     onReject={handleReject}
                     onDelete={handleDelete}
+                    onPreview={setPreviewBlog}
                   />
                 ))}
               </div>
@@ -668,25 +673,52 @@ const Blog = () => {
         lastError={lastError}
         isSaving={isSaving}
       />
+
+      <BlogPreviewModal
+        blog={previewBlog}
+        onClose={() => setPreviewBlog(null)}
+      />
     </section>
   );
 };
 
 // ─── Consultant request card with Approve + Reject + Delete ──────────────────
-const ConsultantBlogCard = ({ blog, onApprove, onReject, onDelete }) => (
+const ConsultantBlogCard = ({
+  blog,
+  onApprove,
+  onReject,
+  onDelete,
+  onPreview,
+}) => (
   <article className="flex h-full flex-col rounded-2xl border border-amber-200 bg-white p-4">
-    {blog.image ? (
-      <img
-        src={blog.image}
-        alt={blog.title}
-        className="h-48 w-full rounded-lg object-cover sm:h-56"
-        loading="lazy"
-      />
-    ) : (
-      <div className="flex h-48 w-full items-center justify-center rounded-lg bg-gray-100 text-sm font-medium text-gray-400 border border-dashed border-gray-300 sm:h-56">
-        No Image
-      </div>
-    )}
+    <div className="group relative">
+      {blog.image ? (
+        <img
+          src={blog.image}
+          alt={blog.title}
+          className="h-48 w-full rounded-lg object-cover sm:h-56"
+          loading="lazy"
+        />
+      ) : (
+        <div className="flex h-48 w-full items-center justify-center rounded-lg bg-gray-100 text-sm font-medium text-gray-400 border border-dashed border-gray-300 sm:h-56">
+          No Image
+        </div>
+      )}
+      {onPreview && (
+        <button
+          type="button"
+          onClick={() => onPreview(blog)}
+          className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset focus-visible:outline-none"
+          aria-label={`Preview "${blog.title}"`}
+        >
+          <Eye
+            size={28}
+            className="text-white drop-shadow"
+            aria-hidden="true"
+          />
+        </button>
+      )}
+    </div>
 
     <div className="flex flex-1 flex-col pt-4">
       <div className="flex flex-wrap items-center gap-2 text-sm text-[#545454]">
