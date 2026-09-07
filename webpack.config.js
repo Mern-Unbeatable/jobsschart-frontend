@@ -135,6 +135,17 @@ module.exports = (env, argv) => {
     plugins: [
       new webpack.DefinePlugin(envKeys),
 
+      // Re-compile whenever an .env file is saved (dev server hot-reload without restart)
+      {
+        apply: (compiler) => {
+          compiler.hooks.afterCompile.tap("WatchEnvFiles", (compilation) => {
+            [defaultEnvPath, envPath].forEach((f) => {
+              if (fs.existsSync(f)) compilation.fileDependencies.add(f);
+            });
+          });
+        },
+      },
+
       new HtmlWebpackPlugin({
         template: "./public/index.html",
         filename: "index.html",
