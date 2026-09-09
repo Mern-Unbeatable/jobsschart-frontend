@@ -27,6 +27,7 @@ import {
 } from "../../features/slices/authSlice";
 import { resolveI18n, resolveI18nArray } from "../../utils/resolveI18n";
 import { redirectToLogin } from "../../utils/authLoginRedirect";
+import ConsultantAvatar from "../../components/ConsultantAvatar";
 
 const ConsultantDetail = memo(() => {
   const { id } = useParams();
@@ -127,17 +128,12 @@ const ConsultantDetail = memo(() => {
           {/* Left: Image */}
           <div className="lg:col-span-5">
             <div className="relative rounded-2xl overflow-hidden aspect-[3/4] sm:aspect-[4/5] lg:aspect-square shadow-sm border border-gray-100">
-              <img
-                src={
-                  consultantForModal.image ||
-                  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop"
-                }
+              <ConsultantAvatar
+                src={consultantForModal.image}
                 alt={consultantForModal.name}
-                className="w-full h-full object-cover object-top"
-                onError={(e) => {
-                  e.target.src =
-                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop";
-                }}
+                className="h-full w-full object-cover object-top"
+                placeholderClassName="absolute inset-0 h-full w-full"
+                placeholderIconClassName="h-28 w-28"
               />
 
               <div className="absolute bottom-6 left-6 text-white z-10">

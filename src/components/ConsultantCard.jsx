@@ -19,6 +19,7 @@ import {
 } from "../utils/consultantList";
 import { redirectToLogin } from "../utils/authLoginRedirect";
 import { resolveI18nArray } from "../utils/resolveI18n";
+import ConsultantAvatar from "./ConsultantAvatar";
 
 const ConsultantCard = memo(({ consultantsData }) => {
   const navigate = useNavigate();
@@ -124,17 +125,9 @@ const ConsultantCard = memo(({ consultantsData }) => {
             >
               <div>
                 <div className="relative rounded-xl overflow-hidden">
-                  <img
-                    src={
-                      consultant.user?.avatar ||
-                      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop"
-                    }
+                  <ConsultantAvatar
+                    src={consultant.user?.avatar || consultant.avatar}
                     alt={consultant.user?.name || "Consultant"}
-                    className="w-full h-60 object-cover object-top"
-                    onError={(e) => {
-                      e.target.src =
-                        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop";
-                    }}
                   />
 
                   <div
