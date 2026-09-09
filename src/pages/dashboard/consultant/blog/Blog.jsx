@@ -21,6 +21,10 @@ import {
   useDeleteBlogMutation,
 } from "../../../../features/api/blogApi";
 import { resolveI18n } from "../../../../utils/resolveI18n";
+import {
+  isEmptyHtml,
+  sanitizeHtml,
+} from "../../../../utils/sanitizeHtml";
 import { Loader2 } from "lucide-react";
 
 const PAGE_LIMIT = 12;
@@ -214,14 +218,14 @@ const Blog = () => {
     setIsSaving(true);
 
     const preparedTitle = formData.title.trim();
-    const preparedContent = formData.content.trim();
+    const preparedContent = sanitizeHtml(formData.content);
     const preparedSlug = formData.slug
       .trim()
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-    if (!preparedTitle || !preparedContent || !formData.categoryId) {
+    if (!preparedTitle || isEmptyHtml(preparedContent) || !formData.categoryId) {
       toast.error("Please fill in all required fields");
       setIsSaving(false);
       return;
@@ -233,10 +237,11 @@ const Blog = () => {
       let hasChanges = false;
       const origTitle =
         resolveI18n(editingBlog?.i18nTitle, "en") || editingBlog?.title || "";
-      const origContent =
+      const origContent = sanitizeHtml(
         resolveI18n(editingBlog?.i18nContent, "en") ||
-        editingBlog?.description ||
-        "";
+          editingBlog?.description ||
+          "",
+      );
 
       if (preparedTitle !== origTitle) {
         fd.append("title", preparedTitle);

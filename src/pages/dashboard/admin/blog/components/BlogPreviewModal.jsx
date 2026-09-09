@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { X, CalendarDays, User, Tag } from "lucide-react";
+import { sanitizeHtml } from "../../../../../utils/sanitizeHtml";
 
 const STATUS_STYLES = {
   PUBLISHED: "bg-green-100 text-green-700",
@@ -114,8 +115,10 @@ const BlogPreviewModal = ({ blog, onClose }) => {
 
             {/* Content — supports plain text and HTML from the rich editor */}
             <div
-              className="prose prose-sm max-w-none leading-relaxed text-[#545454]"
-              dangerouslySetInnerHTML={{ __html: blog.description || "" }}
+              className="blog-rich-content prose prose-sm max-w-none leading-relaxed text-[#545454]"
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(blog.description || ""),
+              }}
             />
           </div>
         </div>

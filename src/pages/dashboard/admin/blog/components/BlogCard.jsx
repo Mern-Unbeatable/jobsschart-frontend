@@ -1,5 +1,6 @@
 import React from "react";
 import { CalendarDays, User, PenLine, Trash2, Check, Eye } from "lucide-react";
+import { stripHtml } from "../../../../../utils/sanitizeHtml";
 
 const STATUS_STYLES = {
   PUBLISHED: "bg-green-100 text-green-700",
@@ -84,7 +85,7 @@ const BlogCard = ({
         </h2>
 
         <p className="mt-2 text-sm leading-relaxed text-[#545454] line-clamp-3">
-          {blog.description}
+          {stripHtml(blog.description)}
         </p>
 
         <div

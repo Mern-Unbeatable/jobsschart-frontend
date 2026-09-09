@@ -9,6 +9,7 @@ import {
   useGetAllBlogCategoriesQuery,
 } from "../../features/api/blogApi";
 import { resolveI18n } from "../../utils/resolveI18n";
+import { stripHtml } from "../../utils/sanitizeHtml";
 
 const BlogContent = memo(() => {
   const { t, i18n } = useTranslation();
@@ -45,7 +46,9 @@ const BlogContent = memo(() => {
         : "N/A",
       author: b.user?.name || "Admin",
       title: resolveI18n(b.title, i18n.language),
-      desc: resolveI18n(b.excerpt, i18n.language) || resolveI18n(b.content, i18n.language),
+      desc:
+        stripHtml(resolveI18n(b.excerpt, i18n.language)) ||
+        stripHtml(resolveI18n(b.content, i18n.language)),
       categoryId: b.categoryId,
       slug: b.slug,
     }));

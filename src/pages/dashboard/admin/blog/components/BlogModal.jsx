@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { X, ImagePlus, Loader2 } from "lucide-react";
+import RichTextEditor from "../../../../../components/RichTextEditor";
 import { resolveI18n } from "../../../../../utils/resolveI18n";
 
 const BlogModal = ({
@@ -47,7 +48,7 @@ const BlogModal = ({
       role="dialog"
     >
       <div
-        className={`w-full max-w-160 rounded-lg bg-white p-4 sm:p-5 shadow-2xl ${
+        className={`w-full max-w-160 max-h-[90vh] overflow-y-auto rounded-lg bg-white p-4 sm:p-5 shadow-2xl ${
           isClosing ? "animate-modal-panel-out" : "animate-modal-panel"
         }`}
       >
@@ -66,6 +67,34 @@ const BlogModal = ({
         </div>
 
         <form className="space-y-3" onSubmit={onSave}>
+          <div>
+            <span className="mb-1 block text-base text-[#333333]">
+              Upload Image
+            </span>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={onChangeImage}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="relative flex h-24 w-full items-center justify-center rounded bg-[#E0E0E0] text-[#8A8A8A] transition hover:bg-[#D6D6D6]"
+            >
+              {formData.image ? (
+                <img
+                  src={formData.image}
+                  alt="Blog preview"
+                  className="h-full w-full rounded object-cover"
+                />
+              ) : (
+                <ImagePlus size={20} aria-hidden="true" />
+              )}
+            </button>
+          </div>
+
           <label className="block">
             <span className="mb-1 block text-base text-[#333333]">Title</span>
             <input
@@ -151,44 +180,13 @@ const BlogModal = ({
             )}
           </div>
 
-          <label className="block">
+          <div className="block">
             <span className="mb-1 block text-base text-[#333333]">Content</span>
-            <textarea
+            <RichTextEditor
               value={formData.content}
-              onChange={(e) => onChangeField("content", e.target.value)}
-              rows={4}
+              onChange={(html) => onChangeField("content", html)}
               placeholder="Write detailed blog content here"
-              className="w-full resize-none rounded bg-[#E8E8E8] px-3 py-2.5 text-base text-[#333333] outline-none ring-1 ring-transparent placeholder:text-[#8A8A8A] focus:ring-green-500/60"
-              required
             />
-          </label>
-
-          <div>
-            <span className="mb-1 block text-base text-[#333333]">
-              Upload Image
-            </span>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={onChangeImage}
-              className="hidden"
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="relative flex h-24 w-full items-center justify-center rounded bg-[#E0E0E0] text-[#8A8A8A] transition hover:bg-[#D6D6D6]"
-            >
-              {formData.image ? (
-                <img
-                  src={formData.image}
-                  alt="Blog preview"
-                  className="h-full w-full rounded object-cover"
-                />
-              ) : (
-                <ImagePlus size={20} aria-hidden="true" />
-              )}
-            </button>
           </div>
 
           <button

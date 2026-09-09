@@ -27,6 +27,11 @@ import {
 } from "../../../../features/api/blogApi";
 import { resolveI18n } from "../../../../utils/resolveI18n";
 import {
+  isEmptyHtml,
+  sanitizeHtml,
+  stripHtml,
+} from "../../../../utils/sanitizeHtml";
+import {
   BookOpen,
   Users,
   CheckCircle2,
@@ -396,17 +401,28 @@ const Blog = () => {
     setIsSaving(true);
 
     const preparedTitle = formData.title.trim();
-    const preparedContent = formData.content.trim();
+    const preparedContent = sanitizeHtml(formData.content);
     const preparedSlug = formData.slug
       .trim()
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
+    if (!preparedTitle || isEmptyHtml(preparedContent) || !formData.categoryId) {
+      toast.error("Please fill in all required fields");
+      setIsSaving(false);
+      return;
+    }
+
     const fd = new FormData();
 
     if (editingBlogId) {
       let hasChanges = false;
+      const origContent = sanitizeHtml(
+        resolveI18n(editingBlog?.i18nContent, "en") ||
+          editingBlog?.description ||
+          "",
+      );
       if (
         preparedTitle !==
         (resolveI18n(editingBlog?.i18nTitle, "en") || editingBlog?.title || "")
@@ -422,12 +438,7 @@ const Blog = () => {
         fd.append("categoryId", formData.categoryId);
         hasChanges = true;
       }
-      if (
-        preparedContent !==
-        (resolveI18n(editingBlog?.i18nContent, "en") ||
-          editingBlog?.description ||
-          "")
-      ) {
+      if (preparedContent !== origContent) {
         fd.append("content", preparedContent);
         hasChanges = true;
       }
@@ -449,11 +460,6 @@ const Blog = () => {
         return;
       }
     } else {
-      if (!preparedTitle || !preparedContent || !formData.categoryId) {
-        toast.error("Please fill in all required fields");
-        setIsSaving(false);
-        return;
-      }
       fd.append("title", preparedTitle);
       fd.append("slug", preparedSlug);
       fd.append("categoryId", formData.categoryId);
@@ -868,7 +874,7 @@ const ConsultantBlogCard = ({
       </h2>
 
       <p className="mt-2 text-sm leading-relaxed text-[#545454] line-clamp-3">
-        {blog.description}
+        {stripHtml(blog.description)}
       </p>
 
       <p className="mt-2 text-xs text-[#8A8AAA]">{blog.date}</p>
