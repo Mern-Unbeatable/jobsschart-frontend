@@ -99,6 +99,10 @@ const BlogModal = ({
                   <ImagePlus size={20} aria-hidden="true" />
                 )}
               </button>
+              <p className="mt-1.5 text-sm text-[#8A8A8A]">
+                (Recommended): 1200 × 800 px (3:2). Please use landscape images for
+                the best display.
+              </p>
             </div>
 
             <label className="block">
