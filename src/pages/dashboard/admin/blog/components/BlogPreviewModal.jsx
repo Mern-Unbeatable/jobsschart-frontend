@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { X, CalendarDays, User, Tag } from "lucide-react";
-import { sanitizeHtml } from "../../../../../utils/sanitizeHtml";
+import BlogRichContent from "../../../../../components/BlogRichContent";
 
 const STATUS_STYLES = {
   PUBLISHED: "bg-green-100 text-green-700",
@@ -113,12 +113,10 @@ const BlogPreviewModal = ({ blog, onClose }) => {
               <p className="font-mono text-xs text-[#AAAACC]">/{blog.slug}</p>
             )}
 
-            {/* Content — supports plain text and HTML from the rich editor */}
-            <div
-              className="blog-rich-content prose prose-sm max-w-none leading-relaxed text-[#545454]"
-              dangerouslySetInnerHTML={{
-                __html: sanitizeHtml(blog.description || ""),
-              }}
+            {/* Content — Quill HTML with editor-matching styles */}
+            <BlogRichContent
+              html={blog.description || ""}
+              className="leading-relaxed text-[#545454]"
             />
           </div>
         </div>
