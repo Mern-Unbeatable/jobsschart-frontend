@@ -408,7 +408,11 @@ const Blog = () => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-    if (!preparedTitle || isEmptyHtml(preparedContent) || !formData.categoryId) {
+    if (
+      !preparedTitle ||
+      isEmptyHtml(preparedContent) ||
+      !formData.categoryId
+    ) {
       toast.error("Please fill in all required fields");
       setIsSaving(false);
       return;
@@ -772,6 +776,7 @@ const Blog = () => {
                       <BlogCard
                         key={blog.id}
                         blog={blog}
+                        onEdit={handleOpenEdit}
                         onDelete={handleDelete}
                         onPreview={setPreviewBlog}
                       />

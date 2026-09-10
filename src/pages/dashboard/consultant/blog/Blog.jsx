@@ -21,10 +21,7 @@ import {
   useDeleteBlogMutation,
 } from "../../../../features/api/blogApi";
 import { resolveI18n } from "../../../../utils/resolveI18n";
-import {
-  isEmptyHtml,
-  sanitizeHtml,
-} from "../../../../utils/sanitizeHtml";
+import { isEmptyHtml, sanitizeHtml } from "../../../../utils/sanitizeHtml";
 import { Loader2 } from "lucide-react";
 
 const PAGE_LIMIT = 12;
@@ -225,7 +222,11 @@ const Blog = () => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-    if (!preparedTitle || isEmptyHtml(preparedContent) || !formData.categoryId) {
+    if (
+      !preparedTitle ||
+      isEmptyHtml(preparedContent) ||
+      !formData.categoryId
+    ) {
       toast.error("Please fill in all required fields");
       setIsSaving(false);
       return;
@@ -370,9 +371,7 @@ const Blog = () => {
               <BlogCard
                 key={blog.id}
                 blog={blog}
-                onEdit={
-                  activeTab === "PENDING_APPROVAL" ? handleOpenEdit : undefined
-                }
+                onEdit={handleOpenEdit}
                 onDelete={handleDelete}
                 onPreview={setPreviewBlog}
                 draftStatusLabel="Pending Approval"

@@ -90,7 +90,11 @@ const BlogCard = ({
 
         <div
           className={`mt-auto pt-5 grid gap-3 ${
-            actionCount >= 3 ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2"
+            actionCount >= 3
+              ? "grid-cols-1 sm:grid-cols-3"
+              : actionCount === 2
+                ? "grid-cols-2"
+                : "grid-cols-1"
           }`}
         >
           {showApprove && (
