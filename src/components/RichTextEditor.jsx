@@ -6,6 +6,7 @@ import Quote from "@editorjs/quote";
 import CodeTool from "@editorjs/code";
 import ImageTool from "@editorjs/image";
 import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 import {
   normalizeEditorJsData,
   createEmptyEditorJsData,
@@ -84,6 +85,7 @@ const RichTextEditor = ({
             uploader: {
               uploadByFile: async (file) => {
                 if (!onImageUploadRef.current) {
+                  toast.error("Image upload is not configured");
                   throw new Error("Image upload handler is not configured");
                 }
 
@@ -91,6 +93,7 @@ const RichTextEditor = ({
                 try {
                   const url = await onImageUploadRef.current(file);
                   if (!url) {
+                    toast.error("Upload succeeded but no image URL was returned");
                     throw new Error("Image upload did not return a URL");
                   }
 
@@ -98,6 +101,13 @@ const RichTextEditor = ({
                     success: 1,
                     file: { url },
                   };
+                } catch (error) {
+                  const message =
+                    error?.data?.message ||
+                    error?.message ||
+                    "Failed to upload image";
+                  toast.error(message);
+                  throw error;
                 } finally {
                   setIsUploadingImage(false);
                 }
