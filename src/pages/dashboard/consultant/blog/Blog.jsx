@@ -18,10 +18,17 @@ import {
   useGetAllBlogCategoriesQuery,
   useCreateBlogMutation,
   useUpdateBlogMutation,
+  useUploadBlogContentImageMutation,
   useDeleteBlogMutation,
 } from "../../../../features/api/blogApi";
 import { resolveI18n } from "../../../../utils/resolveI18n";
-import { isEmptyHtml, sanitizeHtml } from "../../../../utils/sanitizeHtml";
+import {
+  createEmptyEditorJsData,
+  editorJsToPlainText,
+  isEditorJsContentEmpty,
+  normalizeEditorJsData,
+  toI18nEditorJsContent,
+} from "../../../../utils/editorjsContent";
 import { Loader2 } from "lucide-react";
 
 const PAGE_LIMIT = 12;
@@ -30,7 +37,7 @@ const EMPTY_FORM = {
   title: "",
   slug: "",
   categoryId: "",
-  content: "",
+  content: createEmptyEditorJsData(),
   image: "",
   imageFile: null,
 };
@@ -72,6 +79,7 @@ const Blog = () => {
   const { data: categoriesData } = useGetAllBlogCategoriesQuery();
   const [createBlog] = useCreateBlogMutation();
   const [updateBlog] = useUpdateBlogMutation();
+  const [uploadBlogContentImage] = useUploadBlogContentImageMutation();
   const [deleteBlog] = useDeleteBlogMutation();
 
   const blogCategories = useMemo(
@@ -85,26 +93,32 @@ const Blog = () => {
   );
 
   const normalizedBlogs = useMemo(() => {
-    return (blogsData?.blogs || []).map((b) => ({
-      id: b.id,
-      category: resolveI18n(b.category?.name, "en") || "Uncategorized",
-      categoryId: b.categoryId,
-      title: resolveI18n(b.title, "en"),
-      i18nTitle: b.title,
-      description: resolveI18n(b.content, "en"),
-      i18nContent: b.content,
-      slug: b.slug,
-      status: b.status,
-      date: b.createdAt
-        ? new Date(b.createdAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })
-        : "N/A",
-      author: b.user?.name || "You",
-      image: Array.isArray(b.image) ? b.image[0] || null : b.image || null,
-    }));
+    return (blogsData?.blogs || []).map((b) => {
+      const localizedContent = resolveI18n(b.content, "en");
+      const contentData = normalizeEditorJsData(localizedContent);
+
+      return {
+        id: b.id,
+        category: resolveI18n(b.category?.name, "en") || "Uncategorized",
+        categoryId: b.categoryId,
+        title: resolveI18n(b.title, "en"),
+        i18nTitle: b.title,
+        description: editorJsToPlainText(contentData),
+        contentData,
+        i18nContent: b.content,
+        slug: b.slug,
+        status: b.status,
+        date: b.createdAt
+          ? new Date(b.createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
+          : "N/A",
+        author: b.user?.name || "You",
+        image: Array.isArray(b.image) ? b.image[0] || null : b.image || null,
+      };
+    });
   }, [blogsData]);
 
   const totalPages = blogsData?.meta?.totalPages || 1;
@@ -167,7 +181,9 @@ const Blog = () => {
       title: resolveI18n(blog.i18nTitle, "en") || blog.title || "",
       slug: blog.slug || "",
       categoryId: blog.categoryId || "",
-      content: resolveI18n(blog.i18nContent, "en") || blog.description || "",
+      content: normalizeEditorJsData(
+        resolveI18n(blog.i18nContent, "en") || blog.contentData || "",
+      ),
       image: blog.image || "",
       imageFile: null,
     });
@@ -215,7 +231,7 @@ const Blog = () => {
     setIsSaving(true);
 
     const preparedTitle = formData.title.trim();
-    const preparedContent = sanitizeHtml(formData.content);
+    const preparedContent = normalizeEditorJsData(formData.content);
     const preparedSlug = formData.slug
       .trim()
       .toLowerCase()
@@ -224,7 +240,7 @@ const Blog = () => {
 
     if (
       !preparedTitle ||
-      isEmptyHtml(preparedContent) ||
+      isEditorJsContentEmpty(preparedContent) ||
       !formData.categoryId
     ) {
       toast.error("Please fill in all required fields");
@@ -238,11 +254,14 @@ const Blog = () => {
       let hasChanges = false;
       const origTitle =
         resolveI18n(editingBlog?.i18nTitle, "en") || editingBlog?.title || "";
-      const origContent = sanitizeHtml(
+      const origContent = normalizeEditorJsData(
         resolveI18n(editingBlog?.i18nContent, "en") ||
-          editingBlog?.description ||
+          editingBlog?.contentData ||
           "",
       );
+
+      const preparedContentSerialized = JSON.stringify(preparedContent);
+      const originalContentSerialized = JSON.stringify(origContent);
 
       if (preparedTitle !== origTitle) {
         fd.append("title", preparedTitle);
@@ -256,8 +275,11 @@ const Blog = () => {
         fd.append("categoryId", formData.categoryId);
         hasChanges = true;
       }
-      if (preparedContent !== origContent) {
-        fd.append("content", preparedContent);
+      if (preparedContentSerialized !== originalContentSerialized) {
+        fd.append(
+          "content",
+          JSON.stringify(toI18nEditorJsContent(preparedContent)),
+        );
         hasChanges = true;
       }
       if (formData.imageFile) {
@@ -291,7 +313,10 @@ const Blog = () => {
       fd.append("title", preparedTitle);
       fd.append("slug", preparedSlug);
       fd.append("categoryId", formData.categoryId);
-      fd.append("content", preparedContent);
+      fd.append(
+        "content",
+        JSON.stringify(toI18nEditorJsContent(preparedContent)),
+      );
       if (formData.imageFile) fd.append("image", formData.imageFile);
 
       try {
@@ -312,6 +337,18 @@ const Blog = () => {
   };
 
   const isEditMode = Boolean(editingBlogId);
+
+  const handleEditorImageUpload = useCallback(
+    async (file) => {
+      const fd = new FormData();
+      fd.append("image", file);
+      const result = await uploadBlogContentImage(fd).unwrap();
+      const url = result?.url || result?.image;
+      if (!url) throw new Error("Upload succeeded but no URL returned");
+      return url;
+    },
+    [uploadBlogContentImage],
+  );
 
   return (
     <section className="space-y-8">
@@ -395,6 +432,7 @@ const Blog = () => {
         formData={formData}
         onChangeField={handleFieldChange}
         onChangeImage={handleImageChange}
+        onUploadInlineImage={handleEditorImageUpload}
         onSave={handleSave}
         onClose={handleCloseModal}
         categories={blogCategories}

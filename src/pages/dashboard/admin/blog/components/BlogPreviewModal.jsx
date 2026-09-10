@@ -113,9 +113,11 @@ const BlogPreviewModal = ({ blog, onClose }) => {
               <p className="font-mono text-xs text-[#AAAACC]">/{blog.slug}</p>
             )}
 
-            {/* Content — Quill HTML with editor-matching styles */}
+            {/* Content */}
             <BlogRichContent
-              html={blog.description || ""}
+              content={
+                blog.contentData || blog.i18nContent || blog.description || ""
+              }
               className="leading-relaxed text-[#545454]"
             />
           </div>

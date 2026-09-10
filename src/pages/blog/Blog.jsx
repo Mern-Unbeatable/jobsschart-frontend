@@ -10,6 +10,10 @@ import {
 } from "../../features/api/blogApi";
 import { resolveI18n } from "../../utils/resolveI18n";
 import { stripHtml } from "../../utils/sanitizeHtml";
+import {
+  editorJsToPlainText,
+  normalizeEditorJsData,
+} from "../../utils/editorjsContent";
 
 const BlogContent = memo(() => {
   const { t, i18n } = useTranslation();
@@ -34,24 +38,30 @@ const BlogContent = memo(() => {
 
   const filteredBlogs = useMemo(() => {
     const rawBlogs = blogsData?.blogs || [];
-    const normalized = rawBlogs.map((b) => ({
-      id: b.id,
-      image: Array.isArray(b.image) ? b.image[0] || null : b.image || null,
-      date: b.createdAt
-        ? new Date(b.createdAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })
-        : "N/A",
-      author: b.user?.name || "Admin",
-      title: resolveI18n(b.title, i18n.language),
-      desc:
-        stripHtml(resolveI18n(b.excerpt, i18n.language)) ||
-        stripHtml(resolveI18n(b.content, i18n.language)),
-      categoryId: b.categoryId,
-      slug: b.slug,
-    }));
+    const normalized = rawBlogs.map((b) => {
+      const localizedContent = resolveI18n(b.content, i18n.language);
+      const contentSummary = editorJsToPlainText(
+        normalizeEditorJsData(localizedContent),
+      );
+
+      return {
+        id: b.id,
+        image: Array.isArray(b.image) ? b.image[0] || null : b.image || null,
+        date: b.createdAt
+          ? new Date(b.createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
+          : "N/A",
+        author: b.user?.name || "Admin",
+        title: resolveI18n(b.title, i18n.language),
+        desc:
+          stripHtml(resolveI18n(b.excerpt, i18n.language)) || contentSummary,
+        categoryId: b.categoryId,
+        slug: b.slug,
+      };
+    });
 
     if (activeCategory === "all") return normalized;
     return normalized.filter((blog) => blog.categoryId === activeCategory);

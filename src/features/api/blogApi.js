@@ -94,6 +94,15 @@ export const blogApi = baseApi.injectEndpoints({
       transformResponse: (response) => response.data,
     }),
 
+    uploadBlogContentImage: builder.mutation({
+      query: (body) => ({
+        url: "/blogs/upload-content-image",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (response) => response.data,
+    }),
+
     deleteBlog: builder.mutation({
       query: (id) => ({
         url: `/blogs/${id}`,
@@ -153,6 +162,7 @@ export const {
   useGetDraftBlogsQuery,
   useCreateBlogMutation,
   useUpdateBlogMutation,
+  useUploadBlogContentImageMutation,
   useDeleteBlogMutation,
   useApproveBlogMutation,
   useRejectBlogMutation,

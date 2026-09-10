@@ -130,7 +130,7 @@ const BlogDetail = memo(() => {
 
         {/* 5. Blog Content Area */}
         <BlogRichContent
-          html={content}
+          content={content}
           className="max-w-none text-gray-600 text-base leading-relaxed pb-12"
         />
       </div>

@@ -21,16 +21,20 @@ import {
   useGetAllBlogCategoriesQuery,
   useCreateBlogMutation,
   useUpdateBlogMutation,
+  useUploadBlogContentImageMutation,
   useDeleteBlogMutation,
   useApproveBlogMutation,
   useRejectBlogMutation,
 } from "../../../../features/api/blogApi";
 import { resolveI18n } from "../../../../utils/resolveI18n";
+import { stripHtml } from "../../../../utils/sanitizeHtml";
 import {
-  isEmptyHtml,
-  sanitizeHtml,
-  stripHtml,
-} from "../../../../utils/sanitizeHtml";
+  createEmptyEditorJsData,
+  editorJsToPlainText,
+  isEditorJsContentEmpty,
+  normalizeEditorJsData,
+  toI18nEditorJsContent,
+} from "../../../../utils/editorjsContent";
 import {
   BookOpen,
   Users,
@@ -51,7 +55,7 @@ const EMPTY_FORM = {
   title: "",
   slug: "",
   categoryId: "",
-  content: "",
+  content: createEmptyEditorJsData(),
   image: "",
   imageFile: null,
   status: "PUBLISHED",
@@ -92,28 +96,34 @@ const LoadingState = () => (
 );
 
 // ─── Normalize a blog row from the API ────────────────────────────────────────
-const normalizeBlog = (b) => ({
-  id: b.id,
-  category: resolveI18n(b.category?.name, "en") || "Uncategorized",
-  categoryId: b.categoryId,
-  title: resolveI18n(b.title, "en"),
-  i18nTitle: b.title,
-  description: resolveI18n(b.content, "en"),
-  i18nContent: b.content,
-  slug: b.slug,
-  status: b.status,
-  date: b.createdAt
-    ? new Date(b.createdAt).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : "N/A",
-  author: b.user?.name || "Admin",
-  authorId: b.user?.id || null,
-  userRole: b.user?.role || null,
-  image: Array.isArray(b.image) ? b.image[0] || null : b.image || null,
-});
+const normalizeBlog = (b) => {
+  const localizedContent = resolveI18n(b.content, "en");
+  const contentData = normalizeEditorJsData(localizedContent);
+
+  return {
+    id: b.id,
+    category: resolveI18n(b.category?.name, "en") || "Uncategorized",
+    categoryId: b.categoryId,
+    title: resolveI18n(b.title, "en"),
+    i18nTitle: b.title,
+    description: editorJsToPlainText(contentData),
+    contentData,
+    i18nContent: b.content,
+    slug: b.slug,
+    status: b.status,
+    date: b.createdAt
+      ? new Date(b.createdAt).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
+      : "N/A",
+    author: b.user?.name || "Admin",
+    authorId: b.user?.id || null,
+    userRole: b.user?.role || null,
+    image: Array.isArray(b.image) ? b.image[0] || null : b.image || null,
+  };
+};
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 const Blog = () => {
@@ -183,6 +193,7 @@ const Blog = () => {
   const { data: categoriesData } = useGetAllBlogCategoriesQuery();
   const [createBlog] = useCreateBlogMutation();
   const [updateBlog] = useUpdateBlogMutation();
+  const [uploadBlogContentImage] = useUploadBlogContentImageMutation();
   const [deleteBlog] = useDeleteBlogMutation();
   const [approveBlog] = useApproveBlogMutation();
   const [rejectBlog] = useRejectBlogMutation();
@@ -307,7 +318,9 @@ const Blog = () => {
       title: resolveI18n(blog.i18nTitle, "en") || blog.title || "",
       slug: blog.slug || "",
       categoryId: blog.categoryId || "",
-      content: resolveI18n(blog.i18nContent, "en") || blog.description || "",
+      content: normalizeEditorJsData(
+        resolveI18n(blog.i18nContent, "en") || blog.contentData || "",
+      ),
       image: blog.image || "",
       imageFile: null,
       status: blog.status || "PUBLISHED",
@@ -401,7 +414,7 @@ const Blog = () => {
     setIsSaving(true);
 
     const preparedTitle = formData.title.trim();
-    const preparedContent = sanitizeHtml(formData.content);
+    const preparedContent = normalizeEditorJsData(formData.content);
     const preparedSlug = formData.slug
       .trim()
       .toLowerCase()
@@ -410,7 +423,7 @@ const Blog = () => {
 
     if (
       !preparedTitle ||
-      isEmptyHtml(preparedContent) ||
+      isEditorJsContentEmpty(preparedContent) ||
       !formData.categoryId
     ) {
       toast.error("Please fill in all required fields");
@@ -422,11 +435,13 @@ const Blog = () => {
 
     if (editingBlogId) {
       let hasChanges = false;
-      const origContent = sanitizeHtml(
+      const origContent = normalizeEditorJsData(
         resolveI18n(editingBlog?.i18nContent, "en") ||
-          editingBlog?.description ||
+          editingBlog?.contentData ||
           "",
       );
+      const preparedContentSerialized = JSON.stringify(preparedContent);
+      const originalContentSerialized = JSON.stringify(origContent);
       if (
         preparedTitle !==
         (resolveI18n(editingBlog?.i18nTitle, "en") || editingBlog?.title || "")
@@ -442,8 +457,11 @@ const Blog = () => {
         fd.append("categoryId", formData.categoryId);
         hasChanges = true;
       }
-      if (preparedContent !== origContent) {
-        fd.append("content", preparedContent);
+      if (preparedContentSerialized !== originalContentSerialized) {
+        fd.append(
+          "content",
+          JSON.stringify(toI18nEditorJsContent(preparedContent)),
+        );
         hasChanges = true;
       }
       if (formData.status !== editingBlog?.status) {
@@ -467,7 +485,10 @@ const Blog = () => {
       fd.append("title", preparedTitle);
       fd.append("slug", preparedSlug);
       fd.append("categoryId", formData.categoryId);
-      fd.append("content", preparedContent);
+      fd.append(
+        "content",
+        JSON.stringify(toI18nEditorJsContent(preparedContent)),
+      );
       fd.append("status", formData.status);
       if (formData.imageFile) fd.append("image", formData.imageFile);
     }
@@ -499,6 +520,18 @@ const Blog = () => {
   };
 
   const isEditMode = Boolean(editingBlogId);
+
+  const handleEditorImageUpload = useCallback(
+    async (file) => {
+      const fd = new FormData();
+      fd.append("image", file);
+      const result = await uploadBlogContentImage(fd).unwrap();
+      const url = result?.url || result?.image;
+      if (!url) throw new Error("Upload succeeded but no URL returned");
+      return url;
+    },
+    [uploadBlogContentImage],
+  );
 
   // ─── Tab switch helpers ────────────────────────────────────────────────────
   const switchMainTab = (tab) => {
@@ -804,6 +837,7 @@ const Blog = () => {
         formData={formData}
         onChangeField={handleFieldChange}
         onChangeImage={handleImageChange}
+        onUploadInlineImage={handleEditorImageUpload}
         onSave={handleSave}
         onClose={handleCloseModal}
         categories={blogCategories}

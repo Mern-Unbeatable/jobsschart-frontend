@@ -64,14 +64,14 @@ const decodeEscapedHtml = (html) => {
     .replace(/&amp;/g, "&");
 };
 
-/** Sanitize Quill/HTML content for safe storage and rendering. */
+/** Sanitize rich HTML content for safe rendering. */
 export const sanitizeHtml = (html = "") => {
   if (!html || typeof html !== "string") return "";
   ensureHooks();
   return DOMPurify.sanitize(decodeEscapedHtml(html), PURIFY_CONFIG).trim();
 };
 
-/** True when HTML has no meaningful text (e.g. empty Quill `<p><br></p>`). */
+/** True when HTML has no meaningful text. */
 export const isEmptyHtml = (html = "") => {
   if (!html || typeof html !== "string") return true;
   const text = html

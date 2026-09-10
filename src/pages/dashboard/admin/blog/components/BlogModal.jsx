@@ -10,6 +10,7 @@ const BlogModal = ({
   formData,
   onChangeField,
   onChangeImage,
+  onUploadInlineImage,
   onSave,
   onClose,
   categories = [],
@@ -100,8 +101,8 @@ const BlogModal = ({
                 )}
               </button>
               <p className="mt-1.5 text-sm text-[#8A8A8A]">
-                (Recommended): 1200 × 800 px (3:2). Please use landscape images for
-                the best display.
+                (Recommended): 1200 × 800 px (3:2). Please use landscape images
+                for the best display.
               </p>
             </div>
 
@@ -170,8 +171,8 @@ const BlogModal = ({
 
               {requireApproval ? (
                 <p className="rounded-md bg-amber-50 px-3 py-2.5 text-sm text-amber-800 ring-1 ring-amber-200">
-                  Your blog will be submitted for admin approval. It will go live
-                  only after an admin publishes it.
+                  Your blog will be submitted for admin approval. It will go
+                  live only after an admin publishes it.
                 </p>
               ) : (
                 <label className="block">
@@ -191,10 +192,13 @@ const BlogModal = ({
             </div>
 
             <div className="block">
-              <span className="mb-1 block text-base text-[#333333]">Content</span>
+              <span className="mb-1 block text-base text-[#333333]">
+                Content
+              </span>
               <RichTextEditor
                 value={formData.content}
-                onChange={(html) => onChangeField("content", html)}
+                onChange={(editorData) => onChangeField("content", editorData)}
+                onImageUpload={onUploadInlineImage}
                 placeholder="Write detailed blog content here"
               />
             </div>
@@ -222,7 +226,11 @@ const BlogModal = ({
               className="inline-flex items-center gap-2 rounded bg-green-500/60 px-5 py-2 text-base font-medium text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSaving && (
-                <Loader2 size={15} className="animate-spin" aria-hidden="true" />
+                <Loader2
+                  size={15}
+                  className="animate-spin"
+                  aria-hidden="true"
+                />
               )}
               {isSaving
                 ? "Saving…"
