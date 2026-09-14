@@ -4,11 +4,28 @@ import { Link } from "react-router-dom";
 import {
   Facebook,
   Instagram,
-  Youtube,
+  Linkedin,
   ExternalLink,
-  MapPin,
 } from "lucide-react";
 import { ROUTES } from "../config";
+
+const SOCIAL_LINKS = [
+  {
+    name: "Facebook",
+    href: "https://www.facebook.com/share/1Dbp98YGxq/",
+    Icon: Facebook,
+  },
+  {
+    name: "Instagram",
+    href: "https://www.instagram.com/illuminoracle",
+    Icon: Instagram,
+  },
+  {
+    name: "LinkedIn",
+    href: "https://www.linkedin.com/in/illorac1111",
+    Icon: Linkedin,
+  },
+];
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -29,26 +46,19 @@ const Footer = () => {
             <br />
             {t("footer.taxAndReviews")}
           </div>
-          {/* Lucide Icons used here */}
           <div className="flex gap-4 items-center">
-            <a
-              href="#"
-              className="w-9 h-9 rounded-full border border-gray-400 flex items-center justify-center hover:bg-white hover:text-[#545454] transition-all"
-            >
-              <Facebook size={18} strokeWidth={1.5} />
-            </a>
-            <a
-              href="#"
-              className="w-9 h-9 rounded-full border border-gray-400 flex items-center justify-center hover:bg-white hover:text-[#545454] transition-all"
-            >
-              <Instagram size={18} strokeWidth={1.5} />
-            </a>
-            <a
-              href="#"
-              className="w-9 h-9 rounded-full border border-gray-400 flex items-center justify-center hover:bg-white hover:text-[#545454] transition-all"
-            >
-              <Youtube size={18} strokeWidth={1.5} />
-            </a>
+            {SOCIAL_LINKS.map(({ name, href, Icon }) => (
+              <a
+                key={name}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={name}
+                className="w-9 h-9 rounded-full border border-gray-400 flex items-center justify-center hover:bg-white hover:text-[#545454] transition-all"
+              >
+                <Icon size={18} strokeWidth={1.5} />
+              </a>
+            ))}
           </div>
         </div>
 
@@ -119,7 +129,12 @@ const Footer = () => {
             <p>{t("footer.information.line2")}</p>
             <p>{t("footer.information.address1")}</p>
             <p>{t("footer.information.address2")}</p>
-            <p className="pt-2">{t("footer.information.email")}</p>
+            <a
+              href="mailto:Info@illorac.com"
+              className="inline-block pt-2 hover:text-white transition-colors"
+            >
+              {t("footer.information.email")}
+            </a>
           </div>
         </div>
         {/* Section 4: Map Section */}
