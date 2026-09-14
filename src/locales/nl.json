@@ -650,8 +650,8 @@
     }
   },
   "footer": {
-    "logoAlt": "Netwerkmediums logo",
-    "copyright": "Copyright © 2026 – netwerkmediums.nl",
+    "logoAlt": "Illorac logo",
+    "copyright": "Copyright © 2026 – Illorac.nl / Illorac.com",
     "taxAndReviews": "Alle prijzen zijn inclusief btw. Klantbeoordelingen: 9.8 / 10 – 3022 reviews",
     "customerService": {
       "title": "Klantenservice",
@@ -668,18 +668,18 @@
     },
     "information": {
       "title": "Belangrijke informatie",
-      "line1": "Netwerkmediums/",
-      "line2": "Nconsultancy",
+      "line1": "IlluminOracle /",
+      "line2": "DCAPZ",
       "address1": "Wijnstraat 75, 3311BT",
       "address2": "Dordrecht",
-      "email": "info@netwerkmediums.nl"
+      "email": "Info@illorac.com"
     },
     "map": {
       "openInMaps": "Openen in Kaarten",
-      "location": ""
+      "location": "Wijnstraat 75, 3311BT Dordrecht"
     },
     "bottomBar": {
-      "copyright": "© 2026 Netwerkmediums. Alle rechten voorbehouden.",
+      "copyright": "© 2026 Illorac. Alle rechten voorbehouden.",
       "links": {
         "terms": "Voorwaarden",
         "privacy": "Privacy",
