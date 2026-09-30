@@ -1,7 +1,7 @@
 /** Download a protected API file using Bearer token (works when window.open cannot send headers). */
 export async function downloadWithAuth(relativePath, filename) {
   const baseUrl =
-    import.meta.env.VITE_API_BASE_URL || 'https://api.illorac.nl/api/v1';
+    import.meta.env.VITE_API_BASE_URL || 'https://api.illorac.com/api/v1';
   const path = relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
   const url = `${baseUrl.replace(/\/$/, '')}${path}`;
 

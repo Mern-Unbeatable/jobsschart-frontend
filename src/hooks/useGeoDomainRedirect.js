@@ -13,9 +13,9 @@ function useGeoDomainRedirect() {
 
                 const currentHost = host.replace(/^www\./, '');
                 const configuredApiBase =
-                    import.meta.env.VITE_API_BASE_URL || 'https://api.illorac.nl';
+                    import.meta.env.VITE_API_BASE_URL || 'https://api.illorac.com';
 
-                let geoRoutingUrl = 'https://api.illorac.nl/geo-routing';
+                let geoRoutingUrl = 'https://api.illorac.com/geo-routing';
                 try {
                     geoRoutingUrl = `${new URL(configuredApiBase).origin}/geo-routing`;
                 } catch {
