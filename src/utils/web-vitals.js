@@ -66,7 +66,7 @@ const logToConsole = (metric) => {
 const handleMetric = (metric) => {
   logToConsole(metric);
 
-  if (process.env.NODE_ENV === 'production') {
+  if (import.meta.env.PROD) {
     sendToAnalytics(metric);
   }
 };

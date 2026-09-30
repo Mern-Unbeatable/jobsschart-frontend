@@ -202,7 +202,7 @@ const CallRoom = ({ callData, onClose }) => {
                 console.error('Failed to connect to call:', {
                     message: error?.message,
                     callId,
-                    api: process.env.REACT_APP_API_BASE_URL,
+                    api: import.meta.env.VITE_API_BASE_URL,
                     tokenIdentity: tokenInfo?.identity,
                     tokenRoom: tokenInfo?.room,
                     tokenIss: tokenInfo?.iss,
@@ -450,7 +450,7 @@ const CallRoom = ({ callData, onClose }) => {
                     <div className="bg-red-500/20 border border-red-500/40 text-red-200 text-sm rounded-xl px-4 py-3 mb-6 text-center max-w-sm">
                         {connectError}
                         <p className="text-xs text-red-300/80 mt-2">
-                            API: {process.env.REACT_APP_API_BASE_URL || 'not set'}
+                            API: {import.meta.env.VITE_API_BASE_URL || 'not set'}
                         </p>
                     </div>
                 )}

@@ -14,15 +14,15 @@ class SocketService {
     }
 
     _getSocketUrl() {
-        const configured = (process.env.REACT_APP_SOCKET_URL || '').trim();
+        const configured = (import.meta.env.VITE_SOCKET_URL || '').trim();
         if (configured) {
             return configured.replace(/\/$/, '');
         }
-        // Dev: same origin → webpack proxies /socket.io to backend
+        // Dev: same origin → Vite proxies /socket.io to backend
         if (typeof window !== 'undefined') {
             return window.location.origin;
         }
-        const apiBase = process.env.REACT_APP_API_BASE_URL || '';
+        const apiBase = import.meta.env.VITE_API_BASE_URL || '';
         return apiBase.replace(/\/api\/v1\/?$/, '') || 'http://localhost:5000';
     }
 

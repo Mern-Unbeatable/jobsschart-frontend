@@ -1,18 +1,13 @@
 // src/config/index.js
 
-const getEnv = (key, fallback = "") => {
-  if (typeof process !== "undefined" && process.env) {
-    return process.env[key] ?? fallback;
-  }
-  return fallback;
-};
+const getEnv = (key, fallback = "") => import.meta.env[key] ?? fallback;
 
 /* =========================
    APP CONFIG
 ========================= */
 export const APP_CONFIG = {
-  NAME: getEnv("REACT_APP_NAME", "NM"),
-  VERSION: getEnv("REACT_APP_VERSION", "1.0.0"),
+  NAME: getEnv("VITE_NAME", "NM"),
+  VERSION: getEnv("VITE_VERSION", "1.0.0"),
 };
 
 /* =========================
@@ -116,24 +111,24 @@ export const getDashboardRoute = (role) => {
 ========================= */
 
 export const API_CONFIG = {
-  BASE_URL: process.env.REACT_APP_API_BASE_URL,
-  VITALS_ENDPOINT: getEnv("REACT_APP_VITALS_ENDPOINT", ""),
-  TIMEOUT: parseInt(process.env.REACT_APP_API_TIMEOUT, 10) || 10000,
-  RETRY_ATTEMPTS: parseInt(process.env.REACT_APP_API_RETRY_ATTEMPTS, 10) || 3,
-  RETRY_DELAY: parseInt(process.env.REACT_APP_API_RETRY_DELAY, 10) || 1000,
+  BASE_URL: import.meta.env.VITE_API_BASE_URL,
+  VITALS_ENDPOINT: getEnv("VITE_VITALS_ENDPOINT", ""),
+  TIMEOUT: parseInt(import.meta.env.VITE_API_TIMEOUT, 10) || 10000,
+  RETRY_ATTEMPTS: parseInt(import.meta.env.VITE_API_RETRY_ATTEMPTS, 10) || 3,
+  RETRY_DELAY: parseInt(import.meta.env.VITE_API_RETRY_DELAY, 10) || 1000,
 };
 
 /* =========================
    SEO CONFIG
 ========================= */
 export const SEO_CONFIG = {
-  DEFAULT_TITLE: getEnv("REACT_APP_SEO_TITLE", "NM"),
+  DEFAULT_TITLE: getEnv("VITE_SEO_TITLE", "NM"),
   DEFAULT_DESCRIPTION: getEnv(
-    "REACT_APP_SEO_DESCRIPTION",
+    "VITE_SEO_DESCRIPTION",
     "A professional React application",
   ),
   DEFAULT_KEYWORDS: getEnv(
-    "REACT_APP_SEO_KEYWORDS",
+    "VITE_SEO_KEYWORDS",
     "react,webpack,tailwind",
   ).split(","),
 

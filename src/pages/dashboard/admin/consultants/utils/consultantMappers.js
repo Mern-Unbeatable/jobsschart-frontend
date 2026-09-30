@@ -1,6 +1,6 @@
 import { resolveI18n, resolveI18nArray } from '../../../../../utils/resolveI18n';
 
-const API_ORIGIN = (process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api/v1')
+const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1')
   .replace(/\/api\/v1\/?$/, '');
 
 export function resolveAssetUrl(url) {

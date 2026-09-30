@@ -140,7 +140,7 @@ const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listener.middleware),
-  devTools: process.env.NODE_ENV !== 'production',
+  devTools: !import.meta.env.PROD,
 });
 
 // Apply initial primary color on store creation
