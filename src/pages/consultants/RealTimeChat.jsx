@@ -202,7 +202,7 @@ const RealTimeChat = memo(({
         }
 
         fetch(
-            `${process.env.REACT_APP_API_BASE_URL}/chat/conversations/${activeConv.id}/messages?limit=50`,
+            `${import.meta.env.VITE_API_BASE_URL}/chat/conversations/${activeConv.id}/messages?limit=50`,
             { headers: { Authorization: `Bearer ${token}` } }
         )
             .then(async (r) => {
@@ -536,7 +536,7 @@ const RealTimeChat = memo(({
         formData.append('file', file);
         try {
             const res = await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/chat/upload`,
+                `${import.meta.env.VITE_API_BASE_URL}/chat/upload`,
                 formData,
                 { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
             );

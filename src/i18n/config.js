@@ -32,7 +32,7 @@ i18n
     lng: getInitialLanguage(), // Set initial language from localStorage
     fallbackLng: "nl", // Fallback language if translation is missing
 
-    debug: process.env.NODE_ENV === "development",
+    debug: import.meta.env.DEV,
 
     interpolation: {
       escapeValue: false, // React already escapes values
