@@ -30,7 +30,7 @@ axiosInstance.interceptors.request.use(
   (config) => {
     if (!config.baseURL) {
       throw new Error(
-        "Missing REACT_APP_API_BASE_URL. Set it in .env.development and restart dev server.",
+        "Missing VITE_API_BASE_URL. Set it in .env and restart dev server.",
       );
     }
 
@@ -80,7 +80,7 @@ axiosInstance.interceptors.response.use(
           if (!refreshToken) throw new Error("No refresh token");
 
           if (!API_CONFIG.BASE_URL) {
-            throw new Error("Missing REACT_APP_API_BASE_URL");
+            throw new Error("Missing VITE_API_BASE_URL");
           }
 
           refreshPromise = axios

@@ -16,7 +16,7 @@ root.render(
   </React.StrictMode>,
 );
 
-if (process.env.NODE_ENV !== 'production') {
+if (!import.meta.env.PROD) {
   reportWebVitals();
   detectLongTasks();
   checkPerformanceBudget();

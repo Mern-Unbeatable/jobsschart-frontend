@@ -1,17 +1,18 @@
 {
   "name": "react-webpack-tailwind-app",
   "version": "1.0.0",
-  "description": "React app with Webpack, Tailwind CSS, and React Router DOM",
+  "description": "React app with Vite, Tailwind CSS, and React Router DOM",
   "main": "index.js",
   "scripts": {
-    "start": "webpack serve --mode development --open",
-    "build": "webpack --mode production",
-    "dev": "webpack serve --mode development",
+    "start": "vite --open",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "serve": "serve -s dist -l 5173"
   },
   "keywords": [
     "react",
-    "webpack",
+    "vite",
     "tailwind",
     "react-router"
   ],
@@ -47,24 +48,11 @@
     "web-vitals": "^5.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.7",
-    "@babel/preset-env": "^7.23.7",
-    "@babel/preset-react": "^7.23.3",
-    "@tailwindcss/postcss": "^4.1.18",
-    "babel-loader": "^9.1.3",
-    "copy-webpack-plugin": "^14.0.0",
-    "css-loader": "^6.9.0",
-    "dotenv": "^17.3.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^10.2.0",
     "eslint-plugin-tailwindcss": "^3.18.3",
-    "html-webpack-plugin": "^5.6.0",
-    "postcss": "^8.5.6",
-    "postcss-loader": "^8.2.0",
-    "process": "^0.11.10",
-    "style-loader": "^3.3.4",
-    "tailwindcss": "^4.3.0",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.2"
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.1"
   }
 }

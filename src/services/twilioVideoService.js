@@ -1,5 +1,6 @@
-import { connect as connectTwilioVideo, createLocalAudioTrack, createLocalVideoTrack } from 'twilio-video';
 import { applyAudioOutputRoute, getRemoteMediaElements, releaseCallAudioRoutes } from '../utils/callAudioOutput';
+
+const loadTwilioVideo = () => import('twilio-video');
 
 class TwilioVideoService {
     constructor() {
@@ -113,6 +114,7 @@ class TwilioVideoService {
     }
 
     async _getLocalTracks(callType) {
+        const { createLocalAudioTrack, createLocalVideoTrack } = await loadTwilioVideo();
         const tracks = [];
         try {
             const audioTrack = await createLocalAudioTrack();
@@ -221,6 +223,7 @@ class TwilioVideoService {
         const localTracks = await this._getLocalTracks('VIDEO');
         this.localTracks = localTracks;
 
+        const { connect: connectTwilioVideo } = await loadTwilioVideo();
         this.room = await connectTwilioVideo(token, {
             name: roomName,
             tracks: localTracks,
@@ -271,6 +274,7 @@ class TwilioVideoService {
         const localTracks = await this._getLocalTracks('PHONE');
         this.localTracks = localTracks;
 
+        const { connect: connectTwilioVideo } = await loadTwilioVideo();
         this.room = await connectTwilioVideo(token, {
             name: roomName,
             tracks: localTracks,
