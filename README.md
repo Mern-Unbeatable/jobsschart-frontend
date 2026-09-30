@@ -332,7 +332,7 @@ REACT_APP_DEFAULT_LOCALE=en
 ### Component Structure (Standard Order)
 
 ```jsx
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo } from "react";
 // 1. Third-party imports
 // 2. Internal imports (hooks, utils, components)
 // 3. Constants
@@ -543,8 +543,8 @@ Desktop: 1024px+   (lg: / xl:)
 
 ```jsx
 // ✅ Correct usage
-toast.success('Profile updated successfully');
-toast.error('Failed to save changes. Please try again.');
+toast.success("Profile updated successfully");
+toast.error("Failed to save changes. Please try again.");
 
 // ❌ Never use for form field validation
 // ❌ Never use alert()
@@ -581,8 +581,8 @@ toast.error('Failed to save changes. Please try again.');
 
 ```jsx
 // ✅ Code splitting — all page components
-const Home = React.lazy(() => import('../pages/Home'));
-const About = React.lazy(() => import('../pages/About'));
+const Home = React.lazy(() => import("../pages/Home"));
+const About = React.lazy(() => import("../pages/About"));
 ```
 
 ---
@@ -605,12 +605,12 @@ const About = React.lazy(() => import('../pages/About'));
 ```jsx
 // ✅ Accessible button
 <button
-  type='button'
-  aria-label='Close navigation menu'
+  type="button"
+  aria-label="Close navigation menu"
   onClick={handleClose}
-  className='focus:outline-none focus:ring-2 focus:ring-primary'
+  className="focus:outline-none focus:ring-2 focus:ring-primary"
 >
-  <X size={20} aria-hidden='true' />
+  <X size={20} aria-hidden="true" />
 </button>
 ```
 
@@ -625,12 +625,12 @@ Every page must set:
 ```jsx
 // Via useSEO() hook
 useSEO({
-  title: 'Page Title | Brand Name',
-  description: 'Concise 150–160 char description with primary keyword',
-  keywords: 'keyword1, keyword2',
-  canonical: 'https://example.com/page',
-  ogImage: 'https://example.com/og-image.jpg',
-  locale: 'en_US',
+  title: "Page Title | Brand Name",
+  description: "Concise 150–160 char description with primary keyword",
+  keywords: "keyword1, keyword2",
+  canonical: "https://example.com/page",
+  ogImage: "https://example.com/og-image.jpg",
+  locale: "en_US",
 });
 ```
 
@@ -688,11 +688,11 @@ src/i18n/
 - SEO metadata must also be localized (page title, description, OG tags)
 
 ```jsx
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 function HeroSection() {
   const { t } = useTranslation();
-  return <h1 className='text-4xl font-bold'>{t('hero.title')}</h1>;
+  return <h1 className="text-4xl font-bold">{t("hero.title")}</h1>;
 }
 ```
 
@@ -849,10 +849,10 @@ npm test -- --coverage
 ```jsx
 // Route structure — extend here only
 <Route element={<Layout />}>
-  <Route path='/' element={<Home />} />
-  <Route path='/about' element={<About />} />
-  <Route path='/services' element={<Services />} />
-  <Route path='/contact' element={<Contact />} />
+  <Route path="/" element={<Home />} />
+  <Route path="/about" element={<About />} />
+  <Route path="/services" element={<Services />} />
+  <Route path="/contact" element={<Contact />} />
 </Route>
 ```
 
@@ -862,10 +862,10 @@ All route paths are defined as constants — never hardcode `/about` strings in 
 
 ```js
 export const ROUTES = {
-  HOME: '/',
-  ABOUT: '/about',
-  SERVICES: '/services',
-  CONTACT: '/contact',
+  HOME: "/",
+  ABOUT: "/about",
+  SERVICES: "/services",
+  CONTACT: "/contact",
 };
 ```
 
@@ -899,7 +899,7 @@ export const ROUTES = {
 // src/config/index.js
 export const API_BASE_URL = process.env.REACT_APP_API_URL;
 export const ANALYTICS_ID = process.env.REACT_APP_ANALYTICS_ID;
-export const DEFAULT_LOCALE = process.env.REACT_APP_DEFAULT_LOCALE || 'en';
+export const DEFAULT_LOCALE = process.env.REACT_APP_DEFAULT_LOCALE || "en";
 ```
 
 **Rules:**
@@ -980,4 +980,4 @@ Build scalable, responsive, optimized, secure, reusable, clean, production-level
 
 ---
 
-_This document is the authoritative reference for all development on this project. Keep it updated when architecture decisions change.
+\_This document is the authoritative reference for all development on this project. Keep it updated when architecture decisions change.
